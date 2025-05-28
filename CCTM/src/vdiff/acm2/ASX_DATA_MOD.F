@@ -198,9 +198,7 @@ C Land use information:
       Real, Parameter :: dwat       = 0.2178     ! [cm^2/s] at 273.15K
       Real, Parameter :: hplus_ap   = 1.0e-6     ! pH=6.0 leaf apoplast solution Ph (Massad et al 2008)      
       Real, Parameter :: hplus_def  = 1.0e-5     ! pH=5.0
-      Real, Parameter :: hplus_east = 1.0e-5     ! pH=5.0
       Real, Parameter :: hplus_h2o  = 7.94328e-9 ! 10.0**(-8.1)
-      Real, Parameter :: hplus_west = 3.16228e-6 ! 10.0**(-5.5)
       Real, Parameter :: kvis       = 0.132      ! [cm^2 / s] at 273.15K
       Real, Parameter :: pr         = 0.709      ! [dim'less]
       Real, Parameter :: rcut0      = 3000.0     ! [s/m]
@@ -253,19 +251,19 @@ C Land use information:
       DATA depname(  5), dif0(  5), ar(  5), meso(  5), lebas(  5) / 'O3              ', 0.1444,   12.0, 1.0,  21.0 /
       DATA depname(  6), dif0(  6), ar(  6), meso(  6), lebas(  6) / 'HNO3            ', 0.1067, 8000.0, 0.0,  35.0 /
       DATA depname(  7), dif0(  7), ar(  7), meso(  7), lebas(  7) / 'H2O2            ', 0.1300,34000.0, 1.0,  28.0 /   !ar=34,000 such that r_cut=0.7 s/m as in Nguyen et al. 2015
-      DATA depname(  8), dif0(  8), ar(  8), meso(  8), lebas(  8) / 'ACETALDEHYDE    ', 0.1111,   10.0, 0.0,  56.0 /
-      DATA depname(  9), dif0(  9), ar(  9), meso(  9), lebas(  9) / 'FORMALDEHYDE    ', 0.1554,   10.0, 0.0,  35.0 /
-      DATA depname( 10), dif0( 10), ar( 10), meso( 10), lebas( 10) / 'METHYLHYDROPEROX', 0.1179,   10.0, 0.3,  49.0 /   !meso change from 0.1 to 0.3, Wolfe and Thornton 2011 ACP per J. Bash
-      DATA depname( 11), dif0( 11), ar( 11), meso( 11), lebas( 11) / 'PEROXYACETIC_ACI', 0.0868,   20.0, 0.1,  70.0 /
-      DATA depname( 12), dif0( 12), ar( 12), meso( 12), lebas( 12) / 'ACETIC_ACID     ', 0.0944,   20.0, 0.0,  63.0 /
+      DATA depname(  8), dif0(  8), ar(  8), meso(  8), lebas(  8) / 'ACETALDEHYDE    ', 0.1111,   0.01, 0.0,  56.0 /
+      DATA depname(  9), dif0(  9), ar(  9), meso(  9), lebas(  9) / 'FORMALDEHYDE    ', 0.1554,   0.01, 0.0,  35.0 /
+      DATA depname( 10), dif0( 10), ar( 10), meso( 10), lebas( 10) / 'METHYLHYDROPEROX', 0.1179,   0.01, 0.3,  49.0 /   !meso change from 0.1 to 0.3, Wolfe and Thornton 2011 ACP per J. Bash
+      DATA depname( 11), dif0( 11), ar( 11), meso( 11), lebas( 11) / 'PEROXYACETIC_ACI', 0.0868,   0.01, 0.1,  70.0 /
+      DATA depname( 12), dif0( 12), ar( 12), meso( 12), lebas( 12) / 'ACETIC_ACID     ', 0.0944,   0.01, 0.0,  63.0 /
       DATA depname( 13), dif0( 13), ar( 13), meso( 13), lebas( 13) / 'NH3             ', 0.1978,   20.0, 0.0,  28.0 /
       DATA depname( 14), dif0( 14), ar( 14), meso( 14), lebas( 14) / 'PAN             ', 0.0687,   16.0, 0.1,  91.0 /
       DATA depname( 15), dif0( 15), ar( 15), meso( 15), lebas( 15) / 'HNO2            ', 0.1349,   20.0, 0.1,  28.0 /
-      DATA depname( 16), dif0( 16), ar( 16), meso( 16), lebas( 16) / 'CO              ', 0.1807,    5.0, 0.0,  14.0 /
-      DATA depname( 17), dif0( 17), ar( 17), meso( 17), lebas( 17) / 'METHANOL        ', 0.1329,    2.0, 0.0,  42.0 /
+      DATA depname( 16), dif0( 16), ar( 16), meso( 16), lebas( 16) / 'CO              ', 0.1807,   0.01, 0.0,  14.0 /
+      DATA depname( 17), dif0( 17), ar( 17), meso( 17), lebas( 17) / 'METHANOL        ', 0.1329,   0.01, 0.0,  42.0 /
       DATA depname( 18), dif0( 18), ar( 18), meso( 18), lebas( 18) / 'N2O5            ', 0.0808, 5000.0, 0.0,  49.0 /
       DATA depname( 19), dif0( 19), ar( 19), meso( 19), lebas( 19) / 'NO3             ', 0.1153, 5000.0, 0.0,  28.0 /
-      DATA depname( 20), dif0( 20), ar( 20), meso( 20), lebas( 20) / 'GENERIC_ALDEHYDE', 0.0916,   10.0, 0.0,  56.0 /
+      DATA depname( 20), dif0( 20), ar( 20), meso( 20), lebas( 20) / 'GENERIC_ALDEHYDE', 0.0916,   0.01, 0.0,  56.0 /
       DATA depname( 21), dif0( 21), ar( 21), meso( 21), lebas( 21) / 'CL2             ', 0.1080,   10.0, 0.0,  49.0 /
       DATA depname( 22), dif0( 22), ar( 22), meso( 22), lebas( 22) / 'HOCL            ', 0.1300,   10.0, 0.0,  38.5 / ! used value of HCL
       DATA depname( 23), dif0( 23), ar( 23), meso( 23), lebas( 23) / 'HCL             ', 0.1510, 8000.0, 0.0,  31.5 /
@@ -311,8 +309,8 @@ C Land use information:
       DATA depname( 63), dif0( 63), ar( 63), meso( 63), lebas( 63) / 'NITRYL_CHLORIDE ', 0.0888,    8.0, 0.0,  45.5 /  ! dif0 estimated following Erickson III et al., JGR, 104, D7, 8347-8372, 1999
       DATA depname( 64), dif0( 64), ar( 64), meso( 64), lebas( 64) / 'ISOPNN          ',0.0457,  275.9, 0.0,  206.8 /
       DATA depname( 65), dif0( 65), ar( 65), meso( 65), lebas( 65) / 'MTNO3           ',0.0453,   96.2, 0.0,  251.2 /
-      DATA depname( 66), dif0( 66), ar( 66), meso( 66), lebas( 66) / 'IEPOX           ',0.0579,    8.0, 0.0,  110.8 /
-      DATA depname( 67), dif0( 67), ar( 67), meso( 67), lebas( 67) / 'HACET           ',0.1060,    8.0, 0.0,   72.6 /  ! dif0 from Nguyen 2015 PNAS
+      DATA depname( 66), dif0( 66), ar( 66), meso( 66), lebas( 66) / 'IEPOX           ',0.0579,   0.12, 0.0,  110.8 /
+      DATA depname( 67), dif0( 67), ar( 67), meso( 67), lebas( 67) / 'HACET           ',0.1060,   0.01, 0.0,   72.6 /  ! dif0 from Nguyen 2015 PNAS
       DATA depname( 68), dif0( 68), ar( 68), meso( 68), lebas( 68) / 'SVALK1          ',0.0514, 4572.8, 0.0,  280.5 /  ! Pye et al. doi:10.5194/acp-17-343-2017; rel. reactivity per J. Bash
       DATA depname( 69), dif0( 69), ar( 69), meso( 69), lebas( 69) / 'SVALK2          ',0.0546,   12.9, 0.0,  275.6 /
       DATA depname( 70), dif0( 70), ar( 70), meso( 70), lebas( 70) / 'SVBNZ1          ',0.0642,20671.2, 0.0,  134.1 /
@@ -367,42 +365,42 @@ C Land use information:
       DATA depname(119), dif0(119), ar(119), meso(119), lebas(119) / 'ADIPIC_ACID     ',0.0493,  241.0, 0.0,   63.0 / ! VSVPO2
       DATA depname(120), dif0(120), ar(120), meso(120), lebas(120) / 'ADIPIC_ACID     ',0.0474,   31.8, 0.0,   63.0 / ! VSVPO3
       DATA depname(121), dif0(121), ar(121), meso(121), lebas(121) / 'FORMIC_ACID     ',0.1411,   20.0, 0.0,   63.0 / ! FACD
-      DATA depname(122), dif0(122), ar(122), meso(122), lebas(122) / 'MEK             ',0.0859,    1.0, 0.0,  108.2 / ! KET different in different mechanisms
-      DATA depname(123), dif0(123), ar(123), meso(123), lebas(123) / 'ETHENE          ',0.1366,    1.0, 0.0,   58.1 / ! ETH
-      DATA depname(124), dif0(124), ar(124), meso(124), lebas(124) / 'HNO4            ',0.1233,    1.0, 0.0,   45.2 / ! PNA
-      DATA depname(125), dif0(125), ar(125), meso(125), lebas(125) / 'GLYOXAL         ',0.1188,    1.0, 0.0,   56.2 / ! GLY
-      DATA depname(126), dif0(126), ar(126), meso(126), lebas(126) / 'GLYOXAL         ',0.1181,    1.0, 0.0,   56.4 / ! GLYD
-      DATA depname(127), dif0(127), ar(127), meso(127), lebas(127) / 'METHYL_GLYOXAL  ',0.1038,    1.0, 0.0,   72.5 / ! MGLY
-      DATA depname(128), dif0(128), ar(128), meso(128), lebas(128) / 'ETHANE          ',0.1312,    1.0, 0.0,   61.5 / ! ETHA
-      DATA depname(129), dif0(129), ar(129), meso(129), lebas(129) / 'ETHANOL         ',0.1213,    1.0, 0.0,   59.1 / ! ETOH
-      DATA depname(130), dif0(130), ar(130), meso(130), lebas(130) / 'ETHANE          ',0.0870,    1.0, 0.0,  111.1 / ! PAR as Pentane
-      DATA depname(131), dif0(131), ar(131), meso(131), lebas(131) / 'ACETONE         ',0.1057,    1.0, 0.0,   75.2 / ! ACET
-      DATA depname(132), dif0(132), ar(132), meso(132), lebas(132) / 'PROPANE         ',0.1095,    1.0, 0.0,   78.1 / ! PRPA
-      DATA depname(133), dif0(133), ar(133), meso(133), lebas(133) / 'ACETYLENE       ',0.1523,    1.0, 0.0,   45.8 / ! ETHY
-      DATA depname(134), dif0(134), ar(134), meso(134), lebas(134) / 'ETHENE          ',0.1135,    1.0, 0.0,   73.1 / ! OLE as Propene
-      DATA depname(135), dif0(135), ar(135), meso(135), lebas(135) / 'ETHENE          ',0.0990,    1.0, 0.0,   89.5 / ! IOLE as Isobutene
-      DATA depname(136), dif0(136), ar(136), meso(136), lebas(136) / 'MEK             ',0.0852,    1.0, 0.0,  101.2 / ! IEPOX different scavenging H in CB05 and CB06
-      DATA depname(137), dif0(137), ar(137), meso(137), lebas(137) / 'BENZENE         ',0.0942,    1.0, 0.0,   89.4 / ! BENZENE
-      DATA depname(138), dif0(138), ar(138), meso(138), lebas(138) / '2-CRESOL        ',0.0850,    1.0, 0.0,  108.1 / ! CRES
-      DATA depname(139), dif0(139), ar(139), meso(139), lebas(139) / 'TOLUENE         ',0.0860,    1.0, 0.0,  105.7 / ! TOL
-      DATA depname(140), dif0(140), ar(140), meso(140), lebas(140) / 'O-XYLENE        ',0.0796,    1.0, 0.0,  122.0 / ! XYLMN
-      DATA depname(141), dif0(141), ar(141), meso(141), lebas(141) / 'O-XYLENE        ',0.0777,    1.0, 0.0,  123.5 / ! NAPH
-      DATA depname(142), dif0(142), ar(142), meso(142), lebas(142) / 'PHENOL          ',0.0844,    1.0, 0.0,  102.6 / ! CAT1
-      DATA depname(143), dif0(143), ar(143), meso(143), lebas(143) / 'PINENE          ',0.0545,    1.0, 0.0,  251.5 / ! SESQ
-      DATA depname(144), dif0(144), ar(144), meso(144), lebas(144) / 'PINENE          ',0.0700,    1.0, 0.0,  136.2 / ! TERP
-      DATA depname(145), dif0(145), ar(145), meso(145), lebas(145) / 'ISOPRENE        ',0.0913,    1.0, 0.0,  136.2 / ! ISOP
-      DATA depname(146), dif0(146), ar(146), meso(146), lebas(146) / 'METHACROLEIN    ',0.1033,    1.0, 0.0,   69.6 / ! OPEN C4H4O2
-      DATA depname(147), dif0(147), ar(147), meso(147), lebas(147) / 'MEK             ',0.0950,    1.0, 0.0,   81.7 / ! XOPN C5H6O2
-      DATA depname(148), dif0(148), ar(148), meso(148), lebas(148) / 'DECANE          ',0.0739,    1.0, 0.0,  142.8 / ! SOAALK as Propylcyclopentane
-      DATA depname(149), dif0(149), ar(149), meso(149), lebas(149) / '13-BUTADIENE    ',0.1019,    1.0, 0.0,   84.8 / ! BUTADIENE13
-      DATA depname(150), dif0(150), ar(150), meso(150), lebas(150) / 'ACROLEIN        ',0.1092,    1.0, 0.0,   70.5 /
-      DATA depname(151), dif0(151), ar(151), meso(151), lebas(151) / 'SVMT1           ',0.0424,   20.0,      0.0, 355.2/ ! see Xu et al., 2018 ACPD: doi:10.5194/acp-2017-1109
-      DATA depname(152), dif0(152), ar(152), meso(152), lebas(152) / 'SVMT2           ',0.0556,   20.0,      0.0, 236.8/
-      DATA depname(153), dif0(153), ar(153), meso(153), lebas(153) / 'SVMT3           ',0.0583,   20.0,      0.0, 214.6/
-      DATA depname(154), dif0(154), ar(154), meso(154), lebas(154) / 'SVMT4           ',0.0587,   20.0,      0.0, 229.4/
-      DATA depname(155), dif0(155), ar(155), meso(155), lebas(155) / 'SVMT5           ',0.0619,   20.0,      0.0, 207.2/
-      DATA depname(156), dif0(156), ar(156), meso(156), lebas(156) / 'SVMT6           ',0.0624,   20.0,      0.0, 222.0/
-      DATA depname(157), dif0(157), ar(157), meso(157), lebas(157) / 'SVMT7           ',0.0661,   20.0,      0.0, 199.8/
+      DATA depname(122), dif0(122), ar(122), meso(122), lebas(122) / 'MEK             ',0.0859,   0.01, 0.0,  108.2 / ! KET different in different mechanisms
+      DATA depname(123), dif0(123), ar(123), meso(123), lebas(123) / 'ETHENE          ',0.1366,   0.01, 0.0,   58.1 / ! ETH
+      DATA depname(124), dif0(124), ar(124), meso(124), lebas(124) / 'HNO4            ',0.1233,   0.01, 0.0,   45.2 / ! PNA
+      DATA depname(125), dif0(125), ar(125), meso(125), lebas(125) / 'GLYOXAL         ',0.1188,   0.01, 0.0,   56.2 / ! GLY
+      DATA depname(126), dif0(126), ar(126), meso(126), lebas(126) / 'GLYOXAL         ',0.1181,   0.01, 0.0,   56.4 / ! GLYD
+      DATA depname(127), dif0(127), ar(127), meso(127), lebas(127) / 'METHYL_GLYOXAL  ',0.1038,   0.01, 0.0,   72.5 / ! MGLY
+      DATA depname(128), dif0(128), ar(128), meso(128), lebas(128) / 'ETHANE          ',0.1312,   0.01, 0.0,   61.5 / ! ETHA
+      DATA depname(129), dif0(129), ar(129), meso(129), lebas(129) / 'ETHANOL         ',0.1213,   0.01, 0.0,   59.1 / ! ETOH
+      DATA depname(130), dif0(130), ar(130), meso(130), lebas(130) / 'ETHANE          ',0.0870,   0.01, 0.0,  111.1 / ! PAR as Pentane
+      DATA depname(131), dif0(131), ar(131), meso(131), lebas(131) / 'ACETONE         ',0.1057,   0.01, 0.0,   75.2 / ! ACET
+      DATA depname(132), dif0(132), ar(132), meso(132), lebas(132) / 'PROPANE         ',0.1095,   0.01, 0.0,   78.1 / ! PRPA
+      DATA depname(133), dif0(133), ar(133), meso(133), lebas(133) / 'ACETYLENE       ',0.1523,   0.01, 0.0,   45.8 / ! ETHY
+      DATA depname(134), dif0(134), ar(134), meso(134), lebas(134) / 'ETHENE          ',0.1135,   0.01, 0.0,   73.1 / ! OLE as Propene
+      DATA depname(135), dif0(135), ar(135), meso(135), lebas(135) / 'ETHENE          ',0.0990,   0.01, 0.0,   89.5 / ! IOLE as Isobutene
+      DATA depname(136), dif0(136), ar(136), meso(136), lebas(136) / 'MEK             ',0.0852,   0.01, 0.0,  101.2 / ! IEPOX different scavenging H in CB05 and CB06
+      DATA depname(137), dif0(137), ar(137), meso(137), lebas(137) / 'BENZENE         ',0.0942,   0.01, 0.0,   89.4 / ! BENZENE
+      DATA depname(138), dif0(138), ar(138), meso(138), lebas(138) / '2-CRESOL        ',0.0850,   0.01, 0.0,  108.1 / ! CRES
+      DATA depname(139), dif0(139), ar(139), meso(139), lebas(139) / 'TOLUENE         ',0.0860,   0.01, 0.0,  105.7 / ! TOL
+      DATA depname(140), dif0(140), ar(140), meso(140), lebas(140) / 'O-XYLENE        ',0.0796,   0.01, 0.0,  122.0 / ! XYLMN
+      DATA depname(141), dif0(141), ar(141), meso(141), lebas(141) / 'O-XYLENE        ',0.0777,   0.01, 0.0,  123.5 / ! NAPH
+      DATA depname(142), dif0(142), ar(142), meso(142), lebas(142) / 'PHENOL          ',0.0844,   0.01, 0.0,  102.6 / ! CAT1
+      DATA depname(143), dif0(143), ar(143), meso(143), lebas(143) / 'PINENE          ',0.0545,   0.02, 0.0,  251.5 / ! SESQ
+      DATA depname(144), dif0(144), ar(144), meso(144), lebas(144) / 'PINENE          ',0.0700,   0.01, 0.0,  136.2 / ! TERP
+      DATA depname(145), dif0(145), ar(145), meso(145), lebas(145) / 'ISOPRENE        ',0.0913,   0.01, 0.0,  136.2 / ! ISOP
+      DATA depname(146), dif0(146), ar(146), meso(146), lebas(146) / 'METHACROLEIN    ',0.1033,   0.01, 0.0,   69.6 / ! OPEN C4H4O2
+      DATA depname(147), dif0(147), ar(147), meso(147), lebas(147) / 'MEK             ',0.0950,   0.01, 0.0,   81.7 / ! XOPN C5H6O2
+      DATA depname(148), dif0(148), ar(148), meso(148), lebas(148) / 'DECANE          ',0.0739,   0.01, 0.0,  142.8 / ! SOAALK as Propylcyclopentane
+      DATA depname(149), dif0(149), ar(149), meso(149), lebas(149) / '13-BUTADIENE    ',0.1019,   0.01, 0.0,   84.8 / ! BUTADIENE13
+      DATA depname(150), dif0(150), ar(150), meso(150), lebas(150) / 'ACROLEIN        ',0.1092,   0.01, 0.0,   70.5 /
+      DATA depname(151), dif0(151), ar(151), meso(151), lebas(151) / 'SVMT1           ',0.0424,145839.6,0.0, 355.2/ ! see Xu et al., 2018 ACPD: doi:10.5194/acp-2017-1109
+      DATA depname(152), dif0(152), ar(152), meso(152), lebas(152) / 'SVMT2           ',0.0556,12788.1,      0.0, 236.8/
+      DATA depname(153), dif0(153), ar(153), meso(153), lebas(153) / 'SVMT3           ',0.0583, 1512.4,      0.0, 214.6/
+      DATA depname(154), dif0(154), ar(154), meso(154), lebas(154) / 'SVMT4           ',0.0587,  189.1,      0.0, 229.4/
+      DATA depname(155), dif0(155), ar(155), meso(155), lebas(155) / 'SVMT5           ',0.0619,   22.2,      0.0, 207.2/
+      DATA depname(156), dif0(156), ar(156), meso(156), lebas(156) / 'SVMT6           ',0.0624,    2.8,      0.0, 222.0/
+      DATA depname(157), dif0(157), ar(157), meso(157), lebas(157) / 'SVMT7           ',0.0661,   0.01,      0.0, 199.8/
       DATA depname(158), dif0(158), ar(158), meso(158), lebas(158) / 'SVAVB1          ',0.0560,100388.0,     0.0, 163.1/
       DATA depname(159), dif0(159), ar(159), meso(159), lebas(159) / 'SVAVB2          ',0.0600,  1461.2,     0.0, 163.2/
       DATA depname(160), dif0(160), ar(160), meso(160), lebas(160) / 'SVAVB3          ',0.0620,   175.2,     0.0, 163.0/
@@ -423,65 +421,65 @@ C Land use information:
       DATA depname(175), dif0(175), ar(175), meso(175), lebas(175) / 'MBC2            ',0.0739,    2.0,      0.0,  94.5/
       DATA depname(176), dif0(176), ar(176), meso(176), lebas(176) / 'MBC             ',0.0834,    2.0,      0.0,  77.0/
       DATA depname(177), dif0(177), ar(177), meso(177), lebas(177) / 'CLO             ',0.1288,    8.0,      0.0,  31.5/
-      DATA depname(178), dif0(178), ar(178), meso(178), lebas(178) / 'ACETALDEHYDE    ',0.0975,    1.0,      0.0,  58.9/    
-      DATA depname(179), dif0(179), ar(179), meso(179), lebas(179) / 'ACETYLENE       ',0.1212,    1.0,      0.0,  45.8/    
-      DATA depname(180), dif0(180), ar(180), meso(180), lebas(180) / 'ACROOPERA       ',0.0869,    1.0,      0.0,  70.5/    
-      DATA depname(181), dif0(181), ar(181), meso(181), lebas(181) / 'ACETONE         ',0.0842,    1.0,      0.0,  75.2/    
-      DATA depname(182), dif0(182), ar(182), meso(182), lebas(182) / 'APIOPERA        ',0.0560,    1.0,      0.0, 154.9/    
-      DATA depname(183), dif0(183), ar(183), meso(183), lebas(183) / 'BENZALDEHYDE    ',0.0688,    1.0,      0.0, 101.1/    
-      DATA depname(184), dif0(184), ar(184), meso(184), lebas(184) / 'BDE13OPERA      ',0.0812,    1.0,      0.0,  84.8/    
-      DATA depname(185), dif0(185), ar(185), meso(185), lebas(185) / 'BENOPERA        ',0.0751,    1.0,      0.0,  89.4/    
-      DATA depname(186), dif0(186), ar(186), meso(186), lebas(186) / 'CSLOPERA        ',0.0590,    1.0,      0.0, 137.1/    
-      DATA depname(187), dif0(187), ar(187), meso(187), lebas(187) / 'METHACROLEIN    ',0.0696,    1.0,      0.0, 100.6/    
-      DATA depname(188), dif0(188), ar(188), meso(188), lebas(188) / 'METHACROLEIN    ',0.0647,    1.0,      0.0, 115.4/    
-      DATA depname(189), dif0(189), ar(189), meso(189), lebas(189) / 'METHACROLEIN    ',0.0768,    1.0,      0.0,  82.8/    
-      DATA depname(190), dif0(190), ar(190), meso(190), lebas(190) / 'ETHANOL         ',0.0965,    1.0,      0.0,  59.1/    
-      DATA depname(191), dif0(191), ar(191), meso(191), lebas(191) / 'ETHENE          ',0.1085,    1.0,      0.0,  58.1/    
-      DATA depname(192), dif0(192), ar(192), meso(192), lebas(192) / 'ETHYLENEGLYCOL  ',0.0931,    1.0,      0.0,  56.6/
-      DATA depname(193), dif0(193), ar(193), meso(193), lebas(193) / 'FURANOPERA      ',0.0751,    1.0,      0.0,  83.9/    
-      DATA depname(194), dif0(194), ar(194), meso(194), lebas(194) / 'FURANONEOPERA   ',0.0820,    1.0,      0.0,  66.5/    
-      DATA depname(195), dif0(195), ar(195), meso(195), lebas(195) / 'HC10OPERA       ',0.0505,    1.0,      0.0, 194.0/    
-      DATA depname(196), dif0(196), ar(196), meso(196), lebas(196) / 'HC3OPERA        ',0.0872,    1.0,      0.0,  78.1/    
-      DATA depname(197), dif0(197), ar(197), meso(197), lebas(197) / 'HC5OPERA        ',0.0694,    1.0,      0.0, 111.0/    
-      DATA depname(198), dif0(198), ar(198), meso(198), lebas(198) / 'HYDROXY-ACETONE ',0.0823,    1.0,      0.0,  72.7/
-      DATA depname(199), dif0(199), ar(199), meso(199), lebas(199) / 'METHACROLEIN    ',0.0663,    1.0,      0.3, 107.6/    
-      DATA depname(200), dif0(200), ar(200), meso(200), lebas(200) / 'ISOOPERA        ',0.0728,    1.0,      0.0, 101.0/    
-      DATA depname(201), dif0(201), ar(201), meso(201), lebas(201) / '2NITRO_1BUTNL   ',0.0609,    1.0,      0.1, 125.4/    
-      DATA depname(202), dif0(202), ar(202), meso(202), lebas(202) / 'LIMOPERA        ',0.0547,    1.0,      0.0, 163.0/    
-      DATA depname(203), dif0(203), ar(203), meso(203), lebas(203) / 'UALDOPERA       ',0.0511,    1.0,      0.0, 183.3/    
-      DATA depname(204), dif0(204), ar(204), meso(204), lebas(204) / 'METHACROLEIN    ',0.0772,    1.0,      0.0,  86.8/    
-      DATA depname(205), dif0(205), ar(205), meso(205), lebas(205) / 'METHACROLEIN    ',0.0745,    1.0,      0.3,  84.1/    
+      DATA depname(178), dif0(178), ar(178), meso(178), lebas(178) / 'ACETALDEHYDE    ',0.0975,   0.01,      0.0,  58.9/    
+      DATA depname(179), dif0(179), ar(179), meso(179), lebas(179) / 'ACETYLENE       ',0.1212,   0.01,      0.0,  45.8/    
+      DATA depname(180), dif0(180), ar(180), meso(180), lebas(180) / 'ACROOPERA       ',0.0869,   0.01,      0.0,  70.5/    
+      DATA depname(181), dif0(181), ar(181), meso(181), lebas(181) / 'ACETONE         ',0.0842,   0.01,      0.0,  75.2/    
+      DATA depname(182), dif0(182), ar(182), meso(182), lebas(182) / 'APIOPERA        ',0.0560,   0.01,      0.0, 154.9/    
+      DATA depname(183), dif0(183), ar(183), meso(183), lebas(183) / 'BENZALDEHYDE    ',0.0688,   0.01,      0.0, 101.1/    
+      DATA depname(184), dif0(184), ar(184), meso(184), lebas(184) / 'BDE13OPERA      ',0.0812,   0.01,      0.0,  84.8/    
+      DATA depname(185), dif0(185), ar(185), meso(185), lebas(185) / 'BENOPERA        ',0.0751,   0.01,      0.0,  89.4/    
+      DATA depname(186), dif0(186), ar(186), meso(186), lebas(186) / 'CSLOPERA        ',0.0590,   0.01,      0.0, 137.1/    
+      DATA depname(187), dif0(187), ar(187), meso(187), lebas(187) / 'METHACROLEIN    ',0.0696,   0.01,      0.0, 100.6/    
+      DATA depname(188), dif0(188), ar(188), meso(188), lebas(188) / 'METHACROLEIN    ',0.0647,   0.01,      0.0, 115.4/    
+      DATA depname(189), dif0(189), ar(189), meso(189), lebas(189) / 'METHACROLEIN    ',0.0768,   0.01,      0.0,  82.8/    
+      DATA depname(190), dif0(190), ar(190), meso(190), lebas(190) / 'ETHANOL         ',0.0965,   0.01,      0.0,  59.1/    
+      DATA depname(191), dif0(191), ar(191), meso(191), lebas(191) / 'ETHENE          ',0.1085,   0.01,      0.0,  58.1/    
+      DATA depname(192), dif0(192), ar(192), meso(192), lebas(192) / 'ETHYLENEGLYCOL  ',0.0931,   0.01,      0.0,  56.6/
+      DATA depname(193), dif0(193), ar(193), meso(193), lebas(193) / 'FURANOPERA      ',0.0751,   0.01,      0.0,  83.9/    
+      DATA depname(194), dif0(194), ar(194), meso(194), lebas(194) / 'FURANONEOPERA   ',0.0820,   0.03,      0.0,  66.5/    
+      DATA depname(195), dif0(195), ar(195), meso(195), lebas(195) / 'HC10OPERA       ',0.0505,   0.01,      0.0, 194.0/    
+      DATA depname(196), dif0(196), ar(196), meso(196), lebas(196) / 'HC3OPERA        ',0.0872,   0.01,      0.0,  78.1/    
+      DATA depname(197), dif0(197), ar(197), meso(197), lebas(197) / 'HC5OPERA        ',0.0694,   0.01,      0.0, 111.0/    
+      DATA depname(198), dif0(198), ar(198), meso(198), lebas(198) / 'HYDROXY-ACETONE ',0.0823,   0.01,      0.0,  72.7/
+      DATA depname(199), dif0(199), ar(199), meso(199), lebas(199) / 'METHACROLEIN    ',0.0663,   0.01,      0.3, 107.6/    
+      DATA depname(200), dif0(200), ar(200), meso(200), lebas(200) / 'ISOOPERA        ',0.0728,   0.01,      0.0, 101.0/    
+      DATA depname(201), dif0(201), ar(201), meso(201), lebas(201) / '2NITRO_1BUTNL   ',0.0609,   0.01,      0.1, 125.4/    
+      DATA depname(202), dif0(202), ar(202), meso(202), lebas(202) / 'LIMOPERA        ',0.0547,   0.01,      0.0, 163.0/    
+      DATA depname(203), dif0(203), ar(203), meso(203), lebas(203) / 'UALDOPERA       ',0.0511,   0.01,      0.0, 183.3/    
+      DATA depname(204), dif0(204), ar(204), meso(204), lebas(204) / 'METHACROLEIN    ',0.0772,   0.01,      0.0,  86.8/    
+      DATA depname(205), dif0(205), ar(205), meso(205), lebas(205) / 'METHACROLEIN    ',0.0745,   0.01,      0.3,  84.1/    
       DATA depname(206), dif0(206), ar(206), meso(206), lebas(206) / 'MCTOPERA        ',0.0672,    1.7,      0.0, 103.0/    
-      DATA depname(207), dif0(207), ar(207), meso(207), lebas(207) / 'MEK             ',0.0752,    1.0,      0.0,  91.7/    
-      DATA depname(208), dif0(208), ar(208), meso(208), lebas(208) / 'METHANOL        ',0.1182,    1.0,      0.0,  42.5/    
-      DATA depname(209), dif0(209), ar(209), meso(209), lebas(209) / 'MVK             ',0.0772,    1.0,      0.0,  86.8/    
-      DATA depname(210), dif0(210), ar(210), meso(210), lebas(210) / '2NITRO_1BUTNL   ',0.0766,    1.0,      0.1,  78.0/    
-      DATA depname(211), dif0(211), ar(211), meso(211), lebas(211) / 'OLIOPERA        ',0.0717,    1.0,      0.0, 104.0/    
-      DATA depname(212), dif0(212), ar(212), meso(212), lebas(212) / 'OLTOPERA        ',0.0904,    1.0,      0.0,  73.1/    
-      DATA depname(213), dif0(213), ar(213), meso(213), lebas(213) / 'MPAN            ',0.0647,    1.0,      0.1, 114.0/    
-      DATA depname(214), dif0(214), ar(214), meso(214), lebas(214) / 'METHYLHYDROPEROX',0.1030,    1.0,      0.3,  48.9/    
-      DATA depname(215), dif0(215), ar(215), meso(215), lebas(215) / 'METHYLHYDROPEROX',0.0881,    1.0,      0.3,  65.4/    
-      DATA depname(216), dif0(216), ar(216), meso(216), lebas(216) / 'METHYLHYDROPEROX',0.0535,    1.0,      0.3, 162.4/    
-      DATA depname(217), dif0(217), ar(217), meso(217), lebas(217) / 'ORA1OPERA       ',0.1119,    1.0,      0.0,  39.9/    
-      DATA depname(218), dif0(218), ar(218), meso(218), lebas(218) / 'ORA2OPERA       ',0.0939,    1.0,      0.0,  56.2/    
+      DATA depname(207), dif0(207), ar(207), meso(207), lebas(207) / 'MEK             ',0.0752,   0.01,      0.0,  91.7/    
+      DATA depname(208), dif0(208), ar(208), meso(208), lebas(208) / 'METHANOL        ',0.1182,   0.01,      0.0,  42.5/    
+      DATA depname(209), dif0(209), ar(209), meso(209), lebas(209) / 'MVK             ',0.0772,   0.01,      0.0,  86.8/    
+      DATA depname(210), dif0(210), ar(210), meso(210), lebas(210) / '2NITRO_1BUTNL   ',0.0766,   0.01,      0.1,  78.0/    
+      DATA depname(211), dif0(211), ar(211), meso(211), lebas(211) / 'OLIOPERA        ',0.0717,   0.01,      0.0, 104.0/    
+      DATA depname(212), dif0(212), ar(212), meso(212), lebas(212) / 'OLTOPERA        ',0.0904,   0.01,      0.0,  73.1/    
+      DATA depname(213), dif0(213), ar(213), meso(213), lebas(213) / 'MPAN            ',0.0647,   0.01,      0.1, 114.0/    
+      DATA depname(214), dif0(214), ar(214), meso(214), lebas(214) / 'METHYLHYDROPEROX',0.1030,   0.01,      0.3,  48.9/    
+      DATA depname(215), dif0(215), ar(215), meso(215), lebas(215) / 'METHYLHYDROPEROX',0.0881,   0.01,      0.3,  65.4/    
+      DATA depname(216), dif0(216), ar(216), meso(216), lebas(216) / 'METHYLHYDROPEROX',0.0535,   0.01,      0.3, 162.4/    
+      DATA depname(217), dif0(217), ar(217), meso(217), lebas(217) / 'ORA1OPERA       ',0.1119,   0.01,      0.0,  39.9/    
+      DATA depname(218), dif0(218), ar(218), meso(218), lebas(218) / 'ORA2OPERA       ',0.0939,   0.01,      0.0,  56.2/    
       DATA depname(219), dif0(219), ar(219), meso(219), lebas(219) / 'PHENOPERA       ',0.0731,    3.4,      0.0,  86.3/    
-      DATA depname(220), dif0(220), ar(220), meso(220), lebas(220) / 'GENERIC_ALDEHYDE',0.0521,    1.0,      0.0, 175.5/
-      DATA depname(221), dif0(221), ar(221), meso(221), lebas(221) / 'PROGOPERA       ',0.0816,    1.0,      0.0,  73.4/    
-      DATA depname(222), dif0(222), ar(222), meso(222), lebas(222) / 'ROCIOXYOPERA    ',0.0354,    1.0,      0.0, 384.0/    
-      DATA depname(223), dif0(223), ar(223), meso(223), lebas(223) / 'ADIPIC_ACID     ',0.0382,    1.0,      0.0, 326.0/    
-      DATA depname(224), dif0(224), ar(224), meso(224), lebas(224) / 'ADIPIC_ACID     ',0.0528,    1.0,      0.0, 172.0/    
-      DATA depname(225), dif0(225), ar(225), meso(225), lebas(225) / 'ADIPIC_ACID     ',0.0431,    1.0,      0.0, 260.0/    
-      DATA depname(226), dif0(226), ar(226), meso(226), lebas(226) / 'ADIPIC_ACID     ',0.0465,    1.0,      0.0, 221.0/    
-      DATA depname(227), dif0(227), ar(227), meso(227), lebas(227) / 'ADIPIC_ACID     ',0.0483,    1.0,      0.0, 207.0/    
-      DATA depname(228), dif0(228), ar(228), meso(228), lebas(228) / 'ADIPIC_ACID     ',0.0447,    1.0,      0.0, 243.0/    
-      DATA depname(229), dif0(229), ar(229), meso(229), lebas(229) / 'ADIPIC_ACID     ',0.0484,    1.0,      0.0, 205.0/    
-      DATA depname(230), dif0(230), ar(230), meso(230), lebas(230) / 'ADIPIC_ACID     ',0.0530,    1.0,      0.0, 174.0/    
-      DATA depname(231), dif0(231), ar(231), meso(231), lebas(231) / 'N-PROPANOL      ',0.0836,    1.0,      0.0,  75.6/    
-      DATA depname(232), dif0(232), ar(232), meso(232), lebas(232) / 'SLOWROCOPERA    ',0.1041,    1.0,      0.1,  38.9/    
+      DATA depname(220), dif0(220), ar(220), meso(220), lebas(220) / 'GENERIC_ALDEHYDE',0.0521,   0.01,      0.0, 175.5/
+      DATA depname(221), dif0(221), ar(221), meso(221), lebas(221) / 'PROGOPERA       ',0.0816,   0.01,      0.0,  73.4/    
+      DATA depname(222), dif0(222), ar(222), meso(222), lebas(222) / 'ROCIOXYOPERA    ',0.0354,   0.01,      0.0, 384.0/    
+      DATA depname(223), dif0(223), ar(223), meso(223), lebas(223) / 'ADIPIC_ACID     ',0.0382,   0.01,      0.0, 326.0/    
+      DATA depname(224), dif0(224), ar(224), meso(224), lebas(224) / 'ADIPIC_ACID     ',0.0528,   0.01,      0.0, 172.0/    
+      DATA depname(225), dif0(225), ar(225), meso(225), lebas(225) / 'ADIPIC_ACID     ',0.0431,   0.01,      0.0, 260.0/    
+      DATA depname(226), dif0(226), ar(226), meso(226), lebas(226) / 'ADIPIC_ACID     ',0.0465,   0.01,      0.0, 221.0/    
+      DATA depname(227), dif0(227), ar(227), meso(227), lebas(227) / 'ADIPIC_ACID     ',0.0483,   0.01,      0.0, 207.0/    
+      DATA depname(228), dif0(228), ar(228), meso(228), lebas(228) / 'ADIPIC_ACID     ',0.0447,   0.01,      0.0, 243.0/    
+      DATA depname(229), dif0(229), ar(229), meso(229), lebas(229) / 'ADIPIC_ACID     ',0.0484,   0.01,      0.0, 205.0/    
+      DATA depname(230), dif0(230), ar(230), meso(230), lebas(230) / 'ADIPIC_ACID     ',0.0530,   0.01,      0.0, 174.0/    
+      DATA depname(231), dif0(231), ar(231), meso(231), lebas(231) / 'N-PROPANOL      ',0.0836,   0.01,      0.0,  75.6/    
+      DATA depname(232), dif0(232), ar(232), meso(232), lebas(232) / 'SLOWROCOPERA    ',0.1041,   0.01,      0.1,  38.9/    
       DATA depname(233), dif0(233), ar(233), meso(233), lebas(233) / '2NITRO_1BUTNL   ',0.0597,   18.6,      0.1, 123.5/    
-      DATA depname(234), dif0(234), ar(234), meso(234), lebas(234) / 'UALDOPERA       ',0.0704,    1.0,      0.0, 102.0/    
-      DATA depname(235), dif0(235), ar(235), meso(235), lebas(235) / 'XYEOPERA        ',0.0636,    1.0,      0.0, 122.0/    
-      DATA depname(236), dif0(236), ar(236), meso(236), lebas(236) / 'XYMOPERA        ',0.0636,    1.0,      0.0, 122.0/    
+      DATA depname(234), dif0(234), ar(234), meso(234), lebas(234) / 'UALDOPERA       ',0.0704,   0.01,      0.0, 102.0/    
+      DATA depname(235), dif0(235), ar(235), meso(235), lebas(235) / 'XYEOPERA        ',0.0636,   0.01,      0.0, 122.0/    
+      DATA depname(236), dif0(236), ar(236), meso(236), lebas(236) / 'XYMOPERA        ',0.0636,   0.01,      0.0, 122.0/    
       DATA depname(237), dif0(237), ar(237), meso(237), lebas(237) / 'ELHOLM          ',0.0464,49000.0,      0.3, 237.0/    
       DATA depname(238), dif0(238), ar(238), meso(238), lebas(238) / 'HOLM            ',0.0534,  711.0,      0.3, 157.7/    
       DATA depname(239), dif0(239), ar(239), meso(239), lebas(239) / 'METHYLHYDROPEROX',0.0551,  783.0,      0.3, 153.1/    
@@ -501,15 +499,15 @@ C Land use information:
       DATA depname(253), dif0(253), ar(253), meso(253), lebas(253) / 'ADIPIC_ACID     ',0.0483, 2820.0,      0.0, 202.0/    
       DATA depname(254), dif0(254), ar(254), meso(254), lebas(254) / 'ADIPIC_ACID     ',0.0332,    1.1,      0.0, 425.0/    
       DATA depname(255), dif0(255), ar(255), meso(255), lebas(255) / 'ADIPIC_ACID     ',0.0464,    9.6,      0.0, 221.0/    
-      DATA depname(256), dif0(256), ar(256), meso(256), lebas(256) / 'ADIPIC_ACID     ',0.0355,    1.0,      0.0, 375.0/    
-      DATA depname(257), dif0(257), ar(257), meso(257), lebas(257) / 'ADIPIC_ACID     ',0.0489,    1.0,      0.0, 198.7/
+      DATA depname(256), dif0(256), ar(256), meso(256), lebas(256) / 'ADIPIC_ACID     ',0.0355,   0.01,      0.0, 375.0/    
+      DATA depname(257), dif0(257), ar(257), meso(257), lebas(257) / 'ADIPIC_ACID     ',0.0489,   0.01,      0.0, 198.7/
       DATA depname(258), dif0(258), ar(258), meso(258), lebas(258) / 'IPNOPERA        ',0.0652,   86.6,      0.3, 104.8/ ! VD_IPN   
-      DATA depname(259), dif0(259), ar(259), meso(259), lebas(259) / 'IPCOPERA        ',0.0687,    1.0,      0.3,  99.3/ ! VD_IPC       
-      DATA depname(260), dif0(260), ar(260), meso(260), lebas(260) / 'EBZOPERA        ',0.0636,    1.0,      0.0, 122.0/
-      DATA depname(261), dif0(261), ar(261), meso(261), lebas(261) / 'XYLOPERA        ',0.0636,    1.0,      0.0, 122.0/
-      DATA depname(262), dif0(262), ar(262), meso(262), lebas(262) / 'STYOPERA        ',0.0700,    1.0,      0.0, 115.4/
-      DATA depname(263), dif0(263), ar(263), meso(263), lebas(263) / 'IPXOPERA        ',0.0716,    1.0,      0.3,  99.3/
-      DATA depname(264), dif0(264), ar(264), meso(264), lebas(264) / 'INALDOPERA      ',0.0671,    1.0,      0.1,  78.0/
+      DATA depname(259), dif0(259), ar(259), meso(259), lebas(259) / 'IPCOPERA        ',0.0687,   0.01,      0.3,  99.3/ ! VD_IPC       
+      DATA depname(260), dif0(260), ar(260), meso(260), lebas(260) / 'EBZOPERA        ',0.0636,   0.01,      0.0, 122.0/
+      DATA depname(261), dif0(261), ar(261), meso(261), lebas(261) / 'XYLOPERA        ',0.0636,   0.01,      0.0, 122.0/
+      DATA depname(262), dif0(262), ar(262), meso(262), lebas(262) / 'STYOPERA        ',0.0700,   0.01,      0.0, 115.4/
+      DATA depname(263), dif0(263), ar(263), meso(263), lebas(263) / 'IPXOPERA        ',0.0716,   0.01,      0.3,  99.3/
+      DATA depname(264), dif0(264), ar(264), meso(264), lebas(264) / 'INALDOPERA      ',0.0671,   0.01,      0.1,  78.0/
       DATA depname(265), dif0(265), ar(265), meso(265), lebas(265) / '2NITRO_1BUTNL   ',0.0517,216903.,      0.1, 152.2/ ! HONIT
       DATA depname(266), dif0(266), ar(266), meso(266), lebas(266) / 'HCOCL           ',0.1094,   10.0,      0.0,  45.5/ ! Use FMCL data
       DATA depname(267), dif0(267), ar(267), meso(267), lebas(267) / 'CH2BR2          ',0.0804,    2.0,      0.0,  84.0/ ! Use MB2 data

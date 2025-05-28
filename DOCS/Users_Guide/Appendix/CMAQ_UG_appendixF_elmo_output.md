@@ -30,7 +30,7 @@ This resolves a potential vulnerability where, for example, the OM:OC of organic
 
 - Keywords are available to select groups of variables of interest. 
 
-- Variables may be added to the ELMO_LIST table in ELMO_DATA.F and then prescribed in ELMO_PROC.F with greater ease.
+- Variables may be added to the ELMO_LIST table in [ELMO_DATA.F][link_elmo_data] and then prescribed in [ELMO_PROC.F][link_elmo_proc] with greater ease.
  
 ELMO has no significant quantitative impact on results, but there will be a noticeable advantageous impact on the time invested in post-processing aggregate PM components and storage volumes required for standard runs. 
 There can be some slight numerical differences when one compares quantities averaged directly online with ELMO vs. calculated offline using averages. 
@@ -48,7 +48,7 @@ The ELMO_INIT namelist section prescribes how the ELMO output file parameters wi
 /
 ```
 The variable N_Files must equal exactly the number of ELMO files you wish. N_Max_Output Variables provides a limit on the total number of variables on any one file. 
-N_Keywords must match exactly the number of Keyword variables below. Finally, N_Max_Keywords_Variables should be greater than the ;argest number of components for any one keyword below.
+N_Keywords must match exactly the number of Keyword variables below. Finally, N_Max_Keywords_Variables should be greater than the largest number of components for any one keyword below.
 
 ```
 &ELMO_Files
@@ -82,7 +82,7 @@ There are thousands of variables that can be requested in the File_Vars field.
 ### F.2 Output Variable Types
 
 #### F.2.1 CMAQ Species
-ELMO has full capability of outputting all 'raw' CMAQ species for concentration, dry deposition, and wet deposition. If the name of any CMAQ species is provided, it's concentration 
+ELMO has full capability of outputting all 'raw' CMAQ species for concentration, dry deposition, and wet deposition. If the name of any CMAQ species is provided, its concentration 
 will be output in ppm for gases and ug m-3 for aerosols. If DD_ is prepended, then dry deposition in kg ha-1 is output. If WD_ is prepended, wet deposition in kg ha-1 is output.  
 
 Additionally, ELMOv2 allows several shortcut wildcards that will activate all CMAQ species so that Users do not have to list them all (Table F-1). 
@@ -121,7 +121,7 @@ Here is an example for NOx:
                 'NO + NO2',
 ```
 Each definition includes 5 comma-separated fields. The first field is the short-name name of the composite; we recommend keeping these to 10 characters or less. The second field is 
-a long description of the composite, and the third field specify the units. Some unit conversions are supported (e.g. ppmV to ug m-3) and are discussed below, but it is recommended that complex unit 
+a long description of the composite, and the third field specifies the units. Some unit conversions are supported (e.g. ppmV to ug m-3) and are discussed below, but it is recommended that complex unit 
 conversions be done by the user offline. The fourth field provides information about the particle sizes corresponding to the composite. If no particle species are included in the 
 composite, then the 4th field may read 'GAS'. The 5th field specifies the calculation of the composite, which can include CMAQ species concentrations or deposition, as well as any
 ELMO composites that have already been defined.  
@@ -152,7 +152,7 @@ internally to the sum of the Aitken and Accumulation modes. The name PMF_SO4 den
 | **GAS**        | No particle number, mass, or surface area concentrations used in COMPOSITE definition |
 
 Although these labels indicate mass or number (e.g. PM25 vs. INUM20), they merely define a size range and so could be used for number, mass, or surface area concentration species 
-interchangeably. Users may modify the size limits of these options or create new options by editing the 'ELMO_INLET' structure in ELMO_DATA.F.
+interchangeably. Users may modify the size limits of these options or create new options by editing the 'ELMO_INLET' structure in [ELMO_DATA.F][link_elmo_data].
 
 Once NOx and PMF_SO4 are defined as in the examples above, they may be used in the File_Vars variable in CMAQ_Control.nml as if they were a CMAQ species.
 
@@ -161,7 +161,7 @@ For convenience, ELMO automatically assumes that the variables ASO4, ANO3, ANH4,
 These species names may be used in File_Vars to request the total concentration across all modes, or they may be combined with DD_ or WD_ to request the deposition across all modes 
 (e.g. WD_ANH4 = WD_NH4I + WD_NH4J + WD_NH4K). 
 
-It is also possible to use a * to reuqest ELMO to expand an aerosol chemical species to all modes. For example, adding the variable 
+It is also possible to use a * to request ELMO to expand an aerosol chemical species to all modes. For example, adding the variable 
 '*ASO4', will instruct ELMO to add ASO4I, ASO4J, and ASO4K to the output file.  
 
 ##### Unit Conversions
@@ -196,7 +196,7 @@ Some output variables are either more complicated to calculate than linear combi
 mechanisms that it makes sense to automate their calculation. ELMO derived variables achieve this purpose. The most commonly used derived variables are total particle mass metrics 
 (e.g. PM01, PM1, PM25, PM25TO10, and PM10). Because derived variables are defined in CMAQ source code, they may be requested directly in File_Vars without the user needing to specify 
 their contents. This provides convenience and ensures that as chemical mechanisms change, the definitions of these variables remains consistent. Table F-3 defines more derived variables. 
-The variable attributes are defined in ELMO_DATA.F.  
+The variable attributes are defined in [ELMO_DATA.F][link_elmo_data].  
 
 **Table F-3. Definition of ELMOv2 derived variables**
 
@@ -238,7 +238,7 @@ The variable attributes are defined in ELMO_DATA.F.
 | **WD_PMF_SOC** | Wet Deposition of Fine-mode secondary organic carbon mass |
 
 #### F.2.4 Aerosol Property Variables
-ELMOv1 was able to output important aerosol properties. ELMOv2 maintains this capability. These variables are defined in ELMO_DATA.F as well. Table F-4 lists the variables that are 
+ELMOv1 was able to output important aerosol properties. ELMOv2 maintains this capability. These variables are defined in [ELMO_DATA.F][link_elmo_data] as well. Table F-4 lists the variables that are 
 supported. Those with a (m) are expanded to each particle mode if no mode is specified. For example, for STDEV (modal standard deviation), File_Vars could contain STDEV_ACC to output 
 just the standard deviation of the Accumulation mode, or STDEV to output the standard deviation of all three particulate modes. 
 
@@ -280,7 +280,7 @@ just the standard deviation of the Accumulation mode, or STDEV to output the sta
 
 #### F.2.5 Meteorological Variables
 ELMOv2 can output many useful meteorological variables on the same files and using the same time averaging as the pollutant fields. These variables are calculated by the weather 
-forecasting model and used to drive CMAQ simulations, or they are derived from input environmental conditions. Examples are in Table F-5. Their attributes may be viewed in ELMO_DATA.F.  
+forecasting model and used to drive CMAQ simulations, or they are derived from input environmental conditions. Examples are in Table F-5. Their attributes may be viewed in [ELMO_DATA.F][link_elmo_data].  
 
 **Table F-5. Definition of ELMOv2 meteorological variables**
 
@@ -316,7 +316,7 @@ forecasting model and used to drive CMAQ simulations, or they are derived from i
 
 #### F.2.6 Chemistry Variables
 ELMOv2 can also output useful variables for diagnosing chemical reaction rates. The list of supported variables are mostly relevant for heterogeneous chemistry. We recommend relying 
-on process anlysis (IRR) for comprehenisve diagnostics of the gas-phase chemical system. Examples of ELMOv2 chemical variables are in Table F-6. Their attributes may be viewed in ELMO_DATA.F.   
+on process anlysis (IRR) for comprehenisve diagnostics of the gas-phase chemical system. Examples of ELMOv2 chemical variables are in Table F-6. Their attributes may be viewed in [ELMO_DATA.F][link_elmo_data].   
 
 **Table F-6. Definition of ELMOv2 chemical variables**
 
@@ -334,7 +334,7 @@ on process anlysis (IRR) for comprehenisve diagnostics of the gas-phase chemical
 | **EF_HNO3**        |  Enhancement factor for HNO3 photolysis |
  
 #### F.2.7 Optical Variables
-Variables that are useful for comparing to satelites or other remote sensing techniques are available as well. Their attributes may be viewed in ELMO_DATA.F
+Variables that are useful for comparing to satelites or other remote sensing techniques are available as well. Their attributes may be viewed in [ELMO_DATA.F][link_elmo_data]
 
 **Table F-7. Definition of ELMOv2 optical variables**
 
@@ -399,7 +399,7 @@ other ELMO variables and CMAQ species. They are defined below the ELMO File spec
   Keywd_name(1) = 'SIMPLE'
   Keywd(1,:) = 'PM25','PM10','O3','SO2','CO','NOX','NH3','ISOPRENE','FORMALD'
 ```
-Now the Keyword 'SIMPLE' may be used in File_Vard and ELMO will substitute in all 9 variables in its contents list.
+Now the Keyword 'SIMPLE' may be used in File_Vars and ELMO will substitute in all 9 variables in its contents list.
 ```
   Flabel(1)= 'SMALL_OUT'
   Tmode(1) = 'aggregate'
@@ -543,11 +543,11 @@ CMAQv5.5 User's Guide<br>
 
 <!-- START_OF_COMMENT --> 
 
-[link_F_Data]: ../../../CCTM/src/driver/ELMO_DATA.F
-[link_F_Proc]: ../../../CCTM/src/driver/ELMO_PROC.F
+[link_elmo_data]: ../../../CCTM/src/driver/ELMO_DATA.F
+[link_elmo_proc]: ../../../CCTM/src/driver/ELMO_PROC.F
 
 
 <!-- END_OF_COMMENT -->
 
-[link_F_Data]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/driver/ELMO_DATA.F
-[link_F_Proc]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/driver/ELMO_PROC.F
+[link_elmo_data]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/driver/ELMO_DATA.F
+[link_elmo_proc]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/driver/ELMO_PROC.F

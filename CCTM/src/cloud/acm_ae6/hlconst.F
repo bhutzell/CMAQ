@@ -37,7 +37,7 @@ C...pointers for additional Henry's law species needed in KMT version of AQCHEM
      &                       HLC_PYRUVACID
 
 C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
-         INTEGER, PUBLIC  :: HLC_IEPOX, HLC_IMAE
+         INTEGER, PUBLIC  :: HLC_IEPOX, HLC_IMAE, HLC_HCHO
 
          PUBLIC :: SUBNAME, HLCONST, HLCONST_INIT
 
@@ -464,6 +464,7 @@ C...  Atmospheric Chemistry and Physics, 1997
             CALL HLINDEX( 'HNO4            ', HLC_HNO4      , LERROR ) 
             CALL HLINDEX( 'NO3             ', HLC_NO3       , LERROR ) 
             CALL HLINDEX( 'PYRUVIC_ACID    ', HLC_PYRUVACID , LERROR ) 
+	    CALL HLINDEX( 'FORMALDEHYDE    ', HLC_HCHO      , LERROR )
 
 ! additional species needed in AEROSOL_CHEMISTRY
             CALL HLINDEX( 'IEPOX           ', HLC_IEPOX     , LERROR )

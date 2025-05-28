@@ -86,10 +86,12 @@ C-------------------------------------------------------------------------------
  
          Use HGRD_DEFN           ! horizontal grid specifications
          Use UTILIO_DEFN         
-         Use Bidi_Mod, Only: gamma1, gamma2, MHp1, MHp2
-         Use ASX_DATA_MOD, Only: zsoil1, zsoil2, Grid_Data
-         Use LSM_MOD
-         Use depv_data_module
+         Use STAGE_Bidi_Mod, Only: MHp1, MHp2, gamma1, gamma2
+         Use ASX_DATA_MOD, Only: Grid_Data
+         Use MOSAIC_MOD, Only: zsoil1, zsoil2
+         Use STAGE_LU_MOD
+         Use depv_data_module, Only: e2c_cats, Beld_Names, Beld_ag, pHs1, pHs2, NH4ps1, NH4ps2
+         Use STAGE_DATA, Only:  Nit1, Nit2, L1_ON, L2_ON, GMN, BDc1, BDc2, F1_NH4, F2_NH4, L1_ON_Yest, L2_ON_Yest, F1_ON, F2_ON
          Use centralized_io_module
 !         Use CONST
 
@@ -381,10 +383,10 @@ C-------------------------------------------------------------------------------
          Subroutine Get_NH3_Comp( NH3_st, NH3_ll, NH3_g, diff, r, c, l, l_ag )
          
          Use UTILIO_DEFN
-         Use Bidi_Mod, Only: gamma1, gamma2, MHp1, MHp2
+         Use STAGE_Bidi_Mod, Only: gamma1, gamma2, MHp1, MHp2
          Use ASX_DATA_MOD
-         Use LSM_MOD
-         Use MOSAIC_MOD, Only: Tile_Data 
+         Use STAGE_LU_MOD
+         Use MOSAIC_MOD, Only: Tile_Data, zsoil1, zsoil2
          
          Implicit None
          
@@ -433,26 +435,26 @@ C-------------------------------------------------------------------------------
          If( PX_LSM ) Then
 ! simplified from Darcy's law assuming stationarity and only gravitational draining with the Campbell hydrological functions applied
 ! 0.4 is the difference in the layer depths of 1cm and 5 cm
-            w5cm = MET_DATA%SOIM1( c,r ) * exp( 0.04 * GRAV )**(1.0/GRID_DATA%BSLP( c,r ))
-            w5cm = Min( w5cm, GRID_DATA%WSAT( c,r ) )
-            w5cm = Max( w5cm, GRID_DATA%WRES( c,r ) )
+            w5cm = MET_DATA%SOIM1( c,r ) * exp( 0.04 * GRAV )**(1.0/Tile_DATA%BSLP( c,r ))
+            w5cm = Min( w5cm, Tile_DATA%WSAT( c,r ) )
+            w5cm = Max( w5cm, Tile_DATA%WRES( c,r ) )
          Else If( CLM_LSM .OR. NOAH_LSM ) Then
-            w5cm = MET_DATA%SOIM2( c,r )
-            w5cm = Min( w5cm, GRID_DATA%WSAT( c,r ) )
-            w5cm = Max( w5cm, GRID_DATA%WRES( c,r ) )
+            w5cm = Tile_DATA%SOIM2( c,r )
+            w5cm = Min( w5cm, Tile_DATA%WSAT( c,r ) )
+            w5cm = Max( w5cm, Tile_DATA%WRES( c,r ) )
          End If
 
 ! Updated based on EPIC 5cm soil moisture estimates where the 25% percentile of the irrigated crop fractional soil moisture was 
 ! approximately equal approximately equal to 60% of the field capacity.  
-         If ( frac_ir( c,r ) .Gt. 0.0 .And. MET_DATA%SOIM2( c,r ) .LE.  0.60 * GRID_DATA%WFC( c,r ) ) Then            
-            wg_ir = ( 1.0 - frac_ir( c,r ) ) * MET_DATA%SOIM1( c,r ) + frac_ir( c,r ) * 0.60 * GRID_DATA%WFC( c,r )
-            w5cm  = ( 1.0 - frac_ir( c,r ) ) * w5cm + frac_ir( c,r ) * 0.60 * GRID_DATA%WFC( c,r )
+         If ( frac_ir( c,r ) .Gt. 0.0 .And. Tile_DATA%SOIM2( c,r ) .LE.  0.60 * Tile_DATA%WFC( c,r ) ) Then            
+            wg_ir = ( 1.0 - frac_ir( c,r ) ) * MET_DATA%SOIM1( c,r ) + frac_ir( c,r ) * 0.60 * Tile_DATA%WFC( c,r )
+            w5cm  = ( 1.0 - frac_ir( c,r ) ) * w5cm + frac_ir( c,r ) * 0.60 * Tile_DATA%WFC( c,r )
          Else
             wg_ir = MET_DATA%SOIM1( c,r )
          End If
  
-         wg_ir = Min( wg_ir,GRID_DATA%WSAT( c,r ) )
-         wg_ir = Max( wg_ir,GRID_DATA%WRES( c,r ) )
+         wg_ir = Min( wg_ir,Tile_DATA%WSAT( c,r ) )
+         wg_ir = Max( wg_ir,Tile_DATA%WRES( c,r ) )
 
 ! The following resistance parameterization is derived from measurements with soil samples of 2 cm thick (Kondo et al 1990)
 ! https://doi.org/10.1175/1520-0450(1990)029<0385:APOEFB>2.0.CO;2 as discussed in Sakaguchi and Zeng 2009 JGR 
@@ -460,7 +462,7 @@ C-------------------------------------------------------------------------------
 ! references therin the dry layer thickness varies from 1 to 3 cm. 
          ldry_max = 0.02
 ! From Sakaguchi and Zeng 2009 JGR Equation 10
-         ldry1 = ldry_max * ( Exp( ( 1.0 - wg_ir / GRID_DATA%WSAT( c,r ) ) ** 5 ) - 1.0 ) / 1.718
+         ldry1 = ldry_max * ( Exp( ( 1.0 - wg_ir / Tile_DATA%WSAT( c,r ) ) ** 5 ) - 1.0 ) / 1.718
 
 !> Compute compensation point. gamma is specified according to the amount of 
 !> cultivated vegetation               
@@ -556,9 +558,9 @@ C-------------------------------------------------------------------------------
          
          Use UTILIO_DEFN
          Use ASX_DATA_MOD
-         Use Bidi_Mod, Only: gamma1, gamma2, MHp1, MHp2
-         Use LSM_MOD
-         Use MOSAIC_MOD, Only: Tile_Data 
+         Use STAGE_Bidi_Mod, Only: gamma1, gamma2, MHp1, MHp2
+         Use STAGE_LU_MOD
+         Use MOSAIC_MOD, Only: Tile_Data, zsoil1, zsoil2 
          
          Implicit None                
          
@@ -591,7 +593,7 @@ C-------------------------------------------------------------------------------
             Knit   = Knit1( C,R )
             gamma2( C,R ) = gamma2( C,R ) * exp( -Knit2( c,r ) * dt )
          Else
-            T_Soil = MET_DATA%SoiT2( C,R )
+            T_Soil = Tile_DATA%SoiT2( C,R )
             gam    = max( gamma2( C,R ), 630.0 )
             MHp    = MHp2( C,R ) 
             Knit   = Knit2( C,R ) 
@@ -657,10 +659,10 @@ C-------------------------------------------------------------------------------
             Write( logdev,* ) 'gam    :', gam
             Write( logdev,* ) 'MHp    :', MHp
             Write( logdev,* ) 'wg     :', wg
-            Write( logdev,* ) 'wres   :', GRID_DATA%WRES( c,r )
-            Write( logdev,* ) 'wsat   :', GRID_DATA%WSAT( c,r )
-            Write( logdev,* ) 'wfc    :', GRID_DATA%WFC( c,r )
-            Write( logdev,* ) 'wwlt   :', GRID_DATA%WWLT( c,r )
+            Write( logdev,* ) 'wres   :', Tile_DATA%WRES( c,r )
+            Write( logdev,* ) 'wsat   :', Tile_DATA%WSAT( c,r )
+            Write( logdev,* ) 'wfc    :', Tile_DATA%WFC( c,r )
+            Write( logdev,* ) 'wwlt   :', Tile_DATA%WWLT( c,r )
             Write( logdev,* ) 'kvs    :', kvs
             Write( logdev,* ) 'kn     :', kn
             Write( logdev,* ) 'zsoil  :', zsoil

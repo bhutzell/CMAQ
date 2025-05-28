@@ -168,7 +168,7 @@
      &                     MAP_MODE_MASK
       USE CGRID_SPCS, ONLY : MAP_CGRIDtoWDEP
       USE VDIFF_MAP, ONLY : DEPV_MAP
-      USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, MAP_OAtoAERO, OASPC,
+      USE ORG_DEFN, ONLY : N_OA, N_OA_NotTracers, MAP_OAtoAERO, OASPC,
      &                     MAP_ORG_MASK
       USE ELMO_DATA, ONLY : ET_CMPST, ET_DRVD, OT_OA, OT_OC, OT_OMOC, 
      &                      OT_OTOC, OT_DD_OA, OT_DD_OC, OT_WD_OA, 

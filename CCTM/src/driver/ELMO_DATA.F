@@ -22,7 +22,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       USE AERO_DATA, ONLY : N_MODE, IM_ALL, IM_UF, IM_F, IM_C, IM_AIT,
      &                      IM_ACC, IM_NUC
-      USE SOA_DEFN, ONLY  : IOA_PRI, IOA_SEC, IOA_ANTSEC, IOA_BIOSEC
+      USE ORG_DEFN, ONLY  : IOA_PRI, IOA_SEC, IOA_ANTSEC, IOA_BIOSEC
       USE UTILIO_DEFN
 
       IMPLICIT NONE

@@ -185,6 +185,12 @@ END ELIMINATE
 
 
 
+
+
+
+
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -214,18 +220,18 @@ REACTIONS[CM] =
 <R018> HKET = HO2 + ACO3 + HCHO # 1.0/<HKET_RACM2>;
 
 <R019> MACR = 0.340*HO + 0.660*HO2 + 0.670*ACO3 + 0.330*MACP 
-            + 0.340*XO2 + 0.670*CO + 0.670*HCHO # 1.0/<MACR_RACM2>;
+            + 0.340*XO2 + 0.670*CO + 0.670*HCHO # 1.0/<MACR_RACM2>;            
 <R020> MVK = 0.300*MO2 + 0.300*MACP + 0.700*CO + 0.700*UALD  
-           - 1.7000*DELTA_C # 1.0/<MVK_JPL19>;
-<R021>  GLY =  2*CO         # 1.0/<GLYH2_JPL19>;
-<R022>  GLY =  HCHO  + CO   # 1.0/<GLYF_JPL19>;
-<R023>  GLY =  2*HO2 + 2*CO # 1.0/<GLYHX_JPL19>;
+           - 1.7000*DELTA_C # 1.0/<MVK_JPL19>;           
+<R021> GLY = 2.000*CO # 1.0/<GLYH2_JPL19>;
+<R022> GLY = HCHO + CO # 1.0/<GLYF_JPL19>;
+<R023> GLY = 2.000*HO2 + 2.000*CO # 1.0/<GLYHX_JPL19>;
 <R024> MGLY = HO2 + ACO3 + CO # 1.0/<MGLY_RACM2>;
 <R025> DCB1 = 1.500*HO2 + 0.250*ACO3 + 0.200*XO2 + CO + 0.500*GLY 
             + 0.500*MGLY  + 1.0000*DELTA_C # 1.0/<MGLY_RACM2>;            
 <R026> DCB2 = 1.500*HO2 + 0.250*ACO3 + 0.200*XO2 + CO + 0.500*GLY 
             + 0.500*MGLY  + 2.0000*DELTA_C # 1.0/<MGLY_RACM2>;            
-<R027a> BALD = BEN  + CO       # 1.0/<BALD1_CALVERT11>;
+<R027a> BALD = BEN + CO # 1.0/<BALD1_CALVERT11>;
 <R027b> BALD = BENP + CO + HO2 # 1.0/<BALD2_CALVERT11>;
 <R028> OP1 = HO + HO2 + HCHO # 1.0/<OP1_RACM2>;
 <R029> OP2 = HO + HO2 + ALD  - 1.0000*DELTA_C # 1.0/<OP1_RACM2>;
@@ -234,12 +240,12 @@ REACTIONS[CM] =
 <R030> PAA = HO + MO2  + 1.0000*DELTA_C # 1.0/<PAA_RACM2>;
 <R031> ONIT = HO2 + NO2 + 0.200*ALD + 0.800*KET  - 0.6000*DELTA_C 
             # 1.0/<ONIT_CALVERT08>;            
-<R032>  PAN = ACO3 + NO2 # 1.0/<PAN1_JPL19>;
-<R033>  PAN = MO2  + NO3 + 1.0000*DELTA_C # 1.0/<PAN2_JPL19>;
+<R032> PAN = ACO3 + NO2 # 1.0/<PAN1_JPL19>;
+<R033> PAN = MO2 + NO3  + 1.0000*DELTA_C # 1.0/<PAN2_JPL19>;
 <R033a> PPN = RCO3 + NO2 # 1.0/<PPN1_JPL19>;
 <R033b> PPN = HC3P + NO3 # 1.0/<PPN2_JPL19>;
 <TRP55> TRPN = NO2 + 0.670*KET + 0.330*UALD  + 5.0000*DELTA_C 
-             # 1.0/<TRPN_WANG2023>;   
+             # 1.0/<TRPN_WANG2023>;             
 <TRP56> HONIT = HKET + NO2  + 7.0000*DELTA_C # 1.0/<TRPN_WANG2023>;
 <R034> O3 + HO = HO2 # 1.7E-12 @ 940.;
 <R035> O3 + HO2 = HO # 1.0E-14 @ 490.;
@@ -2141,6 +2147,20 @@ REACTIONS[CM] =
 ! Aerosol nitrate photolysis (implemented as heterogeneous reactions)
 <HET_ANO3I> ANO3I = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
 <HET_ANO3J> ANO3J = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
+
+! heterogeneous reaction of SO2 in ALW
+<HET_SO2_H2O2> SO2 + H2O2 = ASO4J # 1.0~<HETERO_SO2H>;
+<HET_SO2_O3> SO2 + O3 = ASO4J # 1.0~<HETERO_SO2O>;
+<HET_SO2_MEPX> SO2 + OP1 = ASO4J + MOH # 1.0~<HETERO_SO2M>;
+<HET_SO2_PACD> SO2 + PAA = ASO4J + ORA2 # 1.0~<HETERO_SO2P>;
+<HET_SO2_NO2> SO2 + NO2 = ASO4J + HONO # 1.0~<HETERO_SO2N>;
+
+<HET_SO2_TMI> SO2 + AFEJ + AMNJ = ASO4J + AFEJ + AMNJ 
+                                # 1.0~<HETERO_SO2T>;                                
+<HET_SO2_HCHO> SO2 + HCHO = AHMSJ # 1.0~<HETERO_HMSP>;
+<HET_SO2_HNO4> SO2 + HNO4 = ASO4J + ANO3J # 1.0~<HETERO_HNO4>;
+<HET_HMS_L1> AHMSJ + HO = HO2 + SO2 + ORA1 # 1.0~<HETERO_HMSL1>;
+<HET_HMS_L2> AHMSJ = SO2 + HCHO # 1.0~<HETERO_HMSL2>;
 
 END MECH
 

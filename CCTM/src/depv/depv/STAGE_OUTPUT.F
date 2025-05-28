@@ -250,13 +250,11 @@ C Open diagnostic file
          USE HGRD_DEFN
          USE UTILIO_DEFN
          USE MOSAIC_MOD,   Only: Tile_Data
-         USE ASX_DATA_MOD, Only: MOSAIC_DATA
 
          Implicit None    
 
          Integer, Intent( IN ) :: DATE
          Integer, Intent( IN ) :: TIME
-!         Real,    Intent( IN ) :: DEPV(:,:,:)
 
          Integer               :: N
 
@@ -290,37 +288,37 @@ C Open diagnostic file
 
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'RA',
-     &                            DATE, TIME, MOSAIC_DATA%RA ) ) THEN
+     &                            DATE, TIME, Tile_Data%RA ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'RST',
-     &                            DATE, TIME, Mosaic_Data%RSTW ) ) THEN
+     &                            DATE, TIME, Tile_Data%RSTW ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'LAI',
-     &                            DATE, TIME, MOSAIC_DATA%LAI ) ) THEN
+     &                            DATE, TIME, Tile_Data%LAI ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'USTAR',
-     &                            DATE, TIME, MOSAIC_DATA%USTAR ) ) THEN
+     &                            DATE, TIME, Tile_Data%USTAR ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'Z0',
-     &                            DATE, TIME, MOSAIC_DATA%Z0 ) ) THEN
+     &                            DATE, TIME, Tile_Data%Z0 ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'VEG',
-     &                            DATE, TIME, MOSAIC_DATA%VEG ) ) THEN
+     &                            DATE, TIME, Tile_Data%VEG ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF

@@ -127,7 +127,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       USE PRECURSOR_DATA, ONLY: SULPRD_IDX, SO4RATE, PRECURSOR_CONC,
      &                          PHGRXN_IDX, PHG_RATE,
      &                          EXTRACT_PRECURSOR, UPDATE_PRECURSOR
-      USE SOA_DEFN, ONLY: EXTRACT_SOA, UPDATE_ORGVAPOR
+      USE ORG_DEFN, ONLY: EXTRACT_SOA, UPDATE_ORGVAPOR
       USE AEROMET_DATA, ONLY: AIRTEMP, AIRPRES, AIRQV, AIRDENS, AIRRH, 
      &                        H2OSATVP, H2OVP, SRFTEMP
       USE CONST, ONLY: ESATL, MWWAT, MWAIR
