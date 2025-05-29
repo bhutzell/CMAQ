@@ -82,6 +82,7 @@ C-----------------------------------------------------------------------
       USE centralized_io_module, only : AVGEMIS, interpolate_var
       Use ASX_DATA_MOD, only: MET_DATA
       USE MIO_ASCII
+      USE RUNTIME_VARS, only: USE_SAGE_N
 
 #ifdef mpas
       USE util_module, only : hhmmss, time2sec
@@ -274,12 +275,13 @@ C calculate fseas based on deep soil temperature following WRF 3.8.1 PX
 
 C Calculate temporal non-speciated beis emissions
       CALL BEIS( JDATE, JTIME, NCOLS, NROWS, MSPCS, SEMIS, BIPOL )
+      EMPOL( :,:,1:NSEF-1 ) = BIPOL
 
 C Calculate temporal non-speciated soil NO emissions
-      CALL HRNO( JDATE, JTIME, TSTEP, NOPOL, L_DESID_DIAG )
-
-      EMPOL( :,:,1:NSEF-1 ) = BIPOL
-      EMPOL( :,:,NSEF )     = NOPOL
+      IF ( .Not. USE_SAGE_N ) THEN
+         CALL HRNO( JDATE, JTIME, TSTEP, NOPOL, L_DESID_DIAG )
+         EMPOL( :,:,NSEF )     = NOPOL
+      End If
 
 C Speciate emissions
       DO K = 1, NSEF

@@ -3131,7 +3131,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
 !*********************************************************************
 
       USE BDSNP_MOD
-      USE RUNTIME_VARS, ONLY: BDSNP_MEGAN
+      USE RUNTIME_VARS, ONLY: BDSNP_MEGAN,USE_SAGE_N
 
       IMPLICIT NONE
  
@@ -3182,7 +3182,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
                  CFNO = 0.0 ! INITIALIZE
                  CFNOG = 0.0 ! INITIALIZE
 
-         if (BDSNP_MEGAN) then
+         if (BDSNP_MEGAN .and. .Not. USE_SAGE_N) then
 
           call get_date(JYEAR, JDAY, MM, DD)
 
@@ -3197,7 +3197,9 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
                      TEMP,LSOIL,SLTYP, SOILM1, SOILT,     &
                      LAIc, LAT, PRECADJ,                 &
                      CFNO, CFNOG )
-
+        IF( USE_SAGE_N) THEN
+           GAMNO = 0.0           
+        ELSE
         DO I = 1,NCOLS
           DO J = 1,NROWS
             CALL GROWSEASON(IDATE,LAT(I,J),GDAY,GLEN)
@@ -3227,7 +3229,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
  
            ENDDO  !NCOLS
         ENDDO  !NROWS
-
+        END IF
         END IF ! YL or BDSNP
 
 

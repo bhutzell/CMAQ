@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      MODULE HGSIM
+      MODULE HG_BIDI
 
 C-----------------------------------------------------------------------
 C Function: This module contains the code to predict bidirectional
@@ -126,13 +126,13 @@ C input/output parameters
 
       CONTAINS
 
-         SUBROUTINE INIT_HGSIM( JDATE, JTIME )
+         SUBROUTINE INIT_HG_BIDI( JDATE, JTIME )
 
          USE HGRD_DEFN           ! horizontal grid specifications
          USE UTILIO_DEFN
          USE ASX_DATA_MOD
-         USE LSM_MOD
-         USE Bidi_Mod
+         USE STAGE_LU_MOD
+         USE STAGE_Bidi_Mod
          Use MOSAIC_MOD, Only: Tile_Data 
 
          IMPLICIT NONE
@@ -142,7 +142,7 @@ C input/output parameters
          INTEGER, INTENT( IN ) :: JDATE
          INTEGER, INTENT( IN ) :: JTIME
 
-         CHARACTER( 16 ) :: PNAME = 'INIT_HGSIM'
+         CHARACTER( 16 ) :: PNAME = 'INIT_HG_BIDI'
          CHARACTER( 96 ) :: MSG = ' '
 
          INTEGER  V, L, C, R
@@ -190,13 +190,13 @@ C-------------------------------------------------------------------------------
 
          RETURN
 
-         END SUBROUTINE INIT_HGSIM
+         END SUBROUTINE INIT_HG_BIDI
 !------------------------------------------------------------------------------
 ! Gets compensation points for STAGE
 !------------------------------------------------------------------------------
          Subroutine Get_Hg_Comp( Hg_st, Hg_cut, Hg_grnd, Hg_wat, Hg_atm, H_wat, H_soil, r, c )
  
-         USE BIDI_MOD
+         USE STAGE_BIDI_MOD
          USE ASX_DATA_MOD
 
          IMPLICIT NONE
@@ -278,7 +278,7 @@ C Flux unit conversions
          SUBROUTINE Hg_Surf_Update (flx_stom, flx_cut, flx_grnd, flx_wat, flx_hgII,
      &                              H_wat, H_soil, dt, c, r, Jdate, Jtime )
 
-         USE BIDI_MOD
+         USE STAGE_BIDI_MOD
          USE ASX_DATA_MOD
          USE UTILIO_DEFN
          Use MOSAIC_MOD, Only: Tile_Data 
@@ -468,11 +468,11 @@ C*****************************************************************************
             End If
 ! soil flux
             If( flux_grnd .le. 0.0 ) Then ! deposition 
-               Prod = kr * Grid_Data%RHOB( c,r ) * HgII_grnd * ZG /( 1.0e3 * 200.59 ) -
+               Prod = kr * Tile_Data%RHOB( c,r ) * HgII_grnd * ZG /( 1.0e3 * 200.59 ) -
      &                flux_grnd / max((1.0 - f_wat( c,r )),0.001 )
                Hg_grnd = Hg_grnd + Prod * dt
             Else 
-               Prod    = kr * Grid_Data%RHOB( c,r ) * HgII_grnd * ZG /( 1.0e3 * 200.59 )
+               Prod    = kr * Tile_Data%RHOB( c,r ) * HgII_grnd * ZG /( 1.0e3 * 200.59 )
                K_loss  = min( flux_grnd / ( Hg_grnd * max((1.0 - f_wat( c,r )),0.001 ) ), 0.99 ) 
                K_loss  = -log(1.0 - K_loss)
                If( K_loss .eq. 0.0 ) Then ! due to numerical rounding
@@ -495,7 +495,7 @@ C------------------------------------------------------------------------------
 
          Use Const, Only: MWWAT
          Use ASX_DATA_MOD, Only: Grid_Data
-         USE BIDI_MOD, Only: CMedia
+         USE STAGE_BIDI_MOD, Only: CMedia
 
          IMPLICIT NONE
 
@@ -534,4 +534,4 @@ C------------------------------------------------------------------------------
          RETURN
 
          END SUBROUTINE GET_WDEP
-      END MODULE HGSIM
+      END MODULE HG_BIDI

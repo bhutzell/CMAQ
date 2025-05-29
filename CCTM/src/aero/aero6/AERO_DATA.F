@@ -74,7 +74,7 @@ C             aerosol extinction efficiency
 C HOTP 7/17/2018 Added kappaorg hygroscopicity parameter (Petters and
 C             Kreidenweis 2007 ACP) for organic aerosols. kappa should be zero for
 C             species that are not organic. Water uptake onto inorganics calculated using ISORROPIA.
-C             POC+NCOM kappa is set to zero and calculated in SOA_DEFN if those species are in use.
+C             POC+NCOM kappa is set to zero and calculated in ORG_DEFN if those species are in use.
 C             Current kappaorg values are based on species specific
 C             OM/OC ratios (Pye et al. 2017 ACP).
 C GS  08/17/81 Added bromide in seasalt
@@ -136,7 +136,7 @@ C Define Logical values as T and F for the aerospc table
 
 C Number of aerosol species and modes
 
-      Integer, Parameter :: n_aerolist = 140    ! number of aero species
+      Integer, Parameter :: n_aerolist = 141    ! number of aero species
       Integer, Parameter :: n_mode = 3          ! number of modes:
       Integer, Parameter :: iait = 1            ! 1 = Aitken       
       Integer, Parameter :: iacc = 2            ! 2 = accumulation 
@@ -406,7 +406,10 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('AISO4   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.21), ! from heterogeneous uptake of IPX
      & spcs_list_type('AISO5   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.18), ! from heterogeneous uptake of INALD
      & spcs_list_type('ATRPN   ',F,T,F, cm_set, 1400.0, 'TRPN   ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! SOA from first generation monoterpene nitrate
-     & spcs_list_type('AHONIT  ',F,T,F, cm_set, 1400.0, 'HONIT  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14)  ! SOA from second generation monoterpene nitrate
+     & spcs_list_type('AHONIT  ',F,T,F, cm_set, 1400.0, 'HONIT  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14), ! SOA from second generation monoterpene nitrate
+     
+      ! The following species are associated with CRACMM3
+     & spcs_list_type('AHMS    ',F,T,F, cm_set, 1800.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.2, 4.8,F, 'SOLUTE', 0.00)  ! hydroxymethanesulfonate -- not OM for now 
      & /)                                                 
  
 ! Define Reference Emissions Size Distributions
@@ -674,6 +677,7 @@ C Flag if optional species present
       Logical :: ae6hg   = .False.
       Logical :: ae7orgh2o = .False.
       Logical :: marine  = .False.
+      Logical :: hethms = .False.
 
 C Optional Species
       Character( 16 ), Private, Parameter :: req_ietet  = 'AIETET'
@@ -683,8 +687,9 @@ C Optional Species
       Character( 16 ), Private, Parameter :: req_imos   = 'AIMOS'
       Character( 16 ), Private, Parameter :: req_phgj   = 'APHGJ'
       Character( 16 ), Private, Parameter :: req_orgh2o = 'AORGH2O'
-      Character( 16 ), Private, Parameter :: req_br     = 'ABR'
-      Character( 16 ), Private, Parameter :: req_seast  = 'ASEAST'      
+      Character( 16 ), Private, Parameter :: req_br     = 'ABR' 
+      Character( 16 ), Private, Parameter :: req_seast  = 'ASEAST'
+      Character( 16 ), Private, Parameter :: req_hms    = 'AHMS' 
       Character( 16 ), Private, Parameter :: req_so4aqh2o2 = 'ASO4AQH2O2'
       Character( 16 ), Private, Parameter :: req_so4aqo3   = 'ASO4AQO3'
       Character( 16 ), Private, Parameter :: req_so4aqfemn = 'ASO4AQFEMN'
@@ -713,6 +718,7 @@ C Indices of Optional species
       Integer :: aorgh2o_idx= 0
       Integer :: aseast_idx = 0
       Integer :: abr_idx    = 0
+      Integer :: ahms_idx   = 0
 C Indices of Optional sulfur tracking species
       Integer :: aso4aqh2o2_idx = 0
       Integer :: aso4aqo3_idx   = 0
@@ -1230,7 +1236,15 @@ C Find indices of required species
       Else
          abr_idx     = 0
          marine = .False.
-      End If
+       End If
+
+      If ( Index( mechname, 'CRACMM3' ) .Gt. 0 ) Then
+         ahms_idx     = findAero( req_hms,     .True. ) 
+         hethms = .True.
+      Else
+         ahms_idx     = 0
+         hethms = .False.
+      End If       
 
       aphgj_idx = findAero( req_phgj,  .False. )
       If ( aphgj_idx .Gt. 0 ) Then

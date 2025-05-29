@@ -2176,6 +2176,26 @@
              RKI( NCELL,  905) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
 !  Reaction Label HET_ANO3J       
              RKI( NCELL,  906) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
+!  Reaction Label HET_SO2_H2O2    
+             RKI( NCELL,  907) =  BLKHET(  NCELL, IK_HETERO_SO2H )
+!  Reaction Label HET_SO2_O3      
+             RKI( NCELL,  908) =  BLKHET(  NCELL, IK_HETERO_SO2O )
+!  Reaction Label HET_SO2_MEPX    
+             RKI( NCELL,  909) =  BLKHET(  NCELL, IK_HETERO_SO2M )
+!  Reaction Label HET_SO2_PACD    
+             RKI( NCELL,  910) =  BLKHET(  NCELL, IK_HETERO_SO2P )
+!  Reaction Label HET_SO2_NO2     
+             RKI( NCELL,  911) =  BLKHET(  NCELL, IK_HETERO_SO2N )
+!  Reaction Label HET_SO2_TMI     
+             RKI( NCELL,  912) =  BLKHET(  NCELL, IK_HETERO_SO2T )
+!  Reaction Label HET_SO2_HCHO    
+             RKI( NCELL,  913) =  BLKHET(  NCELL, IK_HETERO_HMSP )
+!  Reaction Label HET_SO2_HNO4    
+             RKI( NCELL,  914) =  BLKHET(  NCELL, IK_HETERO_HNO4 )
+!  Reaction Label HET_HMS_L1      
+             RKI( NCELL,  915) =  BLKHET(  NCELL, IK_HETERO_HMSL1 )
+!  Reaction Label HET_HMS_L2      
+             RKI( NCELL,  916) =  BLKHET(  NCELL, IK_HETERO_HMSL2 )
 
         END DO  
 !  Multiply rate constants by [M], [O2], [N2], [H2O], [H2], or [CH4]
@@ -2689,5 +2709,8 @@
              INDEX_ABRJ        = IOLD2NEW( INDEX_ABRJ       , 1 )
              INDEX_ANO3I       = IOLD2NEW( INDEX_ANO3I      , 1 )
              INDEX_ANO3J       = IOLD2NEW( INDEX_ANO3J      , 1 )
+             INDEX_AFEJ        = IOLD2NEW( INDEX_AFEJ       , 1 )
+             INDEX_AMNJ        = IOLD2NEW( INDEX_AMNJ       , 1 )
+             INDEX_AHMSJ       = IOLD2NEW( INDEX_AHMSJ      , 1 )
           END SUBROUTINE RESET_SPECIES_POINTERS
        END MODULE RXNS_FUNCTION
