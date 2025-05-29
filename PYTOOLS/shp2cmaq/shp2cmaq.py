@@ -12,6 +12,7 @@ shp2cmaq : function
     Converts a shapefile to a CMAQ-ready mask file using area overlap
 
 Updates:
+- v1.1 : Updated to fix time-independence and update unit attribute to units
 - v1.0 : Barron H. Henderson converted code to a script.
 
 
@@ -47,7 +48,7 @@ import os
 import string
 
 
-__version__ = '1.0'
+__version__ = '1.1.0'
 
 
 def shp2cmaq(
@@ -230,7 +231,7 @@ def shp2cmaq(
         gf[vark].attrs.update(
             long_name=vark.ljust(16),
             var_desc=var_desc.ljust(80)[:80],
-            unit='1'.ljust(16)
+            units='1'.ljust(16)
         )
 
     # Set any missing values (i.e., no overla) to 0.
@@ -250,6 +251,11 @@ def shp2cmaq(
 
     # Add IOAPI meta-data
     igf = gf.expand_dims(TSTEP=1, LAY=1).csp.to_ioapi()
+
+    # avoid errors when CMAQ reads the time information.
+    igf['TFLAG'][:] = 0
+    igf.attrs['SDATE'] = igf['TFLAG'][0, 0, 0].data
+
     desctxt = f'{attrkey} fractional area coverage, total ({prefix}TOT) and'
     desctxt += f' dominant ({prefix}DOM)'
     igf.attrs['FILEDESC'] = f"""title: {outpath}
