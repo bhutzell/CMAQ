@@ -103,7 +103,6 @@
           deallocate( lon )
           jdate_prev = 0
           jtime_prev = 0
-          print *,"==jwilliso close_flag"
           return
         end if
       end if  

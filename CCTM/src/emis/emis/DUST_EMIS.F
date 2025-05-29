@@ -792,7 +792,7 @@ C-----------------------------------------------------------------------
                      call interp_v(jdate, jtime, lat(i,j), lon(i,j), interp_unit, pv(i,j))
                   end do
                 end do
-                     call interp_v(jdate, jtime, lat(i,j), lon(i,j), interp_unit, pv(i,j), .true.) ! optional logical says to close the file and deallocate arrays
+                     call interp_v(jdate, jtime, lat(1,1), lon(1,1), interp_unit, pv(1,1), .true.) ! optional logical says to close the file and deallocate arrays
     
                 interp_unit = getefile( 'NPV_AVG_FILE', .true., .true., pname )
                 do i = 1, ncols
@@ -800,7 +800,7 @@ C-----------------------------------------------------------------------
                      call interp_v(jdate, jtime, lat(i,j), lon(i,j), interp_unit, npv(i,j))
                   end do
                 end do
-                     call interp_v(jdate, jtime, lat(i,j), lon(i,j), interp_unit, npv(i,j), .true.) ! optional logical says to close the file and deallocate arrays
+                     call interp_v(jdate, jtime, lat(1,1), lon(1,1), interp_unit, npv(1,1), .true.) ! optional logical says to close the file and deallocate arrays
             END IF
 
          end if ! firstime
