@@ -28,6 +28,400 @@
 
       Contains 
 !--------------------------------------------------------------------------------------------------
+! Calculate agricultural leaf out for the tiled grid
+!--------------------------------------------------------------------------------------------------
+         Pure Function Calc_ag_seas( Ts_2 ) Result( ag_seas )
+         Implicit None        
+
+         Real,    Intent( IN ) :: Ts_2        ! layer 2 soil temperature (K)
+         Real                  :: ag_seas     ! Agricultural seasonal leaf on/off 0.0-1.0 where 1.0 is leaf on condutions
+
+
+C based on a 10 C germination temperature for 5 cm soil depth reported multiple agricultural extension offices, 
+C e.g. https://www.agry.purdue.edu/ext/corn/news/timeless/Emergence.html. 
+         If( Ts_2 .Lt. 290.0 .And. Ts_2 .Gt. 283.0 ) Then
+            ag_seas = 1.0 - ( 290.0 - Ts_2 ) ** 2 / 49.0 
+         Else If( Ts_2 .Ge. 290.0 ) Then
+            ag_seas = 1.0
+         Else
+            ag_seas = 0.0
+         End If
+         End Function Calc_ag_seas
+
+!--------------------------------------------------------------------------------------------------
+! Calculate natural veg leaf out for the tiled grid
+!--------------------------------------------------------------------------------------------------
+         Pure Function Calc_veg_seas( Ts_2 ) Result( veg_seas )
+         Implicit None        
+
+         Real,    Intent( IN ) :: Ts_2         ! layer 2 soil temperature (K)
+         Real                  :: veg_seas     ! Agricultural seasonal leaf on/off 0.0-1.0 where 1.0 is leaf on condutions
+
+C From WRF PX LSM
+         If( Ts_2 .Lt. 290.0 .And. Ts_2 .Gt. 282.0 ) Then
+            veg_seas = 1.0 - 0.015625 * ( 290.0 - Ts_2 ) ** 2
+         Else If( Ts_2 .Ge. 290.0 ) Then
+            veg_seas = 1.0
+         Else
+            veg_seas = 0.0
+         End If
+         End Function Calc_veg_seas
+
+!--------------------------------------------------------------------------------------------------
+! Calculate zO for the tiled grid
+!--------------------------------------------------------------------------------------------------
+         Pure Function Calc_z0( is_ag, is_agmos, is_water, LU_frac, tile_z0, grid_z0, tile_LAIMN, tile_LAIMX, Ts_2 ) Result( z0 )
+         Implicit None        
+
+         Logical, Intent( IN ) :: is_ag       ! Agriculture?
+         Logical, Intent( IN ) :: is_agmos    ! Agriculture/Natural mosaic?
+         Logical, Intent( IN ) :: is_water    ! Water?
+         Real,    Intent( IN ) :: LU_frac     ! Land use fraction
+         Real,    Intent( IN ) :: tile_z0     ! tabular z0 for land uses
+         Real,    Intent( IN ) :: grid_z0     ! grid z0 from met model
+         Real,    Intent( IN ) :: tile_LAIMN  ! Land use Min LAI (m**2/m**2)
+         Real,    Intent( IN ) :: tile_LAIMX  ! Land use Max LAI (m**2/m**2)
+         Real,    Intent( IN ) :: Ts_2        ! layer 2 soil temperature (K)
+         Real                  :: ag_seas     ! Agricultural seasonal leaf on/off 0.0-1.0 where 1.0 is leaf on condutions
+         Real                  :: d_past_emer ! Agricultural seasonal leaf on/off 0.0-1.0 where 1.0 is leaf on condutions  
+         Real                  :: z0          ! Tile zero plane displacement (m)
+         If( LU_frac .EQ. 1.0 ) Then
+            z0 = grid_z0
+         Else
+            If( is_water .Or. .Not.is_ag ) then
+               z0 = tile_z0
+            else  
+               ag_seas = Calc_ag_seas( Ts_2 )
+               d_past_emer = ((tile_LAIMN + ag_seas * (tile_LAIMX - tile_LAIMN))**(1.0/1.923))/2.273
+               d_past_emer = max(0.0184 * 0.0184 - 4.0 * 1.057e-4 * d_past_emer,0.0)
+               d_past_emer = ( 0.0184 - SQRT( d_past_emer ) ) / ( 2.0 * 1.057E-4 )
+               z0 = 0.05
+               If ( d_past_emer .Gt. 87.0 ) Then
+                  z0 = 0.15
+               Else If( d_past_emer .Gt. 0.0 ) Then
+                  z0 = 5.00 + 0.23 * d_past_emer - 1.32E-3 * d_past_emer**2
+                  z0 = z0 / 100.0  ! convert to meters
+               End If
+               If( is_agmos ) Then
+                 z0 = 0.5 * ( z0 + tile_z0 )
+               End If
+            End If
+         End If
+
+         End Function Calc_z0
+
+!--------------------------------------------------------------------------------------------------
+! Calculate Veg for the tiled grid
+!--------------------------------------------------------------------------------------------------
+         Pure Function Calc_Veg( LU_ind, n_LU, is_ag, is_agmos, is_water, grid_Veg, LU_frac, tile_VEGMN, tile_VEGMX, Ts_2 ) 
+     &     Result( veg )
+         Implicit None        
+
+         Integer, Intent( IN ) :: LU_ind           ! Land Use Index
+         Integer, Intent( IN ) :: n_LU             ! number of land use classes
+         Logical, Intent( IN ) :: is_ag(:)         ! Agriculture?
+         Logical, Intent( IN ) :: is_agmos(:)      ! Agriculture/Natural mosaic?
+         Logical, Intent( IN ) :: is_water(:)      ! Water?
+         Real,    Intent( IN ) :: grid_Veg         ! Grid cell vegetation fraction
+         Real,    Intent( IN ) :: LU_frac( : )     ! Land use fraction (-) 
+         Real,    Intent( IN ) :: tile_VEGMN( : )  ! Land use Min vegetation fraction (-)
+         Real,    Intent( IN ) :: tile_VEGMX( : )  ! Land use Max vegetation fraction (-)
+         Real,    Intent( IN ) :: Ts_2             ! layer 2 soil temperature (K)
+         Real                  :: ag_seas          ! Agricultural seasonal leaf on/off 0.0-1.0 where 1.0 is leaf on condutions
+         Real                  :: veg_seas         ! Vegetation seasonal leaf on/off 0.0-1.0 where 1.0 is leaf on condutions
+         Real                  :: tot_veg          ! Estimated total vegetation fraction (-)
+         Real                  :: tmp_veg          ! Temporary estiamated vegetation fraction (-)
+         Real                  :: veg              ! Tile vegetation fraction (-)
+         Integer               :: l                ! Land use counter
+
+         If( LU_frac(LU_ind) .EQ. 1.0 ) Then
+            veg = grid_Veg
+         Else
+            tot_veg = 0.0
+            Do l = 1, n_LU 
+              If( is_water( l ) ) then
+                  tmp_veg = 0.0
+               Else If( is_ag( l ) ) Then
+                  ag_seas = Calc_ag_seas( Ts_2 )
+                  tmp_veg = ( tile_VEGMN( l ) +  ag_seas * ( tile_VEGMX( l ) - tile_VEGMN( l )))/100.0
+               Else If( is_agmos( l ) ) Then
+                  ag_seas  = Calc_ag_seas( Ts_2 )
+                  veg_seas = Calc_veg_seas( Ts_2 )
+                  tmp_veg  = ( tile_VEGMN( l ) +  0.5 * (ag_seas + veg_seas) * ( tile_VEGMX( l ) - tile_VEGMN( l )))/100.0
+               Else 
+                  veg_seas = Calc_veg_seas( Ts_2 )
+                  tmp_veg  = ( tile_VEGMN( l ) + veg_seas * ( tile_VEGMX( l ) - tile_VEGMN( l )))/100.0
+               End If
+               if(l .EQ. LU_ind) veg = tmp_veg
+               tot_veg = tot_veg + tmp_veg * LU_frac( l )
+            End Do
+            if( .not. is_water( LU_ind ) .And. tot_veg .Gt. 0.0 .And. grid_Veg .Gt. 0.0 ) Then
+               veg = veg * grid_Veg / tot_veg
+            End If
+            veg = min( veg, 1.0 )
+         End If
+
+         End Function Calc_Veg
+
+!--------------------------------------------------------------------------------------------------
+! Calculate LAI for the tiled grid
+!--------------------------------------------------------------------------------------------------
+         Pure Function Calc_LAI( LU_ind, n_LU, is_ag, is_agmos, is_water, grid_LAI, LU_frac, tile_LAIMN, tile_LAIMX, Ts_2 ) 
+     &     Result( lai )
+         Implicit None        
+
+         Integer, Intent( IN ) :: LU_ind           ! Land Use Index
+         Integer, Intent( IN ) :: n_LU             ! number of land use classes
+         Logical, Intent( IN ) :: is_ag( : )       ! Agriculture?
+         Logical, Intent( IN ) :: is_agmos( : )    ! Agriculture/Natural mosaic?
+         Logical, Intent( IN ) :: is_water( : )    ! Water?
+         Real,    Intent( IN ) :: grid_LAI         ! Grid cell LAI
+         Real,    Intent( IN ) :: LU_frac( : )     ! Land use fraction (-) 
+         Real,    Intent( IN ) :: tile_LAIMN( : )  ! Land use Min LAI (-)
+         Real,    Intent( IN ) :: tile_LAIMX( : )  ! Land use Max LAI (-)
+         Real,    Intent( IN ) :: Ts_2             ! layer 2 soil temperature (K)
+         Real                  :: ag_seas          ! Agricultural seasonal leaf on/off 0.0-1.0 where 1.0 is leaf on condutions
+         Real                  :: veg_seas         ! Vegetation seasonal leaf on/off 0.0-1.0 where 1.0 is leaf on condutions
+         Real                  :: tot_lai          ! Estimated total vegetation fraction (-)
+         Real                  :: tmp_lai          ! Temporary estiamated vegetation fraction (-)
+         Real                  :: lai              ! Tile vegetation fraction (-)
+         Integer               :: l                ! Land use counter
+
+         If( LU_frac(LU_ind) .Eq. 1.0 ) Then
+            lai = grid_LAI
+         Else
+            If( is_water( LU_ind ) ) then
+               lai = 0.0
+            Else If( is_ag( LU_ind ) ) Then
+               ag_seas = Calc_ag_seas( Ts_2 )
+               lai = ( tile_LAIMN( LU_ind ) +  ag_seas * ( tile_LAIMX( LU_ind ) - tile_LAIMN( LU_ind )))
+            Else If( is_agmos( LU_ind ) ) Then
+               ag_seas  = Calc_ag_seas( Ts_2 )
+               veg_seas = Calc_veg_seas( Ts_2 )
+               lai  = ( tile_LAIMN( LU_ind ) +  0.5 * (ag_seas + veg_seas) * ( tile_LAIMX( LU_ind ) - tile_LAIMN( LU_ind )))
+            Else 
+               veg_seas = Calc_veg_seas( Ts_2 )
+               lai  = ( tile_LAIMN( LU_ind ) + veg_seas * ( tile_LAIMX( LU_ind ) - tile_LAIMN( LU_ind )))
+            End If
+
+            tot_lai = 0.0
+            Do l = 1, n_LU 
+               If( is_water( l ) ) then
+                  tmp_lai = 0.0
+               Else If( is_ag( l ) ) Then
+                  ag_seas = Calc_ag_seas( Ts_2 )
+                  tmp_lai = ( tile_LAIMN( l ) +  ag_seas * ( tile_LAIMX( l ) - tile_LAIMN( l )))
+               Else If( is_agmos( l ) ) Then
+                  ag_seas  = Calc_ag_seas( Ts_2 )
+                  veg_seas = Calc_veg_seas( Ts_2 )
+                  tmp_lai  = ( tile_LAIMN( l ) +  0.5 * (ag_seas + veg_seas) * ( tile_LAIMX( l ) - tile_LAIMN( l )))
+               Else 
+                  veg_seas = Calc_veg_seas( Ts_2 )
+                  tmp_lai  = ( tile_LAIMN( l ) + veg_seas * ( tile_LAIMX( l ) - tile_LAIMN( l )))
+               End If
+!               if( l .EQ. LU_ind ) lai = tmp_lai
+               tot_lai = tot_lai + tmp_lai * LU_frac( l )
+            End Do
+            if( .not. is_water( LU_ind ) .And. tot_lai .Gt. 0.0 .And. grid_LAI .Gt. 0.0 ) Then
+               lai = lai * grid_LAI / tot_lai
+               lai = min( lai, 6.0 )  
+            Else 
+               lai = 0.0
+            End If
+         End If
+
+         End Function Calc_LAI
+
+!--------------------------------------------------------------------------------------------------
+! Calculate LAI for the tiled grid
+!--------------------------------------------------------------------------------------------------
+         Pure Function Calc_USTAR( grid_Ustar, zh, grid_z0, tile_z0, LU_frac ) Result( Ustar )
+         Implicit None        
+
+         Real,    Intent( IN ) :: grid_Ustar       ! Grid cell Ustar (m/s)
+         Real,    Intent( IN ) :: grid_z0          ! Grid cell z0 (m)
+         Real,    Intent( IN ) :: tile_z0          ! tabular z0 for land uses
+         Real,    Intent( IN ) :: zh               ! Mid layer height (m)
+         Real,    Intent( IN ) :: LU_frac          ! Land use fraction
+         Real                  :: Ustar            ! Tile Ustar (m/s)
+
+! Removed the grid cell normalization as ustar*Ubar should be conserved Byun et al. 1999 EPA/600/R-99/030 discusion following equation 12-43         
+         If( LU_frac .EQ. 1.0 ) Then
+            Ustar = grid_Ustar
+         Else
+            Ustar = grid_Ustar * sqrt( log( zh / grid_z0 )/log( zh / tile_z0 ))
+         End If
+
+         End Function Calc_USTAR
+!--------------------------------------------------------------------------------------------------
+! Calculate Ra for individual land use types
+!--------------------------------------------------------------------------------------------------
+         Pure Function Calc_Ra( grid_Ra, zh, grid_z0, tile_z0, LU_frac ) Result( Ra )
+         Implicit None        
+
+         Real,    Intent( IN ) :: grid_Ra          ! Grid cell aerodynamic resistance [s/m]
+         Real,    Intent( IN ) :: grid_z0          ! Grid cell z0 (m)
+         Real,    Intent( IN ) :: tile_z0          ! tabular z0 for land uses
+         Real,    Intent( IN ) :: zh               ! mid-layer height above ground [m]
+         Real,    Intent( IN ) :: LU_frac          ! Land use fraction
+         Real                  :: Ra               ! land use aerodynamic resistance [s/m]
+         
+         If( LU_frac .EQ. 1.0 ) Then
+            Ra = grid_Ra
+         Else
+! Let Ra = Ubar/ustar**2
+! From Byun et al. 1999 EPA/600/R-99/030 equations 12-42 and 12-46 
+! ustar_j = ustar*sqrt(ln(zr/z0)/ln(zr/z0j)) Eq. 12-42
+! Ubar_j  = Ubar *sqrt(ln(zr/z0j)/ln(zr/z0)) Eq. 12-43
+! Thus
+! Ra_j = Ubar_j/ustar_j^2 = Ra * sqrt(ln(zr/z0)/ln(zr/zoj))**3
+            Ra  = grid_Ra * sqrt( log( zh / tile_z0 )/log( zh / grid_z0 ))**3
+         End If
+
+         End Function Calc_Ra
+!--------------------------------------------------------------------------------------------------
+! Calculate tile Rst for water
+!--------------------------------------------------------------------------------------------------
+         Pure Function Calc_Rstw( LU_ind, n_LU, grid_Rstw, LU_frac, Rst_min, tile_LAI, tile_Ustar,
+     &                            tile_Ra, RGRND, SOIM2, WWLT, WFC, TEMP2, QSS_GRND, QV, LWMASK,
+     &                            k_vis, dwat_T, l_leaf ) Result( Rstw )
+         Implicit None        
+
+         Integer, Intent( IN ) :: LU_ind           ! Land Use Index
+         Integer, Intent( IN ) :: n_LU             ! number of land use classes
+         Real,    Intent( IN ) :: grid_Rstw        ! Grid cell Rstw
+         Real,    Intent( IN ) :: LU_frac( : )     ! Land use fraction (-) 
+         Real,    Intent( IN ) :: Rst_min( : )     ! Tiled minimum stomatal resistance (s/m)
+         Real,    Intent( IN ) :: tile_LAI         ! land use LAI
+         Real,    Intent( IN ) :: tile_ustar       ! Land use Ustar
+         Real,    Intent( IN ) :: tile_Ra          ! Land use Ra
+         Real,    Intent( IN ) :: RGRND
+         Real,    Intent( IN ) :: SOIM2
+         Real,    Intent( IN ) :: WWLT
+         Real,    Intent( IN ) :: WFC
+         Real,    Intent( IN ) :: TEMP2
+         Real,    Intent( IN ) :: QSS_GRND
+         Real,    Intent( IN ) :: QV
+         Real,    Intent( IN ) :: LWMASK
+         Real,    Intent( IN ) :: k_vis
+         Real,    Intent( IN ) :: dwat_T
+         Real,    Intent( IN ) :: l_leaf
+         Real                  :: lai                 ! tiled lai (-)
+         Real                  :: grid_Gstm           ! grid minimum stomatal conductance [m/s]
+         Real                  :: Rstw                ! land use stomatal resistance [s/m]
+         Real                  :: Rb_leaf             ! land use quasi-laminar boundray layer resistance [s/m]
+         Real                  :: f1, f1max, par      ! radiation variables
+         Real                  :: f2, w2avail, w2mxav ! soil moisture variables
+         Real                  :: f3, gs, ga, raw     ! humidity variables
+         Real                  :: f4                  ! temperature variables
+         Real                  :: ftot, fshelt        ! combined Jarvis variables
+         Real                  :: lu_tot              ! total land use where Rst is estiamted
+         Real, Parameter       :: f3min      = 0.25
+         Real, Parameter       :: ftmin      = 0.0000001  ! m/s
+         Real, Parameter       :: rsmax      = 5000.0     ! s/m
+         Integer               :: l                ! Land use counter
+
+         If( LU_frac( LU_ind ) .EQ. 1.0 ) Then
+            Rstw = grid_Rstw
+         Else if( LU_frac( LU_ind ) .Ge. 0.0 .And. tile_lai .Gt. 0.0 .And. grid_Rstw .Lt. 1.0e30 ) Then
+! assume stomatal resistance differences are due to 
+            grid_Gstm = 0.0
+            lu_tot    = 0.0
+            Do l = 1, n_LU
+               If( LU_frac( l ) .Gt. 0.0 .And. Rst_min( l ) .Lt. 9999.0 ) Then
+                  grid_Gstm = grid_Gstm  +  LU_frac( l ) / ( Rst_min( l ) )
+                  lu_tot    = lu_tot + LU_frac( l )
+               End If
+            End Do
+            if( lu_tot .gt. 0.0 ) then
+               grid_Gstm = grid_Gstm / lu_tot
+               Rstw      = Rst_min( LU_ind ) * grid_Gstm * grid_Rstw
+            else 
+! no vegetation
+               Rstw      = 1.0e6 
+            end if
+         Else If( LWMASK .eq. 0.0 .And. tile_lai .Gt. 0.0 ) Then
+!-SOIL MOISTURE
+            w2avail = SOIM2 - WWLT
+            w2mxav  = WFC   - WWLT
+            f2      = 1.0 / ( 1.0 + EXP( -5.0 * ( w2avail / w2mxav - ( w2mxav / 3.0 + WWLT ) ) ) )    ! according JP, 9/94
+!-AIR TEMP
+!... according to Avissar (1985) and AX 7/95
+            IF ( TEMP2 .LE. 302.15 ) THEN
+               f4 = 1.0 / ( 1.0 + EXP( -0.41 * (TEMP2 - 282.05 ) ) )
+            ELSE
+               f4 = 1.0 / ( 1.0 + EXP( 0.5 * (TEMP2 - 314.0 ) ) )
+            END IF
+!-RADIATION
+            par = 0.45 * RGRND * 4.566
+            IF ( Rst_min( LU_ind ) .GT. 130.0 ) THEN
+               f1max = 1.0 - 0.02 * tile_lai
+            ELSE
+               f1max = 1.0 - 0.07 * tile_lai
+            END IF
+            f1  = f1max * ( 1.0 - exp( -0.0017 * par ) )
+            f1  = amax1( f1, Rst_min( LU_ind ) / rsmax )
+            ftot = tile_lai * f1 * f2 * f4
+            ftot = MAX( ftot,ftmin )
+            fshelt  = 1.0   ! go back to NP89
+            gs      = ftot / ( Rst_min( LU_ind ) * fshelt )
+            Rb_leaf = Calc_Rb_leaf( k_vis, dwat_T, tile_Ustar, l_leaf, tile_lai )
+            raw     = Tile_Ra + Rb_leaf
+            ga      = 1.0 / raw
+!-- Compute humidity effect according to RH at leaf surf
+            f3 = 0.5 * ( gs - ga + SQRT( ga * ga + ga * gs * ( 4.0 * QV / QSS_GRND - 2.0 ) + gs * gs ) ) / gs
+            f3 = MIN ( MAX( f3, f3min ), 1.0 )
+            Rstw = 1.0 / ( gs * f3 )
+            if( Rstw*tile_lai .lt. Rst_min( LU_ind ) ) Then
+               Rstw = Rst_min( LU_ind ) / tile_lai 
+            end if
+         Else
+            Rstw = 1.0e6
+         End If
+
+         End Function Calc_Rstw
+
+
+!--------------------------------------------------------------------------------------------------
+! Calculate Ra for individual land use types
+!--------------------------------------------------------------------------------------------------
+         Pure Function Calc_CanWat( tile_veg, tile_lai, WR, WR_AVAIL, Q2, QSS_Grnd, Rn, Rc ) Result( CanWat )
+         Implicit None        
+
+         Real,    Intent( In ) :: Tile_veg
+         Real,    Intent( In ) :: Tile_lai
+         Real,    Intent( In ) :: WR
+         Real,    Intent( In ) :: Q2
+         Real,    Intent( In ) :: QSS_Grnd
+         Real,    Intent( In ) :: Rn
+         Real,    Intent( In ) :: Rc
+         Logical, Intent( In ) :: WR_AVAIL
+         Real                  :: rh_grnd
+         Real                  :: CanWat
+
+         CanWat = 0.0
+         IF ( .NOT. WR_AVAIL ) THEN  ! approx canopy wetness - 
+            rh_grnd  = 100.0 * Q2 / QSS_Grnd
+            rh_grnd  = MIN( 100.0, rh_grnd )
+            If ( Rn + Rc .GT. 0.025 ) THEN
+               CanWat = 1.0
+            Else 
+! Leaf wetness as a function of RH (Burkhardt et al. 2009 www.biogeosciences.net/6/67/2009/)
+               CanWat =  3.68e-4 * exp( 0.079 * rh_grnd )
+            End If
+         Else
+            If( Tile_veg .LE. 0.0 .or. Tile_lai .LE. 0.0 .or. WR .LE. 0.0 ) Then
+               CanWat = 0.0
+            Else
+               CanWat = WR / ( 0.2e-3 * Tile_veg * Tile_LAI )   ! refer to SiB model
+            End If
+         End If
+
+         CanWat = min(max(CanWat,0.0),1.0)
+
+         End Function Calc_CanWat
+
+!--------------------------------------------------------------------------------------------------
 ! Calculate soil dry diffusive length until saturation
 !--------------------------------------------------------------------------------------------------
          Pure Function Calc_ldry( sm_v1cm, sm_v5cm, sm_vsat, zsoil1 ) Result( ldry )
@@ -165,7 +559,7 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 !--------------------------------------------------------------------------------------------------
 ! Calculate resistance to snow-covered surfaces
 !--------------------------------------------------------------------------------------------------
-         Pure Function Calc_Rsnow( temp_g, snow, molwt, M_ac, heff, dif_T, rel_rx ) Result( Rsnow )
+         Pure Function Calc_Rsnow( temp_g, snow, molwt, M_ac, heff, dif_T, Rx ) Result( Rsnow )
          Use const, only: stdtemp
 
          Implicit None
@@ -176,15 +570,15 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
          Real, Intent( IN ) :: M_ac   ! Mass accommodation coefficient (ratio)
          Real, Intent( IN ) :: heff   ! Effective henry's constant (unitless)
          Real, Intent( IN ) :: dif_T  ! Mass diffusivity of the trace gas (m2/s) 
-         Real, Intent( IN ) :: rel_rx ! Relative reactivivity (unitless)
+         Real, Intent( IN ) :: Rx ! Relative reactivivity (unitless)
          Real               :: Rwet   ! Resistance of deposition to water surfaces (s/m)
          Real               :: Rice   ! Resistance of deposition to ice surfaces (s/m)
          Real               :: Rsnow  ! Resistance of deposition to snow surfaces (s/m)
          Real               :: melt_snow, ice_snow ! Ration of snow with semi-solid melted and ice surfaces (ratio)
          Real, Parameter    :: rsndiff    = 10.0   ! snow diffusivity fac (s/m)
 
-         Rwet = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T )
-         Rice = Calc_Rice( rel_rx )
+         Rwet = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T, Rx )
+         Rice = Calc_Rice( Rx )
 ! Liquid snow fraction modeled as a system dominated by van der Waals forces following Dash et al. 1999 S. Rep. Prog. Phys. 
 ! with a maximum fraction of the disordered interface acting as an aqueous solution as 20% following Conklin et al 1993 with
 ! the negligible impact of the disordered interface depth of 2 nm following Roth et al 2004. The 2 nm depth was approximated 
@@ -210,8 +604,8 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 !-------------------------------------------------------------------------------------------------
 ! Resistance to air-wet surface exchange
 !-------------------------------------------------------------------------------------------------
-         Pure Function Calc_Rwet( temp_g, MW, ac, H, dif_T ) Result( Rwet )
-         Use Const, only: RGASUNIV
+         Pure Function Calc_Rwet( temp_g, MW, ac, H, dif_T, Rx ) Result( Rwet )
+         Use Const, only: RGASUNIV, stdtemp
 
          Implicit None
 
@@ -220,6 +614,7 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
          Real,    Intent( IN ) :: dif_T
          Real,    Intent( IN ) :: MW
          Real,    Intent( IN ) :: ac
+         Real,    Intent( IN ) :: Rx ! Relative reactivivity (unitless)
          Real, Parameter :: rad_wat     = 1.9e-4    ! water droplet radius (m)
          Real            :: Rwet
          Real            :: rmsv
@@ -227,7 +622,11 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 
          rmsv    = sqrt( 3.0 * RGASUNIV * 1.0e3 * temp_g / MW) 
          rawmt   = rad_wat / dif_T  + 4.0 / ( rmsv  * ac )
-         Rwet   = rawmt + rawmt/( H * rad_wat )
+         If(temp_g .gt. stdtemp) Then
+            Rwet   = rawmt + rawmt/( H * rad_wat )
+         Else 
+            Rwet = Calc_Rice( Rx )
+         End If
 
          End Function Calc_Rwet
 
@@ -274,14 +673,13 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 !-------------------------------------------------------------------------------------------------
 ! Resistance to air-cuticular exchange
 !-------------------------------------------------------------------------------------------------
-         Pure Function Calc_Rcut( temp_g, Rx, molwt, M_ac, heff, dif_T, a_cut,  
+         Pure Function Calc_Rcut( temp_g, Rx, molwt, M_ac, heff, dif_T,  
      &                            snow, no_snow, dry, wet, rh, lai, O3_hit, NH3_hit, ABFLUX ) Result( Rcut )
 
          Use const, only: stdtemp
          Implicit None
 
          Real, Intent( IN ) :: temp_g
-         Real, Intent( IN ) :: a_cut
          Real, Intent( IN ) :: snow
          Real, Intent( IN ) :: no_snow
          Real, Intent( IN ) :: dry
@@ -293,13 +691,12 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
          Real, Intent( IN ) :: M_ac 
          Real, Intent( IN ) :: heff 
          Real, Intent( IN ) :: dif_T
-!         Real, Intent( IN ) :: Rice
-!         Real, Intent( IN ) :: Rsnow
          Logical, Intent( IN ) :: O3_hit
          Logical, Intent( IN ) :: NH3_hit
          Logical, Intent( IN ) :: ABFLUX
 
          Real            :: Rcut
+         Real            :: Gcns
          Real            :: Rsnow
          Real            :: rcdry
          Real            :: rwet
@@ -312,32 +709,18 @@ C Calculate Rcut
          ! If the surface is cold and wet, use dry snow.                   
          rcdry = rcut0 * a0 / Rx
          Rsnow = Calc_Rsnow( temp_g, snow, molwt, M_ac, heff, dif_T, Rx )
-         IF ( temp_g .GE. stdtemp ) THEN 
-!            Rwet= Rwet0         
-            Rwet = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T ) 
-         ELSE ! temp_g .Lt. stdtemp
-!            rwet = Rice
-            rwet = Calc_Rice( Rx )
-         END IF ! temp 
-         IF ( O3_hit ) THEN 
+         Rwet = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T, Rx )
+         If( O3_hit .AND. temp_g .GT. stdtemp ) Then
          ! Canopy level wet resistence Rwet to ozone was found to be about 200 s/m on basis of Keysburg exp
          ! Using LAI(1-sided) of about 6.25 measured at Keysburg gives leaf level rwet about 1250 s/m
-            rwet = 1250.0    ! s/m
-         ! Leaf level rwet estimated from Altimir et al 2006 gives about 1350 s/m  
-         ! Dry cuticle
-            rh_func = max( 0.0,( rh - 70.0 )/30.0 )
-            rcdry   = 1.0 / ( ( 1.0 -rh_func) / ( rcut0 * a0 / Rx )  + rh_func / rwet )               
+               rwet = 1250.0    ! s/m
          End If
-         If ( NH3_hit .And. ABFLUX ) Then
-         ! Massad et al. 2010 Cuticular resistance
-            rcdry = rwm * EXP( a_cut * ( 100.0 - rh ) )    
-         End If ! O3
 
-         Rcut = no_snow / ( lai * ( dry / rcdry     +  ! Dry Cuticle 
-     &                               wet / rwet ) ) +  ! Wet Cuticle 
-     &          snow * Rsnow                           ! Snow
+         Gcns = lai * ( dry / rcdry  + wet / rwet )    ! No Snow Cuticular Conductance
+         Rcut = 1.0 / ( no_snow * Gcns + snow / Rsnow) ! Cuticular resistance with snow
 
          End Function Calc_Rcut
+
 !-------------------------------------------------------------------------------------------------
 ! In-Canopy Aerodynamics Resistance
 !-------------------------------------------------------------------------------------------------
@@ -421,49 +804,49 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
          Real               :: sm_v1cm_ir, sm_v5cm_ir, sm_v10cm
          Real               :: sm_func
          Real               :: ldry
-         Real               :: dp, rgdry
-         Real               :: p_wet ! wet soil surface
-         Real               :: p_dry ! dry soil surface
+         Real               :: dp, rgdry, rgdiff
+         Real               :: s_wet ! wet soil surface
+         Real               :: s_dry ! dry soil surface
          Real, Parameter    :: ldry_max = 0.02
          Real, Parameter    :: rg0      = 1000.0     ! [s/m]
 
-         Rwet  = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T )
+         Rwet  = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T, Rx )
          Rsnow = Calc_Rsnow( temp_g, snow, molwt, M_ac, heff, dif_T, Rx )
-
-         If(ABFLUX .And. NH3_Hit) Then
+!         If(ABFLUX .And. NH3_Hit) Then
 ! Updated based on EPIC 5cm soil moisture estimates where the 25% percentile of the irrigated crop fractional soil moisture was 
 ! approximately equal to 60% of the field capacity.  
-            If ( frac_ir .Gt. 0.0 .And. sm_v5cm .LE.  0.60 * sm_vfc ) Then            
-               sm_v1cm_ir = ( 1.0 - frac_ir ) * sm_v1cm + frac_ir * 0.60 * sm_vfc
-               sm_v5cm_ir = ( 1.0 - frac_ir ) * sm_v5cm + frac_ir * 0.60 * sm_vfc
-            Else
-               sm_v1cm_ir = sm_v1cm
-               sm_v5cm_ir = sm_v5cm
-            End If
+         If ( frac_ir .Gt. 0.0 .And. sm_v5cm .LE.  0.60 * sm_vfc ) Then            
+            sm_v1cm_ir = ( 1.0 - frac_ir ) * sm_v1cm + frac_ir * 0.60 * sm_vfc
+            sm_v5cm_ir = ( 1.0 - frac_ir ) * sm_v5cm + frac_ir * 0.60 * sm_vfc
+         Else
+            sm_v1cm_ir = sm_v1cm
+            sm_v5cm_ir = sm_v5cm
+         End If
             
 ! The following resistance parameterization is derived from measurements with soil samples of 2 cm thick (Kondo et al 1990)
 ! https://doi.org/10.1175/1520-0450(1990)029<0385:APOEFB>2.0.CO;2 as discussed in Sakaguchi and Zeng 2009 JGR 
 ! https://doi.org/10.1029/2008JD010834 According to Swenson and Lawrence 2014 (https://doi.org/10.1002/2014JD022314) and the 
 ! references therein the dry layer thickness varies from 1 to 3 cm. 
 ! From Sakaguchi and Zeng 2009 JGR Equation 10
-            ldry = Calc_ldry( sm_v1cm_ir, sm_v5cm_ir, sm_vsat, zsoil )         
-            dp  = dif_T * sm_vsat**2 * ( 1.0 - sm_vres / sm_vsat ) ** ( 2.0 + 3.0 / sm_bslp )         
-            rgdry = max(ldry / dp,1.0e-6)
+         ldry = Calc_ldry( sm_v1cm_ir, sm_v5cm_ir, sm_vsat, zsoil )         
+         dp  = dif_T * sm_vsat**2 * ( 1.0 - sm_vres / sm_vsat ) ** ( 2.0 + 3.0 / sm_bslp )         
+         rgdiff = max(ldry / dp,1.0e-6)
 ! Assumes that the soil water is an emission source. Air-soil water gradient replaces the empirical resistance to water
-            Rg = no_snow * rgdry + snow * Rsnow 
+!         Rg = 1.0 / ( no_snow / rgdry + snow / Rsnow ) 
 
-         Else If ( O3_Hit ) Then
+!         Else If ( O3_Hit ) Then
+         If ( O3_Hit ) Then
 ! Following based on measurements Fares et al 2014 https://doi.org/10.1016/j.agrformet.2014.08.014 for sandy soil 
 ! forests at 10cm measured soil moisture and Fumagalli et al. 20016 https://doi.org/10.1016/j.agrformet.2016.07.011 for sandy loam soils
 ! Here an asymptotic function was applied to set lower and upper bounds in the resistance as reported by Fumagalli et al. 2016
             sm_v10cm = min(sm_v1cm * exp( 0.09 * GRAV )**(1.0/sm_bslp), sm_vsat )
             sm_func = max( tiny(0.0)**(1.0/sm_bslp) * PI , ( sm_v10cm-sm_vwlt ) / sm_vfc )
             rgdry   = 250.0 + 2000.0 * atan( sm_func**sm_bslp ) /PI  
-
-            Rg = no_snow * ( 1.0/ ( dry / rgdry + wet / rwet ) ) + snow * Rsnow   
+            Rg = 1.0 / ( no_snow / ( 1.0/ ( dry / rgdry + wet / rwet ) ) + snow / Rsnow )   
          Else 
             rgdry  = rg0 * a0 / Rx
-            Rg = no_snow * ( 1.0/ ( dry / rgdry + wet / rwet ) ) + snow * Rsnow  
+            rgdry  = 1.0 / ( 1.0 / rgdry + 1.0 / ( rgdiff + rwet ) )
+            Rg     = 1.0 / ( no_snow / ( 1.0/ ( dry / rgdry + wet / rwet ) ) + snow / Rsnow )
          End If
          Rinc =  Calc_Rinc( Ra, lai )
          Rbgc = Calc_Rbg( k_vis, dif_T, lai, ustar )
@@ -697,7 +1080,7 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
 !-------------------------------------------------------------------------------------------------
 ! Aerosol Deposition Velocity
 !-------------------------------------------------------------------------------------------------
-         Pure Function aero_depv_E20(veg, lai, Ustar, Ra, wet, l_aero, Alpha, DG, SC, NU, VGHAT, EINHAT)
+         Pure Function aero_depv_E20(veg, lai, Ustar, Ra, lwet, swet, l_aero, Alpha, DG, SC, NU, VGHAT, EINHAT)
      &                               Result( depv )
                   
          Implicit None
@@ -706,7 +1089,8 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
          Real, Intent( IN ) :: lai
          Real, Intent( IN ) :: Ustar
          Real, Intent( IN ) :: Ra
-         Real, Intent( IN ) :: wet
+         Real, Intent( IN ) :: lwet
+         Real, Intent( IN ) :: swet
          Real, Intent( IN ) :: l_aero
          Real, Intent( IN ) :: Alpha
          Real, Intent( IN ) :: DG
@@ -721,11 +1105,11 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
          Real               :: Rc     ! Two layer canopy resitance
          Real               :: Rinc   ! In canopy resistance for two layer model 
 
-         RD_GW = RD_Smooth_E20(VGHAT, Ustar, 0.0, SC, NU, wet )
+         RD_GW = RD_Smooth_E20(VGHAT, Ustar, 0.0, SC, NU, swet )
          If( lai .gt. 0.0 .and. veg .gt. 0.0 ) Then
             Rinc      = Calc_Rinc( Ra, lai )
-            RD_VegL   = RD_Veg_E20( Vghat, Ustar, SC,l_aero, lai, DG, wet, Alpha, EINHAT )
-            RD_VegG   = RD_Smooth_E20(VGHAT, Ustar, lai, SC, NU, wet )
+            RD_VegL   = RD_Veg_E20( Vghat, Ustar, SC,l_aero, lai, DG, lwet, Alpha, EINHAT )
+            RD_VegG   = RD_Smooth_E20(VGHAT, Ustar, lai, SC, NU, swet )
 ! Resistance to:                  Soil              Canopy
             Rc   = 1.0 /( 1.0/(Rinc + RD_VegG) + 1.0/RD_VegL )  
             depv =       veg   * Vghat / ( 1.0 - EXP( -Vghat * ( Ra + Rc ) ) ) +  

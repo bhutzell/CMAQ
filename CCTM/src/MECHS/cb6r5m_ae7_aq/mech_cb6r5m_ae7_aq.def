@@ -6,7 +6,7 @@
 !   Remove TRPRXN formation from NO3 reactions
 !   Split APIN from other monoterpenes
 !   Add MTNO3 formation following Pye et al. 2015 (from SAPRC07tic implementation)
-!   Update TRPRXN SOA yields in SOA_DEFN.F
+!   Update TRPRXN SOA yields in ORG_DEFN.F
 !   Documentation in Xu et al. 2018 ACPD: https://doi.org/10.5194/acp-2017-1109
 ! 06-19-18 G.Sarwar
 !    updated <HAL_OZONE>

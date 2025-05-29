@@ -202,7 +202,8 @@
       LOGICAL :: DEPV_DIAG  = .FALSE. ! flag for grid cell deposition velocity diagnostic file
       Logical :: HGBIDI     = .FALSE. ! flag for Hg bidirectional exchange
       Logical :: BIDI_FERT_NH3 = .TRUE. ! flag to remove fertilizer ammonia from Bidirectional emissions
-      Logical :: STAGE_E20 = .TRUE.   ! flag for the Emerson et al. 2020 Aerosol deposition model PNAS https://www.pnas.org/cgi/doi/10.1073/pnas.2014761117
+      Logical :: USE_STAGE = .FALSE.   ! flag for the STAGE deposition option
+      Logical :: STAGE_E20 = .TRUE.   ! flag for the Emerson et al. 2020 Aerosol deposition model 
       Logical :: STAGE_P22 = .FALSE.  ! flag for the Pleim et al. 2022 Aerosol deposition model
       Logical :: STAGE_S22 = .FALSE.  ! flag for the Shu et al. 2022 Aerosol deposition model
       CHARACTER(16) :: DUST_LAND_SCHEME = "UNKNOWN" ! NLCD, USGS, etc
@@ -222,7 +223,6 @@
       CHARACTER( MAXLEN_CCTM_APPL ) :: STAGECTRL  = 'STAGECTRL_NML' ! STAGE Deposition Control Filename
       CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CTRL  = 'CMAQ_CTRL_NML' ! Emission Control Filename
       CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CHEM_CTRL  = 'CMAQ_CH_CTRL_NML' ! Emission Control Filename
-      INTEGER :: EMLAYS_MX     = 0       ! Emission Layers
       INTEGER :: N_FILE_GR     = 0       ! Number of Gridded Emission Files
       INTEGER :: N_FILE_TR     = 0       ! NUmber of Tracer Emission Files
       LOGICAL :: EMISCHK       = .TRUE.  ! flag for checking that surrogate emissions 
@@ -241,11 +241,11 @@
       LOGICAL :: SSEMDIAG      = .FALSE. ! flag for SSEMIS diagnostic file
       LOGICAL :: LTNG_NO       = .FALSE. ! flag for online calculation of NO from lightning
       INTEGER :: LT_ASM_DT     = 0       ! Lightning Input Time Interval
-      LOGICAL :: NLDNSTRIKE    = .FALSE. ! flag to use NLDN STRIKE directly 
+      LOGICAL :: LTNGON_DATA   = .FALSE. ! flag to use LTNG data directly 
       LOGICAL :: LTNGDIAG      = .FALSE. ! flag to turn on lightning NO diagnostics
       REAL    :: MOLSNCG       = 350.0   ! Lightning NO Production Rate
       REAL    :: MOLSNIC       = 350.0   ! Lightning NO Production Rate
-      CHARACTER(250) :: LTNG_FNAME = 'InLine' ! Lightning NO Input Name
+      INTEGER :: LNO_OPTION    = 1       ! Lightning NO options, 1 is default
 
       INTEGER :: NPTGRPS       = 0       ! no. pt src input file groups
       LOGICAL :: PT3DDIAG      = .FALSE. ! Write point source 3d emis diagnostic file
@@ -754,6 +754,9 @@
       ! CTM_IGNORE_FERT_NH3
       CALL GET_ENV ( BIDI_FERT_NH3, 'CTM_BIDI_FERT_NH3', BIDI_FERT_NH3, VARDEV )
  
+      ! Flag for Surface Tiled Aerosol and Gaseous Exchange (STAGE) model Emerson et al. 2020 Aerosol Deposition Option
+      CALL GET_ENV ( USE_STAGE, 'CTM_USE_STAGE', USE_STAGE, VARDEV )
+
       ! Flag for using BELD Land Use for WindBlown Dust 
       CALL GET_ENV ( STRTEMP, 'CTM_WBDUST_BELD', DUST_LAND_SCHEME, VARDEV )
       DUST_LAND_SCHEME = STRTEMP( 1:16)
@@ -815,9 +818,6 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
-      ! Number of Layers for Emissions
-      CALL GET_ENV ( EMLAYS_MX, 'CTM_EMLAYS', EMLAYS_MX, VARDEV )
-
       ! Get Name of Emission Control File
       CALL GET_ENV ( CMAQ_CTRL, 'CMAQ_CTRL_NML', CMAQ_CTRL, VARDEV )
       CALL GET_ENV ( CMAQ_CHEM_CTRL,'CMAQ_CH_CTRL_NML', CMAQ_CHEM_CTRL, VARDEV )
@@ -872,16 +872,13 @@
       CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
   
       ! Set LTNG_NO to Y or T to turn on lightning NO production
-      CALL GET_ENV ( LTNG_NO, 'CTM_LTNG_NO', LTNG_NO, VARDEV ) 
+      CALL GET_ENV ( LTNG_NO, 'CTM_LNO_ONLINE', LTNG_NO, VARDEV ) 
 
       ! Get Lightning Input Time Interval
       CALL GET_ENV ( LT_ASM_DT, 'LTNG_ASSIM_DT', LT_ASM_DT, VARDEV ) 
 
-      ! Get Lightning NO File Name
-      CALL GET_ENV ( LTNG_FNAME, 'LTNGNO', LTNG_FNAME, VARDEV )
- 
       ! Flag for using NLDN data for Lightning Strikes
-      CALL GET_ENV ( NLDNSTRIKE, 'USE_NLDN', NLDNSTRIKE, VARDEV )
+      CALL GET_ENV ( LTNGON_DATA, 'USE_LTNG_DATA', LTNGON_DATA, VARDEV )
  
       ! Flag for Outputing Lightning Diagnostic File
       CALL GET_ENV ( LTNGDIAG, 'LTNGDIAG', LTNGDIAG, VARDEV )
@@ -891,6 +888,12 @@
       
       ! Get Lightning NO Production Rate
       CALL GET_ENV ( MOLSNIC, 'MOLSNIC', 350.0, VARDEV )
+
+      ! Get Lightning NO Options: 1, 2, 3, 4
+      ! 1: default using ground-based lightning flash
+      ! 2: using GLM (satellite) flash, 3: using GLM energy
+      ! 4: using synergized GLM/WWLLN energy 
+      CALL GET_ENV ( LNO_OPTION, 'LNO_OPTION', 1, VARDEV )
  
       ! get number of different file groups (sectors)
       CALL GET_ENV ( NPTGRPS, 'N_EMIS_PT', NPTGRPS, VARDEV )

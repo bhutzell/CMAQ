@@ -184,18 +184,18 @@ The lack of adequate turbulence measurements has limited the development of robu
 
 The vertical diffusion model in CMAQ is the Asymmetrical Convective Model Version 2 (ACM2) (Pleim 2007a,b).  The ACM2 is a combined local and non-local closure PBL scheme that is implemented in CMAQ and WRF for consistent PBL transport of meteorology and chemistry.  Thus, it is recommended that the ACM2 option in WRF or MPAS also be used when preparing meteorology for CMAQ.  
 
-There are two options for the ACM2 model in the BuildScript that are compatible with either the M3Dry or STAGE dry deposition options.  
+There are two options for the ACM2 model in the RunScript that are compatible with either the M3Dry or STAGE dry deposition options.  
 
 When running m3dry dry deposition:
 
 ```
-Set ModVdiff   = acm2_m3dry
+setenv CTM_USE_STAGE N       
 ```
 
 When running STAGE dry deposition:
 
 ```
-Set ModVdiff   = acm2_stage
+setenv CTM_USE_STAGE Y       
 ```
 <a id=6.8_Dry_Dep/Air></a>
 
@@ -211,18 +211,19 @@ Exchange of pollutants between the atmosphere and Earth's surface can be modeled
 
 Currently, most chemicals in CMAQ are modeled as depositing only.  However, ammonia and mercury can be both emitted from the surface and deposited and are therefore modeled as bidirectional. Estimates of the soil and stomatal compensation concentrations needed to compute the bidirectional ammonia flux in CMAQ are derived from input provided by the Environmental Policy Integrated Climate (EPIC) agricultural ecosystem model that is executed using the Fertilizer Emission Scenario Tool for CMAQ (FEST-C, https://www.cmascenter.org/fest-c ) (Ran et al., 2011; Cooter et al., 2012). Information for surface concentrations of mercury are initially specified using land use specific tabular data and then by modeling the accumulation, transformation and evasion of mercury in the surface media (Bash 2010).
 
-Starting with CMAQ v5.3, there are two options for calculating dry deposition/surface exchange which are invoked in the BuildScript as:
+Starting with CMAQ v5.3, there are two options for calculating dry deposition/surface exchange which are selected in the RunScript as:
 
 ```
-Set DepMod   = m3dry
+setenv CTM_USE_STAGE N       
 ```
 
-or:
+When running STAGE dry deposition:
 
 ```
-Set DepMod   = stage
+setenv CTM_USE_STAGE Y       
 ```
-Deetails of each module are provided in the sections below.
+
+Details of each module are provided in the sections below.
 
 <a id=6.8.1_Dry_Depm3dry></a>
 

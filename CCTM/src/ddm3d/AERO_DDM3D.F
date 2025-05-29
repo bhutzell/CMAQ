@@ -13,7 +13,7 @@ C-----------------------------------------------------------------------
       Implicit None
 
 c These parameters have to match what is found in the following modules:
-c aero_data, precursor_data, soa_defn
+c aero_data, precursor_data, org_defn
 
       Real( 8 ), Allocatable, Save :: s_aerospc_conc( :,:,: )  ! aero species sensitivity [ ug/m^3 ]
 

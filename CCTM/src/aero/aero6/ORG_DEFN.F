@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      Module soa_defn
+      Module org_defn
 
 C  Defines aerosol species arrays and parameters required in SOA processing.
 
@@ -251,7 +251,7 @@ C-----------------------------------------------------------------------
       ! Variables for controlling behavior of OA module
       Logical, Private, Save :: mapped              = .False.
       Logical, Private, Save :: RXNS_eflag          = .False. ! error flag for RXNS modules used
-      Character( 16 ), Private, Save :: pname = 'SOA_DEFN        '
+      Character( 16 ), Private, Save :: pname = 'ORG_DEFN        '
 
       ! Indices for specifying groups of organics to sum for output
       INTEGER, PARAMETER :: IOA_ALL = 0, IOA_PRI = 1, IOA_SEC = 2,
@@ -1669,8 +1669,8 @@ C
 C PVB 11/19/07 renamed NP to NCVAP for consistency with ORGAER5 subroutine
 C
 C SH  02/10/10 embedded the old Fortran module, SOA_NEWT, into a new module,
-C     SOA_DEFN, so all SOA-related code can be found in one file.  Renamed
-C     NCVAP to n_oa.  Its value is now set in SOA_DEFN (instead of inside
+C     ORG_DEFN, so all SOA-related code can be found in one file.  Renamed
+C     NCVAP to n_oa.  Its value is now set in ORG_DEFN (instead of inside
 C     this subroutine).  Added TOLX to the call vector of Subroutine LNSRCH,
 C     since that parameter is now set in this subroutine (instead of in the
 C     Fortran module).
@@ -1827,7 +1827,7 @@ C           delta X_j    ( ( X_i  - CTOT_i ) * IMW_j     If i .NE. j
 
 C Revision History:
 C   CGN 01/12/04 changed B1 & B2 to scalars
-C   SH  02/10/10 renamed NCVAP to n_oa. Value is inherited from SOA_DEFN.
+C   SH  02/10/10 renamed NCVAP to n_oa. Value is inherited from ORG_DEFN.
 
       IMPLICIT NONE
 
@@ -1887,7 +1887,7 @@ C Key Subroutines Called: FUNCV
 C Revision History:
 C   YOJ 07/31/02 changed FUNCTION FMIN to SUBROUTINE FMINV to avoid errors
 C       with (some) compilers
-C   SH  02/10/10 renamed NCVAP to n_oa. Value is inherited from SOA_DEFN.
+C   SH  02/10/10 renamed NCVAP to n_oa. Value is inherited from ORG_DEFN.
 
       IMPLICIT NONE
 
@@ -1935,7 +1935,7 @@ C Key Subroutines Called: none
 
 C Revision History:
 C CGN 01/12/04  Added documentation, removed extraneous lines of code
-C SH  02/10/10 renamed NCVAP to n_oa.  Value is inherited from SOA_DEFN
+C SH  02/10/10 renamed NCVAP to n_oa.  Value is inherited from ORG_DEFN
 
 C References:
 C   1. Schell, B., I. J. Ackermann, H. Hass, F. S. Binkowski, and
@@ -2573,4 +2573,4 @@ C     Calculations
 
 !-----------------------------------------------
 
-      End Module soa_defn
+      End Module org_defn

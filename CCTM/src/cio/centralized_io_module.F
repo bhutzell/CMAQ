@@ -146,10 +146,11 @@
         real*8  :: file_ycell(max_nfiles) = 0.0d0
         logical :: file_sym_date(max_nfiles)  
 
-        CHARACTER( 40 ), parameter :: NLDN_STRIKES = 'NLDN_STRIKES'
+        CHARACTER( 40 ), parameter :: LTNGFILE     = 'LTNG_DATA'
         CHARACTER( 40 ), parameter :: ICFILE       = 'INIT_CONC_1'
         CHARACTER( 40 ), parameter :: BCFILE       = 'BNDY_CONC_1'
         CHARACTER( 40 ), parameter :: ISAM_PREVDAY = 'ISAM_PREVDAY'
+        integer  :: LT_VARS                      ! Number of variables in LTNGFILE
 
 ! time independent data
         real, allocatable :: MSFX2(:,:),         ! from GRID_CRO_2D data
@@ -167,6 +168,7 @@
      &                       szone(:,:),         ! from OCEAN data
      &                       chlr(:,:),          ! from OCEAN data
      &                       dmsl(:,:),          ! from OCEAN data
+     &                       LTNG_DATA4D(:,:,:,:,:), ! lightning input data (col, row, layer, time, vars)
      &                       OCEAN_MASK(:,:),    ! from LTNG parameter data
      &                       SLOPE(:,:),         ! from LTNG parameter data
      &                       INTERCEPT(:,:),     ! from LTNG parameter data
@@ -359,7 +361,7 @@
      &                      x_dot_ncols, x_dot_nrows    ! extended dot file nools and nrows 
 
         integer, private :: cio_LTLYRS                  ! number of layers in lightning strike dataset
-        CHARACTER( 16 )  :: LT_NAME                     ! LNT name: old Cis NLDNstrk and new is LNT
+        CHARACTER( 16 ), allocatable  :: LT_NAME(:)     ! lightning data input variable names: such as LTNGstrk or LNT
 
         interface interpolate_var
 #ifdef mpas
@@ -602,8 +604,8 @@
           USE VGRD_DEFN, only : VGTYP_GD, nlays
           USE RUNTIME_VARS, only : N_FILE_GR,
      &                             STDATE, WB_DUST, ISAM_NEW_START,
-     &                             local_tstep, met_tstep, NLDNSTRIKE,
-     &                             LPVO3
+     &                             local_tstep, met_tstep, LTNGON_DATA,
+     &                             LPVO3, LNO_OPTION
           use LSM_Mod, only : LAND_SCHEME
           use cgrid_spcs, only : n_gc_spcd, n_ae_spc
 #ifdef mpas
@@ -1365,45 +1367,43 @@
 ! lightning file
           n_l2d = 0
 #ifndef mpas
-          if (NLDNSTRIKE) then
-             IF ( .NOT. OPEN3( NLDN_STRIKES, FSREAD3, PNAME ) ) THEN
-                XMSG = 'Open failure for ' // NLDN_STRIKES
-                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-             END IF
-             n_opened_file = n_opened_file + 1
-             f_ltng = n_opened_file
-             IF ( .NOT. DESC3( NLDN_STRIKES ) ) THEN
-                XMSG = 'Could not get description of file  '// NLDN_STRIKES 
-                CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-             END IF
-             call subhfile ( NLDN_STRIKES, gxoff, gyoff,
+         if (LTNGON_DATA) then
+            IF ( .NOT. OPEN3( LTNGFILE, FSREAD3, PNAME ) ) THEN
+               XMSG = 'Open failure for ' // LTNGFILE
+               Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+            END IF
+            n_opened_file = n_opened_file + 1
+            f_ltng = n_opened_file
+            IF ( .NOT. DESC3( LTNGFILE ) ) THEN
+               XMSG = 'Could not get description of file  '// LTNGFILE
+               CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+            END IF
+            call subhfile ( LTNGFILE, gxoff, gyoff,
      &                       STRTCOLLNT, ENDCOLLNT, STRTROWLNT, ENDROWLNT)
 
-             file_sdate(f_ltng) = sdate3d
-             file_stime(f_ltng) = stime3d
-             file_tstep(f_ltng) = tstep3d
-             file_xcell(f_ltng) = xcell3d
-             file_ycell(f_ltng) = ycell3d
+            file_sdate(f_ltng) = sdate3d
+            file_stime(f_ltng) = stime3d
+            file_tstep(f_ltng) = tstep3d
+            file_xcell(f_ltng) = xcell3d
+            file_ycell(f_ltng) = ycell3d
 
-             n_l2d = nvars3d
-             cio_LTLYRS = nlays3d
-             allocate (l2d_name(n_l2d, 3), stat=stat)
-             if (stat .ne. 0) then
-                xmsg = 'Failure allocating l2d_name '
-                call m3exit (pname, 0, 0, xmsg, xstat1 )
-             end if
-             l2d_name(:,1) = vname3d(1:n_l2d) 
-             l2d_name(:,2) = 'lnt'   ! denote lightning variable
-             l2d_name(:,3) = ' '     ! denote non met variable
+            n_l2d = nvars3d
+            LT_VARS = n_l2d
+            cio_LTLYRS = nlays3d
+            allocate (l2d_name(n_l2d, 3), stat=stat)
+            allocate (lt_name(n_l2d), stat=stat)
+            if (stat .ne. 0) then
+               xmsg = 'Failure allocating l2d_name '
+               call m3exit (pname, 0, 0, xmsg, xstat1 )
+            end if
+            l2d_name(:,1) = vname3d(1:n_l2d) 
+            l2d_name(:,2) = 'lnt'   ! denote lightning variable
+            l2d_name(:,3) = ' '     ! denote non met variable
              ! Check to see what the lightning variable name is called
-             ! backwards (NLDNstrk) & forwards compatible (LNT)  
-             if ( index1('NLDNstrk', n_l2d ,l2d_name(:,1)) .gt. 0 ) then
-                lt_name = 'NLDNstrk'
-             else
-                lt_name = 'LNT'
-             end if
-
-          end if
+            do v = 1, n_l2d 
+               lt_name(v) = trim(vname3d(v)) 
+            end do
+         end if
 #endif
 
 ! combining all files
@@ -1508,7 +1508,7 @@
              cio_grid_var_name(begin:end, :) = is3d_name
           end if
 
-          if (NLDNSTRIKE) then
+          if (LTNGON_DATA) then
              begin = end + 1
              end = end + n_l2d
              cio_grid_var_name(begin:end, :) = l2d_name
@@ -1920,15 +1920,15 @@
                 else if (cio_grid_var_name(v,2) == 'lnt') then
 
 #ifndef mpas
-                   data_jdate = loc_jdate(f_ltng)
-                   data_jtime = loc_jtime(f_ltng)
+                  data_jdate = loc_jdate(f_ltng)
+                  data_jtime = loc_jtime(f_ltng)
 
-                   IF ( .NOT. XTRACT3( NLDN_STRIKES, cio_grid_var_name(v,1), 
+                  IF ( .NOT. XTRACT3( LTNGFILE, cio_grid_var_name(v,1), 
      &                                 1, cio_LTLYRS, STRTROWLNT, ENDROWLNT, STRTCOLLNT, ENDCOLLNT, 
      &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
-                      XMSG = 'Could not extract ' // NLDN_STRIKES // ' file'
-                      CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
-                   END IF
+                     XMSG = 'Could not extract ' // LTNGFILE // ' file'
+                     CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
+                  END IF
 #endif
 
                 else
@@ -1953,7 +1953,7 @@
 #endif
 
              CALL NEXTIME ( loc_jdate(f_met), loc_jtime(f_met), file_tstep(f_met) )
-             if (NLDNSTRIKE) then
+             if (LTNGON_DATA) then
                  CALL NEXTIME ( loc_jdate(f_ltng), loc_jtime(f_ltng), file_tstep(f_ltng) )
              end if
              CALL NEXTIME ( loc_jdate(f_bcon), loc_jtime(f_bcon), file_tstep(f_bcon) )
@@ -1989,7 +1989,7 @@
 
           USE UTILIO_DEFN
           USE HGRD_DEFN
-          USE LSM_Mod, ONLY: n_lufrac, init_lsm
+          USE LSM_Mod,      ONLY: n_lufrac, init_lsm
 #if defined twoway || defined mpas
           USE coupler_module
 #endif
@@ -5322,6 +5322,9 @@ C Read the various categories of normalized emissions
           USE UTILIO_DEFN
           use HGRD_DEFN, only : ncols, nrows
           use depv_data_module
+          Use STAGE_DATA, Only:  Nit1, Nit2, L1_ON, L2_ON, GMN, BDc1, BDc2, F1_NH4, F2_NH4, L1_ON_Yest, L2_ON_Yest, F1_ON, F2_ON, 
+     &                           gamma1, gamma2
+          use RUNTIME_VARS, only : USE_STAGE
 !         use util_module, only : index1
 
           INCLUDE SUBST_FILES_ID  ! file name parameters
@@ -5386,7 +5389,7 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
 
-#ifdef m3dry_opt
+          If(.NOT. USE_STAGE) Then
           Allocate ( por1 ( ncols, nrows, e2c_cats ),
      &               por2 ( ncols, nrows, e2c_cats ),
      &               wp1  ( ncols, nrows, e2c_cats ),
@@ -5442,7 +5445,7 @@ C Read the various categories of normalized emissions
      &              '" from file "' // TRIM( E2C_SOIL ) // '"'
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
-#endif
+          End If
  
 ! for E2C_CHEM file
           If ( .Not. Open3( E2C_CHEM, fsread3, pname ) ) Then
@@ -5481,8 +5484,7 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
 
-#ifdef m3dry_opt
-
+          If( .NOT.USE_STAGE ) Then
           Allocate ( wep1 ( ncols, nrows, e2c_cats ),
      &               wep2 ( ncols, nrows, e2c_cats ),
      &               dep2 ( ncols, nrows, e2c_cats ),
@@ -5511,8 +5513,9 @@ C Read the various categories of normalized emissions
      &              '" from file "' // TRIM( E2C_CHEM ) // '"'
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
-#else
-#ifdef stage_opt
+          End If
+
+          If( USE_STAGE ) Then
           Allocate( Nit1       ( ncols,nrows,e2c_cats ),
      &              Nit2       ( ncols,nrows,e2c_cats ),
      &              L1_ON      ( ncols,nrows,e2c_cats ),
@@ -5694,9 +5697,7 @@ C Read the various categories of normalized emissions
           end if   ! MEDC_AVAIL
 
 9001      Format( 'Failure reading ', a, 1x, 'from ', a )
-
-#endif   ! end if stage option
-#endif   ! end if m3dry option
+          endif ! USE_STAGE
 
         end subroutine depv_data_setup
 
@@ -5705,6 +5706,8 @@ C Read the various categories of normalized emissions
 
           USE UTILIO_DEFN
           use bidi_mod
+          use STAGE_bidi_mod, only : INIT_STAGE_BIDI
+          use RUNTIME_VARS, only : USE_STAGE
 
           INCLUDE SUBST_FILES_ID             ! file name parameters
 
@@ -5713,8 +5716,11 @@ C Read the various categories of normalized emissions
           CHARACTER( 256 ) :: xmsg
           integer :: v
           integer :: startcol, endcol, startrow, endrow, gxoff, gyoff
-
-          CALL INIT_BIDI( )
+          If( USE_STAGE ) Then
+             CALL INIT_STAGE_BIDI( )
+          Else 
+             CALL INIT_BIDI( )
+          End If
 
           IF ( .NOT. OPEN3( INIT_MEDC_1, FSREAD3, PNAME ) ) THEN
              XMSG = 'Open failure for ' // INIT_MEDC_1
@@ -6067,7 +6073,21 @@ C Read the various categories of normalized emissions
           INTEGER          :: STAT
           CHARACTER( 120 ) :: XMSG = ' '
           integer :: startcol, endcol, startrow, endrow, gxoff, gyoff
+          integer :: v, i, n, jdate, jtime, tstep, nstep, nvars
 
+          IF ( .NOT. OPEN3( LTNGFILE, FSREAD3, PNAME ) ) THEN
+                XMSG = 'Open failure for ' // LTNGFILE
+                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+          END IF
+          IF ( .NOT. DESC3( LTNGFILE ) ) THEN
+               XMSG = 'Could not get description of file  '// LTNGFILE
+               CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+          END IF
+          jdate = SDATE3D
+          jtime = STIME3D
+          tstep = TSTEP3D
+          nstep = MXREC3D
+          nvars = NVARS3D
           allocate (OCEAN_MASK(ncols, nrows), 
      &              SLOPE(ncols, nrows), 
      &              INTERCEPT(ncols, nrows), 
@@ -6075,6 +6095,7 @@ C Read the various categories of normalized emissions
      &              INTERCEPT_lg(ncols, nrows), 
      &              ICCG_SUM(ncols, nrows), 
      &              ICCG_WIN(ncols, nrows), 
+     &              LTNG_DATA4D(ncols, nrows, 1, nstep, nvars),
      &              STAT=STAT)
           IF ( STAT .NE. 0 ) THEN
              XMSG = 'Failure allocating ltng parameter arrays'
@@ -6093,51 +6114,65 @@ C Read the various categories of normalized emissions
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "OCNMASK", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, OCEAN_MASK ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract OPEN from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "SLOPE", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, SLOPE ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract SLOPE from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "INTERCEPT", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, INTERCEPT ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract INTERCEPT from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "SLOPE_lg", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, SLOPE_lg ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract SLOPE_lg from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "INTERCEPT_lg", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, INTERCEPT_lg ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract INTERCEPT_lg from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "ICCG_SUM", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, ICCG_SUM ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract ICCG_SUM from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "ICCG_WIN", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, ICCG_WIN ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract ICCG_WIN from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
+
+
+          DO n = 1, nstep 
+            DO v = 1, nvars
+               IF ( .NOT. XTRACT3( LTNGFILE, LT_NAME(v), 1, 1,
+     &                        startrow, endrow, startcol, endcol,
+     &                        jdate, jtime, LTNG_DATA4D(:,:,:,n,v) ) ) Then
+                  XMSG = 'Could not extract ' // LT_NAME(v) // ' from ' // LTNGFILE
+                  Call M3EXIT( PNAME, jdate, jtime, XMSG, XSTAT1 )
+               End If
+            ENDDO
+            CALL nextime (jdate, jtime, tstep)
+          ENDDO
+             
 
         end subroutine retrieve_ltng_param_data
 

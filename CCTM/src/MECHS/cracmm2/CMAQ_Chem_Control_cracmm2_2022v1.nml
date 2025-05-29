@@ -177,6 +177,24 @@
    'EVERYWHERE', 'ALL'         ,'AROCP2ALK'    ,'AROCP2ALK'    ,'FINE' ,1.  ,'MASS','a',
    'EVERYWHERE', 'ALL'         ,'AROCP2OXY2'   ,'AROCP2OXY2'   ,'FINE' ,1.  ,'MASS','a',
 
+   ! Scale Fire ROC Emissions to account for volatility
+   ! The scale factor for P0OXY4 was 0.15 in the emission processing workflow. The
+   ! scaling for VROCP3ALK (0.1) and VROCP4ALK (0.3) is normalized to this species.
+   ! This should only be applied for Residential wood combustion, not for large-scale
+   ! fires.
+   'EVERYWHERE', 'GR_RWC'      ,'AROCN2OXY4', 'AROCN2OXY4'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCN2OXY8', 'AROCN2OXY8'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCN1OXY3', 'AROCN1OXY3'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCN1OXY6', 'AROCN1OXY6'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY2', 'AROCP0OXY2'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'AROCP0OXY4'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP1OXY1', 'AROCP1OXY1'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP1OXY3', 'AROCP1OXY3'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP2ALK',  'AROCP2ALK'   ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP2OXY2', 'AROCP2OXY2'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP3ALK'   ,'GAS' ,0.667,'MASS','a',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP4ALK'   ,'GAS' ,2.0  ,'MASS','a',
+
                                                         
    ! Coarse-Mode Inorganic Ions Scaling                 
    'EVERYWHERE', 'ALL'         ,'PMC'    ,'ACORS'   ,'COARSE',0.99675,'UNIT','a', 
