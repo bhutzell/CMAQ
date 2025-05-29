@@ -17,7 +17,7 @@
 !------------------------------------------------------------------------!
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+      SUBROUTINE STAGE_VDIFF ( CGRID, JDATE, JTIME, TSTEP )
 
 C-----------------------------------------------------------------------
 C Asymmetric Convective Model v2 (ACM2) -- Pleim(2006)
@@ -82,13 +82,14 @@ C-----------------------------------------------------------------------
       USE DESID_VARS, ONLY : VDEMIS_DIFF, DESID_LAYS
       USE DESID_MODULE, ONLY : DESID_INIT, DESID_DRIVER
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_DDEP
-      USE DEPV_DEFN
+      USE STAGE_DEFN
       USE ASX_DATA_MOD
+      USE STAGE_EMIS_MAP
       USE VDIFF_MAP
       USE UTILIO_DEFN
-      USE BIDI_MOD
-      USE HGSIM
-      Use MOSAIC_MOD, Only: Tile_Data
+      USE STAGE_BIDI_MOD
+      USE HG_BIDI
+      Use MOSAIC_MOD, Only: Init_Mosaic, Tile_Data, GET_STAGE_MET
       USE SEDIMENTATION
       USE VDIFF_DIAG
       USE PA_UPDATE
@@ -99,6 +100,12 @@ C-----------------------------------------------------------------------
      &                   S_SPCTAG, T_SPCTAG, NSPC_SA, ISAM_SPEC
       USE ELMO_DATA, Only : ELMO_ISAM_DDEP
 #endif
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY: NP, NPMAX, SENGRID, SPCNAME, S_DDEP, S_DDEP0, 
+     &                      SNGRD, SENGRID_TEMP, SEN_PAR
+      USE ELMO_DATA, ONLY : ELMO_DDM_DDEP
+#endif 
 
       IMPLICIT NONE
 
@@ -122,7 +129,7 @@ C Parameters:
 C External Functions: None
 
 C Local Variables: 
-      CHARACTER( 16 ), SAVE :: PNAME = 'VDIFFPROC'
+      CHARACTER( 16 ), SAVE :: PNAME = 'STAGE_VDIFFPROC'
 
       CHARACTER( 80 ) :: VARDESC                ! env variable description
 
@@ -159,6 +166,7 @@ C Local Variables
       INTEGER     ASTAT
       INTEGER     C, R, L, S, V, I, J, OFF      ! loop induction variables
       INTEGER     MDATE, MTIME, MSTEP           ! internal simulation date&time
+      CHARACTER(LEN=16) :: SPCBASE
 
       INTERFACE
          SUBROUTINE CONV_CGRID ( CGRID, JDATE, JTIME, CNGRD )
@@ -174,14 +182,14 @@ C Local Variables
          SUBROUTINE EDDYX ( EDDYV )
             REAL,           INTENT( OUT ) :: EDDYV( :,:,: )
          END SUBROUTINE EDDYX
-         SUBROUTINE VDIFFACMX( dtsec, seddy, ddep, TOT_BD_EMIS, ddepj, cngrd )
+         SUBROUTINE STAGE_VDIFFACMX( dtsec, seddy, ddep, TOT_BD_EMIS, ddepj, cngrd )
             REAL, INTENT( IN )    :: dtsec
             REAL, INTENT( INOUT ) :: seddy( :,:,: )
             REAL, INTENT( INOUT ) :: ddep ( :,:,: )
             REAL, INTENT( INOUT ) :: TOT_BD_EMIS ( :,:,: )
             REAL, INTENT( INOUT ), OPTIONAL :: ddepj    ( :,:,:,: )
             REAL, INTENT( INOUT ) :: cngrd( :,:,:,: )
-         END SUBROUTINE VDIFFACMX
+         END SUBROUTINE STAGE_VDIFFACMX
 #ifdef isam
          SUBROUTINE SA_OPWDDEP ( SADEPFILE, JDATE, JTIME, TSTEP )
             IMPLICIT NONE
@@ -201,6 +209,7 @@ C-----------------------------------------------------------------------
 
          CALL LOG_HEADING( LOGDEV, "Initialize Surface Exchange Module" )
 
+         CALL INIT_MOSAIC( JDATE, JTIME, Grid_Data%LUFRAC )
          IF ( .NOT. DEPV_INIT ( JDATE, JTIME, TSTEP, CGRID ) ) THEN
             XMSG = 'Failure initializing deposition velocities module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -212,16 +221,22 @@ C create global maps
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
+C create global maps for bidi emissions and between STAGE and vdiff
+         IF ( .NOT. STAGE_EMIS_MAP_INIT( ) ) THEN
+            XMSG = 'Failure initializing index mapping module'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+
 C Initialize the met data
          CALL INIT_MET( JDATE, JTIME )
 
-         IF ( HGBIDI ) THEN ! Initialize HGSIM module
-            CALL INIT_HGSIM(JDATE, JTIME)
+         IF ( HGBIDI ) THEN ! Initialize HG_BIDI module
+            CALL INIT_HG_BIDI(JDATE, JTIME)
          END IF
 
 C Set output file characteristics based on COORD.EXT and open the dry dep file
          IF ( IO_PE_INCLUSIVE ) THEN
-            CALL OPDDEP ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP )
+            CALL STAGE_OPDDEP ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP )
 #ifdef isam
             CALL SA_OPWDDEP ( SA_DD_1, JDATE, JTIME,TSTEP( 1 ) )
 #endif
@@ -326,14 +341,32 @@ C Set up for grav. settling
             END IF
             DDEPJ = 0.0   ! array assignment
             IF ( IO_PE_INCLUSIVE )
-     &         CALL OPDDEP_MOS ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP )
+     &         CALL STAGE_OPDDEP_MOS ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP )
          END IF   ! if Mosaic
 !--------------------------------------------------------------------------------------------------
          DO V = 1, N_SPC_DEPV
             IF ( DV2DF_SPC( V ) .EQ. 'NH3' ) THEN
                NH3_HIT = V
             END IF
+
          END DO
+#ifdef sens
+         ALLOCATE ( S_DDEP( N_SPC_DEPV,NCOLS,NROWS,NPMAX ), 
+     &              S_DDEP0(N_SPC_DEPV,NCOLS,NROWS,NPMAX ), STAT = ASTAT )
+         IF ( ASTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating S_DDEP and S_DDEP0'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            END IF
+         S_DDEP = 0.0
+         S_DDEP0 = 0.0
+
+         ALLOCATE ( SNGRD( N_SPC_CGRID,NLAYS,NCOLS,NROWS,NPMAX ), STAT = ASTAT )
+         IF ( ASTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SNGRD'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         SNGRD = 0.0
+#endif
 
          RETURN ! Added for MIO implementation
       END IF   !  if Firstime
@@ -347,8 +380,24 @@ C Set up for grav. settling
 C Convert non-molar mixing ratio species and re-order CGRID
       CALL CONV_CGRID ( CGRID, MDATE, MTIME, CNGRD )
 
+#ifdef sens
+      DO NP = 1, NPMAX
+         DO L = 1, NLAYS
+            DO R = 1, NROWS
+               DO C = 1, NCOLS
+                  DO S = 1, N_SPC_CGRID
+                     SENGRID_TEMP( C,R,L,S ) = SENGRID( C,R,L,NP,S )
+                  END DO
+               END DO
+            END DO
+         END DO
+         CALL CONV_CGRID ( SENGRID_TEMP,MDATE, MTIME, SNGRD(:,:,:,:,NP) )
+      END DO
+#endif
+
 C read & interpolate met data
-      CALL GET_MET ( MDATE, MTIME, MSTEP )
+      CALL GET_MET       ( MDATE, MTIME, MSTEP )
+      CALL GET_STAGE_MET ( MDATE, MTIME, MSTEP )
 
 C read & interpolate deposition velocities
       CALL GET_DEPV ( MDATE, MTIME, TSTEP, CGRID )      
@@ -384,6 +433,9 @@ C EDDYV returned = Kz, where Kz is in m**2/sec
       IF ( WSTEP .EQ. 0 ) THEN
          DDEP = 0.0                      ! array assignment
          TOT_BD_EMIS = 0.0                      ! array assignment
+#ifdef sens
+         S_DDEP = 0.0
+#endif
          IF ( MOSAIC ) THEN
             DDEPJ = 0.0                  ! array assignment
          END IF
@@ -393,17 +445,21 @@ C Store Deposition Change in Budget and Process Analysis Arrays
       IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) THEN
           DDEP0 = DDEP
 #ifdef isam
-          SA_DDEP0 = SA_DDEP
+          IF ( L_ELMO ) SA_DDEP0 = SA_DDEP
 #endif
+
+#ifdef sens
+          IF ( L_ELMO ) S_DDEP0 = S_DDEP
+#endif         
       END IF
 
 C Calculate the change in concentration and dry dep from vertical diffusion and vsed
 C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual argument
       IF ( .NOT. MOSAIC ) THEN
-         CALL VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
+         CALL STAGE_VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
      &                   cngrd = CNGRD )
       ELSE
-         CALL VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
+         CALL STAGE_VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
      &                   ddepj = DDEPJ, cngrd = CNGRD )
       END IF 
 
@@ -439,6 +495,14 @@ C Store Deposition Change in Budget and Process Analysis Arrays
             END DO
             IF ( L_ELMO ) 
      &         ELMO_DDEP(:,:,MAP_DDEPtoCGRID(V)) = DDEP_PA(:,:,MAP_DDEPtoCGRID(V))
+#ifdef sens               
+               DO NP = 1,NPMAX
+                  IF ( L_ELMO ) THEN
+                     ELMO_DDM_DDEP(:,:,MAP_DDEPtoCGRID(V),NP) =
+     &                     S_DDEP(S,:,:,NP) - S_DDEP0(S,:,:,NP)
+                  END IF
+               END DO
+#endif             
          END DO
          CALL PA_UPDATE_DDEP ( DDEP_PA, JDATE, JTIME, TSTEP )
 
@@ -452,6 +516,21 @@ C Store Deposition Change in Budget and Process Analysis Arrays
  
 C Revert non-molar mixing ratio species and re-order CGRID
       CALL REV_CGRID ( CNGRD, MDATE, MTIME, CGRID )
+
+#ifdef sens
+      DO NP = 1, NPMAX
+         CALL REV_CGRID ( SNGRD(:,:,:,:,NP), MDATE, MTIME, SENGRID_TEMP )
+         DO L = 1, NLAYS
+            DO R = 1, NROWS
+               DO C = 1, NCOLS
+                  DO S = 1, N_SPC_CGRID
+                     SENGRID( C,R,L,NP,S ) = SENGRID_TEMP( C,R,L,S )
+                  END DO
+               END DO
+            END DO
+         END DO
+      END DO
+#endif
 
 C If last call this hour:  write accumulated depositions:
 
@@ -471,6 +550,12 @@ C If last call this hour:  write accumulated depositions:
                   XMSG = 'Could not open ' // TRIM(CTM_DRY_DEP_1)
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
+#ifdef sens
+               IF ( .NOT. OPEN3( CTM_SDRYDEP_1, FSNONIO, PNAME ) ) THEN
+                  XMSG = 'Could not open ' // TRIM(CTM_SDRYDEP_1)
+                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+               END IF
+#endif 
                IF ( MOSAIC ) THEN
                   IF ( .NOT. OPEN3( CTM_DRY_DEP_MOS, FSREAD3, PNAME ) ) THEN
                      XMSG = 'Could not open ' // TRIM(CTM_DRY_DEP_MOS)
@@ -523,6 +608,11 @@ C If last call this hour:  write accumulated depositions:
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF     
          ENDIF
+         IF ( .NOT. WRITE3( CTM_DRY_DEP_1, BD_EMIS_SPC( HCHO_E ),
+     &        MDATE, MTIME, TOT_BD_EMIS( HCHO_E,:,: ) ) ) THEN
+            XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
+            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+         END IF     
 ! End of STAGE Diagnostic output
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &         'Timestep written to', CTM_DRY_DEP_1,
@@ -660,6 +750,7 @@ C re-set dry deposition array to zero
 
          DDEP = 0.0
          TOT_BD_EMIS = 0.0
+
          IF ( MOSAIC ) THEN
             DDEPJ = 0.0   ! array assignment
          END IF
@@ -681,6 +772,35 @@ C re-set dry deposition array to zero
          END DO
 
          SA_DDEP = 0.0
+#endif
+
+#ifdef sens
+C WT - write out dry deposition sensitivities
+         DO V = 1, N_SPC_DDEP
+            S = DD2DV( V )
+            SPCBASE = DDEP_SPC( V )( 1:12 )                       ! <- these lines have to
+!           WRITE( LOGDEV,'(A)')'DDEP_SPC value: ' // TRIM( SPCBASE )
+            DO NP = 1, NPMAX
+               SPCNAME = TRIM( SPCBASE ) //'_' // SEN_PAR( NP )   ! <- match what is in opddep.F
+               DO R = 1, NROWS
+                  DO C = 1, NCOLS
+                     WRDD( C,R ) = S_DDEP( S, C, R, NP )
+                  ENDDO
+               ENDDO
+!           WRITE( LOGDEV,'(A)')'WRITE3D for ' // TRIM( SPCNAME )
+
+               IF ( .NOT. WRITE3( CTM_SDRYDEP_1, SPCNAME,
+     &                 MDATE, MTIME, WRDD ) ) THEN
+                  XMSG = 'Could not write ' // CTM_SDRYDEP_1 // ' file'
+                  CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+               END IF
+            ENDDO
+         ENDDO
+         WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
+     &         'Timestep written to', CTM_SDRYDEP_1,
+     &         'for date and time', MDATE, MTIME
+
+         S_DDEP = 0.0
 #endif
 
       END IF

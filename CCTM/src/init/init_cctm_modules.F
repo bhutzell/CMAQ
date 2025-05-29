@@ -20,7 +20,7 @@
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE INIT_CCTM_MODULES ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
 
-      USE RUNTIME_VARS, ONLY : COLUMN_MODEL
+      USE RUNTIME_VARS, ONLY : COLUMN_MODEL, USE_STAGE
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP
       USE ELMO_PROC, ONLY : ELMO_DRIVER  
       USE ELMO_INIT_DEFN, ONLY : ELMO_INIT, OPEN_ELMO
@@ -78,6 +78,11 @@ C Arguments:
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
          END SUBROUTINE VDIFF
+         SUBROUTINE STAGE_VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+            REAL, POINTER             :: CGRID( :,:,:,: )
+            INTEGER, INTENT( IN )     :: JDATE, JTIME
+            INTEGER, INTENT( IN )     :: TSTEP( 3 )
+         END SUBROUTINE STAGE_VDIFF
          SUBROUTINE PHOT ( CGRID, JDATE, JTIME, TSTEP )
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
@@ -107,7 +112,11 @@ C Arguments:
       END INTERFACE
 
       ! Calculate Vertical Diffusion, Dry Deposition, and Emissions
-      CALL VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+      IF( USE_STAGE ) THEN 
+         CALL STAGE_VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+      ELSE
+         CALL VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+      END IF
 
       IF ( .NOT. COLUMN_MODEL ) THEN
 

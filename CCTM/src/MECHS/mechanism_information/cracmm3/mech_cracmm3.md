@@ -45,7 +45,7 @@ Information is based on the mech.def file.
 | R025   | DCB1 ---->   1.5000\*HO2 +    0.2500\*ACO3 +    0.2000\*XO2 + CO +    0.5000\*GLY +    0.5000\*MGLY  | MGLY_RACM2 | Not Available<sup>1</sup> | 
 | R026   | DCB2 ---->   1.5000\*HO2 +    0.2500\*ACO3 +    0.2000\*XO2 + CO +    0.5000\*GLY +    0.5000\*MGLY  | MGLY_RACM2 | Not Available<sup>1</sup> | 
 | R027a   | BALD ----> BEN + CO  | BALD1_CALVERT11 | Not Available<sup>1</sup> | 
-| R027b   | BALD ----> BENP + CO + HO2  | BALD2_CALVERT11 | Not Available<sup>1</sup> | 
+| R027b   | BALD ----> BAL1 + CO + HO2  | BALD2_CALVERT11 | Not Available<sup>1</sup> | 
 | R028   | OP1 ----> HO + HO2 + HCHO  | OP1_RACM2 | Not Available<sup>1</sup> | 
 | R029   | OP2 ----> HO + HO2 + ALD  | OP1_RACM2 | Not Available<sup>1</sup> | 
 | TRP03   | OPB ----> HO + HO2 + ALD  | OP1_RACM2 | Not Available<sup>1</sup> | 
@@ -611,9 +611,19 @@ Information is based on the mech.def file.
 | HET_H2NO3PIB   | NO2PIJ + ACLI ----> CLNO2  | HETERO_H2NO3PBIJ | Not Available<sup>2</sup> | 
 | HET_H2NO3PJB   | NO2PIJ + ACLJ ----> CLNO2  | HETERO_H2NO3PBIJ | Not Available<sup>2</sup> | 
 | HET_H2NO3PKB   | NO2PK + ACLK ----> CLNO2  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
-| HET_CLN3_WAI   | CLNO3 ----> HOCL + HNO3  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
-| HET_CLN3_WAJ   | CLNO3 ----> HOCL + HNO3  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
-| HET_CLN3_ACLJ   | CLNO3 + ACLJ ----> CL2 + ANO3J  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
+| HET_CLN3_WAI   | CLNO3 ----> HOCL + HNO3  | HETERO_CLN3_WAI | Not Available<sup>2</sup> | 
+| HET_CLN3_WAJ   | CLNO3 ----> HOCL + HNO3  | HETERO_CLN3_WAJ | Not Available<sup>2</sup> | 
+| HET_CLN3_ACLJ   | CLNO3 + ACLJ ----> CL2 + ANO3J  | HETERO_CLN3_ACLJ | Not Available<sup>2</sup> | 
+| HET_SO2_H2O2   | SO2 + H2O2 ----> ASO4J  | HETERO_SO2H | Not Available<sup>2</sup> | 
+| HET_SO2_O3   | SO2 + O3 ----> ASO4J  | HETERO_SO2O | Not Available<sup>2</sup> | 
+| HET_SO2_MEPX   | SO2 + OP1 ----> ASO4J + MOH  | HETERO_SO2M | Not Available<sup>2</sup> | 
+| HET_SO2_PACD   | SO2 + PAA ----> ASO4J + ORA2  | HETERO_SO2P | Not Available<sup>2</sup> | 
+| HET_SO2_NO2   | SO2 + NO2 ----> ASO4J + HONO  | HETERO_SO2N | Not Available<sup>2</sup> | 
+| HET_SO2_TMI   | SO2 + AFEJ + AMNJ ----> ASO4J + AFEJ + AMNJ  | HETERO_SO2T | Not Available<sup>2</sup> | 
+| HET_SO2_HCHO   | SO2 + HCHO ----> AHMSJ  | HETERO_HMSP | Not Available<sup>2</sup> | 
+| HET_SO2_HNO4   | SO2 + HNO4 ----> ASO4J + ANO3J  | HETERO_HMSP | Not Available<sup>2</sup> | 
+| HET_HMS_L1   | AHMSJ + HO ----> HO2 + SO2 + ORA1  | HETERO_HMSP | Not Available<sup>2</sup> | 
+| HET_HMS_L2   | AHMSJ ----> SO2 + HCHO  | HETERO_HMSP | Not Available<sup>2</sup> | 
 
 <sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     
 <sup>1</sup>Photolysis Reaction;depends on radiation and predicted concentrations     

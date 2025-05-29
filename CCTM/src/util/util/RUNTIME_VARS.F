@@ -202,7 +202,8 @@
       LOGICAL :: DEPV_DIAG  = .FALSE. ! flag for grid cell deposition velocity diagnostic file
       Logical :: HGBIDI     = .FALSE. ! flag for Hg bidirectional exchange
       Logical :: BIDI_FERT_NH3 = .TRUE. ! flag to remove fertilizer ammonia from Bidirectional emissions
-      Logical :: STAGE_E20 = .TRUE.   ! flag for the Emerson et al. 2020 Aerosol deposition model PNAS https://www.pnas.org/cgi/doi/10.1073/pnas.2014761117
+      Logical :: USE_STAGE = .FALSE.   ! flag for the STAGE deposition option
+      Logical :: STAGE_E20 = .TRUE.   ! flag for the Emerson et al. 2020 Aerosol deposition model 
       Logical :: STAGE_P22 = .FALSE.  ! flag for the Pleim et al. 2022 Aerosol deposition model
       Logical :: STAGE_S22 = .FALSE.  ! flag for the Shu et al. 2022 Aerosol deposition model
       CHARACTER(16) :: DUST_LAND_SCHEME = "UNKNOWN" ! NLCD, USGS, etc
@@ -242,6 +243,8 @@
       INTEGER :: LT_ASM_DT     = 0       ! Lightning Input Time Interval
       LOGICAL :: LTNGON_DATA   = .FALSE. ! flag to use LTNG data directly 
       LOGICAL :: LTNGDIAG      = .FALSE. ! flag to turn on lightning NO diagnostics
+      LOGICAL :: USE_SAGE_N    = .FALSE. ! flag to turn on SAGE biogenic soil NO and HONO emissions
+      LOGICAL :: USE_SAGE_N_EF = .FALSE. ! flag to use SAGE emission factor file
       REAL    :: MOLSNCG       = 350.0   ! Lightning NO Production Rate
       REAL    :: MOLSNIC       = 350.0   ! Lightning NO Production Rate
       INTEGER :: LNO_OPTION    = 1       ! Lightning NO options, 1 is default
@@ -753,6 +756,9 @@
       ! CTM_IGNORE_FERT_NH3
       CALL GET_ENV ( BIDI_FERT_NH3, 'CTM_BIDI_FERT_NH3', BIDI_FERT_NH3, VARDEV )
  
+      ! Flag for Surface Tiled Aerosol and Gaseous Exchange (STAGE) model Emerson et al. 2020 Aerosol Deposition Option
+      CALL GET_ENV ( USE_STAGE, 'CTM_USE_STAGE', USE_STAGE, VARDEV )
+
       ! Flag for using BELD Land Use for WindBlown Dust 
       CALL GET_ENV ( STRTEMP, 'CTM_WBDUST_BELD', DUST_LAND_SCHEME, VARDEV )
       DUST_LAND_SCHEME = STRTEMP( 1:16)
@@ -836,6 +842,10 @@
       CALL GET_ENV(USE_MEGAN_LAI, 'USE_MEGAN_LAI',USE_MEGAN_LAI,VARDEV )
       CALL GET_ENV(MGN_ONLN_DEP, 'MGN_ONLN_DEP',MGN_ONLN_DEP,VARDEV )
       CALL GET_ENV(BDSNP_MEGAN, 'BDSNP_MEGAN',BDSNP_MEGAN,VARDEV )
+
+      ! SAGE biogenic soil N and HONO emissions        
+      CALL GET_ENV( USE_SAGE_N,    'USE_SAGE_N',    USE_SAGE_N,    VARDEV ) 
+      CALL GET_ENV( USE_SAGE_N_EF, 'USE_SAGE_N_EF', USE_SAGE_N_EF, VARDEV )
 
       ! Get the speciation profile to use
       CALL GET_ENV ( SPPRO, 'BIOG_SPRO', SPPRO, VARDEV )

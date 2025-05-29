@@ -23,6 +23,7 @@ C Function: User-defined types
 
 C Revision History:
 C     26 June 2014 J.Bash: initial implementation
+      use STAGE_Bidi_Mod, Only: gamma1, gamma2
 
       Implicit None
 
@@ -40,6 +41,25 @@ C     26 June 2014 J.Bash: initial implementation
       Integer, Allocatable, SAVE         :: hlind       ( : )       ! Henry's constant index
       LOGICAL, Allocatable, SAVE         :: USE_DEPSPC  ( : )
       Logical, Allocatable, Save         :: asx_run_map ( : )
+
+! STAGE bidirectional exchange data
+      Real, Allocatable :: Nit1    ( :,:,: ) ! Epic Nitrification layer 1
+      Real, Allocatable :: Nit2    ( :,:,: ) ! Epic Nitrification layer 2
+      Real, Allocatable :: L1_ON   ( :,:,: ) ! Epic Layer 1 organic N
+      Real, Allocatable :: L2_ON   ( :,:,: ) ! Epic Layer 2 organic N
+
+      Real, Allocatable :: GMN     ( :,:,: ) ! Epic Layer 1 and 2 N mineralized in Fest-C 1.4
+
+      Real, Allocatable :: BDc1    ( :,:,: ) ! crop soil bulk density kg/ha
+      Real, Allocatable :: BDc2    ( :,:,: ) ! crop soil bulk density kg/ha   
+
+      Real, Allocatable :: F1_NH4  ( :,:,: ) ! fertlizer application to layer 1 
+      Real, Allocatable :: F2_NH4  ( :,:,: ) ! fertlizer application to layer 2
+
+      Real, Allocatable :: L1_ON_Yest ( :,:,: ) ! Epic Layer 1 organic N
+      Real, Allocatable :: L2_ON_Yest ( :,:,: ) ! Epic Layer 2 organic N
+      Real, Allocatable :: F1_ON      ( :,:,: ) ! Epic Layer 1 organic N Fertilization 
+      Real, Allocatable :: F2_ON      ( :,:,: ) ! Epic Layer 2 organic N Fertilization 
 
       INTEGER, SAVE                      :: N_USE_DEPSPC            ! number of gas species used in this simulation 
       CHARACTER( 16 ), Parameter         :: DEPV_METHOD = 'STAGE'

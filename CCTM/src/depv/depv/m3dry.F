@@ -490,20 +490,8 @@ C-------------------------------------------------------------------------------
       ! Assign a pH for rain water based on longitude if US simulation.
       ! Otherwise use default pH.  Use pH value in HPLUS calculation.
 
-#ifdef mpas
-            hplus = hplus_def
-#else
-            IF ( ( ycent .GE.   30.0 ) .AND. ( ycent .LE.  45.0 ) .AND.
-     &           ( xcent .GE. -120.0 ) .AND. ( xcent .LE. -70.0 ) ) THEN
-               IF ( GRID_DATA%LON( c,r ) .GT. -100.0 ) THEN
-                  hplus = hplus_east
-               ELSE
-                  hplus = hplus_west
-               END IF
-            ELSE
-               hplus = hplus_def
-            END IF
-#endif
+
+         hplus = hplus_def
 
          ELSE   ! water
       ! Calculate the water surface film temperature: wet bulb temperature.
