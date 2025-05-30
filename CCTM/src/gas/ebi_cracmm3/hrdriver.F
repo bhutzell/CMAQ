@@ -27,7 +27,7 @@ C
 C  KEY SUBROUTINES/FUNCTIONS CALLED:  HRINIT, HRCALCKS, HRSOLVER
 C                                     FIND_DEGRADED, INIT_DEGRADE, FINAL_DEGRADE
 C
-C  REVISION HISTORY: Created by EBI solver program, May 19, 2025
+C  REVISION HISTORY: Created by EBI solver program, May 27, 2025
 C                       Based on the algorithm in "Test of Two Numerical
 C                       Schemes for Use in Atmospheric Transport-Chemistry
 C                       Models", O. Hertel, R. Berkowicz, J. Christensen,
@@ -83,7 +83,7 @@ C**********************************************************************
       USE CENTRALIZED_IO_MODULE, ONLY : INTERPOLATE_VAR, OCEAN, SZONE
 #ifdef sens
       USE DDM3D_CHEM
-      Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, 
+      Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH,
      &                      SENGRID, NP, NPMAX, CKTIME
 #endif
       USE CONST, ONLY: MWAIR, MWWAT, STDATMPA
@@ -497,7 +497,7 @@ c..unit conversion for current gridcell
                   END IF
                END DO
 
-c..ddm-3d sensitivity solver               
+c..ddm-3d sensitivity solver
                CALL SOLVE_DDM3D_CHEM( C,R,L,CHEMSTEP )
 
 c..revert back to original units

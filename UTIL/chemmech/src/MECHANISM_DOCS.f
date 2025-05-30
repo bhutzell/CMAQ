@@ -4196,7 +4196,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          WRITE(BOTTOM_UP_UNIT,'(A,/)')  "QY{i} = 'Quantum_Yield_" // TRIM( PHOTAB(IDX) ) // ".csv';"
       END DO
       DO IDX = 1,NHETERO
-         WRITE(KTABLE_UNIT,'(/,A)')"i = i + 1"
+         WRITE(KTABLE_UNIT,'(/,A)')"i = i + 1;"
          WRITE(KTABLE_UNIT,'(A)')  "Knames{i}   = 'K_" // TRIM( HETERO(IDX) ) // "';"
          WRITE(KTABLE_UNIT,'(A,/)')"krx(:,i)    =  1.0E-60;"
       END DO
@@ -4340,7 +4340,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &        "%",/,
      &        "%",/,
      &        "% OUTPUTS:",/,
-     &        "% J: structure of J-values.",/,
+     &        "% K: structure of rate constants. Each is size length(T) x # of rate constants",/,
      &        "%",/,
      &        "% INPUTS",/,
      &        "struct2var(Met)",//,

@@ -70,6 +70,8 @@ C-----------------------------------------------------------------------
       use lus_defn
       use aero_data
       use desid_vars
+      use interp_dat
+      use RUNTIME_VARS, only: BROWN_VEG
 
       implicit none 
 
@@ -107,7 +109,7 @@ C of Binkowski & Roselle (2003)
       real, save :: factsrfk ! = pi * factm2k
 
       real       :: sumsplit, sumfrac
-      integer    :: n, idx
+      integer    :: i, j, n, idx
 
 C Number of soil types: For WRF there are 16 types;
       integer, parameter :: nsltyp = 16
@@ -638,6 +640,7 @@ C Parameters:
 
          integer, save   :: wstep = 0      ! local write counter
          integer         :: mdate, mtime   ! diagnostic file write date&time
+         integer         :: interp_unit
 
                        ! automatic arrays
          real       :: fmoit  ( ncols,nrows )      ! factor of soil moisture on u*t
@@ -646,7 +649,7 @@ C Parameters:
          real       :: vegfrac( ncols,nrows )      ! vegetation fraction
          real       :: vegfree                     ! 1.0 - vegfrac for this col, row
          real       :: lai    ( ncols,nrows )      ! leaf area index
-
+         
          real, allocatable, save :: ustr  ( :,:,: ) ! U* [m/s]
          real, allocatable, save :: qam   ( :,:,: ) ! emis for landuse type [g/m**3/s]
          real, allocatable, save :: elus  ( :,:,: ) ! erodible landuse percent (0~100)
@@ -663,16 +666,25 @@ C Parameters:
          character( 16 ), save :: rc_name, rn_name    ! new names: RC -> RCA, RN -> RNA
          logical, save :: firstime = .true.
 
-         real       :: lambda, vegheight
+
          real       :: z0
          real       :: lambdav           ! vegetation roughness density - Shao et. al [Aus. J. Soil Res., 1996]
          real       :: flxfac1, flxfac2  ! combined soli type mapping factors
+         real       :: lambdapv, lambdanpv
+                                         ! roughness density of PV and
+                                         ! NPV by X. Huang 2020
          real       :: hflux, vflux      ! horizontal and vertical dust flux
          real       :: jday
          integer    :: emap( n_dlcat+1 )
 
 C---Height for veg elements
          real :: hv( 4 )
+
+         real       :: pvfree, npvfree
+         real, allocatable, save :: pv    ( :,: )   ! photsynthetic vegetation
+         real, allocatable, save :: npv   ( :,: )   ! nonphotsynthetic vegetation
+         real       :: lambda, vegheight
+         real :: hnpv( 4 )
 
 C---Roughness density for solid elements
 C from Darmenova et al. [JGR,2009] and Xi and Sokolik [JGR,2015]
@@ -762,7 +774,38 @@ C-----------------------------------------------------------------------
                xmsg = '*** Failure allocating USTR, QAM, FRUF, KVH, or ELUS'
                call m3exit( pname, jdate, jtime, xmsg, xstat1 )
             end if
-         end if
+
+            IF (BROWN_VEG) THEN
+               allocate( pv( ncols,nrows ),
+     &                  npv( ncols,nrows ), stat = status )
+               if ( status .ne. 0 ) then
+                  xmsg = '*** Failure allocating PV or NPV'
+                  call m3exit( pname, jdate, jtime, xmsg, xstat1 )
+               end if
+            END IF
+
+            !!!!!!!!!!! PV AND NPV INTERPOLATION !!!!!!!!!!!!!!!!!!
+            IF (BROWN_VEG) THEN
+                interp_unit = getefile( 'PV_AVG_FILE', .true., .true., pname )
+                do i = 1,ncols 
+                  do j= 1,nrows 
+                     call interp_v(jdate, jtime, lat(i,j), lon(i,j), interp_unit, pv(i,j))
+                  end do
+                end do
+                     call interp_v(jdate, jtime, lat(1,1), lon(1,1), interp_unit, pv(1,1), .true.) ! optional logical says to close the file and deallocate arrays
+    
+                interp_unit = getefile( 'NPV_AVG_FILE', .true., .true., pname )
+                do i = 1, ncols
+                  do j= 1, nrows
+                     call interp_v(jdate, jtime, lat(i,j), lon(i,j), interp_unit, npv(i,j))
+                  end do
+                end do
+                     call interp_v(jdate, jtime, lat(1,1), lon(1,1), interp_unit, npv(1,1), .true.) ! optional logical says to close the file and deallocate arrays
+            END IF
+
+         end if ! firstime
+
+
 
 
 C---Get Julian day number in year
@@ -790,6 +833,28 @@ C   following the idea of Xi and Sokolik [JGR,2015]
          else                                                ! Nov-Feb
             hv = (/ 0.05 , 0.05 , 0.05 , 0.05 /)
          end if
+
+         IF (BROWN_VEG) THEN
+C---Height for NPV by X. Huang 2020
+C---NPV height changed based on the month of the year
+C   Veg. heights in [m] for 1: Shrubland 2: shrubgrass 3: barrenland 4:
+C   Cropland
+           if ( jday .gt. 59 .and. jday .le. 90 ) then         ! Mar
+              hnpv = (/ 0.05 , 0.05 , 0.04 , 0.05 /)
+           else if ( jday .gt. 90 .and. jday .le. 243 ) then   ! Apr-Aug
+              hnpv = (/ 0.05 , 0.05 , 0.03 , 0.05 /)
+           else if ( jday .gt. 243 .and. jday .le. 273 ) then  ! Sep
+              hnpv = (/ 0.06 , 0.10 , 0.05 , 0.15 /)
+           else if ( jday .gt. 273 .and. jday .le. 304 ) then  ! Oct
+              hnpv = (/ 0.08 , 0.10 , 0.05 , 0.15 /)
+           else if ( jday .gt. 304 .and. jday .le. 334 ) then  ! Nov
+              hnpv = (/ 0.08 , 0.08 , 0.05 , 0.10 /)
+           else if ( jday .gt. 334 .and. jday .le. 365 ) then  ! Dec
+              hnpv = (/ 0.06 , 0.08 , 0.05 , 0.10 /)
+           else                                                ! Jan-Feb
+              hnpv = (/ 0.06 , 0.08 , 0.04 , 0.08 /)
+           end if
+         END IF
 
 #ifdef verbose_wbdust
          dryhit = 0
@@ -866,12 +931,21 @@ C    Adjust WRF soil definitions to match internal Menut et al. [JGR,2013] Table
             siltf = 1.0 - clay - sandf
 
 
+            IF (BROWN_VEG) THEN
+               vegfrac( c,r ) = max( min( (pv( c,r ) + npv( c,r )), 0.95), 0.005)
+               vegfree = 1.0 - vegfrac( c,r )
+               pvfree  = 1.0 - max( min( pv( c,r ), 0.95), 0.005)
+               npvfree = 1.0 - max( min( npv( c,r ), 0.95), 0.005)
+               lambdav = -0.35 * log( vegfree ) ! Shao et al. [Aus. J. Soil Res.,1996]
+               lambdapv = -0.35 * log( pvfree )
+               lambdanpv = -0.35 * log( npvfree )
+            ELSE
 C---Vegetation fraction based on the WRF/MCIP VEG variable. In WRF that would be VEGF_PX
 C-- for the case of PX and VEGFRA in the case of other LSMs. In more recent WRFv4+ versions
 C-- high resolution MODIS veg data is availiable and can be used in PX with pxlsm_modis_veg = 1
-            vegfrac( c,r ) = max( min( Met_Data%veg(c,r), 0.95 ), 0.005)
-            vegfree = 1.0 - vegfrac( c,r )
-            lambdav = -0.35 * log( vegfree ) ! Shao et al. [Aus. J. Soil Res.,1996]
+               vegfrac( c,r ) = max( min( Met_Data%veg(c,r), 0.95 ), 0.005)
+               lambdav = -0.35 * log( vegfree ) ! Shao et al. [Aus. J. Soil Res.,1996]
+            END IF
 
 C---Dust possiblity only if 1. not over water 
 C                           2. rain < 1/100 in. (1 in. = 2.540 cm)
@@ -979,7 +1053,13 @@ C ------- Start Loop Over Erodible Landuse ----
 
                         n = emap( m )
                         lambda    = lambdab( n ) + lambdav
-                        vegheight = ( hb_lambdab( n ) + hv( n ) * lambdav ) / lambda
+                        IF (BROWN_VEG) THEN
+                           vegheight = ( hb_lambdab( n ) + hv( n ) * lambdapv + hnpv( n ) * lambdanpv )
+     &                              / (lambdab( n ) + lambdapv + lambdanpv )
+                        ELSE
+                           vegheight = ( hb_lambdab( n ) + hv( n ) * lambdav ) / lambda
+                        END IF
+                           
 
 C---New parametrization for surface roughness by H. Foroutan - Oct. 2015
                         if ( lambda .le. 0.2 ) then
