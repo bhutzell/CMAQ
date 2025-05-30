@@ -75,7 +75,7 @@ c..Production of NO3 (except from N2O5 )
      &    +                 RKI(    64 ) * YC ( HNO3        ) * YCP( HO          )      ! HNO3+HO=NO3
      &    +                 RKI(   138 ) * YC ( PAN         ) * YCP( HO          )      ! PAN+HO=NO3+XO2+HCHO
      &    +                 RKI(   139 ) * YC ( PPN         ) * YCP( HO          )      ! PPN+HO=NO3+XO2+HCHO
-     &    +                 RKI(   143 ) * YC ( HONIT       ) * YCP( HO          )      ! HONIT+HO=NO3+HKET
+     &    +                 RKI(   143 ) * YC ( VHONIT      ) * YCP( HO          )      ! VHONIT+HO=NO3+HKET
 
 c..Loss frequency of NO3 ( except NO3 + NO3 if present )
       L15 =                 RKI(     5 )                        ! NO3=NO
@@ -91,7 +91,7 @@ c..Loss frequency of NO3 ( except NO3 + NO3 if present )
      &    +                 RKI(   160 ) * YC ( OLI         )   ! NO3+OLI=0.1100D+...
      &    +                 RKI(   161 ) * YC ( API         )   ! NO3+API=0.9750D+...
      &    +                 RKI(   162 ) * YC ( LIM         )   ! NO3+LIM=0.9450D+...
-     &    +                 RKI(   163 ) * YC ( TRPN        )   ! NO3+TRPN=0.3300D+...
+     &    +                 RKI(   163 ) * YC ( VTRPN       )   ! NO3+VTRPN=...
      &    +                 RKI(   164 ) * YC ( HCHO        )   ! NO3+HCHO=HO2+CO+HNO3
      &    +                 RKI(   165 ) * YC ( ACD         )   ! NO3+ACD=ACO3+HNO3
      &    +                 RKI(   166 ) * YC ( ALD         )   ! NO3+ALD=RCO3+HNO3

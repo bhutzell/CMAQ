@@ -188,7 +188,7 @@ ASO4,Total sulfur IV as sulfate
 ANH4,Ammonium ion
 ANO3,Nitrate ion
 ASOAT,An empirical SOA
-AGLY,SOA from reactive uptake of glyoxal on particles
+AGLYOLIG,SOA from reactive uptake of glyoxal on particles
 AORGC,SOA from cloud processing of GLY and MGLY
 AEC,Elemental carbon
 AOTHR,Primary unspeciated fine PM
@@ -216,8 +216,6 @@ AISO4,Multifunctional product from heterogeneous uptake of IPX
 AISO5,Multifunctional product from heterogeneous uptake of INALD
 NUM,Number of particles
 SRF,Surface area of particles
-ATRPN,SOA from TRPN
-AHONIT,SOA from HONIT
 ASEAST, J-mode seasalt concentration (tracer)
 CL2, Molecular chlorine 
 CL, Atomic chlorine
@@ -231,4 +229,5 @@ CLNO3, Chlorine nitrate
 CLOO, Chlorine superoxide
 NO2PIJ, Dioxidonitrogen
 NO2PK, Dioxidonitrogen
+MTN1,Monoterpene derived species with C* 1e-1 ug/m3
 AHMS, Hydroxymethanesulfonate ion

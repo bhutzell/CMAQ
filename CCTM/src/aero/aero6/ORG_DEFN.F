@@ -84,7 +84,7 @@ C-----------------------------------------------------------------------
       Logical, Parameter, Private :: T = .true.
       Logical, Parameter, Private :: F = .false.
 
-      Integer, Parameter :: n_oa_list = 85   ! # of potential partitioning SVOCs
+      Integer, Parameter :: n_oa_list = 87   ! # of potential partitioning SVOCs
       Integer, Save      :: n_oa             ! Total # of simulated SOA vapors
       Integer, Save      :: n_oa_NotTracers  ! # of simulated SOA vapors that are not tracers
       Integer, Save      :: n_oa_tracers      ! # of simulated SOA vapors that are tracers
@@ -131,8 +131,8 @@ C-----------------------------------------------------------------------
      & oa_type('AMT5   ', 'SVMT5   ', 'TRPRXN  ',   0.143,  100.000,  58.0E3, .333,1.57, F,  F,  T,  F ),
      & oa_type('AMT6   ', 'SVMT6   ', 'TRPRXN  ',   0.285, 1000.000,  47.0E3, .200,1.40, F,  F,  T,  F ),
      & oa_type('AMT7   ', 'SVMT7   ', 'TRPRXN  ',   0.160,10000.000,  36.0E3, .222,1.43, F,  F,  T,  F ),
-     & oa_type('AHOM   ', 'HOM     ', '        ',     0.0,  6.3E-03, 130.0E3, .700,2.08, F,  F,  T,  F ),
-     & oa_type('AELHOM ', 'ELHOM   ', '        ',     0.0,  1.0E-05, 160.0E3, .400,1.67, F,  F,  T,  F ),
+     & oa_type('AHOM   ', 'VHOM    ', '        ',     0.0,  6.3E-03, 130.0E3, .700,2.08, F,  F,  T,  F ),
+     & oa_type('AELHOM ', 'VELHOM  ', '        ',     0.0,  1.0E-05, 160.0E3, .400,1.67, F,  F,  T,  F ),
      & oa_type('AMTNO3 ', 'MTNO3   ', '        ',     0.0,     12.0,  40.0E3, .587,1.90, F,  F,  T,  F ),
      & oa_type('AISOPNN', 'ISOPNN  ', '        ',     0.0,     8.9,   40.0E3,2.107,3.80, F,  F,  T,  F ),
      & oa_type('AMTHYD ', '        ', '        ',     0.0,   1.E-10,   1.0E0, .299,1.54, F,  F,  T,  T ),
@@ -172,7 +172,7 @@ C-----------------------------------------------------------------------
      & oa_type('AAVB4  ', 'SVAVB4  ', '        ',  0.0000,  100.000,  18.0E3, .659,1.99, F,  T,  F,  F ),
      & oa_type('AOLGA  ', '        ', '        ',  0.0000,   1.e-10,   1.0E0,1.067,2.50, F,  T,  F,  T ),
      & oa_type('AOLGB  ', '        ', '        ',  0.0000,   1.e-10,   1.0E0, .747,2.10, F,  F,  T,  T ),
-     & oa_type('AOP3   ', 'OP3     ', '        ',  0.0000,    1.e+1,  81.0E3, .600,1.92, F,  T,  F,  F ),
+     & oa_type('AOP3   ', 'VOP3    ', '        ',  0.0000,    1.e+1,  81.0E3, .600,1.92, F,  T,  F,  F ),
      & oa_type('ASOAT  ', '        ', '        ',  0.0000,  1.0E-10,   1.0E0,0.857,2.31, F,  T,  F,  T ),
      & oa_type('AROCN2ALK','VROCN2ALK','        ', 0.0000,    1.e-2, 104.0E3, .000,1.39, T,  T,  F,  F ),
      & oa_type('AROCN1ALK','VROCN1ALK','        ', 0.0000,    1.e-1,  96.0E3, .000,1.32, T,  T,  F,  F ),
@@ -193,10 +193,13 @@ C-----------------------------------------------------------------------
      & oa_type('AROCP2OXY2','VROCP2OXY2','        ',0.0000,   1.e+2,  77.0E3, .200,1.42, F,  T,  F,  F ),
      & oa_type('AROCP3OXY2','VROCP3OXY2','        ',0.0000,   1.e+3,  73.0E3, .200,1.42, F,  T,  F,  F ),
      & oa_type('ABENAPY', 'BENAPY  ', '        ',  0.0000,   0.0396, 105.0E3, .000,1.00, F,  T,  F,  F ),
-     & oa_type('AISO4  ','         ','         ',     0.0,   1.e-10,   1.0E0,  1.2,2.80, F,  F,  T,  T ),
-     & oa_type('AISO5  ','         ','         ',     0.0,   1.e-10,   1.0E0,  1.0,2.50, F,  F,  T,  T ),
-     & oa_type('ATRPN  ','TRPN     ','         ',     0.0,   1410.0,  89.1E3, .400,1.79, F,  F,  T,  F ),
-     & oa_type('AHONIT ','HONIT    ','         ',     0.0,   0.0413, 121.0E3, .700,2.21, F,  F,  T,  F ) /)
+     & oa_type('AISO4   ','         ','         ',     0.0,   1.e-10,   1.0E0,  1.2,2.80, F,  F,  T,  T ),
+     & oa_type('AISO5   ','         ','         ',     0.0,   1.e-10,   1.0E0,  1.0,2.50, F,  F,  T,  T ),
+     & oa_type('ATRPN   ','VTRPN    ','         ',     0.0,   1410.0,  89.1E3, .400,1.79, F,  F,  T,  F ),
+     & oa_type('AHONIT  ','VHONIT   ','         ',     0.0,   0.0413, 121.0E3, .700,2.21, F,  F,  T,  F ),
+     & oa_type('AGLYOLIG','         ','         ',     0.0,   1.E-10,   1.0E0, .771,2.13, F,  F,  F,  T ),
+     & oa_type('AMTN1   ','VMTN1    ','         ',     0.0,   1.e-1,   85.0E3,  1.0,2.43, F,  F,  T,  F )
+     & /)
       ! Table Comments:
       ! *Reaction Counters are only needed if the vapor species is not formed
       !  directly in the gas-phase chemistry mechanism.

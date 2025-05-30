@@ -382,6 +382,9 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> 
   setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
   setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml
+  if ( ${MECH} =~ *cracmm* ) then
+      setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}_${APPL}.nml
+  endif
 
   #> The following namelist controls the mapping of meteorological land use types and the NH3 and Hg emission
   #> potentials
