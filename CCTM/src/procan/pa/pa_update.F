@@ -368,8 +368,9 @@ C-----------------------------------------------------------------------
          call interpolate_var ('DENS', mdate, mtime, DENS)
       
          DO ICG = 1,N_CGRID_SPC
+            VEMIS(:,:,:,ICG) = VEMIS(:,:,:,ICG) * DT
             IF ( CGRID_MASK_AERO( ICG ) ) 
-     &         VEMIS(:,:,:,ICG) = VEMIS(:,:,:,ICG) * DT *
+     &         VEMIS(:,:,:,ICG) = VEMIS(:,:,:,ICG) * 
      &                            PA_EMIS_CONV(ICG) * DENS( :,:,: )
          END DO
           

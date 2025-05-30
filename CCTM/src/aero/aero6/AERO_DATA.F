@@ -762,19 +762,26 @@ C-------------------------------------------------------------------------------
          Logical         :: accum_mask   ! is this accumulation-mode PM?
          Logical         :: aitken_mask  ! is this aitken-mode PM?
          Logical         :: nuc_mask     ! is this nucleation-mode PM?
+         Logical         :: hyb_eqb      ! should this mode be treated
+                                         !   as equilibrium if the hybrid option 
+                                         !   is selected? 
+                                         !     True = Equilibrium
+                                         !     False = Dynamic
          Real            :: min_numconc  ! minimum number concentration
          Real            :: min_m2conc   ! minimum 2nd moment concentration
          Real            :: min_m3conc   ! minimum 3rd moment concentration
       End Type mode_type
 
       Type ( mode_type ), Parameter  :: aeromode( n_mode ) = (/
-C                  suffix   number     surface         Masks       minimum minimum minimum
-C                            name       name     ALL U  F  C AC AI NU  numconc  m2conc  m3conc
-C                  ------- ----------  -------   --- -  -  - -- -- --  -------- -------  ------
-     &   mode_type('AIT'  ,'NUMATKN', 'SRFATKN', T,  T, T, F, F, T, F, conmin,  conmin, conmin),
-     &   mode_type('ACC'  ,'NUMACC ', 'SRFACC ', T,  F, T, F, T, F, F, conmin,  conmin, conmin),
-     &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', T,  F, F, T, F, F, F, conmin,  conmin, conmin)/)
+C                  suffix   number     surface         Masks           HYB- minimum minimum minimum
+C                            name       name     ALL U  F  C AC AI NU  EQB  numconc  m2conc  m3conc
+C                  ------- ----------  -------   --- -  -  - -- -- --  ---  -------- -------  ------
+     &   mode_type('AIT'  ,'NUMATKN', 'SRFATKN', T,  T, T, F, F, T, F,  T,  conmin,  conmin, conmin),
+     &   mode_type('ACC'  ,'NUMACC ', 'SRFACC ', T,  F, T, F, T, F, F,  T,  conmin,  conmin, conmin),
+     &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', T,  F, F, T, F, F, F,  F,  conmin,  conmin, conmin)/)
 
+      ! Set Mode that receives new particles from NPF algorithm
+      INTEGER, PARAMETER :: NPF_MODE = 1
 
       ! Indices for mode masks
       INTEGER, PARAMETER :: IM_ALL = 1, IM_UF = 2, IM_F = 3, IM_C = 4,

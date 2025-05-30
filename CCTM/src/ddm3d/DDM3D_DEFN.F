@@ -174,6 +174,7 @@ C-----------------------------------------------------------------------
       Use VGRD_DEFN, Only: NLAYS
 
       Use RXNS_DATA, Only: NRXNS
+      Use RUNTIME_VARS, Only : AERO_MASS_TRANSFER
 
       Implicit None
 
@@ -197,12 +198,20 @@ c     Character( 16 ) :: DDM3D_ES   = 'DDM3D_ES'    ! switch for pre-merged emis
       Character( 80 ) :: VARDESC
       Integer LOGDEV       ! FORTRAN unit number for log file
 
-      Character( 96 ) :: XMSG = ' '
+      Character( 250 ) :: XMSG = ' '
       Integer ALLOCSTAT
 
       LOGDEV = INIT3 ()
 
 c     STARTDATE = STDATE
+
+C Halt the model if aerosol partitioning is not configured
+C for the default 'hybrid' mode.
+      IF ( AERO_MASS_TRANSFER .NE. 'HYB' ) THEN
+         WRITE( XMSG, '(A,A)' ),'ERROR: DDM3D may only be used with Hybrid ',
+     &      'aerosol partioning. Please set AERO_MT to HYB in your Run Script.'
+         CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
+      END IF
 
 c Determine number of parameters
       VARDESC = 'Max number of sens parameters.'

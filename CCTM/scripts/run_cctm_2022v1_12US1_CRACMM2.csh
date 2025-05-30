@@ -194,6 +194,13 @@ setenv CTM_STAGE_P22 N       #> Pleim et al. 2022 Aerosol deposition model [defa
 setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [default: Y; active only if CTM_USE_STAGE = Y]
 setenv CTM_STAGE_S22 N       #> Shu et al. 2022 (CMAQ v5.3) Aerosol deposition model [default: N]
 
+setenv AERO_MT "HYB"         #> Specify Inorganic Aerosol Mass Transfer Approach [default = HYB].
+                             #>    Set to EQB to assume equilibirum partitioning for all aerosol 
+                             #>    modes. Set to DYN to calculate dynamic fluxes with respect to 
+                             #>    a fixed sub-time-step. Set to HYB for coarse mode to use dynamic
+                             #>    mass transfer and fine modes to use equilibrium partitioning.
+setenv AERO_DYN_TSTEP 90     #> Specify the fixed sub-time-step for dynamic partitioning of aerol 
+                             #>    modes. 
 setenv BC_AERO_M2WET F       #> Specify whether or not boundary condition aerosol size distribution 
                              #>    is wet or dry [ default: F = dry ]. This option should be set
                              #>    to True if boundary condition size distirbution parameters are
