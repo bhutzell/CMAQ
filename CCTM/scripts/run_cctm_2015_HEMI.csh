@@ -150,6 +150,7 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
 setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
+setenv CTM_BROWN_VEG Y       #> use NPV input files to limit dust emissions [ default: N ]
 setenv CTM_LNO_ONLINE N      #> turn on lightning NOx [ default: N 
                              #> alternatively LNOx emissions can also be read in as external emissions inputs,
                              #> in this case, please setenv this variable to N to avoid double counting
@@ -317,6 +318,12 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Ozone column data
   set OMIfile   = omi_cmaq_2005through2024_27x27.dat
+
+  # If using BROWN_VEG option, then set the path to the NPV input files
+   if ( $CTM_BROWN_VEG == 'Y' ) then
+       setenv PV_AVG_FILE ${INPDIR}/surface/pv_avg.dat
+       setenv NPV_AVG_FILE ${INPDIR}/surface/npv_avg.dat
+   endif
 
   #> Optics file
   set OPTfile = PHOT_OPTICS.dat

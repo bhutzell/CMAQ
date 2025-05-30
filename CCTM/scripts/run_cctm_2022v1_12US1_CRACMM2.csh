@@ -151,8 +151,7 @@ setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aero
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
 
 setenv CTM_WB_DUST N         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
-setenv CTM_BROWN_VEG N       #> use NPV input files to limit dust emissions [ default: N ]
-
+setenv CTM_BROWN_VEG Y       #> use NPV input files to limit dust emissions [ default: N ]
 setenv CTM_LTNG_NO Y         #> turn on lightning NOx [ default: N ]
 
 setenv KZMIN Y               #> use Min Kz option in edyintb [ default: Y ], 
@@ -321,12 +320,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 #  set OMIfile   = OMI_1979_to_2019.dat
   set OMIfile   = OMI_1979_to_2022.dat
 
-# If using BROWN_VEG option, then set the path to the NPV input files
+  # If using BROWN_VEG option, then set the path to the NPV input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
-       setenv PV_AVG_FILE /work/MOD3DATA/dust/pv_avg.dat
-       setenv NPV_AVG_FILE /work/MOD3DATA/dust/npv_avg.dat
+       setenv PV_AVG_FILE ${INPDIR}/surface/pv_avg.dat
+       setenv NPV_AVG_FILE ${INPDIR}/surace/npv_avg.dat
    endif
-  
 
   #> Optics file
   set OPTfile = PHOT_OPTICS.dat
