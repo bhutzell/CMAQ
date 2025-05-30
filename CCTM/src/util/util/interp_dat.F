@@ -465,8 +465,8 @@
       end if
 
 899   if ( datvar .gt. 10000.0 ) then
-        print *, "problem with interpoloation"
-        STOP
+        xmsg = 'problem with interpoloation'
+        call m3exit ( pname, jdate, 0, xmsg, xstat1 )
       end if
 
       return
