@@ -270,7 +270,7 @@ their budget calculated.
 
 <!-- END COMMENT -->
 
-Beginning with CMAQv6.0beta, a new CMAQ Chemical Control Namelist is stored in each chemical mechanism folder within MECHS. It allows users to input sophisticated scaling rules for 
+Beginning with CMAQv6.0alpha, a new CMAQ Chemical Control Namelist is stored in each chemical mechanism folder within MECHS. It allows users to input sophisticated scaling rules for 
 configuring emissions with DESID. If the user modifies the name or location of this namelist, then the following command in the RunScript should be updated as well:
 ```
 setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml

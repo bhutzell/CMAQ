@@ -81,7 +81,7 @@ C Allocate and define arrays used to calculate aerosol optical properties
          USE UTILIO_DEFN
       
          USE AERO_DATA           ! aero variable data
-         USE SOA_DEFN            ! gas soa data
+         USE ORG_DEFN            ! gas soa data
          USE AEROMET_DATA        
          USE CONST      
          USE CSQY_DATA, ONLY : NWL => NWL_REF, NUM_REFRACTIVE, REFRACTIVE_INDEX,
@@ -436,7 +436,7 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
 
       USE AERO_DATA           ! aero variable data
-      USE SOA_DEFN            ! gas soa data
+      USE ORG_DEFN            ! gas soa data
       USE AEROMET_DATA        ! met data
       USE CONST      
       USE CSQY_DATA,  ONLY : NWL => NWL_REF, NUM_REFRACTIVE, REFRACTIVE_INDEX,

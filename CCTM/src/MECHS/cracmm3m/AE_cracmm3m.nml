@@ -60,4 +60,5 @@ AE_SPECIES_DATA =
 'AHONIT'    ,265.0  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'ASEAST'    ,31.30  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'PRI'        , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Sea salt tracer,L,NA,NA
 'ABR'      , 79.90  ,F      ,T     ,T      ,''     ,'' ,-1    ,''  ,-1     ,'VMASS'     , 1  ,'PRI'        , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Bromide ion,E,DTXSID6043967,[Br-]
+'AHMS'      ,111.10 ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Hydroxymethanesulfonate ion,E,DTXSID20225910,C(O)S(=O)(=O)[O-]
 /   

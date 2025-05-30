@@ -86,6 +86,18 @@ The SOA predictions for the non-contiguous regions show dramatically large maxim
 
 | | [PR#1317](https://github.com/USEPA/CMAQ_Dev/pull/1317)  |
 
+##  Add cracmm3m to mechanisms supported by ISAM
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Science Update    
+**Release Version**: CMAQv6.0  
+
+**Description**: Code changes allow  CCTM-ISAM simulations to use the cracmm3m chemical mechanism.
+
+**Significance and Impact**: The update adds information to the ISAM module so CCTM-ISAM simulations can use the cracmm3m chemical mechanism.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+| | [PR#1313](https://github.com/USEPA/CMAQ_Dev/pull/1313)  |
 
 
 ##  Source Apportionment of SOA

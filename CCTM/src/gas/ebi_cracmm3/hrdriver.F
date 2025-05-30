@@ -27,7 +27,7 @@ C
 C  KEY SUBROUTINES/FUNCTIONS CALLED:  HRINIT, HRCALCKS, HRSOLVER
 C                                     FIND_DEGRADED, INIT_DEGRADE, FINAL_DEGRADE
 C
-C  REVISION HISTORY: Created by EBI solver program, Mar 24, 2025
+C  REVISION HISTORY: Created by EBI solver program, May 19, 2025
 C                       Based on the algorithm in "Test of Two Numerical
 C                       Schemes for Use in Atmospheric Transport-Chemistry
 C                       Models", O. Hertel, R. Berkowicz, J. Christensen,
@@ -83,7 +83,8 @@ C**********************************************************************
       USE CENTRALIZED_IO_MODULE, ONLY : INTERPOLATE_VAR, OCEAN, SZONE
 #ifdef sens
       USE DDM3D_CHEM
-      Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, NP, NPMAX, CKTIME
+      Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, 
+     &                      SENGRID, NP, NPMAX, CKTIME
 #endif
       USE CONST, ONLY: MWAIR, MWWAT, STDATMPA
 
@@ -485,8 +486,30 @@ c..update irrout arrays if needed
                   END IF
                END DO
 
+c..unit conversion for current gridcell
+               DO SPC = 1, NUMB_MECH_SPC
+                  S = CGRID_INDEX( SPC )
+                  IF( CONVERT_CONC( SPC ) )THEN
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,S ) = REAL ( INV_DENS*FORWARD_CONV( SPC ) )
+     &                                        * SENGRID( C,R,L,NP,S )
+                     END DO
+                  END IF
+               END DO
 
+c..ddm-3d sensitivity solver               
                CALL SOLVE_DDM3D_CHEM( C,R,L,CHEMSTEP )
+
+c..revert back to original units
+               DO SPC = 1, NUMB_MECH_SPC
+                  S = CGRID_INDEX( SPC )
+                  IF( CONVERT_CONC( SPC ) )THEN
+                      DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,S ) = REAL( REVERSE_CONV( SPC ) * DENS( C,R,L ) )
+     &                                        * SENGRID( C,R,L,NP,S )
+                      END DO
+                  ENDIF
+               END DO
 #endif
 
             END DO

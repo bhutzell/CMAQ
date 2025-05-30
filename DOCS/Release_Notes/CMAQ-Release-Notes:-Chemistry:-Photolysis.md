@@ -25,7 +25,7 @@ Updates regarding the photolysis processes do not alter model predictions. The c
 ### Updated OMI.dat file that contains data from 2005 through 2024
 [Kirk Baker](mailto:baker.kirk@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: New ancillary input file   
-**Release Version/Date**:  CMAQv6.0 beta1 and beta 2
+**Release Version/Date**:  CMAQv6.0
 
 **Description**:  
 New O3 column input file for the photolysis routine in CMAQ. This file provides finer resolution than the previous file and includes more recent data which extends from 2005 through 2024. This new OMI.dat file has a resolution of 27x27 cells covering the globe compared to the previous file resolution of 17x17. The 27x27 resolution was chosen to produce a file that was below the recommended file size for a GitHub repository. Additional files are available upon request that use finer resolution to cover the globe. 

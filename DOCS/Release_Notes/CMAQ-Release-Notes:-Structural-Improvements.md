@@ -37,6 +37,20 @@ No impact on results.
 |:------:|:-------:|
 |[Merge for PR#1267](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e) | [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  |   
 
+### Correct desid_module.F for serial version of CCTM
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency
+**Type of update**: Bug Fix
+**Release Version**:  v6.0
+
+**Description**:
+The update removes a CCTM compile error from the desid_module.F file when the build script compiles a serial version. The error comes from lines getting a grid cell's column and row number in the simulation domain. The method only works for parallel version because it uses a PARIO routine. The fix inserts a ifdef-else block to consider parallel and non-parallel cases.
+
+**Significance and Impact**: The update allows compiling a serial version of CCTM which can be useful in diagnosing CCTM bugs or errors.
+
+|Merge Commit | Pull Request |
+|:------:|:-------:|
+| Merge for PR#1331 |  [PR#1331](https://github.com/USEPA/CMAQ_Dev/pull/1331) |
+
 ### GNU build flag update to enable compilation with GNU versions 10+
 [Fahim Sidi](mailto:sidi.fahim@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  

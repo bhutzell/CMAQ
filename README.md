@@ -1,4 +1,4 @@
-CMAQv6.0 BETA 
+CMAQv6.0 ALPHA 
 ==========
 
 US EPA Community Multiscale Air Quality Model (CMAQ) Website: https://www.epa.gov/cmaq
@@ -8,11 +8,11 @@ CMAQ is an open-source development project of the U.S. EPA that consists of a su
 CMAQ combines current knowledge in atmospheric science and air quality modeling with multi-processor computing techniques in an open-source framework to deliver scientifically sound estimates of ozone, particulates and toxics in the air we breathe, as well as deposition of pollutants such as acids and nutrients to our land and water.
 
 
-## CMAQ version 6.0 Beta Overview:
+## CMAQ version 6.0 Alpha Overview:
 
-The science updates and new features in the beta version (v6.0b1) are documented in the [CMAQv6.0beta Release Notes](DOCS/Release_Notes/README.md) and summarized in the **[Release FAQ](DOCS/Release_FAQ/CMAQv6.0-FAQ.md)**.
+The science updates and new features in the alpha version (v6.0a1) are documented in the [CMAQv6.0alpha Release Notes](DOCS/Release_Notes/README.md) and summarized in the **[Release FAQ](DOCS/Release_FAQ/CMAQv6.0-FAQ.md)**.
 
-While initially planned for fall 2026, the status and timing of any final release of CMAQv6.0 is to be determined. This CMAQv6.0 beta release allows community members:
+While initially planned for fall 2026, the status and timing of any final release of CMAQv6.0 is to be determined. This CMAQv6.0 alpha release allows community members:
 
 * a preview of science and feature updates planned for the CMAQv6.0 release.
 * the ability to take advantage of improvements for preliminary studies of their own interest.
@@ -47,11 +47,11 @@ While initially planned for fall 2026, the status and timing of any final releas
 
 ## Getting the CMAQ Repository
 This CMAQ Git archive is organized with each version stored as a branch on the main USEPA/CMAQ repository. The most recently released official version of the model will always be on the branch called 'main'. 
-To clone code from the CMAQv6.0 beta version issue the following command from within a working directory on your server:
+To clone code from the CMAQv6.0 alpha version issue the following command from within a working directory on your server:
 
-**Beta 1 Version**
+**Alpha 1 Version**
 ```
-git clone -b 6.0b1 https://github.com/USEPA/CMAQ.git CMAQ_REPO
+git clone -b 6.0a1 https://github.com/USEPA/CMAQ.git CMAQ_REPO
 ```
 
 
@@ -64,12 +64,12 @@ Source code and scripts are organized as follows:
 * **PYTOOLS:** Python pre- and postprocessing tools
 * **UTIL:** Utilities for generating code and using CMAQ (e.g. chemical mechanism generation)
 
-## CMAQv6.0 Beta Documentation
-The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DESID have been updated for CMAQv6.0 beta.  All other User's Guide content in this repository was last updated for the CMAQv5.5 release. Additional documentation updates will be included in the CMAQv6.0 release. Information on the updates in CMAQv6.0 beta is included in the **[CMAQ Release Notes](DOCS/Release_Notes/README.md).**
+## CMAQv6.0 Alpha Documentation
+The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DESID have been updated for CMAQv6.0 alpha.  All other User's Guide content in this repository was last updated for the CMAQv5.5 release. Additional documentation updates will be included in the CMAQv6.0 release. Information on the updates in CMAQv6.0 alpha is included in the **[CMAQ Release Notes](DOCS/Release_Notes/README.md).**
 
 
 ## CMAQ Test Cases 
-Test case input and output data for the CMAQv5.5 release are available from the CMAS Data Warehouse. Step-by-step benchmark tutorials using the test case data are provided in the GitHub repo. These Test Case datasets may be adapted to work with the CMAQv6.0 beta versions.
+Test case input and output data for the CMAQv5.5 release are available from the CMAS Data Warehouse. Step-by-step benchmark tutorials using the test case data are provided in the GitHub repo. These Test Case datasets may be adapted to work with the CMAQv6.0 alpha versions.
 * [CMAQ Test Case Data](DOCS/Test_Case_Data.md)
 
 

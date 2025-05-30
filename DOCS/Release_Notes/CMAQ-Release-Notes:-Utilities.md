@@ -21,7 +21,7 @@ The other item corrects rate constant type thirteen that was developed for the M
 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix, Chemistry  
-**Release Version/Date**: CMAQv6.0 beta 1 and beta 2 
+**Release Version/Date**: CMAQv6.0 
 
 **Description**: the update modifies the create_ebi utility to remove the pgi compile error for the cracmm3m's ebi solver. The error occurs because a subroutine has a statement exceeding number of line continuations allowed by pgf90 in nvhpc version 24.7. Changes to create_ebi remove the specific error for cracmm3's ebi solver but attempt to prevent this type of error in other ebi subroutines. The goal supports developing later versions of chemical mechanism that have more complex or numerous interactions between chemical species.
 

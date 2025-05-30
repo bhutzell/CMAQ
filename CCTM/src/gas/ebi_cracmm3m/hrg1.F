@@ -29,7 +29,7 @@ C  PRECONDITIONS: For the CRACMM3M mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Apr  2, 2025
+C  REVISION HISTORY: Created by EBI solver program, May 20, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C   01 Jun 18 B.Hutzell: replaced steady solution for O1D with backward Euler
@@ -410,6 +410,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &   +                 RKI(   754 ) * YC ( BRO         )   ! NO2+BRO=BRNO3
      &   +                 RKI(   822 ) * YC ( I           )   ! NO2+I=INO2
      &   +                 RKI(   833 ) * YC ( IO          )   ! NO2+IO=INO3
+     &   +                 RKI(   911 ) * YC ( SO2         )   ! NO2+SO2=ASO4J+HONO
       L2     = 1.0D0 + L2 * DTC
 
 
@@ -451,6 +452,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &   +                 RKI(   745 ) * YC ( BR          )   ! O3+BR=BRO
      &   +                 RKI(   758 ) * YC ( OBRO        )   ! O3+OBRO=BRO
      &   +                 RKI(   819 ) * YC ( I           )   ! O3+I=IO
+     &   +                 RKI(   908 ) * YC ( SO2         )   ! O3+SO2=ASO4J
       L3    = 1.0D0 + L3 * DTC
 
 
