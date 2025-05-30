@@ -75,6 +75,7 @@ C-----------------------------------------------------------------------
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE PAGRD_DEFN            ! PA horiz domain specs
       USE UTILIO_DEFN
+      USE CGRID_SPCS, ONLY : N_CGRID_SPC
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE, SE_DATA_COPY_MODULE)
@@ -195,7 +196,13 @@ C  Initialize arrays
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          DELC = 0.0
-
+         IF ( .NOT. ALLOCATED( CSAV ) ) THEN
+           ALLOCATE ( CSAV( NCOLS,NROWS,NLAYS,N_CGRID_SPC ),
+     &                STAT = STATUS )
+           CALL CHECKMEM( STATUS, 'CSAV', PNAME )
+           CSAV = CGRID
+         END IF
+ 
       END IF   ! LIPR
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

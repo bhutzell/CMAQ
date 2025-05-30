@@ -184,10 +184,17 @@
       LOGICAL :: LPVO3     = .FALSE.       ! Activate Potential Vorticity Module (default=False)
 
       ! Aerosols
-      LOGICAL :: BC_AERO_M2WET=.FALSE.! flag for specifying wet aerosol size parameters 
-                                      !   for boundary conditions. FALSE = dry
-      LOGICAL :: BC_AERO_M2USE=.TRUE. ! flag for using the second moment from the input file
-                                          !   for boundary conditions.TRUE = use input 2nd moment
+      CHARACTER(3) :: 
+     &   AERO_MASS_TRANSFER='HYB'          ! Mode-dependent mass transfer approach (Default = 'HYB')
+                                           !   DYN - Dynamic approach for all modes
+                                           !   EQB - Equilibrium Approach for all modes
+                                           !   HYB - Equilibrium for Aitken and Accumulation modes, 
+                                           !         and Dynamic for the coarse mode.
+      INTEGER :: AERO_DYN_TSTEP = 90       ! Maximum sub-time-step for dynamic aerosol mass transfer
+      LOGICAL :: BC_AERO_M2WET=.FALSE.     ! flag for specifying wet aerosol size parameters 
+                                           !   for boundary conditions. FALSE = dry
+      LOGICAL :: BC_AERO_M2USE=.TRUE.      ! flag for using the second moment from the input file
+                                           !   for boundary conditions.TRUE = use input 2nd moment
 
       ! Cloud Parameters
       LOGICAL :: CLD_DIAG  = .FALSE. ! flag to output cloud diagnostic files
@@ -237,6 +244,7 @@
       LOGICAL :: MGEMDIAG      = .FALSE. ! flag for MGEM diagnostic file
       LOGICAL :: OCEAN_CHEM    = .TRUE.  ! Flag for ocean halogen chemistry and sea spray aerosol emissions
       LOGICAL :: WB_DUST       = .FALSE. ! flag for On-Line Dust Emission Calculation
+      LOGICAL :: BROWN_VEG     = .FALSE. ! flag for Using Brown Veg (NPV) for Dust Emission Calculation
       LOGICAL :: DUSTEM_DIAG   = .FALSE. ! flag for dustemis diagnostic file
       LOGICAL :: SSEMDIAG      = .FALSE. ! flag for SSEMIS diagnostic file
       LOGICAL :: LTNG_NO       = .FALSE. ! flag for online calculation of NO from lightning
@@ -687,10 +695,16 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
-      ! Get flag for interpreting initial condition aerosol size distributions as dry
+      ! Get flag for setting aerosol mass transfer approach
+      CALL GET_ENV ( AERO_MASS_TRANSFER, 'AERO_MT', AERO_MASS_TRANSFER, VARDEV )
+
+      ! Get maximum sub-time-step for dynamic aerosol mass transfer
+      CALL GET_ENV ( AERO_DYN_TSTEP, 'AERO_DYN_TSTEP', AERO_DYN_TSTEP, VARDEV )
+
+      ! Get flag for interpreting boundary condition aerosol size distributions as dry
       CALL GET_ENV ( BC_AERO_M2WET, 'BC_AERO_M2WET', BC_AERO_M2WET, VARDEV )
 
-      ! Get flag for using initial condition aerosol second moment
+      ! Get flag for using boundary condition aerosol second moment
       CALL GET_ENV ( BC_AERO_M2USE, 'BC_AERO_M2USE', BC_AERO_M2USE, VARDEV )
 
       !-------------------------------------------------------------------------------------------------------
@@ -861,6 +875,9 @@
 
       ! Flag for Online Calculation of Windblown dust emissions
       CALL GET_ENV ( WB_DUST, 'CTM_WB_DUST', WB_DUST, VARDEV )
+
+      ! Flag for use of brown vegetation (NPV) for  Windblown dust emissions
+      CALL GET_ENV ( BROWN_VEG, 'CTM_BROWN_VEG', BROWN_VEG, VARDEV )
 
       ! Get env var for diagnostic output
       CALL GET_ENV ( DUSTEM_DIAG, 'CTM_DUSTEM_DIAG', DUSTEM_DIAG, VARDEV )

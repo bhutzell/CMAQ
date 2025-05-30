@@ -150,6 +150,7 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
 setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
+setenv CTM_BROWN_VEG Y       #> use NPV input files to limit dust emissions [ default: N ]
 setenv CTM_LNO_ONLINE N      #> turn on lightning NOx [ default: N 
                              #> alternatively LNOx emissions can also be read in as external emissions inputs,
                              #> in this case, please setenv this variable to N to avoid double counting
@@ -194,6 +195,13 @@ setenv CTM_STAGE_P22 N       #> Pleim et al. 2022 Aerosol deposition model [defa
 setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [default: Y; active only if CTM_USE_STAGE = Y]
 setenv CTM_STAGE_S22 N       #> Shu et al. 2022 (CMAQ v5.3) Aerosol deposition model [default: N]
 
+setenv AERO_MT "HYB"         #> Specify Inorganic Aerosol Mass Transfer Approach [default = HYB].
+                             #>    Set to EQB to assume equilibirum partitioning for all aerosol 
+                             #>    modes. Set to DYN to calculate dynamic fluxes with respect to 
+                             #>    a fixed sub-time-step. Set to HYB for coarse mode to use dynamic
+                             #>    mass transfer and fine modes to use equilibrium partitioning.
+setenv AERO_DYN_TSTEP 90     #> Specify the fixed sub-time-step for dynamic partitioning of aerol 
+                             #>    modes. 
 setenv BC_AERO_M2WET F       #> Specify whether or not boundary condition aerosol size distribution 
                              #>    is wet or dry [ default: F = dry ]. This option should be set
                              #>    to True if boundary condition size distirbution parameters are
@@ -317,6 +325,12 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Ozone column data
   set OMIfile   = omi_cmaq_2005through2024_27x27.dat
+
+  # If using BROWN_VEG option, then set the path to the NPV input files
+   if ( $CTM_BROWN_VEG == 'Y' ) then
+       setenv PV_AVG_FILE ${INPDIR}/surface/pv_avg.dat
+       setenv NPV_AVG_FILE ${INPDIR}/surface/npv_avg.dat
+   endif
 
   #> Optics file
   set OPTfile = PHOT_OPTICS.dat

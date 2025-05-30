@@ -43,7 +43,7 @@ C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
 
 C...........PARAMETERS and their descriptions:
 
-         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 282     ! Number of substances
+         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 298     ! Number of substances
 
          PRIVATE 
 
@@ -372,6 +372,23 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(280), A(280), E(280) / 'OBRO            ', 1.01E+00, 3.5E+03 /   ! Using CLOO data
       DATA SUBNAME(281), A(281), E(281) / 'NITROSYL_BROMID ', 4.96E-02, 0.0E+00 /   ! Using NITROSYL_CHLROD data
       DATA SUBNAME(282), A(282), E(282) / 'HYDROGEN_CYANIDE', 1.72E+02, 4.4E+03 /   ! Sander, R. ACP (2015)
+
+      DATA SUBNAME(283), A(283), E(283) / 'ALDOPERA        ', 1.35E+01, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(284), A(284), E(284) / 'DCB1OPERA       ', 3.80E+04, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(285), A(285), E(285) / 'DCB2OPERA       ', 7.59E+01, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(286), A(286), E(286) / 'OP2OPERA        ', 3.39E+02, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(287), A(287), E(287) / 'OPBOPERA        ', 5.89E+06, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(288), A(288), E(288) / 'OP3OPERA        ', 2.51E+06, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(289), A(289), E(289) / 'ONITOPERA       ', 6.46E-01, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(290), A(290), E(290) / 'PINALOPERA      ', 1.70E+03, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(291), A(291), E(291) / 'LIMALOPERA      ', 2.75E+01, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(292), A(292), E(292) / 'DCB3OPERA       ', 1.74E+04, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(293), A(293), E(293) / 'ISHPOPERA       ', 6.61E+05, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(294), A(294), E(294) / 'MAHPOPERA       ', 3.55E+05, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(295), A(295), E(295) / 'ISONOPERA       ', 7.08E+03, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(296), A(296), E(296) / 'TRPNOPERA       ', 2.09E+02, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(297), A(297), E(297) / 'HONITOPERA      ', 7.94E+07, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(298), A(298), E(298) / 'VMTN1OPERA      ', 3.31E+09, 0.0E+00 /   ! CRACMM RepCmp value (OPERA SAR)
 
       DATA B( MSO2   ), D( MSO2   ) / 1.30E-02,  1.96E+03 /  ! SO2*H2O<=>HSO3+H     : Smith and Martell (1976)
       DATA B( MHSO3  ), D( MHSO3  ) / 6.60E-08,  1.50E+03 /  ! HSO3<=>SO3+H         : Smith and Martell (1976)

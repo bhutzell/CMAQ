@@ -3606,7 +3606,7 @@ C
 C *** GET APPROPRIATE ROOT.
 C
       IF (DEL1.LT.ZERO .OR. DEL1.GT.HI .OR. DEL1.GT.NO3I) THEN
-         print *, DELT
+         print *, 'ISORROPIA DELT = ',DELT
          DELT = ZERO
       ELSE
          DELT = DEL1
