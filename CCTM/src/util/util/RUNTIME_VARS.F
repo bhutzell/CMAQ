@@ -324,13 +324,14 @@
       USE M3UTILIO
 #endif
 
+#ifdef parallel
+      USE MPI
+#endif
+
       IMPLICIT NONE                         
 
       INCLUDE SUBST_FILES_ID             ! file name parameters
 
-#ifdef parallel      
-      include 'mpif.h'
-#endif
  
       INTEGER, INTENT( In )  :: JDATE       
       INTEGER, INTENT( In )  :: JTIME  
@@ -1195,13 +1196,11 @@
       REAL( 8 ) FUNCTION SET_CPU_TIMING()
 
 ! Function set cpu time
-      
+#ifdef parallel
+      USE MPI 
+#endif
        IMPLICIT NONE
 
-#ifdef parallel
-      INCLUDE 'mpif.h'
-#endif
-      
  ! local:      
       REAL( 8 )  :: CPU_TIME_FINISH
 #ifndef parallel
@@ -1219,13 +1218,13 @@
 !.........................................................................
       SUBROUTINE TIMING_DELTA( CPU_TIME_START, CPU_TIME_DELTA )
       
-         IMPLICIT NONE
-
 #ifdef parallel
-      INCLUDE 'mpif.h'
+      USE MPI
 #endif
-        REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_START
-        REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_DELTA
+      IMPLICIT NONE
+
+      REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_START
+      REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_DELTA
       
  ! local:      
       REAL( 8 )  :: CPU_TIME_FINISH
@@ -1263,11 +1262,11 @@
 !  character string input for customizing that message. 
 !.........................................................................
  
+#ifdef parallel
+      USE MPI
+#endif
       IMPLICIT NONE
 
-#ifdef parallel
-      INCLUDE 'mpif.h'
-#endif
       REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_START
       INTEGER,   INTENT( IN   )  :: IMSG   ! What kind of checkpoint this is
       CHARACTER( * ), INTENT(IN), OPTIONAL :: CPROCIN

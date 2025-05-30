@@ -168,6 +168,7 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
 #endif
 
 #ifdef parallel
+      USE MPI
       USE SE_MODULES            ! stenex (using SE_INIT_MODULE)
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_INIT_MODULE)
@@ -193,11 +194,6 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
 
 C Include Files:
       INCLUDE SUBST_FILES_ID    ! I/O definitions and declarations
-
-#ifdef parallel
-!     INCLUDE SUBST_MPI         ! MPI definitions and parameters
-      INCLUDE 'mpif.h'
-#endif
 
 C Local variables:
 

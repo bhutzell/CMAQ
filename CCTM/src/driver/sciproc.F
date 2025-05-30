@@ -62,6 +62,7 @@ C-----------------------------------------------------------------------
      &                        COLUMN_MODEL, LPVO3, USE_STAGE
 #ifndef mpas
 #ifdef parallel
+      USE MPI
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
@@ -81,9 +82,6 @@ C-----------------------------------------------------------------------
 
       IMPLICIT NONE   
 
-#ifdef parallel
-      INCLUDE 'mpif.h'
-#endif
 C Arguments:
       REAL, POINTER :: CGRID( :,:,:,: )
 

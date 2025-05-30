@@ -17,9 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker] 
-C $Header: /project/work/rep/PARIO/src/pwrgrdd.f,v 1.11 2012/01/26 20:14:28 sjr Exp $
-
       LOGICAL FUNCTION PWRGRDD( FILNAME, VARNAME, DATE, TIME, BUFFER,
      &                          NCOLS3D, NROWS3D, NLAYS3D,
      &                          NCOLS, NROWS, NP )
@@ -96,7 +93,7 @@ C  OUT: none
  
 C  LOCAL VARIABLE DESCRIPTION:  see below
  
-C  CALLS: WRITE3, PM3WARN, PM3EXIT, TRIMLEN, MPI_SEND, MPI_RECV, MPI_BCAST
+C  CALLS: WRITE3, PM3WARN, PM3EXIT, TRIMLEN, MPI_SEND, MPI_RECV, MPI_ALLREDUCE
  
 C  NOTES: (1) Only the primary I/O processor does the file writing. Input
 C             arguments FILNAME, VARNAME, DATE, and TIME are meaningful
@@ -113,12 +110,12 @@ C-----------------------------------------------------------------------
       USE PIOMAPS_MODULE
       USE ALLOC_DATA_MODULE
       USE M3UTILIO, ONLY : WRITE3              ! i/o api
+      USE MPI
 
       IMPLICIT NONE
 
 C Include Files
 
-      INCLUDE 'mpif.h'            ! MPI definitions and parameters
       INCLUDE 'PIOVARS.EXT'
 
 C Arguments
