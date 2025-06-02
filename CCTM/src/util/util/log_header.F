@@ -15,7 +15,7 @@
      &   '#================================================================================#', 
      &   '#|                                                                              |#', 
      &   '#|               The Community Multiscale Air Quality (CMAQ) Model              |#', 
-     &   '#|                                   Version 5.5                                |#', 
+     &   '#|                                  Version 6.0_alpha1                          |#', 
      &   '#|                                                                              |#', 
      &   '#|                          Built and Maintained by the                         |#', 
      &   '#|                        Office of Research and Development                    |#', 

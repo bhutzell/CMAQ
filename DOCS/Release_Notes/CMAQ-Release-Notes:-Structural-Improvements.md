@@ -1,5 +1,42 @@
 # Structural Improvements
 
+### Replace CONST.EXT include file with module and update constant values  
+[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Restructure   
+**Release Version/Date**: CMAQv6.0
+
+**Description**:   
+In this PR, the code is restructured to define and use a CONST module in lieu of the CONST.EXT include file. 
+The module includes fundamental physical, chemical, and mathematical constants used in CMAQ as well as certain commonly used statement functions, particularly `ESATL` for calculating the saturation vapor pressure of water as a function of temperature.  The values of Avogadro's number, the Boltzmann constant, and the universal gas constant are updated to be consistent with the latest (2019) NIST and SI standards. The single and double precision versions of these constants are also made consistent with each other.
+Additionally, the Meng and Seinfeld (1994) approximation to the error function ERF has been removed. ERF and its complement ERFC are intrinsic Fortran functions since the 2008 standard. 
+
+**Significance and Impact**:   
+Very minor change in model results. Easier code maintenance and better consistency.  
+
+**References**:   
+NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds. NIST Special Publication 330, 2019.   doi: 10.6028/nist.sp.330-2019  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1137](https://github.com/USEPA/CMAQ/commit/e7ed66e185b1b93af8515428053465564ae6857c) | [PR#1137](https://github.com/USEPA/CMAQ_Dev/pull/1137)  | 
+|[Merge for PR#1138](https://github.com/USEPA/CMAQ/commit/96449cd6f20eccf61699cee038317b6ffaed467a) | [PR#1138](https://github.com/USEPA/CMAQ_Dev/pull/1138)  |   
+
+
+### Cap log_message at 1000 lines  
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Bug Fixe  
+**Release Version/Date**:  v6.0 
+
+**Description**:   
+When excessively long character strings are sent to log_message, it has the potential to reach an infinite loop. This update establishes a cap on the log_message at 1000 lines.
+
+**Significance and Impact**:   
+No impact on results.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1267](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e) | [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  |   
+
 ### Correct desid_module.F for serial version of CCTM
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency
 **Type of update**: Bug Fix
@@ -17,7 +54,7 @@ The update removes a CCTM compile error from the desid_module.F file when the bu
 ### GNU build flag update to enable compilation with GNU versions 10+
 [Fahim Sidi](mailto:sidi.fahim@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**:  v5.5  
+**Release Version/Date**:  v5.5   
 
 **Description**:  Starting GNU version 10+, GNU no longer allows rank mismatches between the callee and the calling function. The exact verbiage from the GNU change logs:"Mismatches between actual and dummy argument lists in a single file are now rejected with an error. Use the new option -fallow-argument-mismatch to turn these errors into warnings; this option is implied with -std=legacy. -Wargument-mismatch has been removed.” (https://gcc.gnu.org/gcc-10/changes.html)
 
@@ -30,14 +67,14 @@ The non-FORTRAN explanation boils down to the ability to pass 1-D arrays, 2-D ar
 **References**:  n/a
 |Merge Commit | Internal record|
 |:------:|:-------:|
-| [Merge for PR#1154](https://github.com/USEPA/CMAQ_Dev/commit/c31983b72a3049d708138da3f57227875333eb39) |  [PR#1154](https://github.com/USEPA/CMAQ_Dev/pull/1154) |
+| [Merge for PR#1154](https://github.com/USEPA/CMAQ/commit/c31983b72a3049d708138da3f57227875333eb39) |  [PR#1154](https://github.com/USEPA/CMAQ_Dev/pull/1154) |
 
 ### Emissions Diagnostics and Log Output
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Diagnostic and Log Updates  
 **Release Version**:  v5.5 
  
-**Description**:  
+**Description**:   
 Several issues with emissions diagnostics were identified by internal developers and external users. These have been resolved. Issues include:
 
 - Process analysis errors when PA_BLEV > 1 and emissions are restricted to layer 1 only.  This issue was first identified on the CMAS User Forum: https://forum.cmascenter.org/t/really-large-ipr-emis-results-for-upper-layers/
@@ -47,20 +84,23 @@ Several issues with emissions diagnostics were identified by internal developers
 - The EMVAR molecular weight table defined in desid_vars.F is now assigned with individual operational lines instead of one continuous parameter statement in the module specification section. This update will avoid Fortran continuation line limit issues in the future if the number of emission species continues to expand.
 - Adding space for environment variables like the symbolic date labels to be printed completely in the log files
 
-**Significance and Impact**: These updates improve consistency among diagnostic output files and improve readability of the log files. 
+**Significance and Impact**:  
+These updates improve consistency among diagnostic output files and improve readability of the log files. 
  
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1077](https://github.com/USEPA/CMAQ/commit/1eef012a93faf0f7f9b523fede916fb5cd890fef) | [PR#1077](https://github.com/USEPA/CMAQ_Dev/pull/1077)  |  
 
-## Add precision to timing metrics in logfiles
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Improvement (Minor log formatting change)  
-**Release Version/Date**: v5.5  
+## Add precision to timing metrics in logfiles 
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency   
+**Type of update**: Improvement (Minor log formatting change)   
+**Release Version/Date**: v5.5    
 
-**Description**: This PR adds three decimal places of precision to the process-level timing metrics in the ascii logfile.
+**Description**:   
+This PR adds three decimal places of precision to the process-level timing metrics in the ascii logfile.
 
-**Significance and Impact**: At high computational efficiency, the default precision provided for the timing metrics in the logfile was yielding 0.0 for some processes. When aggregated, this underestimates the time taken by these processes.  
+**Significance and Impact**:   
+At high computational efficiency, the default precision provided for the timing metrics in the logfile was yielding 0.0 for some processes. When aggregated, this underestimates the time taken by these processes.  
  
 |Merge Commit | Internal record|
 |:------:|:-------:|
@@ -68,15 +108,16 @@ Several issues with emissions diagnostics were identified by internal developers
 
 ## Improvement of Logfile output and error reporting
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Bug Fix and Log File Improvements  
-**Release Version**: CMAQv5.4  
+**Type of update**: Bug Fix and Log File Improvements   
+**Release Version**: CMAQv5.4   
 
-**Description**: 
+**Description**:   
 - Propagated SHA ID from git repository to configuration file and execution ID to support versioning and matching code state to results.
 - Propagated (mostly documentation) improvements to v5.4 branch from existing v5.3 release branch. 
 - Added M3EXIT output to Main logfile to improve discoverability.
   
-**Significance and Impact**: No impact on results for the cases tested.  
+**Significance and Impact**:   
+No impact on results for the cases tested.  
 
 |Merge Commit | Internal record|
 |:------:|:-------:|

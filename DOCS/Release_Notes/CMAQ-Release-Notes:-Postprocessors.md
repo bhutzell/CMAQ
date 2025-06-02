@@ -1,10 +1,67 @@
 # Post-processors
 
 ## [calc_tmetric](../../POST/calc_tmetric/README.md) 
- No changes were made to this tool in CMAQv5.5.
+### Expand functionality of calc_tmetric
+[William T. Hutzell](mailto:hutzell.bill@epa.gov)], U.S. Environmental Protection Agency    
+**Type of update**: New Feature 
+**Release Version/Date**:  CMAQv6.0 
+
+**Description**:   
+
+The updates attempts to expand functions of the **calc_tmetric** post-processing tool by the below changes.
+
+- Produce output files with statistical metrics over a period equal to N time steps based on the input file(s). The metrics are sequential over time with a frequency one over N. The value of N is defined at run time.
+- Increase possible metrics to include maximum, minimum, and range over the selected period.  
+- Improve efficiency in processing large grid files covering days to weeks by calculating metrics for input file(s) variables in parallel rather than in serial.  
+- Replace I/O API functions for getting environment variables.
+- Update Fortran syntax closer to the current standard.  
+
+The goal seeks to ease visualizing (e.g., via VERDI) or analyzing (e.g., via R) large data file(s) such as combine extracts or CMAQ output files coverings days to weeks.
+
+**Significance and Impact**:  
+Make **calc_tmetric** a more useful tool for examining CMAQ inputs or output files from long simulations.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1226](https://github.com/USEPA/CMAQ/commit/6847b80ad4ffa39f2cd13b748a704b7f064312c1) | [PR#1226](https://github.com/USEPA/CMAQ_Dev/pull/1226)  |  
+
+No changes were made to this tool in CMAQv5.5.
 
 
 ## [combine](../../POST/combine/README.md)
+### Allow compilation of combine with gcc10+
+[Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Improve code robustness   
+**Release Version/Date**: CMAQv6.0
+
+**Description**:   
+Allows the compilation of combine with gcc compiler versions 10 and higher without having to resort to using the "-fallow-argument-mismatch" compiler flag
+
+**Significance and Impact**:    
+The code update removes lines that prevented the code from compiling with gcc compiler versions 10 and higher. The removed lines were only invoked when using a wrfout file as one of the input files to combine, and the vertical grid information of the wrfout file obtained by the removed function calls in these lines was not actually used by combine in any way. Therefore, removing these lines does not impact any output files but does allow the code to compile.  
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1159](https://github.com/USEPA/CMAQ/commit/5e9753318a3708546298879b68b2ca0ef2dc4be3) | [PR#1159](https://github.com/USEPA/CMAQ_Dev/pull/1159)  |  
+
+### Correct cadmium in SpecDef_Conc_cb6r5hap_ae7_aq.txt   
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix  
+**Release Version/Date**:  CMAQv6.0
+
+**Description**:   
+The COMBINE concentration definitions file for cb6r5hap uses ACD for aerosol cadmium but the aerosol species' bulk name has changed ACADMIUM. This update corrects the model species name in the   SpecDef_Conc_cb6r5hap_ae7_aq.txt.   
+
+**Significance and Impact**:   
+The update allows using the  SpecDef_Conc_cb6r5hap_ae7_aq.txt file for COMBINE processing of CCTM output files.
+
+**Internal PRs**: 
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1213](https://github.com/USEPA/CMAQ/commit/bad219d39b65205052d2768c1e9c0c5f9eccbdb4) | [PR#1213](https://github.com/USEPA/CMAQ_Dev/pull/1213)  |  
+
+
 
 ### Improve Checks on Formulas Used by COMBINE
 [William T. Hutzell](mailto:Hutzell.Bill@epa.gov), U.S. Environmental Protection Agency  

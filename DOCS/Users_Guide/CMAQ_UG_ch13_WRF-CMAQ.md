@@ -36,6 +36,10 @@ Coupled WRF-CMAQv5.5 is compatible with WRF versions 4.4 to 4.5.1. EPA's testing
 
 A complete step by step build process and run instructions are provided in the [WRF-CMAQ Tutorial](Tutorials/CMAQ_UG_tutorial_WRF-CMAQ_Benchmark.md).
 
+#### Unified coupler
+Previously, WRF-CMAQ has utilized IOAPI3 BUFFERED file to facilitate data transfer between WRF and CMAQ. Currently, CMAQ is able to couple with two different meteorological models, WRF and MPAS to form a twoway coupled model. With software interoperability and reusability in mind, a unified coupler was developed that can be used for coupling either WRF-CMAQ or MPAS-CMAQ. The objective is to provide a simple approach to transfer information between two models. The IOAPI3 BUFFERED file is no longer needed in the new approach. In general, a user does not need to know the actual implementation of the unified coupler unless the user wants to modify the current WRF-CMAQ coupled model paradigm by transferring additional new information from WRF to CMAQ or/and new information from CMAQ to WRF. Additional information on the unified coupler can be found in the supplemental [unified_coupler.pdf](Supplemental/unified_coupler.pdf) document.
+
+
 #### WRF-CMAQ bug in v5.3 series
 A bug was identified within the CMAQ to WRF coupling routine (twoway_feedback.F90) where aerosol feedback information is transferred from CMAQ to WRF. In doing so, it was found that WRF was not receiving the correct aerosol feedback information in some cases due to a looping error relating to the number of layers. The bug impacts the WRF-CMAQ coupled system in the CMAQv5.3 release series (v5.3, v5.3.1, v5.3.2, v5.3.3) when running with short wave radiative feedback. The bug was not present in prior WRF-CMAQ versions. The bugfix in CMAQv5.4 (and all subsequent versions) correctly captures the variations in the aerosol optical properties and consequently the direct feedback effects through all layers. **Users of WRF-CMAQv5.3 are strongly encouraged to update to CMAQv5.4 or later. See the [WRF-CMAQ Bugfix Release Note](../Release_Notes/CMAQ-Release-Notes:-WRF-CMAQ-Coupled-Model) for more information.**  
 

@@ -1,0 +1,106 @@
+# Frequently Asked Questions for Using the CMAQv6.0 ALPHA Version
+
+## Table of Contents:
+* [What is a alpha version?](#what_alpha)
+* [Do I need to update from v5.5 to v6.0alpha?](#update_v55_v60b)
+* [What do I need to do to update from v5.5 to v6.0alpha?](#update_v55_v60b)
+  * [What differences should I expect in the required model input files?](#diff_v55_v60b_input_files)
+  * [What differences should I expect in my model output files?](#diff_v55_v60b_output_files)
+* [Are there new benchmark data and documentation updates?](#data_and_docs)
+* [How to cite CMAQ](#how_to_cite)
+* [Additional FAQ](#additional_faq)
+* [Technical support for CMAQ](#tech_support)
+
+<a id=what_alpha></a>
+## What is an alpha version?
+We are making this early version of the code available for testing, evaluation, and demonstration purposes before the official, general release. It is also intended to facilitate community contributions. This alpha version may be unstable, contain bugs, and may not function in the same way that it will in the final release. 
+<a id=update_v55_v60b></a>
+## Do I need to update from v5.5 to v6.0alpha?
+No, CMAQv6.0alpha is not intended as a replacement for CMAQv5.5.
+
+CMAQv6.0alpha includes many scientific enhancements and new features that we are making available for testing, evaluation, and demonstration purposes. See the CMAQ Release Notes for a complete description of each change.   
+
+#### Instrumented Models (CMAQ-ISAM, CMAQ-DDM3D)
+* CMAQv6.0alpha introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as well as several improvements that target CMAQ-ISAM robustness for all chemical mechanisms. Please see the [ISAM release notes](../Release_Notes/CMAQ-Release-Notes%3A-Instrumented-Models%3A-CMAQ-ISAM.md).
+  
+* CMAQv6.0alpha fixes DDM3D instability in sensitivity fields after hetereogenous chemistry due to inconsistent unit conversions. Please see the [DDM3D release note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md).
+
+#### On-line coupling of CMAQ with meteorological models
+* CMAQv6.0alpha introduces the unified coupler to couple WRF-CMAQ and MPAS-CMAQ in a consistent "one-code" framework. Previously, the WRF-CMAQ implementation was built using [I/O API buffered](https://www.cmascenter.org/ioapi/documentation/all_versions/html/BUFFERED.html#buf) files to transfer data from the two models during runtime. Users should note to implement such a system, a number of infrastructure changes were made. See the [WRF-CMAQ release note](../Release_Notes/CMAQ-Release-Notes:-WRF-CMAQ-Coupled-Model.md#wrf-cmaq-coupled-model).
+
+#### Chemistry
+* CMAQv6.0alpha introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates are primarily intended to improve the representation of gas-phase and aerosol chemistry in marine environments. In addition to the base CRACMM3 mechanism,  CMAQv6.0alpha includes CRACMM3M, with extended marine chemistry, and CRACMM3HAPS which includes gas chemistry for additional Hazardous Air Pollutants.  If you are interested in learning more, please see the [CRACMM3 release notes](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3).
+
+* A bug fix to the cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the model species styrene, a hazardous air pollutant. No other model species are impacted. See the [release note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Carbon-Bond-6-Mechanism-(CB6)-with-Hazardous-Air-Pollutants.md#correct-loss-of-reactive-tracer-styrene-from-ozone-reaction) for additional information.
+  
+* CMAQv6.0alpha no longer supports the following mechanisms: CB6R3_AE7_AQ, CRACMM1_AQ, CRACMM1AMORE_AQ, RACM2_AE6_AQ, and SAPRC07TIC_AE7i_AQKMT2. Users that are interested in using these mechanisms will need to downgrade their CMAQ version. 
+  
+#### Vertical Diffusion & Air Surface Exchange
+* CMAQv6.0alpha changes the behavior of the runtime minimum eddy diffusivity (Kz) option called KZMIN. This option, first introduced in CMAQv4.5, is a parameterization to allow the mixing in the planetary boundary layer (PBL) to respond to the land-use characteristics. If the runtime environmental variable KZMIN is set to 'True/Yes', the land-use based parameterized minimum eddy diffusivity will now be applied through the PBL, whereas previously it was limited to 500 meters above ground. If KZMIN is set to 'False/No', a constant minimum value of 0.01 m<sup>2</sup>/s is applied everywhere at all times. This change primarily impacts nighttime concentrations, specifically in grid cells where the PBL is lower than 500 meters. In those grid cells, primary emitted species concentrations will increase, whereas ozone mixing ratios will decrease due to increased NOx titration. 
+
+#### Emissions
+* CMAQv6.0alpha fixes a bug related to the estimation of marine-gas halogen emissions within CMAQ. To estimate the emissions of gaseous halogens in marine environments, the grid cell area covering the spatial extent within the domain is needed. Because CMAQ horizontal domains are defined by projecting a map onto a 2-D plane a map-scale factor must be applied when converting physical areas to projected space, which was not taken into account when estimating halogen emissions within this module. This bug fix impacts halogen emission estimates in grid cells in which map scale factors are not unity. For example, if using a northern polar stereographic map projection, this will lead to increased ozone (less ozone is destroyed by halogens) and decreases sulfate (less is produced via dimethyl sulfide) mostly over lower latitude areas.
+
+* CMAQv6.0alpha fixes a bug related to the estimation of windblown dust emissions within CMAQ when using the NLCD40 land-use classification scheme. To estimate the emissions of windblown dust, grid cell land-use information along with meteorological conditions are needed. In this case, when using WRF with NLCD40 land-use, two categories of NLCD40 (“shrub/scrub” and “dwarf scrub”) were being mapped to the wrong internal categories (“barren or sparsely vegetated” instead of “shrubland”). These internal categories are used in the windblown dust module to assign parameter values controlling erodibility, which in this case was overestimated. Depending on the domain, year and approach to specify vegetation fraction in WRF, this bug fix corrects excessive "soil" PM2.5 and total PM2.5 mass concentrations when using NLCD40 land-use.
+
+* CMAQv6.0alpha introduces the MetEmis module to dynamically calculate meteorology-induced hourly gridded on-road mobile emissions within CMAQ, using simulated meteorology without any computational burden to the CMAQ modeling system. The impact is to improve the spatiotemporal representation of mobile emissions based on the simulated meteorology inputs when compared to the static scenario. For detailed information see Baek et al., 2023. 
+
+#### Structural Improvements
+* CMAQv6.0alpha replaces the CONST.EXT file with a Fortran module to define model fundamental physical, chemical, and mathematical constants (e.g., PI, MWAIR, etc.). Additionally, the values of several constants have been updated to be consistent with 2019 NIST and SI standards, and an approximation to the error function ERF has been removed.
+
+* CMAQv6.0alpha rewrites the HLCONST module, which computes Henry's Law constants used in CCTM, to use integer tokens instead of strings reducing model runtime by approximately 8%.
+
+#### Diagnostic Options
+* CMAQv6.0alpha revises model default from `Budget_Diag = .TRUE.` to `Budget_Diag = .FALSE.`. This change turns off the budget diagnostic tool reducing rutime by 10%. 
+  
+* CMAQv6.0alpha introduces ELMO version 2.1 which adds several new capabilities for CCTM model output including the ability to define custom aggregates of raw model species (e.g., NOY, NOz, etc.). 
+
+#### Post-processors
+
+* CMAQv6.0alpha introduces expanded functionality of the CALC_TMETRIC tool. These updates improve efficiency when processing large data sets and provide the ability to produce additional metrics of interest to users (i.e., min/max over a selected period, etc.). 
+
+<a id=update_v55_v60b></a>
+## What do I need to do to update from v5.5 to v6.0alpha?
+* If you have already successfully migrated to v5.5, you will not need any additional input to run with the analogous options in v6.0. However, users should note that the CCTM runscripts have changed, so older user-created runscripts may need to be adapted to be compatible with v6.0. Additionally, if you are trying to run with the newest released version of CRACMM in v6.0, users will have to generate or map existing emissions to CRACMMv3.0. For additional information on emissions for CRACMMv3.0 please see the CRACMM GitHub page.
+  
+<a id=diff_v55_v60b_input_files></a>
+### What differences should I expect in the required model input files?
+* If you have already successfully migrated to v5.5, you will not need any additional input files to run with the analogous options in v6.0 alpha.  CRACMM2 emissions inputs can be used to run CMAQv6.0 alpha with the new CRACMM3 mechanism without any modifications. 
+
+* CRACMM1 emissions inputs can be mapped to CRACMM2 species with minor adjustments following this guidance: https://usepa.github.io/CRACMM/emissions/README.html
+
+<a id=diff_v55_v60b_output_files></a>
+### What differences should I expect in my model output files?
+* CMAQv6.0alpha updates two of the three photolysis diagnostic files (CCTM_PHOTDIAG1 and CCTM_PHOTDIAG3). The CCTM_PHOTDIAG1 file remains largely unchanged, with the only changes being in the diagnostic variables: AOD_W550_ANST (Aerosol Optical Depth at 550 nm based on an Angstrom Interpolation) and AAOD_W550_ANGST (Aerosol Absorption Optical Depth at 550 nm based on an Angstrom Interpolation). The updates now enable calculation of AOD_550 values when the sun is below the horizon. The CCTM_PHOTDIAG3 file changed in three different ways. (1) The variable representing total extinction, the sum of absorption and scattering at various wavelengths from gas, aerosols and clouds, is no longer reported; this variable is now replaced by the cloud extinction; the total extinction can be computed manually as the sum of gas, aerosol and cloud extinction. (2) The photolysis diagnostic variable names "EXT_AERO_W" are changed to "AERO_EXT_W", making the naming convention consistent with how the gas is reported. (3)  The photolysis diagnostics for AOD_550 and aerosol asymmetry and extinction are now available at all simulation hours, independent of the position of the sun.
+
+* CMAQv6.0alpha updates to ELMO replace ELMOv1.0 diagnostic output files. The CCTM defaults now produce the CCTM_ELMO1 which supersedes older CCTM_ELMO files while adding additional gas and particle phase diagnostic aggregates not available in ELMOv1.0. ELMOv2.1 also produces a CCTM_ELMO2_DEP file which includes gas and particle phase dry and wet deposition hourly aggregates. 
+
+  
+<a id=data_and_docs></a>
+## Are there new benchmark data and documentation updates?
+
+
+|**CMAQ Version**|**Data Type (Size)**|**Domain**|**Simulation Dates**|**Data Access**|**Tutorial**| 
+|:----:|:----:|:--------------:|:----:|:--------:|:----:|
+
+
+<a id=how_to_cite></a>
+## How to Cite CMAQ
+Please see our 'How to Cite CMAQ' page if you are interested in referencing one of our released model versions, scientific algorithms, or model output in your own publication: https://www.epa.gov/cmaq/how-cite-cmaq
+
+<a id=additional_faq></a>
+## Additional FAQ
+A more general list of Frequent CMAQ Questions can be found on our website: https://www.epa.gov/cmaq/frequent-cmaq-questions
+
+<a id=tech_support></a>
+## Technical support for CMAQ
+Technical support for CMAQ, including questions about model inputs, downloading, compiling, and running the model, 
+and pre- and post-processing utilities, should be directed to the [CMAS Center User Forum](https://forum.cmascenter.org/). 
+ [**Please read and follow these steps**](https://forum.cmascenter.org/t/please-read-before-posting/1321) prior to submitting new questions to the User Forum.
+
+<a id=mainbody_references></a>
+## References
+Baek, B. H., Coats, C., Ma, S., Wang, C.-T., Li, Y., Xing, J., Tong, D., Kim, S., and Woo, J.-H.: Dynamic Meteorology-induced Emissions Coupler (MetEmis) development in the Community Multiscale Air Quality (CMAQ): CMAQ-MetEmis, Geosci. Model Dev., 16, 4659–4676, https://doi.org/10.5194/gmd-16-4659-2023, 2023.
+
+NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds. NIST Special Publication 330, 2019. doi: 10.6028/nist.sp.330-2019
+

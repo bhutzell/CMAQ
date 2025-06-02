@@ -33,6 +33,7 @@ In this section, details on the routine CCTM output files are provided. All CMAQ
 |[CCTM_MSOILOUT](#soilout) <a id=soilout_t></a>|GRDDED3|n/a (see detailed file description below)|XY
 |[CCTM_BDSNPOUT](#bdsnpout) <a id=bdsnpout_t></a>|GRDDED3|n/a (see detailed file description below)|XY
 |**Diagnostic and Advanced**| | | |
+|[FLOOR](#floor)<sup>5</sup> <a id=floor_t></a>|ASCII|Hourly|XYZ
 |[CCTM_B3GTS_S](#b3gts) <a id=b3gts_t></a>|GRDDED3|Hourly Instantaneous| XY
 |[CCTM_BUDGET](#budget) <a id=budget_t></a>|ASCII|Hourly Instantaneous| Domain-Wide
 |[CCTM_DEPV](#depv) <a id=depv_t></a>|GRDDED3|Hourly Instantaneous|XY
@@ -75,8 +76,7 @@ AMS (aerosol mass spectrometer) transmission factor for each mode.
 Many diagnostics relating to meteorology, heterogenous chemistry, and optical metrics (e.g. AOD, NO2_COLUMN) are provided. ELMOv2 
 further includes support for ISAM and DDM variables. 
 
-Units for all variables are specified in the output file. Verbose definitions of variables and their attributes are written to each 
-CTM_LOG ascii logfile.
+Units for all variables are specified in the output file. Verbose definitions of variables and their attributes are written to each CCTM_LOG ascii logfile.
 
 The namelist input file CMAQ_Control.nml allows users to declare how many CCTM_ELMO files to create. 
 See [Appendix F (ELMO Output):](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more details.
