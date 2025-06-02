@@ -218,6 +218,7 @@ NUM,Number of particles
 SRF,Surface area of particles
 ASEAST, J-mode seasalt concentration (tracer)
 MTN1,Monoterpene derived species with C* 1e-1 ug/m3
+AHMS, Hydroxymethanesulfonate ion
 CL2, Molecular chlorine 
 CL, Atomic chlorine
 CLO, Chlorine monoxide
@@ -241,6 +242,7 @@ CH2BR2,	Dibromomethane
 CHBR3, Bromoform
 HBR, Hydobromic acid
 HCOBR, Formyl bromide
+ABR, Bromide ion
 I2, Iodine
 I, Atmomic iodine
 IO, Iodine monoxide
