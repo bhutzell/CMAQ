@@ -2503,10 +2503,10 @@ C-----------------------------------------------------------------------
                ! First determine number of emission scale factors (NFAC) and
                ! number of unique regions (NREG) that are specified for this 
                ! instruction and stream combination
-               NFAC = 1
-               NREG = 1
-               REG_UNQ(:) = 1
-               DO IFAC = 2,N_SCALEFAC
+               NFAC = 0
+               NREG = 0
+               REG_UNQ(:) = 0
+               DO IFAC = 1,N_SCALEFAC
                  IF ( LOCAL_OP( ISTR,ISRM,IFAC ) .EQ. '' ) EXIT
                  NFAC = NFAC + 1 
                
