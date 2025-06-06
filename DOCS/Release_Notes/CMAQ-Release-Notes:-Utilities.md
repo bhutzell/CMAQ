@@ -13,11 +13,11 @@
 **Description**:  The update makes two changes to the JPROC utility.    
 
 1.  Increases parameters in JVALPARMS.EXT based on the inline_phot_preproc utility.
-2.  Makes the srband.f file include JVALPARMS.EXT for the maximum number of wavelengths for calculating photolysis frequencies.
+2.  Makes the srband.f and optics.f files include JVALPARMS.EXT for the maximum number of wavelengths for calculating photolysis frequencies.
 
 Changes are motivated by a problem encountered for the cracmm3 based mechanisms.  The JTABLEs give incorrect and unrealistic values for TRPN_WANG2023. A JPROC parameter causes the problem. One parameter limits to 600 the maximum number of wavelengths that input files use to define cross-sections and quantum yields of photolysis frequencies. In cracmm3 based mechanisms, the photolysis frequency for organic nitrates, TRPN_WANG2023, uses 601 wavelengths. Using the  intel compiler, JPROC still produces JTABLEs because the build script does not use debug flags by default but an array bounds error corrupts the output tables. To remove the error, the JPROC parameter is increased to 2000 based on the inline_phot_preproc utility. 
 
-Besides increasing JPROC parameters, the update modified a JPROC subroutine so parameters are consistent between subroutines. 
+Besides increasing JPROC parameters, the update modified two JPROC subroutines so parameters are consistent between subroutines. 
 
 **Significance and Impact**:  The JPROC updates remove errors in output JTABLEs when input files for photolysis frequency use more 600 wavelengths to describe it. 
 
