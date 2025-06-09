@@ -150,7 +150,7 @@ In CRACMM3, photolysis of BALD (benzaldehyde), only proceeds with one pathway:
 
 The process is updated to include 2 different pathways as follows:
 <R027a> BALD  = BEN  + CO                        # 1.0/<BALD1_CALVERT11>;
-<R027b> BALD  = BENP + CO + HO2          # 1.0/<BALD2_CALVERT11>;
+<R027b> BALD  = BAL1 + CO + HO2                  # 1.0/<BALD2_CALVERT11>;
 
 The photolysis frequencies of BALD are also updated to use absorption cross-section and quantum yield data from Calvert et al. (2011).
 
