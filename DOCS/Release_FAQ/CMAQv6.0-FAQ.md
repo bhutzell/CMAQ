@@ -51,9 +51,11 @@ CMAQv6.0alpha includes many scientific enhancements and new features that we are
 * CMAQv6.0alpha rewrites the HLCONST module, which computes Henry's Law constants used in CCTM, to use integer tokens instead of strings reducing model runtime by approximately 8%.
 
 #### Diagnostic Options
+* CMAQv6.0alpha introduces ELMO version 2.1 expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining custom aggregates of raw model species (e.g., NOY, NOz, etc.) and assigning them to output files.
+  
 * CMAQv6.0alpha revises model default from `Budget_Diag = .TRUE.` to `Budget_Diag = .FALSE.`. This change turns off the budget diagnostic tool reducing rutime by 10%. 
   
-* CMAQv6.0alpha introduces ELMO version 2.1 which adds several new capabilities for CCTM model output including the ability to define custom aggregates of raw model species (e.g., NOY, NOz, etc.). 
+
 
 #### Post-processors
 
