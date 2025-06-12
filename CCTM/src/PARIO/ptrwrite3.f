@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/PARIO/src/ptrwrite3.f,v 1.2 2011/03/30 18:13:05 sjr Exp $ 
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
         LOGICAL FUNCTION PTRWRITE3( FNAME, VNAME, JDATE, JTIME, BUFFER )
 
 C-----------------------------------------------------------------------
@@ -57,6 +51,7 @@ C-----------------------------------------------------------------------
       USE M3UTILIO              ! i/o api
       USE RUNTIME_VARS, ONLY : PWRTFLAG
       USE PIOMAPS_MODULE
+      USE MPI
 
       IMPLICIT NONE
 
@@ -67,8 +62,6 @@ C Includes:
       INCLUDE 'PIOVARS.EXT'      ! Parameters for parallel implementation.
       INCLUDE 'PIOGRID.EXT'      ! Parallel grid dimensions.
 !     INCLUDE 'PIOMAPS.EXT'      ! Parallel processor-to-subdomain maps.
-
-      INCLUDE 'mpif.h'
 
 C Arguments:
 

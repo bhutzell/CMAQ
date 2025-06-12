@@ -280,8 +280,6 @@ set make_options = "-j"                #> additional options for make command if
     set seL = se_snl
     set LIB2 = "${ioapi_lib}"
     set LIB3 = "${mpi_lib} ${extra_lib}"
-    set Str1 = (// Parallel / Include message passing definitions)
-    set Str2 = (include SUBST_MPI mpif.h;)
     # Distribute Environment to different machines if not done automatically 
     if ( $?DistrEnv ) then
       set PAR = ($PAR -Dcluster) 
@@ -299,8 +297,6 @@ set make_options = "-j"                #> additional options for make command if
     set Popt = NOOP
     set seL = sef90_noop
     set LIB2 = "${ioapi_lib} ${extra_lib}"
-    set Str1 =
-    set Str2 =
  endif 
 
 #> if DDM-3D is set, add the pre-processor flag for it.
@@ -518,10 +514,6 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "include SUBST_EMISPRM    $ICL_EMCTL/EMISPRM.EXT;"           >> $Cfile
  echo                                                              >> $Cfile
 
- if ( $?ParOpt ) then
-    echo "$Str1"                                                   >> $Cfile
-    echo "include SUBST_MPI        ./mpif.h;"                      >> $Cfile
- endif
  echo                                                              >> $Cfile
 
  set text = "stenex or se_noop"

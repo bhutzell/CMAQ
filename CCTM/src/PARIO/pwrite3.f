@@ -54,7 +54,8 @@ C-----------------------------------------------------------------------
       USE PIOMAPS_MODULE
       USE M3UTILIO              ! i/o api
       USE RUNTIME_VARS , ONLY : PWRTFLAG
-
+      USE MPI
+      
       IMPLICIT NONE
 
 C Includes:
@@ -64,8 +65,6 @@ C Includes:
       INCLUDE 'PIOVARS.EXT'      ! Parameters for parallel implementation.
       INCLUDE 'PIOGRID.EXT'      ! Parallel grid dimensions.
 !     INCLUDE 'PIOMAPS.EXT'      ! Parallel processor-to-subdomain maps.
-
-      INCLUDE 'mpif.h'
 
 C Arguments:
 

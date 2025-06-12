@@ -31,12 +31,12 @@
 
         USE RUNTIME_VARS
         USE UTILIO_DEFN
-
+#ifdef parallel
+        USE MPI
+#endif
         IMPLICIT NONE
 
 #ifdef parallel
-        INCLUDE 'mpif.h'
-
         INTEGER   PAR_ERR     ! Error code from parallel initialization
         REAL( 8 ) BEGTIME     ! Wall-clock time (sec) at MPI initialization
         REAL( 8 ) ENDTIME     ! Wall-clock time (sec) at MPI finish

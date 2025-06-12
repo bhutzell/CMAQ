@@ -37,12 +37,12 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
 
       USE RUNTIME_VARS
       USE UTILIO_DEFN
+#ifdef parallel      
+      USE MPI
+#endif
 
       IMPLICIT NONE
 
-#ifdef parallel      
-      include 'mpif.h'
-#endif
       INTEGER, PARAMETER :: MAXLEN_CTM_LOG   = MAXLEN_CCTM_APPL + 11
 
       CHARACTER(  8 ) :: PRESTR  = 'CTM_LOG_'
