@@ -381,7 +381,7 @@ C-----------------------------------------------------------------------
                    SD( ISRM,1 ) = INDEX1( DESID_SD_NML( IRULE )%MODE_REF,
      &                               DESID_N_AERO_REF, DESID_AERO_REF_CAPS( : ) )
                    IF ( SD( ISRM,1 ) .EQ. 0 ) THEN
-                      WRITE( XMSG,'(A,A,A,/,A,I2,A)' ), '*** Reference Aerosol Mode (', 
+                      WRITE( XMSG,'(A,A,A,/,A,I2,A)' ) '*** Reference Aerosol Mode (', 
      &                       DESID_SD_NML( IRULE )%MODE_REF, 'Specified in Emissions Size ',
      &                       'Dist Rule ',IRULE,' does not exist in AERO_DATA.'
                       CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -393,7 +393,7 @@ C-----------------------------------------------------------------------
                    SD( ISRM,2 ) = INDEX1( DESID_SD_NML( IRULE )%MODE_REF,
      &                               DESID_N_AERO_REF, DESID_AERO_REF_CAPS( : ) )
                    IF ( SD( ISRM,2 ) .EQ. 0 ) THEN
-                      WRITE( XMSG,'(A,A,A,/,A,I2,A)' ), '*** Reference Aerosol Mode (', 
+                      WRITE( XMSG,'(A,A,A,/,A,I2,A)' ) '*** Reference Aerosol Mode (', 
      &                       DESID_SD_NML( IRULE )%MODE_REF, 'Specified in Emissions Size ',
      &                       'Dist Rule ',IRULE,' does not exist in AERO_DATA.'
                       CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -410,7 +410,7 @@ C-----------------------------------------------------------------------
                    SD( ISRM,N_SD( ISRM ) ) = INDEX1( DESID_SD_NML( IRULE )%MODE_REF,
      &                                DESID_N_AERO_REF, DESID_AERO_REF_CAPS( : ) )
                    IF ( SD( ISRM,N_SD( ISRM )) .EQ. 0 ) THEN
-                      WRITE( XMSG,'(A,A,A,/,A,I2,A)' ), '*** Reference Aerosol Mode (', 
+                      WRITE( XMSG,'(A,A,A,/,A,I2,A)' ) '*** Reference Aerosol Mode (', 
      &                       DESID_SD_NML( IRULE )%MODE_REF, 'Specified in Emissions Size ',
      &                       'Dist Rule ',IRULE,' does not exist in AERO_DATA.'
                       CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )

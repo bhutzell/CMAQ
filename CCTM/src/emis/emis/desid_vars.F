@@ -154,8 +154,8 @@
           REAL            :: MW    ! Emissions Variable Molecular Weight [g mol-1]
       End Type desid_legend
       
-      Integer, Parameter :: Desid_N_Emvar_Table = 256
-      Type( desid_legend ), save :: Desid_Emvar_Table( Desid_N_Emvar_Table)
+      Integer, Parameter   :: Desid_N_Emvar_Table = 256
+      Type( desid_legend ) :: Desid_Emvar_Table( Desid_N_Emvar_Table)
 
       CONTAINS
 

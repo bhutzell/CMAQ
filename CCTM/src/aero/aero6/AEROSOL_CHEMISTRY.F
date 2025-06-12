@@ -1137,7 +1137,7 @@ C *** calculate molecular speeds (m/s) using Eq 4 of Pleim et al (1995)
                CBAR_OH    = CBAR_COEFF * INV_SQRT_MWOH 
                CBAR_HOCL  = CBAR_COEFF * INV_SQRT_MWHOCL
                CBAR_HCL   = CBAR_COEFF * INV_SQRT_MWHCL
-               CBAR_CLNO2 = CBAR_COEFF * INV_SQRT_MWCLNO2         
+               CBAR_CLNO2 = CBAR_COEFF * INV_SQRT_MWCLNO2  
                CBAR_NO2   = CBAR_COEFF * INV_SQRT_MWNO2
                CBAR_H2O2  = CBAR_COEFF * INV_SQRT_MWH2O2
                CBAR_O3    = CBAR_COEFF * INV_SQRT_MWO3
@@ -1167,7 +1167,7 @@ C *** correct molecular diffusivity for ambient conditions - assumed similar to 
                INV_DIFF_OH     = 1.0D0 / ( STD_DIFF_OH * ADJUST_DIFF )
                INV_DIFF_HOCL   = 1.0D0 / ( STD_DIFF_HOCL * ADJUST_DIFF )
                INV_DIFF_HCL    = 1.0D0 / ( STD_DIFF_HCL * ADJUST_DIFF )
-               INV_DIFF_CLNO2  = 1.0D0 / ( STD_DIFF_CLNO2 * ADJUST_DIFF )       
+               INV_DIFF_CLNO2  = 1.0D0 / ( STD_DIFF_CLNO2 * ADJUST_DIFF )
                INV_DIFF_NO2    = 1.0D0 / ( STD_DIFF_NO2 * ADJUST_DIFF )
                INV_DIFF_H2O2   = 1.0D0 / ( STD_DIFF_H2O2 * ADJUST_DIFF )
                INV_DIFF_O3     = 1.0D0 / ( STD_DIFF_O3 * ADJUST_DIFF )
@@ -1177,7 +1177,6 @@ C *** correct molecular diffusivity for ambient conditions - assumed similar to 
                INV_DIFF_HCHO   = 1.0D0 / ( STD_DIFF_HCHO * ADJUST_DIFF )
                INV_DIFF_HNO4   = 1.0D0 / ( STD_DIFF_HNO4 * ADJUST_DIFF )
        
-
 C *** get KN2O5 rate constants YIELD_CLNO2 for each mode
                YIELD_CLNO2 = 0.0D0
                YIELDIJ     = 0.0D0
@@ -1305,7 +1304,7 @@ C *** calculate aerosol surface area
 C *** Calculate IEPOX and MAE uptake information for accumulation mode
                RADIUS_I  = 0.5D0 * DE_WET( 1 ) ! particle size - i-mode
                RADIUS    = 0.5D0 * DE_WET( 2 ) ! particle size - j-mode
- 
+
 C *** Calculate approximate seasalt surface area, m2/m3
                MARINE_AREA = ( OCEAN( C,R ) + SZONE( C,R ) )
                IF ( MARINE_AREA .GT. 0.0 .AND. MARINE_MECH ) THEN 
@@ -1872,7 +1871,7 @@ C hydrolysis
                  CASE( IA_INO3_WAI )
                      IF ( AIRRH .LE. 0.2D0 ) THEN
                       KHETERO( IRATE, C,R,L ) = 0.0
-                     ELSEIF (AIRRH .GT. 0.2D0 ) THEN                         
+                     ELSEIF (AIRRH .GT. 0.2D0 ) THEN  
                       KHETERO( IRATE, C,R,L ) = 60.0D0 * WET_M2( 1 ) * DPI / ( RADIUS_I * INV_DIFF_INO3 + INO3_WA_RXN_TIME )
                      ENDIF
 

@@ -300,7 +300,7 @@
      &                     OUT_UNIT=ELMO_TABLE( J )%IUNIT,IERR=IERR )
            IF ( IERR .EQ. 1 ) THEN
               ! Invalid Variable Type
-              WRITE ( XMSG, '(A,I3,A)'),'A user-requested variable for ',
+              WRITE ( XMSG, '(A,I3,A)') 'A user-requested variable for ',
      &                'ELMO cannot be found. Please check that it is ',
      &                'defined correctly. It is number ',J,' on the used ',
      &                'variable list.'
@@ -543,7 +543,7 @@
                 CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, J=IX1, IERR=IERR )
                 IF ( IERR .EQ. 1 ) THEN
                    ! Invalid Variable Type
-                   WRITE ( XMSG, '(2A,I3,4A)'),'There was an error processing ', 
+                   WRITE ( XMSG, '(2A,I3,4A)') 'There was an error processing ', 
      &                     'component number ',IVAR,' of the composite ',
      &                     TRIM(ELMO_TABLE( J )%NAME),'. Please check ',
      &                     'its definition.'

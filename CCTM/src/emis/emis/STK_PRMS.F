@@ -136,18 +136,6 @@ C-----------------------------------------------------------------------
 
          DO N = 1, NGRPS
 
-!           IF ( .NOT. OPEN3( STKPRMS( N ), FSREAD3, PNAME ) ) THEN
-!              XMSG = 'Could not open '// TRIM( STKPRMS( N ) ) // ' file'
-!              CALL M3MESG( XMSG )
-!              SUCCESS = .FALSE.; RETURN
-!           END IF
-
-!           IF ( .NOT. DESC3( STKPRMS( N ) ) ) THEN
-!              XMSG = 'Could not get ' // TRIM( STKPRMS( N ) ) // ' file description'
-!              CALL M3MESG( XMSG )
-!              SUCCESS = .FALSE.; RETURN
-!           END IF
-
             ALLOCATE ( LOC_MAP( NSRC( N ) ), STAT = ASTAT )
             CALL CHECKMEM( ASTAT, 'LOC_MAP', PNAME )
 
@@ -255,7 +243,7 @@ C SOURCE maps STKEMIS read from stk emis file to local STKEM in GET_PT3D_EMIS.
 
             DEALLOCATE ( LOC_MAP )
             
-            WRITE( XMSG, '(A,I3,A,I7)'), 
+            WRITE( XMSG, '(A,I3,A,I7)') 
      &             'Number of Point Sources from ',N,' equals ', MY_NSRC(N)
             IF ( N .EQ. 1 ) THEN
                 CALL LOG_MESSAGE( LOGDEV, '')
@@ -266,7 +254,7 @@ C SOURCE maps STKEMIS read from stk emis file to local STKEM in GET_PT3D_EMIS.
 
          END DO   ! NGRPS
 
-         WRITE( XMSG, '(A,I7)'), 
+         WRITE( XMSG, '(A,I7)') 
      &          'Number of Total Point Sources on this sub-domain equals ', SUM(MY_NSRC(:))
          CALL LOG_MESSAGE( LOGDEV, XMSG )
          CALL LOG_MESSAGE( LOGDEV, '' )

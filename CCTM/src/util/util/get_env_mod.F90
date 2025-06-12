@@ -73,9 +73,9 @@
 
           if ( loc_logdev .gt. 0 ) then
              if (default) then
-                write( loc_logdev, '(5x,A21,2x,A,2x,i10, 1x, a9)' ), env_var,'|', env_value, '(default)'
+                write( loc_logdev, '(5x,A21,2x,A,2x,i10, 1x, a9)' ) env_var,'|', env_value, '(default)'
              else if (regular) then
-                write( loc_logdev, '(5x,A21,2x,A,2x,i10)' ), env_var,'|', env_value
+                write( loc_logdev, '(5x,A21,2x,A,2x,i10)' ) env_var,'|', env_value
              end if
           end if
 
@@ -113,9 +113,9 @@
 
           if ( loc_logdev .gt. 0 ) then
              if (default) then
-                write( loc_logdev, '(5x,A21,2x,A,2x,e10.3, 1x, a9)' ), env_var,'|', env_value, '(default)'
+                write( loc_logdev, '(5x,A21,2x,A,2x,e10.3, 1x, a9)' ) env_var,'|', env_value, '(default)'
              else if (regular) then
-                write( loc_logdev, '(5x,A21,2x,A,2x,e10.3)' ), env_var,'|', env_value
+                write( loc_logdev, '(5x,A21,2x,A,2x,e10.3)' ) env_var,'|', env_value
              end if
           end if
 
@@ -153,9 +153,9 @@
 
           if ( loc_logdev .gt. 0 ) then
              if (default) then
-                write( loc_logdev, '(5x,A21,2x,A,2x,e10.3, 1x, a9)' ), env_var,'|', env_value, '(default)' 
+                write( loc_logdev, '(5x,A21,2x,A,2x,e10.3, 1x, a9)' ) env_var,'|', env_value, '(default)' 
              else if (regular) then
-                write( loc_logdev, '(5x,A21,2x,A,2x,e10.3)' ), env_var,'|', env_value
+                write( loc_logdev, '(5x,A21,2x,A,2x,e10.3)' ) env_var,'|', env_value
              end if
           end if
 
@@ -278,9 +278,9 @@
 
           if ( loc_logdev .gt. 0 ) then
              if (default) then
-                write( loc_logdev, '(5x,A21,2x,A,10x,L, 1x, a9)' ), env_var,'|', env_value, '(default)'
+                write( loc_logdev, '(5x,A21,2x,A,10x,L, 1x, a9)' ) env_var,'|', env_value, '(default)'
              else if (regular) then
-                write( loc_logdev, '(5x,A21,2x,A,10x,L)' ), env_var,'|', env_value
+                write( loc_logdev, '(5x,A21,2x,A,10x,L)' ) env_var,'|', env_value
              end if
           end if
 
