@@ -1,4 +1,19 @@
 # Wind Blown Dust Emissions
+### Brown vegetation added to Windblown Dust Module
+[Jeff Willison](mailto:willison.jeff@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Science Update 
+**Release Version/Date**:  CMAQv6.0
+
+**Description**:   
+Brown (or non-photosynthetically active) vegetation, like photosynthetically active vegetation, creates a sheltering effect that reduces windblown dust emissions. In this update, the vegetation fraction, the vegetation height, and the vegetation roughness are updated using the MODIS spectral mixture analysis (SMA) following the method described by [Huang and Foroutan](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2021JD035243) (2022, HF22).
+
+**Significance and Impact**:   
+The addition of NPV to the windblown dust model reduces 2022 annual dust emissions from 1909 Tg to 598 Tg for the Northern Hemisphere. This means we've gone from possibly a bit high to probably a bit low. Annual average distribution shows the decrease as a result of including NPV (left) relative to the base simulation (right).
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1181](https://github.com/USEPA/CMAQ/commit/b506277bdf8aaedc567348b8604e2bb854f3a707) | [PR#1181](https://github.com/USEPA/CMAQ_Dev/pull/1181)  |
+
 
 ### Correction for NLCD40 Land Use Mapping in Windblown Dust Module
 [Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency     
