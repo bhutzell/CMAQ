@@ -12,6 +12,37 @@ CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version buil
 **Significance and Impact**:   
 CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enable a wider range of applications of CRACMM.
 
+### Heterogeneous Chemistry of Sulfur Species 
+[Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Science Update
+**Release Version/Date**:  CMAQv6.0  
+
+**Description**:    
+In areas with high PM pollution in the winter, CTMs can significantly underpredict particulate sulfur concentrations (e.g., Fairbanks, North China Plain, etc.). Recent studies have suggested that heterogeneous sulfur chemistry in aqueous aerosols, not included in CMAQ, may contribute a large part of the underprediction of sulfur PM. Here we add the oxidation of SO2 to sulfate and production/loss of hydroxymethanesulfonate (HMS) in aqueous aerosol to CRACMM3.
+
+**Significance and Impact**:   
+With the exception of locations with high coinciding SO2 and HCHO, monthly average PM sulfur concentrations do not exhibit very large changes over CONUS. Larger effects are noted on the 1.33km Fairbanks domain and over Asia during the winter. This update should have mixed results on evaluation over CONUS. CMAQ underpredicts particulate sulfur in Fairbanks and North Pole, Alaska, an area that is afflicted with severe PM pollution episodes during the winter. While CMAQ's current secondary production pathways for sulfate do not well represent the high sulfate observed under the cold and dark conditions characteristic of wintertime Fairbanks, adding heterogeneous production of sulfate and HMS in aerosol water significantly reduces the model underprediction. HMS and sulfate predictions with this update compare well with intensive measurements during the ALPACA winter air quality study held in and around Fairbanks during winter 2022.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1337](https://github.com/USEPA/CMAQ_Dev/commit/f0e2d42087e93ff5f37e79d987f5d23e46acac4e) | [PR#1337](https://github.com/USEPA/CMAQ_Dev/pull/1337)  |
+
+### Removal of Formaldehyde, Acetaldehyde, and Acrolein by monoatomic Cl 
+[Bill Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Science Update    
+**Release Version/Date**:  CMAQv6.0  
+
+**Description**:    
+This update removes losses processes of emission tracers: formaldehyde, acetaldehyde, and acrolein emissions tracers via a monatomic chlorine reaction. This update is for default versions of the CRACMM mechanism and the CRACMM3HAP mechanism. It should be noted that the cracmm3m mechanisms should have this loss process.
+
+**Significance and Impact**:   
+The update increases predictions of emission tracers: formaldehyde, acetaldehyde, and acrolein emissions in the CRACMM3HAP mechanism.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1346](https://github.com/USEPA/CMAQ/commit/0134aa61b8065f7a72ac1a609cb4c94da599d3a8)) | [PR#1346](https://github.com/USEPA/CMAQ_Dev/pull/1346)  |
+
+
 ### Halogen chemistry in CRACMM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update  
@@ -36,6 +67,7 @@ Update in MGEMIS.F has minimal impacts on ozone and sulfate over the contiguous 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1212](https://github.com/USEPA/CMAQ/commit/8d512cc361675212430b579adc766c010309bdd1) | [PR#1212](https://github.com/USEPA/CMAQ_Dev/pull/1212)  |
+
 
 ### Photolysis of aerosol nitrate in CRACMM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
