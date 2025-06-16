@@ -215,10 +215,10 @@ The CMAQ model allows several types of emissions that are calculated in-line or 
 |-----------|------------------------|
 | BIOG | Biogenic Emissions (BEIS) |
 | MIOG | Biogenic Emission (MEGAN) |
-| MGEGM | Marine Gas Emissions |
+| MGEM | Marine Gas Emissions |
 | LTNG | Lightning NO Emissions |
-| ASEA | Sea Spray Aerosol Emissions |
-| DUST | Wind-Blown Dust Emissions |
+| SEASPRAY | Sea Spray Aerosol Emissions |
+| WBDUST | Wind-Blown Dust Emissions |
 | PVO3 | Potential Vorticity Incursion* |
 
 *Although it is not an emission stream, it is possible to tag the ozone incursions at the top of the simulated volume if the potential vorticity option `CTM_PVO3` is activated in the run script.

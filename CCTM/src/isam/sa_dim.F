@@ -28,16 +28,26 @@ C
         USE UTILIO_DEFN
         USE SA_DEFN
         USE DESID_VARS, ONLY: DESID_N_SRM
+        USE RUNTIME_VARS, ONLY : AERO_MASS_TRANSFER
 
         IMPLICIT NONE
 
         CHARACTER( 16 ) :: PNAME = 'SA_DIM'
+        CHARACTER(255 ) :: XMSG
 
         INTEGER IOST
 
         INTEGER NTAGS
 
 C----------------------------------------------
+
+C...Halt the model if aerosol partitioning is not configured
+C   for the default 'hybrid' mode.
+          IF ( AERO_MASS_TRANSFER .NE. 'HYB' ) THEN
+             WRITE( XMSG, '(A,A)' ),'ERROR: ISAM may only be used with Hybrid ',
+     &          'aerosol partioning. Please set AERO_MT to HYB in your Run Script.'
+             CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
+          END IF
 
 C...Count the number of tags specified by user
           CALL CNT_SA_IO_LIST( NTAGS )

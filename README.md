@@ -1,71 +1,75 @@
-CMAQv5.5
+CMAQv6.0 ALPHA 
 ==========
 
 US EPA Community Multiscale Air Quality Model (CMAQ) Website: https://www.epa.gov/cmaq
 
-CMAQ is an active open-source development project of the U.S. EPA's Office of Research and Development that consists of a suite of programs for conducting air quality model simulations.
-CMAQ is supported by the CMAS Center: http://www.cmascenter.org
+CMAQ is an open-source development project of the U.S. EPA that consists of a suite of programs for conducting air quality model simulations. CMAQ is supported by the CMAS Center: http://www.cmascenter.org
 
-CMAQ combines current knowledge in atmospheric science and air quality modeling with multi-processor
-computing techniques in an open-source framework to deliver fast, technically sound estimates of ozone,
-particulates, toxics, and acid deposition.
+CMAQ combines current knowledge in atmospheric science and air quality modeling with multi-processor computing techniques in an open-source framework to deliver scientifically sound estimates of ozone, particulates and toxics in the air we breathe, as well as deposition of pollutants such as acids and nutrients to our land and water.
 
 
-## CMAQ version 5.5 Overview:
+## CMAQ version 6.0 Alpha Overview:
 
-* [Frequently asked questions for upgrading to the latest CMAQ version](https://github.com/USEPA/CMAQ/wiki/CMAQv5.5-Series-FAQ)) **- Updated for v5.5 release.** 
-* [CMAQv5.5 Release Notes](https://github.com/USEPA/CMAQ/wiki/CMAQ-Release-Notes) - Release Notes are available on the CMAQ GitHub wiki.
-* [Tutorials for setting up and running CMAQ](DOCS/Users_Guide/Tutorials/README.md) **- Tutorials on running CMAQ, CMAQ-ISAM, CMAQ-DDM, and WRF-CMAQ test cases.**
+The science updates and new features in the alpha version (v6.0a1) are documented in the [CMAQv6.0alpha Release Notes](DOCS/Release_Notes/README.md) and summarized in the **[Release FAQ](DOCS/Release_FAQ/CMAQv6.0-FAQ.md)**.
 
-## New features in CMAQ version 5.5 include:
+While initially planned for fall 2026, the status and timing of any final release of CMAQv6.0 is to be determined. This CMAQv6.0 alpha release allows community members:
 
-* Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 2 including updated formaldehyde chemistry impacting ozone and secondary organic aerosol formation
-* New support for running pre-configured global CMAQ simulations coupled with meteorology from the Model for Prediction Across Scales – Atmosphere (MPAS-A) 
-* Expanded capabilities of the Integrated Source Apportionment Method (ISAM) to quantify source contributions to total secondary organic aerosol (SOA) and individual species
-* Updates to ISAM source attribution estimates, mainly impacting coarse particles and secondary organic aerosols formed through cloud processes
-* Updates to the Decoupled Direct Method (DDM) to improve second order ozone sensitivities  
-* Updated chemistry to properly capture photolysis effects from sub-grid clouds
-* Revised algorithms for modeling dry deposition (M3DRY and STAGE updates)
-* Improved accuracy and error checking for BDSNP soil NO in the MEGAN biogenic emissions algorithm 
-* MCIP (meteorology pre-preprocessor) updates to grid origin definition for fine scale Lambert Conformal Grids (i.e., < 4km )
-* Updates to Sulfur Tracking Model (STM) to properly attribute sulfate from gas phase chemistry
-* Updates to the Explicit and Lumped Model Output (ELMO) synthesizer to fix erroneous output for several PM aggregates including PMF_OC, PMF_NCOM, TNO3
-* New shp2cmaq python tool to convert GIS shapefiles into gridded netCDF mask files that can be used for defining regions and region families with DESID and using geographic source regions when running CMAQ-ISAM
-* Simplified workflows for easier CMAQ installation
+* a preview of science and feature updates planned for the CMAQv6.0 release.
+* the ability to take advantage of improvements for preliminary studies of their own interest.
+* help other interested community members by testing, troubleshooting, and debugging the research version before any potential future final release.
 
-* **See the full list of CMAQv5.5 updates on our new CMAQ Wiki page. [**CMAQv5.5 Updates**](https://github.com/USEPA/CMAQ/wiki/CMAQv5.5-Series-FAQ#do-i-need-to-update-from-v54-to-v55)**
-
-## Important note for WRF-CMAQ users
-Coupled WRF-CMAQv5.5 [(Wong et al., 2010)](https://doi.org/10.5194/gmd-5-299-2012) is compatible with WRF versions 4.4 to 4.5.1.  EPA's testing of WRF-CMAQ has included chemical mechanisms CB6r5 and CRACMMv1 with the M3DRY dry deposition scheme.  Other model options can be used with the WRF-CMAQ model but will have limited user support for issues that are encountered.  
+## New features in CMAQ version 6.0 include:
+* Gas, Aqueous, & Aerosol Chemistry 
+  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 including particle nitrate (pNO3) as a heterogenous reaction 
+  * CRACMM3M, with inclusion of halogen chemistry to improve the representation of gas-phase and aerosol chemistry in marine environments.
+  * CRACMM3HAPS which includes additional gas chemistry for Hazardous Air Pollutants.
+  * Henry’s law rate constant updates 
+  * Photolysis rate constant updates 
+* Transport Processes & Land Surface Exchange 
+  * Changes to runtime minimum eddy diffusivity option (KZMIN) 
+* Emissions
+  * Corrections to estimation of marine-gas halogen emissions 
+  * Corrections to estimation of windblown dust emissions for NLCD40 land-use specification 
+  * Release of MetEmis Module to dynamically calculate meteorology-induced on-road mobile emissions within CMAQ (**community contribution based on [Baek et al., 2023](https://doi.org/10.5194/gmd-16-4659-2023))
+  * New lightning options 
+* Instrumented Models (CMAQ-ISAM & CMAQ-DDM3D)
+  * Introducing CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M 
+  * Additional development to improve robustness for all chemical mechanisms 
+  * Fixes to DDM3D instabilities relating to propagating sensitivity fields through heterogenous chemistry due to inconsistent unit conversions 
+* Diagnostic Model Output
+  * Upgrade from ELMOv1.0 to ELMOv2.1 – added new capabilities for model output 
+  * Updates to photolysis diagnostic outputs (CCTM_PHOTDIAG1 & CCTM_PHOTDIAG3 ) 
+* Coupled model system
+  * First public release of unified coupler to couple WRF-CMAQ and MPAS-CMAQ in a consistent “one-code” framework 
+* Structural Improvements 
+  * Moved CONST.EXT (defines define model fundamental physical, chemical, and mathematical constants) to Fortran module and updated constants to latest 2019 NIST and SI standards 
+  * Rewrote HLCONST to use integer tokens instead of strings reducing model runtime by approximately 8% 
 
 ## Getting the CMAQ Repository
-This CMAQ Git archive is organized with each official public release stored as a branch on the main USEPA/CMAQ repository. The most recently released version of the the model will always be on the branch called 'main'. To clone code from the CMAQ Git archive, specify the branch (i.e. version number) and issue the following command from within
-a working directory on your server:
+This CMAQ Git archive is organized with each version stored as a branch on the main USEPA/CMAQ repository. The most recently released official version of the model will always be on the branch called 'main'. 
+To clone code from the CMAQv6.0 alpha version issue the following command from within a working directory on your server:
 
+**Alpha 1 Version**
 ```
-git clone -b main https://github.com/USEPA/CMAQ.git CMAQ_REPO
+git clone -b 6.0a1 https://github.com/USEPA/CMAQ.git CMAQ_REPO
 ```
+
 
 ## CMAQ Repository Guide
 Source code and scripts are organized as follows:
 * **CCTM (CMAQ Chemical Transport Model):** code and scripts for running the 3D-CTM at the heart of CMAQ.
-* **DOCS:** CMAQ User's Guide, developers guidance, and short tutorials.
+* **DOCS:** Release Notes, Release FAQ, Getting Started reference page, User's Guide, and short tutorials.
 * **PREP:** Data preprocessing tools for important input files like initial and boundary conditions, meteorology, etc.
 * **POST:** Data postprocessing tools for aggregating and evaluating CMAQ output products (e.g. Combine, Site-Compare, etc)
-* **PYTOOLS:** Python pre- and postprocessing tools (currently this includes the DMSCHLO preprocessor)
+* **PYTOOLS:** Python pre- and postprocessing tools
 * **UTIL:** Utilities for generating code and using CMAQ (e.g. chemical mechanism generation)
 
-## Documentation
-Code documentation is included within this repository (they are version-controlled along with the code itself).  
+## CMAQv6.0 Alpha Documentation
+The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DESID have been updated for CMAQv6.0 alpha.  All other User's Guide content in this repository was last updated for the CMAQv5.5 release. Additional documentation updates will be included in the CMAQv6.0 release. Information on the updates in CMAQv6.0 alpha is included in the **[CMAQ Release Notes](DOCS/Release_Notes/README.md).**
 
-* [FAQ for upgrading to the latest CMAQ version](https://github.com/USEPA/CMAQ/wiki/CMAQv5.5-Series-FAQ) 
-* [CMAQv5.5 Release Notes](https://github.com/USEPA/CMAQ/wiki/CMAQ-Release-Notes)
-* [Tutorials](DOCS/Users_Guide/Tutorials/README.md)   
-* [CMAQ User's Guide](DOCS/Users_Guide/README.md)   
-* [Developers' Guide](DOCS/Developers_Guide/CMAQ_Dev_Guide.md)
 
 ## CMAQ Test Cases 
-Test case input and output data for the CMAQv5.5 release are available from the CMAS Data Warehouse. Step-by-step benchmark tutorials using the test case data are provided in the GitHub repo. 
+Test case input and output data for the CMAQv5.5 release are available from the CMAS Data Warehouse. Step-by-step benchmark tutorials using the test case data are provided in the GitHub repo. These Test Case datasets may be adapted to work with the CMAQv6.0 alpha versions.
 * [CMAQ Test Case Data](DOCS/Test_Case_Data.md)
 
 

@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/STENEX/src/se_snl/se_global_sum_module.f,v 1.2 2006/02/15 14:41:56 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C --------------------------------------------------------------------------
 C Purpose:
 C
@@ -48,11 +42,13 @@ C   error       -- error code for mpi call
 C
 C Include Files:
 C
-C   mpif.h
 C   se_pe_info_ext:
 C -----------------------------------------------------------------------------
 
         module se_global_sum_module
+
+        use se_pe_info_ext
+        use mpi
 
         implicit none
 
@@ -66,14 +62,10 @@ C -----------------------------------------------------------------------------
 C -----------------------------------------------------------------------------
         function se_global_isum (var) result (se_global_isum_result)
 
-        use se_pe_info_ext
-
         implicit none
 
         integer :: se_global_isum_result
         integer, intent(in) :: var
-
-        include "mpif.h"
 
         integer :: sum, error
 
@@ -93,14 +85,10 @@ C -----------------------------------------------------------------------------
 C -----------------------------------------------------------------------------
         function se_global_rsum (var) result (se_global_rsum_result)
 
-        use se_pe_info_ext
-
         implicit none
 
         real :: se_global_rsum_result
         real, intent(in) :: var
-
-        include "mpif.h"
 
         real sum
         integer error
@@ -121,14 +109,10 @@ C -----------------------------------------------------------------------------
 C -----------------------------------------------------------------------------
         function se_global_iasum (var) result (se_global_iasum_result)
 
-        use se_pe_info_ext
-
         implicit none
 
         integer, intent(in) :: var(:)
         integer :: se_global_iasum_result(size(var))
-
-        include "mpif.h"
 
         integer :: sum(size(var)), error, n
 
@@ -150,14 +134,10 @@ C -----------------------------------------------------------------------------
 C -----------------------------------------------------------------------------
         function se_global_rasum (var) result (se_global_rasum_result)
 
-        use se_pe_info_ext
-
         implicit none
 
         real, intent(in) :: var(:)
         real :: se_global_rasum_result(size(var))
-
-        include "mpif.h"
 
         real sum(size(var))
         integer error, n

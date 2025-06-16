@@ -39,35 +39,35 @@
 
 c...Tagging maps
       CHARACTER( 16 ), ALLOCATABLE :: ISAM_SPEC( :,: )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_SAtoCGR( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_CGRtoSA( : )
-      LOGICAL, ALLOCATABLE, SAVE   :: L_ISAM_AERO( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_ISAMtoAERO( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_AEROtoSA( :,: )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_AEROGAStoSA( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_AEROCTRtoSA( : )
-      LOGICAL, ALLOCATABLE, SAVE   :: IS_SPC_AEROSOL( :,: )
-      LOGICAL, ALLOCATABLE, SAVE   :: TRANSPORT_SPC ( : )
-      LOGICAL, ALLOCATABLE, SAVE   :: ISAM_SPECIES_BIAS( :,: )
-      INTEGER, ALLOCATABLE, SAVE   :: STREAM_TO_TAG ( :,: )
-      INTEGER, ALLOCATABLE, SAVE   :: TAGS_PER_STREAM( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_DIFFtoSA( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_ADVtoSA( : )
+      INTEGER, ALLOCATABLE         :: MAP_SAtoCGR( : )
+      INTEGER, ALLOCATABLE         :: MAP_CGRtoSA( : )
+      LOGICAL, ALLOCATABLE         :: L_ISAM_AERO( : )
+      INTEGER, ALLOCATABLE         :: MAP_ISAMtoAERO( : )
+      INTEGER, ALLOCATABLE         :: MAP_AEROtoSA( :,: )
+      INTEGER, ALLOCATABLE         :: MAP_AEROGAStoSA( : )
+      INTEGER, ALLOCATABLE         :: MAP_AEROCTRtoSA( : )
+      LOGICAL, ALLOCATABLE         :: IS_SPC_AEROSOL( :,: )
+      LOGICAL, ALLOCATABLE         :: TRANSPORT_SPC ( : )
+      LOGICAL, ALLOCATABLE         :: ISAM_SPECIES_BIAS( :,: )
+      INTEGER, ALLOCATABLE         :: STREAM_TO_TAG ( :,: )
+      INTEGER, ALLOCATABLE         :: TAGS_PER_STREAM( : )
+      INTEGER, ALLOCATABLE         :: MAP_DIFFtoSA( : )
+      INTEGER, ALLOCATABLE         :: MAP_ADVtoSA( : )
  
-      INTEGER, ALLOCATABLE, SAVE   :: ISAM_TO_AERO( : )  ! maps tracked species to bulk concentration if aerosol species
-      INTEGER, ALLOCATABLE, SAVE   :: SA_AERO_INDX( : )  ! index of tracked aerosol in ISAM concentration array
+      INTEGER, ALLOCATABLE         :: ISAM_TO_AERO( : )  ! maps tracked species to bulk concentration if aerosol species
+      INTEGER, ALLOCATABLE         :: SA_AERO_INDX( : )  ! index of tracked aerosol in ISAM concentration array
 
-      INTEGER, ALLOCATABLE, SAVE   :: ISAM_PVO3_MAP( : ) ! potential vorticity map
+      INTEGER, ALLOCATABLE         :: ISAM_PVO3_MAP( : ) ! potential vorticity map
 
       INTEGER ::     NSPC_SA_AE        ! number of tracked species that are aerosols
       INTEGER ::     N_SA_AEROSPC      ! number of unique aerospc in all tracked aerosols
 
-      INTEGER, SAVE ::     NSPC_SA
-      INTEGER, SAVE ::     NTAG_SA
-      INTEGER, SAVE ::     NSPC_TRANSPORT
+      INTEGER ::     NSPC_SA
+      INTEGER ::     NTAG_SA
+      INTEGER ::     NSPC_TRANSPORT
       INTEGER, PARAMETER :: NBIAS = 4 
-      INTEGER, SAVE ::     N_VOC_BIAS
-      INTEGER, SAVE ::     N_NOY_BIAS
+      INTEGER ::     N_VOC_BIAS
+      INTEGER ::     N_NOY_BIAS
 
 c...Define Allocatable Apportionment Arrays
       REAL, POINTER :: ISAM  ( :,:,:,:,: )
@@ -80,29 +80,29 @@ c...Define Allocatable Apportionment Arrays
       REAL, ALLOCATABLE :: SA_VDEMIS_DIFF( :,:,:,:,: ) 
 
 c...Variables regarding the tag list
-      CHARACTER( 16 ), ALLOCATABLE, SAVE :: TAGNAME( : )
-      CHARACTER( 256 )                    :: TAGCLASSES = ' '
-      CHARACTER( 1024 ), ALLOCATABLE, SAVE :: TAGSTREAMS_TEMP( : )
-      CHARACTER( 96 ), ALLOCATABLE, SAVE :: TAGSTREAMS( :, : )
-      INTEGER, ALLOCATABLE, SAVE         :: TAGSTREAMS_NUM( : )
+      CHARACTER( 16 ), ALLOCATABLE       :: TAGNAME( : )
+      CHARACTER( 256 )                   :: TAGCLASSES = ' '
+      CHARACTER( 1024 ), ALLOCATABLE     :: TAGSTREAMS_TEMP( : )
+      CHARACTER( 96 ), ALLOCATABLE       :: TAGSTREAMS( :, : )
+      INTEGER, ALLOCATABLE               :: TAGSTREAMS_NUM( : )
 
-      CHARACTER( 1024 ), ALLOCATABLE, SAVE :: ISAMRGN_TEMP( : )
-      CHARACTER( 96 ), ALLOCATABLE, SAVE :: ISAMRGN( :, : )
-      INTEGER, ALLOCATABLE, SAVE         :: ISAMRGN_NUM( : )
-      INTEGER, ALLOCATABLE, SAVE         :: ISAMRGN_MAP( :, : )
+      CHARACTER( 1024 ), ALLOCATABLE     :: ISAMRGN_TEMP( : )
+      CHARACTER( 96 ), ALLOCATABLE       :: ISAMRGN( :, : )
+      INTEGER, ALLOCATABLE               :: ISAMRGN_NUM( : )
+      INTEGER, ALLOCATABLE               :: ISAMRGN_MAP( :, : )
 
 c...Logical values for tagging species
-      LOGICAL, SAVE :: L_EC      = .FALSE.
-      LOGICAL, SAVE :: L_OC      = .FALSE.
-      LOGICAL, SAVE :: L_SO4     = .FALSE.
-      LOGICAL, SAVE :: L_NO3     = .FALSE.
-      LOGICAL, SAVE :: L_NH4     = .FALSE.
-      LOGICAL, SAVE :: L_PM25    = .FALSE.
-      LOGICAL, SAVE :: L_OZONE   = .FALSE.
-      LOGICAL, SAVE :: L_VOC     = .FALSE.
-      LOGICAL, SAVE :: L_CL      = .FALSE.
+      LOGICAL :: L_EC      = .FALSE.
+      LOGICAL :: L_OC      = .FALSE.
+      LOGICAL :: L_SO4     = .FALSE.
+      LOGICAL :: L_NO3     = .FALSE.
+      LOGICAL :: L_NH4     = .FALSE.
+      LOGICAL :: L_PM25    = .FALSE.
+      LOGICAL :: L_OZONE   = .FALSE.
+      LOGICAL :: L_VOC     = .FALSE.
+      LOGICAL :: L_CL      = .FALSE.
       
-      LOGICAL, SAVE :: SA_BIDI = .FALSE.
+      LOGICAL :: SA_BIDI   = .FALSE.
 
 ! Chemical Mechanism Lists for Populating ISAM Species Arrays
       TYPE ISAM_LIST
@@ -119,14 +119,14 @@ c...Logical values for tagging species
 !     LOGICAL, SAVE :: L_CHEMISTRY
 
 ! Cloud Module variables - sln 4 june 2018
-      REAL, SAVE :: DEPSUM_SAVE = 0.0
-      REAL, SAVE :: DS4_SAVE    = 0.0
-      REAL, SAVE :: REMOV_SAVE  = 0.0
+      REAL :: DEPSUM_SAVE = 0.0
+      REAL :: DS4_SAVE    = 0.0
+      REAL :: REMOV_SAVE  = 0.0
 
-      REAL, SAVE :: DEPSUM_AORGC_SAVE = 0.0
-      REAL, SAVE :: DGLY1_SAVE        = 0.0 
-      REAL, SAVE :: DMGLY1_SAVE       = 0.0  
-      REAL, SAVE :: REMOV_AORGC_SAVE  = 0.0
+      REAL :: DEPSUM_AORGC_SAVE = 0.0
+      REAL :: DGLY1_SAVE        = 0.0 
+      REAL :: DMGLY1_SAVE       = 0.0  
+      REAL :: REMOV_AORGC_SAVE  = 0.0
 
 c...Final, combined tags
       INTEGER                      :: N_SPCTAG
@@ -135,18 +135,18 @@ c...Final, combined tags
       CHARACTER( 16 ), ALLOCATABLE :: VNAM_SPCTAG( : )
 
 C ...Tagging indices for bcon, others, icon
-      INTEGER, SAVE :: BIDITAG = 0
-      INTEGER, SAVE :: BCONTAG = 0
-      INTEGER, SAVE :: OTHRTAG = 0
-      INTEGER, SAVE :: ICONTAG = 0
+      INTEGER :: BIDITAG = 0
+      INTEGER :: BCONTAG = 0
+      INTEGER :: OTHRTAG = 0
+      INTEGER :: ICONTAG = 0
 
       REAL, PRIVATE, ALLOCATABLE :: BUFF2( :,: )
 
 ! Diffusion module variables
-      REAL, ALLOCATABLE, SAVE :: SA_DDEP( :,:,: ), SA_DDEP0( :,:,: )
+      REAL, ALLOCATABLE :: SA_DDEP( :,:,: ), SA_DDEP0( :,:,: )
 
 ! Advection module variables
-      LOGICAL, ALLOCATABLE, SAVE :: BCON_SPC( : )
+      LOGICAL, ALLOCATABLE :: BCON_SPC( : )
 
         INTEGER, PARAMETER, PRIVATE :: MAX_STRING     = 32  ! max length of tagclass name
         INTEGER, PARAMETER, PRIVATE :: MAX_TAGCLASSES = 200 ! max number of tagclasses
@@ -562,18 +562,18 @@ c----------------------------------------------------------
         ISAM_SPEC_VOC( 5 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
      &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
      &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
-     &    'EBZ       ','ELHOM     ','EOH       ','ETE       ','ETEG      ',
-     &    'ETH       ','FURAN     ','FURANONE  ','GLY       ','HOM       ',
+     &    'EBZ       ','VELHOM    ','EOH       ','ETE       ','ETEG      ',
+     &    'ETH       ','FURAN     ','FURANONE  ','GLY       ','VHOM      ',
      &    'HC3       ','HC5       ','HC10      ','HCHO      ','HKET      ',
-     &    'HONIT     ','IEPOX     ','ISHP      ','IPX       ','ISO       ',
+     &    'VHONIT    ','IEPOX     ','ISHP      ','IPX       ','ISO       ',
      &    'KET       ','LIM       ','LIMAL     ','MACR      ','MAHP      ',
      &    'MCT       ','MEK       ','MGLY      ','MOH       ','MVK       ',
      &    'NAPH      ','OLI       ','OLT       ','OP1       ','OP2       ',
-     &    'OP3       ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
+     &    'VOP3      ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
      &    'PHEN      ','PROG      ','ROH       ','SESQ      ','SLOWROC   ',
      &    'STY       ','TOL       ','UALD      ','XYL       ','PAA       ',
      &    'PAN       ','PPN       ','MPAN      ','ONIT      ','ISON      ',
-     &    'TRPN      ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
+     &    'VTRPN     ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
      &    'VROCN1ALK ','VROCP0ALK ','VROCP1ALK ','VROCP2ALK ','VROCP3ALK ',
      &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
      &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
@@ -581,50 +581,52 @@ c----------------------------------------------------------
      &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      ','CO        '/ )
 
         !CRACMM3
-        ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 98 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 99 ) )
         ISAM_SPEC_VOC( 6 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
      &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
      &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
-     &    'EBZ       ','ELHOM     ','EOH       ','ETE       ','ETEG      ',
-     &    'ETH       ','FURAN     ','FURANONE  ','GLY       ','HOM       ',
+     &    'EBZ       ','VELHOM    ','EOH       ','ETE       ','ETEG      ',
+     &    'ETH       ','FURAN     ','FURANONE  ','GLY       ','VHOM      ',
      &    'HC3       ','HC5       ','HC10      ','HCHO      ','HKET      ',
-     &    'HONIT     ','IEPOX     ','ISHP      ','IPX       ','ISO       ',
+     &    'VHONIT    ','IEPOX     ','ISHP      ','IPX       ','ISO       ',
      &    'KET       ','LIM       ','LIMAL     ','MACR      ','MAHP      ',
      &    'MCT       ','MEK       ','MGLY      ','MOH       ','MVK       ',
      &    'NAPH      ','OLI       ','OLT       ','OP1       ','OP2       ',
-     &    'OP3       ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
+     &    'VOP3      ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
      &    'PHEN      ','PROG      ','ROH       ','SESQ      ','SLOWROC   ',
      &    'STY       ','TOL       ','UALD      ','XYL       ','PAA       ',
      &    'PAN       ','PPN       ','MPAN      ','ONIT      ','ISON      ',
-     &    'TRPN      ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
+     &    'VTRPN     ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
      &    'VROCN1ALK ','VROCP0ALK ','VROCP1ALK ','VROCP2ALK ','VROCP3ALK ',
      &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
      &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
      &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
-     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      ','CO        '/ )
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','VMTN1     ','ECH4      ',
+     &    'CO        '/ )
 
         !CRACMM3M
-        ALLOCATE( ISAM_SPEC_VOC( 7 )%LIST( 98 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 7 )%LIST( 99 ) )
         ISAM_SPEC_VOC( 7 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
      &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
      &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
-     &    'EBZ       ','ELHOM     ','EOH       ','ETE       ','ETEG      ',
-     &    'ETH       ','FURAN     ','FURANONE  ','GLY       ','HOM       ',
+     &    'EBZ       ','VELHOM    ','EOH       ','ETE       ','ETEG      ',
+     &    'ETH       ','FURAN     ','FURANONE  ','GLY       ','VHOM      ',
      &    'HC3       ','HC5       ','HC10      ','HCHO      ','HKET      ',
-     &    'HONIT     ','IEPOX     ','ISHP      ','IPX       ','ISO       ',
+     &    'VHONIT    ','IEPOX     ','ISHP      ','IPX       ','ISO       ',
      &    'KET       ','LIM       ','LIMAL     ','MACR      ','MAHP      ',
      &    'MCT       ','MEK       ','MGLY      ','MOH       ','MVK       ',
      &    'NAPH      ','OLI       ','OLT       ','OP1       ','OP2       ',
-     &    'OP3       ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
+     &    'VOP3      ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
      &    'PHEN      ','PROG      ','ROH       ','SESQ      ','SLOWROC   ',
      &    'STY       ','TOL       ','UALD      ','XYL       ','PAA       ',
      &    'PAN       ','PPN       ','MPAN      ','ONIT      ','ISON      ',
-     &    'TRPN      ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
+     &    'VTRPN     ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
      &    'VROCN1ALK ','VROCP0ALK ','VROCP1ALK ','VROCP2ALK ','VROCP3ALK ',
      &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
      &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
      &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
-     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      ','CO        '/ )
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','VMTN1     ','ECH4      ',
+     &    'CO        '/ )
 
         !PRESCRIBE NITRATE SPECIES
         !CB6R5_AE7_AQ
@@ -818,16 +820,27 @@ c----------------------------------------------------------
      &                  'CL2         '/)
 
         !CRACMM2
-        ALLOCATE( ISAM_SPEC_HAPGAS( 5 )%LIST( 1 ) )
-        ISAM_SPEC_HAPGAS( 5 )%LIST = (/'HCHO        '/)
+        ALLOCATE( ISAM_SPEC_HAPGAS( 5 )%LIST( 10 ) )
+        ISAM_SPEC_HAPGAS( 5 )%LIST = (/'HCHO        ','ACD         ',
+     &                  'ACRO        ','BDE13       ','BEN         ',
+     &                  'EBZ         ','ETEG        ','MOH         ',
+     &                  'STY         ','TOL         '/)
+
 
         !CRACMM3
-        ALLOCATE( ISAM_SPEC_HAPGAS( 6 )%LIST( 1 ) )
-        ISAM_SPEC_HAPGAS( 6 )%LIST = (/'HCHO        '/)
+        ALLOCATE( ISAM_SPEC_HAPGAS( 6 )%LIST( 11 ) )
+        ISAM_SPEC_HAPGAS( 6 )%LIST = (/'HCHO        ','ACD         ',
+     &                  'ACRO        ','BDE13       ','BEN         ',
+     &                  'EBZ         ','ETEG        ','MOH         ',
+     &                  'STY         ','TOL         ','CL2         '/)
+
 
         !CRACMM3M
-        ALLOCATE( ISAM_SPEC_HAPGAS( 7 )%LIST( 2 ) )
-        ISAM_SPEC_HAPGAS( 7 )%LIST = (/'HCHO        ','CL2         '/)
+        ALLOCATE( ISAM_SPEC_HAPGAS( 7 )%LIST( 11 ) )
+        ISAM_SPEC_HAPGAS( 7 )%LIST = (/'HCHO        ','ACD         ',
+     &                  'ACRO        ','BDE13       ','BEN         ',
+     &                  'EBZ         ','ETEG        ','MOH         ',
+     &                  'STY         ','TOL         ','CL2         '/)
 
         !AEROSOL HAPS
         ALLOCATE( ISAM_SPEC_HAPAERO%LIST( 14 ) )

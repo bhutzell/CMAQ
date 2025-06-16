@@ -49,9 +49,27 @@ The original algorithm was removed from _combine_, and it was replaced with logi
 ### Additional MCIP release notes can be found under the [DOCS/MCIP](https://github.com/USEPA/CMAQ/tree/main/PREP/mcip/docs) folder. 
 
 ## [ICON](https://github.com/USEPA/CMAQ/tree/main/PREP/icon)
- No changes were made to ICON in CMAQv5.5.
+
+ No changes were made to the source code of ICON in CMAQv5.5 or v6.0. One change was made to the bldit script.  
+Also, See the CMAQv6.0 Release Note on **[Remove option for Aerosol Initial Condition surface area](./CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#remove-option-for-aerosol-initial-condition-surface-area-and-update-settings-for-boundary-condition-surface-area)**.
+ 
+ ### ICON C Compiler fix
+**Primary Contact**: [Barron H. HEnderson](mailto:henderson.barronl@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix  
+**Release Version/Date**: CMAQv6.0
+**Description**:  Updating build script to include c_compiler in configuration if cc was not aliased or on the users path. The update adds c_compiler set to CC. This approach has more fail safes and is used in many other bldit scripts (bcon, cctm, etc).  
+**Significance and Impact**: Makes it easier to get ICON compiled  
+**References**:   N/A
+**Internal PRs**: [PR#1161](https://github.com/USEPA/CMAQ_Dev/pull/1161)
+ 
+
+
 
 ## [BCON](https://github.com/USEPA/CMAQ/tree/main/PREP/bcon)
+No changes were made to the source code of BCON in v6.0.   
+
+See the CMAQv6.0 Release Note on **[Update settings for Boundary Condition Surface Area](./CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#remove-option-for-aerosol-initial-condition-surface-area-and-update-settings-for-boundary-condition-surface-area)**.
+
 
 ### Improved IC/BC species mappings for CRACMM  
 [Havala Pye](mailto:pye.havala@epa.gov) and [Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency   
@@ -72,16 +90,49 @@ Additionally, the mapping of carbon bond species SVSQT was updated for both CRAC
 
 
 ## [Create OMI](https://github.com/USEPA/CMAQ/tree/main/PREP/create_omi) 
+
+### Feature updates to create_omi PREP tool 
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: New Feature  
+**Release Version/Date**:  CMAQv6.0 
+
+**Description**:  
+
+The code changes attempt to accomplish the following goals.  
+1.   Change the diagnostic files or visualization output files from I/O API format to netcdf4 format.  
+2.   Update build script and included makefile, _create_omi.makefile_, to remove dependency on the I/O API library, modules and include files.  
+3.   Update the build and run scripts to ease using the create_omi tool.  
+
+The revised output files are created and updated by adapting subroutines and derive data types from the MCIP file, [outncf.f90][link_outncf]. The adapted code resides in the create_omi code file, outncf_module.f90. Both output files can examined using [VERDI](https://www.cmascenter.org/verdi/) although their data cannot be extracted by using the COMBINE POST tool. The latter loss should be acceptable because the files are purely for QA or visualization and are not used in known analysis or evaluation methods. 
+
+**Significance and Impact**:   
+Simplifies building and running the create_omi tool. 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1122](https://github.com/USEPA/CMAQ/commit/eee81f761b32182a787f401e3ccc8b52d29f32df) | [PR#1122](https://github.com/USEPA/CMAQ_Dev/pull/1122)  |
+
+### Fix formatting in create_omi and update build/run scripts
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Bug fix and Scripts Update         
 **Release Version/Date**: CMAQv5.4    
 
-**Description**:  A bug fix and script enhancement was made. The bug fix corrects format statements used to write the ASCII output file. The error and its fix were identified in a [CMAS Forum post](https://forum.cmascenter.org/t/some-questions-about-using-different-resolution-omi-file-in-cmaq5-3-2/2569/4). When the latitude and longitude resolution is greater than 360X360 degrees, the format descriptors are too small and cause the output lines to wrap around themselves. The error causes the total ozone column to be incorrectly calculated in CCTM and produce bad values of photolysis frequencies from the inline build option. The bad values do not exist in the repositories version of the OMI data file under CCTM/src/phot/inline.
+**Description**:  
+A bug fix and script enhancement was made. The bug fix corrects format statements used to write the ASCII output file. The error and its fix were identified in a [CMAS Forum post](https://forum.cmascenter.org/t/some-questions-about-using-different-resolution-omi-file-in-cmaq5-3-2/2569/4). When the latitude and longitude resolution is greater than 360X360 degrees, the format descriptors are too small and cause the output lines to wrap around themselves. The error causes the total ozone column to be incorrectly calculated in CCTM and produce bad values of photolysis frequencies from the inline build option. The bad values do not exist in the repositories version of the OMI data file under CCTM/src/phot/inline.
  The script enhancement revises create_omi's build and run scripts so they function as similar scripts for ICON and BCON tools.      
 
-**Significance and Impact**:  If the simulation uses an OMI data file created with lat/long resolution greater than 360X360 degrees, CCTM will calculate and use bad values of photolysis frequencies.
+**Significance and Impact**:  
+If the simulation uses an OMI data file created with lat/long resolution greater than 360X360 degrees, CCTM will calculate and use bad values of photolysis frequencies.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#779](https://github.com/USEPA/CMAQ/commit/095ea1e8e40e320786045701a8d0d1cd5b0b4b41) | [PR#779](https://github.com/USEPA/CMAQ_Dev/pull/779)  |
 
+
+<!-- START_OF_COMMENT -->
+
+[link_outncf]: ../../PREP/mcip/src/outncf.f90
+
+<!-- END_OF_COMMENT -->
+
+[link_outncf]: https://github.com/USEPA/CMAQ/blob/main/PREP/mcip/src/outncf.f90

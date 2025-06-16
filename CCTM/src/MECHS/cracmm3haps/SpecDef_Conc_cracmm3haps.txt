@@ -4,8 +4,7 @@
 
 /
 ! This Species Definition File is for Use with the COMBINE tool built for 
-! post-processing CMAQ output. It is compatible with CMAQv5.2.
-! Date: May 12 2017
+! post-processing CMAQ output. It is compatible with CMAQv6.0.
 
 ! Output variables that begin with 'PM' represent those in which a size cut was 
 ! applied based on modeled aerosol mode parameters.  For example, PM25_NA is all 
@@ -30,7 +29,7 @@
 
 / File [1]: CMAQ conc/aconc file
 / File [2]: METCRO3D file
-/ File [3]: PMDIAG/APMDIAG file
+/ File [3]: ELMO/AELMO file
 / File [4]: METCRO2D file
 /
 /new species    ,units     ,expression
@@ -53,27 +52,28 @@ WDIR10          ,deg       ,WDIR10[4]
 CO              ,ppbV      ,1000.0*CO[1]
 H2O2            ,ppbV      ,1000.0*H2O2[1]
 HNO3            ,ppbV      ,1000.0*HNO3[1]
-HNO3_UGM3       ,ug m-3    ,1000.0*(HNO3[1]*2.1752*DENS[2])  
+HNO3_UGM3       ,ug m-3    ,1000.0*(HNO3[1]*(63.0/28.9628)*DENS[2])  
 HONO            ,ppbV      ,1000.0*HONO[1]
 HOX             ,ppbV      ,1000.0*(HO[1]+HO2[1])
 OH              ,ppbV      ,1000.0*HO[1]
 N2O5            ,ppbV      ,1000.0*N2O5[1]
 NH3             ,ppbV      ,1000.0*NH3[1]
-NH3_UGM3        ,ug m-3    ,1000.0*(NH3[1]*0.5870*DENS[2])
-NHX             ,ug m-3    ,1000.0*(NH3[1]*0.5870*DENS[2])+ANH4I[1]+ANH4J[1]+ANH4K[1]
+NH3_UGM3        ,ug m-3    ,1000.0*(NH3[1]*(17.0/28.9628)*DENS[2])
+NHX             ,ug m-3    ,1000.0*(NH3[1]*(17.0/28.9628)*DENS[2])+ANH4I[1]+ANH4J[1]+ANH4K[1]
 NO              ,ppbV      ,1000.0*NO[1]
 NO2             ,ppbV      ,1000.0*NO2[1]
 NOX             ,ppbV      ,1000.0*(NO[1] + NO2[1])
 ANO3_PPB        ,ppbV      ,(ANO3I[1]+ANO3J[1]+ANO3K[1])/(DENS[2]*(62.0/28.9628))
-NTR             ,ppbV      ,1000.0*(ONIT[1]+ISON[1]+INALD[1]+TRPN[1]+HONIT[1]), organic nitrates
+NTR             ,ppbV      ,1000.0*(ONIT[1]+ISON[1]+INALD[1]+VTRPN[1]+VHONIT[1]), organic nitrates
 PANS            ,ppbV      ,1000.0*(PAN[1]+PPN[1]+MPAN[1])
 NOY             ,ppbV      ,1000.0*(NO[1]+NO2[1]+NO3[1]+2*N2O5[1]+HONO[1] \
                                    +HNO3[1]+HNO4[1]+PAN[1]+PPN[1]+MPAN[1] \
-                                   +ISON[1]+INALD[1]+IPX[1]+TRPN[1]+ONIT[1]) \
-                                   +HONIT[1]+ANO3_PPB[0]
+                                   +ISON[1]+INALD[1]+IPX[1]+VTRPN[1]+ONIT[1] \
+                                   +VHONIT[1]+CLNO[1]+CLNO2[1]+CLNO3[1]) \
+                            +ANO3_PPB[0]
 O3              ,ppbV      ,1000.0*O3[1]
 SO2             ,ppbV      ,1000.0*SO2[1]
-SO2_UGM3        ,ug m-3    ,1000.0*(SO2[1]*2.2118*DENS[2])
+SO2_UGM3        ,ug m-3    ,1000.0*(SO2[1]*(64.0/28.9628)*DENS[2])
 TERP            ,ppbV      ,1000.0*(API[1]+LIM[1]),  a-pinene and limonene monoterpenes in CRACMM
 
 ! Deprecate these names in future
@@ -112,7 +112,7 @@ ALDX            ,ppbV      ,1000.0*ALD[1],            C3 and higher aldehydes is
 !NOZ             ,ppbV      ,NOY[0]-NOX[0]
 !SULF            ,ppbV      ,1000.0*SULF[1]
 ! LSIGROC: L/S/IVOC alk and oxy gas species
-LSIVROCG        ,ppbC      ,1000.0* (9.5*VROCIOXY[1] \
+LSIROCG         ,ppbC      ,1000.0* (9.5*VROCIOXY[1] \
                                     +14.0*VROCP5ARO[1]+13.0*VROCP6ARO[1] \
                                     +30.0*VROCN2ALK[1]+29.0*VROCN1ALK[1] \
                                     +28.0*VROCP0ALK[1]+27.0*VROCP1ALK[1] \
@@ -132,9 +132,9 @@ TOTROCG        ,ppbC      ,1000.0*(2.0*ACD[1]+2.0*ACE[1] \
                                     +3.0*ACRO[1]+3.0*ACT[1]+3.0*ALD[1]+10*API[1] \
                                     +7.0*BALD[1]+4.0*BDE13[1]+6.0*BEN[1] \
                                     +9.0*CSL[1]+5.0*DCB1[1]+6.0*DCB2[1]+4.0*DCB3[1] \
-                                    +20.0*ELHOM[1] \
+                                    +20.0*VELHOM[1] \
                                     +2.0*EOH[1]+2.0*ETE[1]+2.0*ETEG[1]+2.0*ETH[1] \
-                                    +5.0*FURAN[1]+4.0*FURANONE[1]+2.0*GLY[1]+10.0*HOM[1] \
+                                    +5.0*FURAN[1]+4.0*FURANONE[1]+2.0*GLY[1]+10.0*VHOM[1] \
                                     +3.0*HC3[1]+5.0*HC5[1]+10.0*HC10[1]  \
                                     +1.0*HCHO[1]+3.0*HKET[1] \
                                     +5.0*IEPOX[1]+5.0*ISHP[1]\
@@ -143,7 +143,7 @@ TOTROCG        ,ppbC      ,1000.0*(2.0*ACD[1]+2.0*ACE[1] \
                                     +7.0*MCT[1]  \
                                     +4.0*MEK[1]+3.0*MGLY[1]+1.0*MOH[1]+4.0*MVK[1] \
                                     +10.0*NAPH[1]+5.0*OLI[1]+3.0*OLT[1] \
-                                    +1.0*OP1[1]+2.0*OP2[1]+8.0*OP3[1]+10.0*OPB[1]   \
+                                    +1.0*OP1[1]+2.0*OP2[1]+8.0*VOP3[1]+10.0*OPB[1]   \
                                     +1.0*ORA1[1]+2.0*ORA2[1] \
                                     +10.0*PINAL[1]   \
                                     +6.0*PHEN[1]+3.0*PROG[1]  \
@@ -152,8 +152,9 @@ TOTROCG        ,ppbC      ,1000.0*(2.0*ACD[1]+2.0*ACE[1] \
                                     +8.0*XYL[1]+8.0*EBZ[1]+8.0*STY[1] \
                                     +2.0*PAA[1]+2.0*PAN[1]+3.0*PPN[1]+4.0*MPAN[1] \  
                                     +4.0*ONIT[1]+5.0*ISON[1] \
-                                    +5.0*INALD[1]+5.0*IPX[1]+10.0*TRPN[1]+10.0*HONIT[1] ) \ 
-                                    +LSIVROCG[0] ,
+                                    +5.0*INALD[1]+5.0*IPX[1]+10.0*VTRPN[1]+10.0*VHONIT[1] \
+                                    +10.0*VMTN1[1] ) \ 
+                                    +LSIROCG[0] ,
 !! Additional Global, Regional and Urban Toxic gases
 ACROLEIN_UGM3   ,ug/m3     ,1000.0*(ACRO[1]*1.9370*DENS[2])
 ACROLEIN_PRIMARY,ug/m3     ,1000.0*(ACRO_PRIM[1]*1.9370*DENS[2])
@@ -236,13 +237,16 @@ ANAK            ,ug m-3    ,0.8373*ASEACAT[1]+0.0626*ASOIL[1]+0.0023*ACORS[1]
 AMGK            ,ug m-3    ,0.0997*ASEACAT[1]+0.0170*ASOIL[1]+0.0032*ACORS[1]
 AKK             ,ug m-3    ,0.0310*ASEACAT[1]+0.0242*ASOIL[1]+0.0176*ACORS[1]
 ACAK            ,ug m-3    ,0.0320*ASEACAT[1]+0.0838*ASOIL[1]+0.0562*ACORS[1]
+AFEK            ,ug m-3    ,                  0.02695*ASOIL[1]+0.0467*ACORS[1]
+AMNK            ,ug m-3    ,                  0.00075*ASOIL[1]+0.0011*ACORS[1]
+
 ACLIJ           ,ug m-3    ,ACLI[1]+ACLJ[1]
 ACLK            ,ug m-3    ,ACLK[1]
 AECIJ           ,ug m-3    ,AECI[1]+AECJ[1]
 ANAIJ           ,ug m-3    ,ANAJ[1]+ANAI[1]
 ANO3IJ          ,ug m-3    ,ANO3I[1]+ANO3J[1]
 ANO3K           ,ug m-3    ,ANO3K[1]
-TNO3            ,ug m-3    ,2175.2*(HNO3[1]*DENS[2])+ANO3I[1]+ANO3J[1]+ANO3K[1]
+TNO3            ,ug m-3    ,1000.0*HNO3[1]*(63.0/28.9628)*DENS[2]+ANO3I[1]+ANO3J[1]+ANO3K[1]
 ANH4IJ          ,ug m-3    ,ANH4I[1]+ANH4J[1]
 ANH4K           ,ug m-3    ,ANH4K[1]
 ASO4IJ          ,ug m-3    ,ASO4I[1]+ASO4J[1]
@@ -271,9 +275,10 @@ ASOCI     ,ugC m-3,  AROCN2OXY2I[1]/1.42  + AROCN2OXY4I[1]/1.67  \
                     + AROCP0OXY2I[1]/1.42 + AROCP0OXY4I[1]/1.67 \
                     + AROCP1OXY1I[1]/1.29 + AROCP1OXY3I[1]/1.54
 ASOCJ     ,ugC m-3,  AHOMJ[1]/2.08 + AELHOMJ[1]/1.67 + AISO3NOSJ[1]/2.27 \
-                   + AISO3OSJ[1]/3.6 + AGLYJ[1]/2.13 + AORGCJ[1]/2  \
+                   + AISO3OSJ[1]/3.6 + AGLYOLIGJ[1]/2.13 + AORGCJ[1]/2  \
                    + AOP3J[1]/1.92 + ASOATJ[1]/2.31 + AROCN2OXY2J[1]/1.42 \
-                   + AISO4J[1]/2.80 + AISO5J[1]/2.50 + AHONITJ[1]/2.21 + ATRPNJ[1]/1.79 \
+                   + AISO4J[1]/2.80 + AISO5J[1]/2.50 \
+                   + AHONITJ[1]/2.21 + ATRPNJ[1]/1.79 + AMTN1J[1]/2.13 \
                    + AROCN2OXY4J[1]/1.67 + AROCN2OXY8J[1]/2.17 + AROCN1OXY1J[1]/1.29 \
                    + AROCN1OXY3J[1]/1.54 + AROCN1OXY6J[1]/1.92 + AROCP0OXY2J[1]/1.42 \
                    + AROCP0OXY4J[1]/1.67 + AROCP1OXY1J[1]/1.29 + AROCP1OXY3J[1]/1.54 \
@@ -286,11 +291,10 @@ ASOMI    ,ug m-3, AROCN2OXY2I[1]  + AROCN2OXY4I[1]  \
                     + AROCP0OXY2I[1] + AROCP0OXY4I[1] \
                     + AROCP1OXY1I[1] + AROCP1OXY3I[1]
 ASOMJ    ,ug m-3,  AHOMJ[1] + AELHOMJ[1] + AISO3NOSJ[1] \
-                   + AISO3OSJ[1] + AGLYJ[1] + AORGCJ[1]  \
+                   + AISO3OSJ[1] + AGLYOLIGJ[1] + AORGCJ[1]  \
                    + AOP3J[1] + ASOATJ[1] \
-                   + AISO4J[1] + AISO5J[1] + AHONITJ[1] + ATRPNJ[1] \
+                   + AISO4J[1] + AISO5J[1] + AHONITJ[1] + ATRPNJ[1] + AMTN1J[1] \
                    + AROCN2OXY2J[1] \
-                   + AOP3J[1] + ASOATJ[1] + AROCN2OXY2J[1] \
                    + AROCN2OXY4J[1] + AROCN2OXY8J[1] + AROCN1OXY1J[1] \
                    + AROCN1OXY3J[1] + AROCN1OXY6J[1] + AROCP0OXY2J[1] \
                    + AROCP0OXY4J[1] + AROCP1OXY1J[1] + AROCP1OXY3J[1] \
@@ -321,12 +325,14 @@ AORGAJ          ,ug m-3     ,AROCN2OXY2J[1]+AROCN2OXY4J[1]+AROCN2OXY8J[1]+AROCN1
 AORGAIJ         ,ug m-3     ,AORGAI[0] + AORGAJ[0]
 
 !!! Biogenic-VOC Derived Organic Aerosol
-AORGBIJ         ,ug m-3    ,AISO3NOSJ[1] +AISO3OSJ[1] +AHOMJ[1] + AELHOMJ[1]
+AORGBIJ         ,ug m-3    ,AISO3NOSJ[1] +AISO3OSJ[1] +AHOMJ[1] + AELHOMJ[1] \
+                           +AISO4J[1] + AISO5J[1] + ATRPNJ[1] + AHONITJ[1] \
+                           +AMTN1J[1]
 
 !!! Cloud-Processed  SOA
 AORGCJ          ,ug m-3    ,AORGCJ[1]
 !!! Remaining SOA
-AGLYJ           ,ug m-3    ,AGLYJ[1]
+AGLYJ           ,ug m-3    ,AGLYOLIGJ[1]
 
 !!! OM/OC ratios
 AOMOCRAT_TOT    ,           ,AOMIJ[0]/AOCIJ[0]

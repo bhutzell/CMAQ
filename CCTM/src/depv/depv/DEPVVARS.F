@@ -48,7 +48,7 @@ C           10 Mar 2025: G. SarwarL added CRACMM3M species
 C-----------------------------------------------------------------------
 
       INTEGER, PARAMETER :: LDDEP = 4
-      INTEGER, PARAMETER :: LTOTG = 275
+      INTEGER, PARAMETER :: LTOTG = 276
       INTEGER, PARAMETER :: LCMP  = 8
       CHARACTER( 16 )    :: DEPV_METHOD
 
@@ -354,10 +354,11 @@ C-------------------------------------------------------------------------------
          DEPSPC( 269) = 'HCOBR           '
          DEPSPC( 270) = 'CH2I2           '
          DEPSPC( 271) = 'CH2IBR          '
-         DEPSPC( 272) = 'CH2ICL          '	 
+         DEPSPC( 272) = 'CH2ICL          ' 
          DEPSPC( 273) = 'CHBR2CL         '
          DEPSPC( 274) = 'CHBRCL2         '
          DEPSPC( 275) = 'CH2BRCL         '
+         DEPSPC( 276) = 'VMTN1           '
 
          N_USE_DEPSPC = 0
          USE_DEPSPC = .FALSE.   ! array

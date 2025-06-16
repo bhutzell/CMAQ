@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/STENEX/src/se_snl/se_util_module.f,v 1.3 2006/02/17 12:54:05 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C --------------------------------------------------------------------------
 C Purpose:
 C
@@ -411,12 +405,11 @@ C --------------------------------------------------------------------------
         subroutine se_barrier (flag)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
         character, optional, intent(in) :: flag
-
-        include "mpif.h"
 
         integer :: local_comm, error
 
@@ -490,6 +483,7 @@ C -----------------------------------------------------------------------------
 
         use se_pe_info_ext
         use se_domain_info_ext
+        use mpi
 
         implicit none
 
@@ -497,8 +491,6 @@ C -----------------------------------------------------------------------------
         real, intent(inout) :: meddyv, mth1, mth2, mrib, mws
         integer, intent(inout) :: col, row, lvl, mtrop
         logical, intent(inout) :: never, ftrop
-
-        include "mpif.h"
 
         integer :: num_item = 11
 
@@ -700,14 +692,13 @@ C -----------------------------------------------------------------------------
         function se_isum_chk (var1, op, var2) result (se_isum_chk_result)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
         logical :: se_isum_chk_result
         integer, intent(in) :: var1, var2
         character (len = 2), intent(in) :: op
-
-        include "mpif.h"
 
         integer :: sum, error
         logical :: lse_isum_chk
@@ -786,14 +777,13 @@ C -----------------------------------------------------------------------------
         function se_rsum_chk (var1, op, var2) result (se_rsum_chk_result)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
         logical :: se_rsum_chk_result
         real, intent(in) :: var1, var2
         character (len = 2), intent(in) :: op
-
-        include "mpif.h"
 
         real    :: sum
         integer :: error
@@ -873,10 +863,9 @@ C -----------------------------------------------------------------------------
 
         use se_pe_info_ext
         use se_domain_info_ext
+        use mpi
 
         implicit none
-
-        include "mpif.h"
 
         integer, intent(in) :: x, y
         integer, intent(out) :: wpe
@@ -943,13 +932,12 @@ C -----------------------------------------------------------------------------
         subroutine se_global_logical (var, op)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
         logical var
         character*3 op
-
-        include "mpif.h"
 
         logical temp_var
         integer error
@@ -1922,6 +1910,7 @@ C -----------------------------------------------------------------------------
         subroutine se_in_syn (var, pe)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
@@ -1930,8 +1919,6 @@ C -----------------------------------------------------------------------------
 
         integer :: error
  
-        include "mpif.h"
-
         if (pe .ge. 0) then
            call mpi_bcast (var, 1, mpi_logical, pe, se_worker_comm, error)
         end if
@@ -1962,10 +1949,9 @@ C -----------------------------------------------------------------------------
         subroutine se_collect (ncols, nrows, ncols_pe, nrows_pe)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
-
-        include "mpif.h"
 
         integer, intent(inout) :: ncols, nrows
         integer, intent(out) :: ncols_pe(:), nrows_pe(:)

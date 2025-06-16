@@ -17,10 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/par/mpi/mpcomm_init.F,v 1.4 2011/10/21 16:11:25 yoj Exp $
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE MPCOMM_INIT( NPROCS, MYPE, CLOCK, IERR )
 C.......................................................................
@@ -54,13 +50,9 @@ C Calls: M3WARN, MPI_INIT, MPI_COMM_RANK, MPI_COMM_SIZE, MPI_WTIME
 C........................................................................
 
       USE UTILIO_DEFN
+      USE MPI
 
       IMPLICIT  NONE
-
-C Include Files
-
-!     INCLUDE SUBST_MPI         ! MPI definitions and parameters
-      include 'mpif.h'
 
 C Arguments
 

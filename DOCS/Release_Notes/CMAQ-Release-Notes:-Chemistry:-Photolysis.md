@@ -1,3 +1,75 @@
+# Photolysis
+
+### Fix photolysis loss process in reactive tracer module
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix, Science Update      
+**Release Version/Date**:  CMAQv6.0   
+
+**Description**:   
+The reactive tracers module allows its species to have loss processes from photolysis reactions. The photolysis frequencies used must be available in the gas phase chemistry. Currently, CMAQ chemical mechanisms do use the capacity but testing it found two errors. 
+
+-   One error incorrectly converted the units of photolysis frequencies from 1/min. to 1/sec. 
+-   The second error used the array holding the photolysis frequencies before the gas chemistry driver sets the array values. This error only occurs in the hrdriver.F file of the EBI gas chemistry solvers.
+
+Updates remove the above errors. They also modify a ppmV to molecules/cm<sup>3</sup> conversion factor used by the reactive tracer module so the factor is more consistent the values used in the RXNS_FUNC_MOD.F90 for the gas phase chemistry. The factor depends on the air number density.
+
+**Significance and Impact**:   
+The changes corrects a loss process in the reactive tracer module. The correction supports developing a version of the CRACMM3 mechanism supporting air toxics assessment such as EPA's AirToxScreen.
+
+Updates regarding the photolysis processes do not alter model predictions. The corrected conversion factor does change predictions of model species that are treated by the reactive tracers module such as in the NR species namelist of the cb6r5hap_ae7_aq mechanism. Tests showed that concentrations of these species have a mean change around +/\- 0.5% over the 12NE3 2018 benchmark and 12US1 2020 domains. The mean change seems consistent with mean relative change of the conversion factor around +/-1%.
+
+|Merge Commit | Internal record| 
+|:------:|:-------:|
+|[Merge for PR#1178](https://github.com/USEPA/CMAQ/commit/1752ce0d71f76485798cad916a5505c8c65eac2c) | [PR#1178](https://github.com/USEPA/CMAQ_Dev/pull/1178)  | 
+
+### Updated OMI.dat file that contains data from 2005 through 2024
+[Kirk Baker](mailto:baker.kirk@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: New ancillary input file   
+**Release Version/Date**:  CMAQv6.0
+
+**Description**:  
+New O3 column input file for the photolysis routine in CMAQ. This file provides finer resolution than the previous file and includes more recent data which extends from 2005 through 2024. This new OMI.dat file has a resolution of 27x27 cells covering the globe compared to the previous file resolution of 17x17. The 27x27 resolution was chosen to produce a file that was below the recommended file size for a GitHub repository. Additional files are available upon request that use finer resolution to cover the globe. 
+
+**Significance and Impact**:  
+Minor changes to O3 and related species due to changing O3 column input data resolution. Also extends file to include data through 2024.
+
+|Merge Commit | Internal record| 
+|:------:|:-------:|
+|[Merge for PR#1256](https://github.com/USEPA/CMAQ/commit/8322e8f53705dcc07a81ef40b09099c52fb23a63) | [PR#1256](https://github.com/USEPA/CMAQ_Dev/pull/1256)  | 
+
+### Remove uninitialized variable and correct a diagnostic in CCTM's inline module for photolysis frequencies
+[William B. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Bug Fix   
+**Release Version/Date**: CMAQv6.0   
+
+**Description**:   
+Two errors in CCTM's inline module for photolysis frequencies are corrected. 
+
+First, the PHOTDIAG3 files's total extinction had two conversions from m<sup>-1</sup> to Km<sup>-1</sup>. This update removes the first conversion in CCTM/src/phot/inline/PHOT_MOD.F so total extinction's conversion occurs in CCTM/src/phot/inline/phot.F and is consistent to where gas and aerosol extinctions are converted to  Km<sup>-1</sup>. 
+
+The other error is a a model crash when the cb6r5hap_ae7_aq mechanism is used for the 12NE3 domain on 07/01/2018 and the model is compiled with the gfortran compiler with debug flags.  The cause is that the GWC array (Graupel Water Content) is not initialized during the following condition: A vertical column does not have resolved clouds but has sub-grid (convective) clouds that do not occupy the entire column. The error allows the GWC array to have NaNs or very small negative numbers. NaNs produce floating point errors in a subroutine of the CLOUD_OPTICS.F file that crash the model. The solution inserts a command to zero out GWC in phot.F when this condition occurs. The change removes NaNs and other erroneous values in GWC. 
+
+**Significance and Impact**:   
+1. Total extinction's correction allows more accurate comparisons to gas and aerosol extinction values in PHOTDIAG3.
+2. Uninitialized variables can have unpredictable effects on model simulations or results, e.g., crashes, inconsistent predictions between different process configurations, etc. Removing the GWC's uninitialized or bad values prevents a potential source of such problems.
+
+|Merge Commit | Internal record| 
+|:------:|:-------:|
+|[Merge for PR#1158](https://github.com/USEPA/CMAQ/commit/211b328a5d41012426d1d034d11008d946d21bf8) | [PR#1158](https://github.com/USEPA/CMAQ_Dev/pull/1158)  | 
+
+
+### Updates to diagnostics for Inline Photolysis
+**Primary Contact**: [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix, New Feature   
+**Release Version/Date**:  CMAQv6.0    
+**Description**:  This update replaces total extinction coefficients in the PHOTDIAG3 diagnostic file with cloud extinction coefficients. The replacement seeks to give a informative diagnostic on what sources are attenuating light in a grid cell. The update also adds calculating aerosol extinction coefficients and asymmetry parameters when the sun is below horizon if PHOTDIAG is _**yes**_. The motive seeks to expand model time steps for evaluating the aerosol optical properties.  
+**Significance and Impact**: Changes remove a unit conversion error, give a informative diagnostic on what sources are attenuating light, and provide more diagnostic data to evaluate how aerosol properties are calculated.  
+
+
+|Merge Commit | Internal record| 
+|:------:|:-------:|
+|[Merge for PR#1231](https://github.com/USEPA/CMAQ/commit/dd7760aba8719a9bfec0be1a48db652d56958a85) | [PR#1231](https://github.com/USEPA/CMAQ_Dev/pull/1231)  | 
+
 ### Remove compiler error using table option of phot module 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
