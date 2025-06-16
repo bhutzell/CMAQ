@@ -682,7 +682,7 @@
      &                ch(ncoef))
      
             do 120 ni=1,nrefi
-              do 120 nr=1,nrefr                                        
+              do 110 nr=1,nrefr                                        
 
                refrtab(nr)=refrmin+(nr-1)*drefr
                refitab(ni)=refimin+(ni-1)*drefi
@@ -723,6 +723,7 @@
                                        
                enddo loop_modes
 
+110           continue
 120         continue
 
             If( MYPE .eq. 0 )Then
@@ -744,9 +745,9 @@
                 write(mie_unit,'(a)')'number real and imaginary parts'
                 write(mie_unit,'(i4,1x,i4)')nrefr,nrefi
                 write(mie_unit,'(a)')'minimum mie parameter for each mode '
-                write(mie_unit,'(3(es16.7,1x))')Modal_Tables(1:n_mode)%rmin
+                write(mie_unit,'(3(es16.7,1x))') Modal_Tables(1:n_mode)%rmin
                 write(mie_unit,'(a)')'maximum mie parameters for each mode' 
-                write(mie_unit,'(3(es16.7,1x))'),Modal_Tables(1:n_mode)%rmax
+                write(mie_unit,'(3(es16.7,1x))') Modal_Tables(1:n_mode)%rmax
                 write(mie_unit,'(a)')'number coefficients for chebyshev polynomials for each fit= '
                 write(mie_unit,'(i4)')ncoef
                 do ni=1,nrefi
@@ -803,7 +804,7 @@
            read(mie_unit,'(a)')msg
            read(mie_unit,'(3(es16.7,1x))')Modal_Tables(1:n_mode)%rmin
            read(mie_unit,'(a)')msg
-           read(mie_unit,'(3(es16.7,1x))'),Modal_Tables(1:n_mode)%rmax
+           read(mie_unit,'(3(es16.7,1x))') Modal_Tables(1:n_mode)%rmax
            read(mie_unit,'(a)')msg
            read(mie_unit,'(i4)')ncoef
 

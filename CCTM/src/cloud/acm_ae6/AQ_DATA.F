@@ -368,7 +368,7 @@ C...Create Map Directly from CGRID to the gas and aerosol species in AQCHEM
            ! Map Gas-Phase Species
            igas = index1( aq_spc( I ), n_aq_gas, SRGGAS(:)%name )
            if ( igas .eq. 0 ) then
-             Write ( xmsg, '(A,A,A,A,A,A)' ),'Aqueous Chem Surrogate ',trim( aq_spc(I) ),
+             Write ( xmsg, '(A,A,A,A,A,A)' ) 'Aqueous Chem Surrogate ',trim( aq_spc(I) ),
      &             ' for species ',trim( CGRID_NAME( SPC )),' is not available as a gas in the ',
      &             ' Aq Chem Solver. Please Correct or Delete.'
              Call m3exit( 'AQ_INIT', 0, 0, xmsg, xstat3 )
@@ -390,7 +390,7 @@ C...Create Map Directly from CGRID to the gas and aerosol species in AQCHEM
              end if
            end do
            if ( iaero .eq. 0 ) then
-             Write ( xmsg, '(A,A,A,A,A,A)' ),'Aqueous Chem Surrogate ',trim( aq_spc(I) ),
+             Write ( xmsg, '(A,A,A,A,A,A)' ) 'Aqueous Chem Surrogate ',trim( aq_spc(I) ),
      &             ' for species ',trim( CGRID_NAME( SPC )),' is not available as an ',
      &             'aerosol in the Aq Chem Solver. Please Correct or Delete.'
              Call m3exit( 'AQ_INIT', 0, 0, xmsg, xstat3 )

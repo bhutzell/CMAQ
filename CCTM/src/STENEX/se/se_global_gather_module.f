@@ -17,9 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-! what(1) key, module and SID; SCCS file; date and time of last delta:
-! %W% %P% %G% %U%
-
 ! --------------------------------------------------------------------------
 ! Purpose:
 !
@@ -40,15 +37,13 @@
 !   max   -- maximum value among all processors
 !   error -- error code of mpi call
 !
-! Include Files:
-!
-!   mpif.h
 C -----------------------------------------------------------------------------
 
         module se_global_gather_module
 
           use se_pe_info_ext, only : se_worker_comm, se_myworker_pe, se_numworkers
           use se_domain_info_ext, only : se_gl_ind
+          use mpi
 
           implicit none
 
@@ -85,8 +80,6 @@ C -----------------------------------------------------------------------------
 
             real, intent(in)  :: indata(:,:)
             real, intent(out) :: outdata(:,:)
-
-            include "mpif.h"
 
             integer :: data_size, error, pe, lsc, lec, lsr, ler,
      $                 lnc, lnr, status(MPI_STATUS_SIZE)
@@ -149,8 +142,6 @@ C -----------------------------------------------------------------------------
             real, intent(in)  :: indata(:,:,:)
             real, intent(out) :: outdata(:,:,:)
 
-            include "mpif.h"
-
             integer :: data_size, error, pe, lsc, lec, lsr, ler,
      $                 lnc, lnr, status(MPI_STATUS_SIZE)
             real, allocatable :: buf(:,:,:)
@@ -211,8 +202,6 @@ C -----------------------------------------------------------------------------
 
             integer, intent(in)  :: indata(:,:)
             integer, intent(out) :: outdata(:,:)
-
-            include "mpif.h"
 
             integer :: data_size, error, pe, lsc, lec, lsr, ler,
      $                 lnc, lnr, status(MPI_STATUS_SIZE)
@@ -275,8 +264,6 @@ C -----------------------------------------------------------------------------
             integer, intent(in)  :: indata(:,:,:)
             integer, intent(out) :: outdata(:,:,:)
 
-            include "mpif.h"
-
             integer :: data_size, error, pe, lsc, lec, lsr, ler,
      $                 lnc, lnr, status(MPI_STATUS_SIZE)
             integer, allocatable :: buf(:,:,:)
@@ -338,8 +325,6 @@ C -----------------------------------------------------------------------------
             logical, intent(in)  :: indata(:,:)
             logical, intent(out) :: outdata(:,:)
 
-            include "mpif.h"
-
             integer :: data_size, error, pe, lsc, lec, lsr, ler,
      $                 lnc, lnr, status(MPI_STATUS_SIZE)
             logical, allocatable :: buf(:,:)
@@ -400,8 +385,6 @@ C -----------------------------------------------------------------------------
 
             logical, intent(in)  :: indata(:,:,:)
             logical, intent(out) :: outdata(:,:,:)
-
-            include "mpif.h"
 
             integer :: data_size, error, pe, lsc, lec, lsr, ler,
      $                 lnc, lnr, status(MPI_STATUS_SIZE)

@@ -93,7 +93,7 @@
              RULE_STREAM( IDX ) = .TRUE.
            ELSE 
              ! Print warning that this stream is being ignored
-             WRITE( LOGDEV, '(/,5x,3A,I3,/,5x,A,3(/,5x,A))' ),
+             WRITE( LOGDEV, '(/,5x,3A,I3,/,5x,A,3(/,5x,A))' )
      &         'Warning: The Emissions Stream Label (',TRIM( RULE_STREAM_NML ),
      &         ') applied for Rule ',IRULE,
      &         ' does not match any of the emissions stream labels or ',
@@ -150,7 +150,7 @@
       NSPEC_NML = INDEX1( '', DESID_MAX_DIAG_SPEC, Spec ) - 1
       IF ( NSPEC_NML .LE. 0 ) THEN
           WRITE( LOGDEV, * )
-          WRITE( XMSG, '(A,I3,A)' ),
+          WRITE( XMSG, '(A,I3,A)' )
      &        'No Emission Species have been selected for group ',IDIAG,
      &        ' of the emission diagnostic input. Please correct.'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )     
@@ -475,7 +475,7 @@
             CONV = 1.0e-9
             BASIS = 'MASS'
          ELSE
-            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A)' ),
+            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A)' )
      &              'ERROR: Species ',TRIM(SPEC),' on emission stream ',
      &              ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
      &              'as an emission rate. If you wish to use this variable for ',
@@ -489,7 +489,7 @@
          ! denominator is empty.
          DENOM = UNITS(X+2:)
          IF ( DENOM .EQ. '' ) THEN
-            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' ),
+            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' )
      &              'ERROR: Species ',TRIM(SPEC),' on emission stream ',
      &              ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
      &              'as an emission rate. If you wish to use this variable for ',
@@ -520,7 +520,7 @@
          CALL CHECK_UNIT_DENOMINATOR( DENOM1, LAREA_UNIT, LTIME_UNIT, 
      &                                BASIS, CONV )
          IF ( BASIS .EQ. 'UNKNOWN' ) THEN
-            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' ),
+            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' )
      &              'ERROR: Species ',TRIM(SPEC),' on emission stream ',
      &              ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
      &              'as an emission rate. If you wish to use this variable for ',
@@ -535,7 +535,7 @@
             CALL CHECK_UNIT_DENOMINATOR( DENOM2, LAREA_UNIT, LTIME_UNIT, 
      &                                   BASIS, CONV )
             IF ( BASIS .EQ. 'UNKNOWN' ) THEN
-               WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' ),
+               WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' )
      &                'ERROR: Species ',TRIM(SPEC),' on emission stream ',
      &                ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
      &                'as an emission rate. If you wish to use this variable for ',
@@ -548,7 +548,7 @@
 
          ! Check to make sure the time component has been defined 
          IF ( .NOT. LTIME_UNIT ) THEN
-            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' ),
+            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' )
      &             'ERROR: Species ',TRIM(SPEC),' on emission stream ',
      &             ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
      &             'as an emission rate. If you wish to use this variable for ',
@@ -673,7 +673,7 @@
          ELSE IF ( OP .EQ. 'O' .OR. OP .EQ. 'o' ) THEN
              OP = 'o'
          ELSE
-             WRITE( XMSG,'(A,I3,A,A1)' ),
+             WRITE( XMSG,'(A,I3,A,A1)' )
      &              'ERROR: OP parameter for rule ',IRULE,
      &              ' has invalid value: ',OP
              CALL M3EXIT( 'CHECK_OP (EMIS_DEFN)', 0, 0, XMSG, 2 )
@@ -705,7 +705,7 @@
      &             BASIS .EQ. 'Unit' ) THEN
              BASIS = 'UNIT'
          ELSE
-             WRITE( XMSG,'(A,I3,A,A4)' ),
+             WRITE( XMSG,'(A,I3,A,A4)' )
      &              'ERROR: BASIS parameter for rule ',IRULE,
      &              ' has invalid value: ',BASIS
              CALL M3EXIT( 'CHECK_BASIS (EMIS_DEFN)', 0, 0, XMSG, 2 )

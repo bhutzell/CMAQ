@@ -172,9 +172,9 @@ C Allocate MG arrays using NMGSPC value
             DESID_EMVAR( IMGSRM )%LAREA = .FALSE.
             DESID_EMVAR( IMGSRM )%LAREAADJ = .FALSE.
 
-            ALLOCATE ( VDEMIS_MG( NMGSPC,NCOLS,NROWS), STAT = STATUS )	    
-	    VDEMIS_MG = 0.0
-	    
+            ALLOCATE ( VDEMIS_MG( NMGSPC,NCOLS,NROWS), STAT = STATUS )
+            VDEMIS_MG = 0.0
+    
             IF ( STATUS .NE. 0 ) THEN
                XMSG = '*** VDEMIS_MG, memory allocation failed'
                CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
@@ -406,7 +406,7 @@ C Includes:
 
 C Parameters:
 C.. Define Marine Gas indices
-	    
+    
             INTEGER, PARAMETER :: ITRIBROMOMETHANE = 1
             INTEGER, PARAMETER :: IDIBROMOMETHANE  = 2
             INTEGER, PARAMETER :: IBROMOCHLOROMETH = 3
@@ -419,7 +419,7 @@ C.. Define Marine Gas indices
             INTEGER, PARAMETER :: IMOLECULARIODINE = 10
             INTEGER, PARAMETER :: IHYPOIODUSACID   = 11
             INTEGER, PARAMETER :: IDIMETHYLSULFID  = 12
-	       	      	      
+
             REAL, PARAMETER :: SECS2HR = 1.0 / 3600.0          ! hour per seconds
             REAL, PARAMETER :: C_FACT  = 1.0E-9 /(24.0*3600.0) ! factor to convert nmole/m2/day to mole/m2/sec
             REAL, PARAMETER :: LON2TZ  = 1.0 / 15.0            ! longitude to time zone, 1/degrees
@@ -529,7 +529,7 @@ C Initialize marine gas output buffer
 #ifdef mpas
                      MARINE_AREA = MARINE_AREA * cell_area(c,1)
 #else
-                     MARINE_AREA = MARINE_AREA * A / msfx2 (C, R)		     
+                     MARINE_AREA = MARINE_AREA * A / msfx2 (C, R)
 #endif
 
                      CHLA      = MIN ( 1.0, CHLR ( C,R ) )
@@ -625,7 +625,7 @@ C.. Calculate HYPOIODUSACID emission rate in mole/s (Macdonald et al., ACP, 14, 
 C .. Calculate DIMETHYLSULFIDE emission rate in mole/s 
                      DUMMY = MARINE_AREA *  DMS_L * KT * 2.78E-12
                      VDEMIS_MG( IDIMETHYLSULFID, C, R ) = MAX ( 0.0, DUMMY)
-		     
+
                      END IF  ! Marine area
 
 C Update the MGBF array, for writing the diagnostic marine gas emission file

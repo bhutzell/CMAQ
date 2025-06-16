@@ -419,12 +419,12 @@ C-----------------------------------------------------------------------
 
          USE PIOMAPS_MODULE
          USE M3UTILIO, ONLY : WRITE3              ! i/o api
+         USE MPI
 
          IMPLICIT NONE
 
 C Include Files
 
-         INCLUDE 'mpif.h'            ! MPI definitions and parameters
          INCLUDE 'PIOVARS.EXT'
 
 C Arguments

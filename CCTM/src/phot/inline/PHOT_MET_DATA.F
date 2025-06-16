@@ -898,7 +898,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ! 1) Randall, D. A. (1995), Parameterizing fractional cloudiness produced
 !    by cumulus entrainment. Preprints, Workshop on Cloud Microphysics
 !    Parameterizations in Global Atmospheric Circulation
-!    Models, Kananaskis, AB, Canada, WMO, 1–16.
+!    Models, Kananaskis, AB, Canada, WMO, 1-16.
 ! 2) Xu, K. And D.A. Randall (1996), A semiempircal cloudiness 
 !    parameterization for use in climate models, J. Atm. Sci., vol 53(21),
 !    pp 3084-3102.
@@ -1161,7 +1161,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
              
             CHARACTER( 18 ), PARAMETER  :: PNAME = 'INIT_ACM_CLOUD'
                        
-            WRITE( XMSG, '(3A)' ), 'ATTENTION: Attempt to include subgrid ',
+            WRITE( XMSG, '(3A)' ) 'ATTENTION: Attempt to include subgrid ',
      &             'cloud effects: photolysis rates include ACM CLOUD effects. ',
      &             'It would be prudent to examine diagnostic cloud fractions.'
             CALL LOG_MESSAGE( LOGDEV, XMSG)
