@@ -68,13 +68,13 @@ C----------------------------------------------------------------------
       
       USE CENTRALIZED_IO_MODULE, ONLY : INTERPOLATE_VAR, LAT, LON, HT
       USE RUNTIME_VARS,          ONLY : PHOTDIAG, START_DATE => STDATE, START_TIME => STTIME
+      USE CONST
 
 #ifdef parallel
       USE SE_MODULES           ! stenex (using SE_UTIL_MODULE)
 #else
       USE NOOP_MODULES         ! stenex (using NOOP_UTIL_MODULE)
 #endif
-      USE CONST, ONLY: MWAIR, MWWAT, PI180
 
       IMPLICIT NONE
 
@@ -100,23 +100,15 @@ C saved local variables:
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.  ! Flag for first call to PHOT
 
-      INTEGER, SAVE :: LOC_STDATE         ! Julian date
-      INTEGER, SAVE :: LOC_STTIME         ! current time
+      INTEGER, SAVE :: LOC_STDATE = -1    ! Julian date
+      INTEGER, SAVE :: LOC_STTIME = -1    ! current time
       INTEGER, SAVE :: JPHOT              ! # of photolytic reactions
-      INTEGER, SAVE :: JVHT               ! number of vertical levels
-      INTEGER, SAVE :: JVTMAX             ! number of hour angles
-      INTEGER, SAVE :: JVLAT              ! number of latitudes
 
       INTEGER, ALLOCATABLE, SAVE :: PHID( : )     ! index of phot tab name in file list
 
       REAL, SAVE    :: STRTHR             ! starting GMT hour
       REAL, SAVE    :: JDSTRT             ! current Julian day (DDD)
 
-      REAL, ALLOCATABLE, SAVE :: XJVAL( :,:,:,: ) ! file jvalues
-      REAL, ALLOCATABLE, SAVE :: XHAJV ( : ) ! hours from noon
-      REAL, ALLOCATABLE, SAVE :: XLATJV( : ) ! latitudes of file photolytic rates
-      REAL, ALLOCATABLE, SAVE :: XZJV  ( : ) ! vertical heights of file photolytic
-      REAL, ALLOCATABLE, SAVE :: ACLD  ( : ) ! ??????????
       REAL, ALLOCATABLE, SAVE :: ZM    ( :,:,: )     ! layer half height agl [m]
 
 
@@ -128,7 +120,6 @@ C saved local variables:
 
 C scratch local variables:
 
-      CHARACTER(  16 ) :: J2FILE  = 'XJ_DATA'
       CHARACTER(  16 ) :: VARNM
       CHARACTER(  80 ) :: VARDESC      ! env var description
       CHARACTER( 120 ) :: XMSG    = ' '
@@ -177,6 +168,7 @@ C scratch local variables:
       REAL         ZLEV               ! height in single dimension
       REAL         CLDFR              ! total fractional cloud coverage
       REAL         CLOD               ! cloud optical depth
+      REAL         GMT                ! Greenwich mean time (hours)
       REAL         ZEN                ! cosine of zenith angle
       REAL         TRANS              ! transmitivity
       REAL         FCLDA              ! above cloud top factor
@@ -216,40 +208,7 @@ C----------------------------------------------------------------------
 
       IF ( FIRSTIME ) THEN
         FIRSTIME = .FALSE.
-        LOC_STDATE = JDATE
-        LOC_STTIME = JTIME
-        STRTHR = FLOAT ( JTIME / 10000 )
-        JDSTRT = FLOAT ( MOD ( JDATE, 1000 ) )
         TSTEP  = DTSTEP( 1 )  ! output timestep for photolysis diagnostic files
-
-        JVUNIT = GETEFILE( J2FILE, .TRUE., .TRUE., PNAME )
-
-        IF ( JVUNIT .LT. 0 ) THEN
-          XMSG = 'Error opening JVALUE file'
-          CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-        END IF
-
-C...read julian start date from the file..............................
-
-        READ( JVUNIT, *, IOSTAT = IOST ) JVDATE
-
-        XMSG = 'Error reading file header from JVALUE file'
-        IF ( IOST .NE. 0 )
-     &    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-
-C...note differences in start dates to the log
-
-        XMSG = 'Date on JVALUE file differs from model start date'
-        IF ( JVDATE .NE. LOC_STDATE )
-     &    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-
-C...read number of levels.............................................
-
-        READ( JVUNIT, *, IOSTAT = IOST ) JVHT
-
-        XMSG = 'Error reading number of LEVELS from JVALUE file'
-        IF ( IOST .NE. 0 )
-     &    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
 
 C...allocate arrays dependent on number of levels
 
@@ -258,22 +217,10 @@ C...allocate arrays dependent on number of levels
           XMSG = 'Failure allocating XZJV'
           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
-
-C...read levels
-
-        READ( JVUNIT, *, IOSTAT = IOST ) ( XZJV( NHT ), NHT=1, JVHT )
-
-        XMSG = 'Error reading LEVELS from JVALUE file'
-        IF ( IOST .NE. 0 )
-     &    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-
-C...read number of latitude bands.....................................
-
-        READ( JVUNIT, *, IOSTAT = IOST ) JVLAT
-
-        XMSG = 'Error reading number of LATITUDES from JVALUE file'
-        IF ( IOST .NE. 0 )
-     &    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+! vertical hts (m) for jvalue file
+          XZJV( 1:JVHT )     = (/    0.0,  1000.0,  2000.0,  3000.0, 4000.0,
+     &                              5000.0,  8000.0, 10000.0, 15000.0, 20000.0,
+     &                             25000.0, 30000.0, 35000.0 /)  ! <<< 13 levels
 
 C...allocate arrays dependent on number of latitudinal bands
 
@@ -282,23 +229,10 @@ C...allocate arrays dependent on number of latitudinal bands
           XMSG = 'Failure allocating XLATJV'
           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
-
-C...read latitude bands
-
-        READ( JVUNIT, *, IOSTAT = IOST ) ( XLATJV( NLAT ),
-     &                                     NLAT=1, JVLAT )
-
-        XMSG = 'Error reading LATITUDES from JVALUE file'
-        IF ( IOST .NE. 0 )
-     &    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-
-C...read hour number angles...........................................
-
-        READ( JVUNIT, *, IOSTAT = IOST ) JVTMAX
-
-        XMSG = 'Error reading number of HOURS from JVALUE file'
-        IF ( IOST .NE. 0 )
-     &    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+! latitudes for jvalue file
+          XLATJV( 1:JVLAT )  = (/ -90.0, -80.0, -70.0, -60.0, -50.0, -40.0, 
+     &                              -30.0, -20.0, -10.0,   0.0,  10.0,  20.0, 30.0, 
+     &                               40.0,  50.0,  60.0,  70.0,  80.0,  90.0 /)
 
 C...allocate arrays dependent on number of hour angles
 
@@ -308,28 +242,15 @@ C...allocate arrays dependent on number of hour angles
           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
-C...read hour angles
+! hours from noon for jtable
+          XHAJV( 1:JVTMAX )  = (/ 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0,
+     &                              9.0, 10.0, 11.0, 12.0 /)
 
-        READ( JVUNIT, *, IOSTAT = IOST ) ( XHAJV( NT ), NT=1, JVTMAX )
 
-        XMSG = 'Error reading HOURS from JVALUE file'
-        IF ( IOST .NE. 0 )
-     &    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
 
-C...read number of reactions..........................................
+C...set number of reactions..........................................
 
-        READ( JVUNIT, *, IOSTAT = IOST ) JPHOT
-
-        XMSG = 'Error reading number of REACTIONS from JVALUE file'
-        IF ( IOST .NE. 0 )
-     &    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-
-C...make sure number of reactions is correct
-
-        XMSG = 'Photolysis reactions on JVALUE file do not '
-     &          //'match the expected list (NPHOTAB)'
-        IF ( JPHOT .NE. NPHOTAB )
-     &    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+        JPHOT = NPHOTAB
 
 C...allocate arrays dependent on number of photolysis reactions
 
@@ -339,27 +260,21 @@ C...allocate arrays dependent on number of photolysis reactions
           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
+        PHOTNM( 1:NPHOTAB ) = PHOTAB( 1:NPHOTAB )
+
         ALLOCATE ( ACLD( JPHOT ), STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
           XMSG = 'Failure allocating ACLD'
           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
+        
+        ACLD = 1.0
 
         ALLOCATE ( PHID( JPHOT ), STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
           XMSG = 'Failure allocating PHID'
           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
-
-C...read reaction id's and ACLD array
-
-        XMSG = 'Error reading REACTIONS and ACLD from JVALUE file'
-        DO NPHOT = 1, JPHOT
-          READ( JVUNIT, *, IOSTAT = IOST ) PHOTNM( NPHOT ),
-     &                                     ACLD( NPHOT )
-          IF ( IOST .NE. 0 )
-     &      CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-        END DO
 
 C...check the file list
 
@@ -380,43 +295,6 @@ C...allocate the XJVAL array
           XMSG = 'Failure allocating XJVAL'
           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
-
-C...read the j-values
-
-        XMSG = 'Error reading jvalues from JVALUE file'
-        DO NHT = 1, JVHT
-          DO NLAT = 1, JVLAT
-            DO NPHOT = 1, JPHOT
-
-              READ( JVUNIT, *, IOSTAT = IOST ) NHTO, NLATO, NPHOTO
-
-              IF ( IOST .NE. 0 )
-     &          CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-
-              IF ( PHID( NPHOT ) .NE. 0 ) THEN
-
-                 READ( JVUNIT, *, IOSTAT = IOST )
-     &               ( XJVAL( PHID( NPHOT ), NT, NLAT, NHT ), NT = 1, JVTMAX )
-
-                 IF ( IOST .NE. 0 )
-     &             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-
-              ELSE
-
-                 READ( JVUNIT, *, IOSTAT = IOST ) DUMP
-
-                 IF ( IOST .NE. 0 )
-     &             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-
-              END IF
-
-            END DO
-          END DO
-        END DO
-
-C...close the jvalue file
-
-        CLOSE ( JVUNIT )
 
         ALLOCATE ( ZM( NCOLS,NROWS, NLAYS ), STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -465,7 +343,6 @@ C...open the photolysis rate diagnostic files
 #endif
 
          CALL SUBST_BARRIER
-         RETURN ! Added for MIO Implementation
 
       END IF  ! FIRSTIME
 
@@ -486,6 +363,15 @@ C...  correct for current *positive* West longitude convention
          JTIME_CHK = .FALSE.
       END IF
       
+      IF ( LOC_STDATE .NE. JDATE ) THEN ! compute table of photolysis frequencies
+        LOC_STDATE = JDATE
+        LOC_STTIME = JTIME
+        STRTHR = FLOAT ( JTIME / 10000 )
+        JDSTRT = FLOAT ( MOD ( JDATE, 1000 ) )
+        CALL GET_JTABLE( LOC_STDATE, LOC_STTIME)      
+      END IF
+      
+      write(logdev,*)'phot : ',JDATE, JTIME
       CURRHR = STRTHR
      &       + FLOAT ( SECSDIFF ( LOC_STDATE, LOC_STTIME, JDATE, JTIME ) )
      &       / 3600.0
@@ -503,42 +389,38 @@ C...If sun below horizon at all cells, zero photolysis rates & exit
 C...  (assumes sun below horizon at *all* levels!)
 
       IF ( NDARK ) THEN
-        DO JP = 1, NPHOTAB
-          DO LEV = 1, NLAYS
-            DO ROW = 1, NROWS
-              DO COL =1, NCOLS
-                RJ( COL, ROW, LEV, JP ) = 0.0
-              END DO
-            END DO
-          END DO
-        END DO
-        WRITE( LOGDEV, 1003) JDATE, JTIME
-1003    FORMAT( 8X, 'In darkness at ', I8.7, ':', I6.6,
-     &          1X, 'GMT - no photolysis')
 
-        IF ( PHOTDIAG .AND. JTIME_CHK ) THEN
+      write(logdev,*)'phot DARK: ',JDATE, JTIME
+         RJ = 0.0
+         WRITE( LOGDEV, 1003) JDATE, JTIME
+1003     FORMAT( 8X, 'In darkness at ', I8.7, ':', I6.6,
+     &           1X, 'GMT - no photolysis')
 
-          DO JP = 1, NPHOTAB
-            IF ( .NOT. WRITE3( CTM_RJ_2, PHOTAB( JP ), JDATE,
-     &                         JTIME, RJ( :,:,:,JP ) ) ) THEN
-              XMSG = 'Could not write ' // CTM_RJ_2 // ' file'
-              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-          END DO
+         IF ( PHOTDIAG .AND. JTIME_CHK ) THEN
 
-          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
-     &           'RJ Values written to', CTM_RJ_2,
-     &           'for date and time', JDATE, JTIME
+           DO JP = 1, NPHOTAB
+             IF ( .NOT. WRITE3( CTM_RJ_2, PHOTAB( JP ), JDATE,
+     &                          JTIME, RJ( :,:,:,JP ) ) ) THEN
+               XMSG = 'Could not write ' // CTM_RJ_2 // ' file'
+               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+             END IF
+           END DO
 
-        END IF ! if photdiag .and. jtime_chk .eq. 0
+           WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
+     &            'RJ Values written to', CTM_RJ_2,
+     &            'for date and time', JDATE, JTIME
 
-        RETURN
+         END IF ! if photdiag .and. jtime_chk .eq. 0
+
+         RETURN
       END IF
 
 C...Calculate mid date and time
       MDATE = JDATE
       MTIME = JTIME
       ITMSTEP = TIME2SEC( DTSTEP( 2 ) ) / 2
+      GMT = TIME2SEC( JTIME ) + REAL( ITMSTEP )
+
       CALL NEXTIME( MDATE, MTIME, SEC2TIME( ITMSTEP ) )
 
 C...Get heights of each level
@@ -622,6 +504,8 @@ C...Interpolate all photolysis rates at each COL, ROW
      &             + JWT( 8 ) * XJVAL( JP, JVTM - 1, JLATN - 1,
      &                                 KHTA - 1 )
               RJ( COL, ROW, LEV, JP ) = MAX ( JVAL, 0.0 )
+              RJ_RES( COL, ROW, LEV, JP ) = RJ( COL, ROW, LEV, JP )
+              RJ_SUB( COL, ROW, LEV, JP ) = RJ( COL, ROW, LEV, JP )
             END DO
 
           END DO     ! LEV
@@ -701,7 +585,6 @@ C...cos of the zenith angle, ( <= cos 60 degrees )
      &                      0.5
      &                      )
                   TRANS = ( 5.0 - EXP ( -CLOD ) ) / ( 4.0 + 0.42 * CLOD )
-
 C...calculate cloud correction factors
 
 C...  below cloud base
@@ -734,6 +617,9 @@ C...  in cloud - linearly interpolate between base and top value
         END DO
 
       END IF
+
+      
+      write(logdev,*)'phot completed: ',JDATE, JTIME
 
       IF ( PHOTDIAG .AND. JTIME_CHK ) THEN
 
