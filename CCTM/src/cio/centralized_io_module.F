@@ -7463,6 +7463,8 @@ C Read the various categories of normalized emissions
 
 #endif
 
+#endif
+
 #ifdef m3box
         SUBROUTINE interpolate_var( VNAME, JDATE, JTIME, BUFFER, FNAME )
 
