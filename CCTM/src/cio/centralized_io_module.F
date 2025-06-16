@@ -322,6 +322,8 @@
      &             STRTCOLISIC, ENDCOLISIC, STRTROWISIC, ENDROWISIC,  ! for ISAM ICFILE
      &             STRTCOLLNT,  ENDCOLLNT,  STRTROWLNT,  ENDROWLNT   ! for lightning strike file
 
+#ifndef m3box
+
         private :: gridded_files_setup,
      &             retrieve_lufrac_cro_data
 #ifdef mpas
@@ -333,6 +335,7 @@
      &             retrieve_ocean_data
 #endif
 
+#endif
         integer, private :: count = 0
         integer, private :: cio_logdev, 
      &                              size_s2d,    ! standard 2d cro file size (in twoway model, size_s2d not equal to size_c2d
@@ -366,6 +369,7 @@
         integer, private :: cio_LTLYRS                  ! number of layers in lightning strike dataset
         CHARACTER( 16 ), allocatable  :: LT_NAME(:)     ! lightning data input variable names: such as LTNGstrk or LNT
 
+#ifndef m3box
         interface interpolate_var
 #ifdef mpas
           module procedure r_interpolate_var_1ds_mpas,
@@ -380,6 +384,7 @@
      &                     r_interpolate_var_3d         ! Interpolation for generic Real 3-D Data 
 #endif
         end interface
+#endif
 
 ! Common routines:
 
@@ -4940,6 +4945,7 @@ C   mminlu and num_land_cat are WRF global variables
 
 #else
 
+#ifndef m3box
 ! -------------------------------------------------------------------------
         subroutine boundary_files_setup
 
@@ -6149,7 +6155,7 @@ C Read the various categories of normalized emissions
                 XMSG = 'CTM_OCEAN_CHEM must be set to TRUE when using CRACMM3M mechanism' 
                 Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
              endif
-     
+	     
           ELSEIF ( OCEAN_CHEM .AND. .NOT. USE_MARINE_GAS_EMISSION ) THEN
 
              IF ( .NOT. OPEN3( OCEAN_1, FSREAD3, PNAME ) ) THEN
@@ -7454,6 +7460,237 @@ C Read the various categories of normalized emissions
           end if
 
         end subroutine r_interpolate_var_3d
+
+#endif
+
+#ifdef m3box
+        SUBROUTINE interpolate_var( VNAME, JDATE, JTIME, BUFFER, FNAME )
+
+
+C***********************************************************************
+C
+C  FUNCTION:  Mimics IO/API function DESC3 by putting selected
+C             file description data in commons.
+C
+C  RETURN VALUE:  TRUE iff successful
+C
+C  PRECONDITIONS REQUIRED: None
+C
+C  SUBROUTINES AND FUNCTIONS CALLED: None
+C
+C  REVISION  HISTORY: Prototype created by Golam Sarwar - March, 2004
+C  REVISION  HISTORY: This file was Created from INTERP3
+C  REVISION  HISTORY: INTERP3 was created Prototype created by Jerry Gipson IN JULY 1997	
+C
+C***********************************************************************
+      USE DRIVER_INPUTS
+
+      IMPLICIT NONE
+
+C...........   INCLUDES:
+       INCLUDE SUBST_FILES_ID  ! I/O definitions and declarations 
+       INCLUDE 'SCENDATA.EXT'
+
+
+C...........   ARGUMENTS and their descriptions:
+
+!       CHARACTER*(*)   FNAME   !  logical name of file to be "opened"
+!       CHARACTER*(*)   CALLER  !  Calling program name
+!        CHARACTER*(*)   VNAME   !  variable name
+
+!        INTEGER   COL0        !  COLUMN for value
+!        INTEGER   COL1        !  COLUMN for value
+!        INTEGER   ROW0        !  ROW for value
+!        INTEGER   ROW1        !  ROW for value
+!        INTEGER   LAY0        !  LAYER for value
+!        INTEGER   LAY1        !  LAYER for value
+!        INTEGER   JDATE       !  Date for value
+!        INTEGER   JTIME       !  Time for value
+!        REAL   BUFFER ( COL1 ) !  interpolation-output buffer array
+
+        CHARACTER*(*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+!       CHARACTER*(*), INTENT(IN   ) :: CALLER          !  name of caller
+        INTEGER      , INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
+        INTEGER      , INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
+        REAL         , INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
+        CHARACTER*(*), INTENT(IN   ), OPTIONAL :: FNAME           !  logical file name
+!       INTEGER      , INTENT(IN   ), OPTIONAL :: COL0            !  lower col   bound for interpolation
+!       INTEGER      , INTENT(IN   ), OPTIONAL :: COL1            !  upper col   bound for interpolation
+!       INTEGER      , INTENT(IN   ), OPTIONAL :: ROW0            !  lower row   bound for interpolation
+!       INTEGER      , INTENT(IN   ), OPTIONAL :: ROW1            !  upper row   bound for interpolation
+!       INTEGER      , INTENT(IN   ), OPTIONAL :: LAY0            !  lower layer bound for interpolation
+!       INTEGER      , INTENT(IN   ), OPTIONAL :: LAY1            !  upper layer bound for interpolation
+
+        INTEGER  L
+
+        LOGICAL, SAVE :: INITIALIZE = .TRUE.
+C.............................................................................
+C   begin body of subroutine  OPEN3
+
+!       IF ( INITIALIZE ) THEN
+!          CALL RETRIEVE_OCEAN_DATA
+!          INITIALIZE = .FALSE.
+!       END IF
+
+
+!     DO L = LAY0, LAY1
+      DO L = 1,1
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  MET_CRO_2D variables
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+   
+            IF ( VNAME .EQ. 'PRES' ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER(L) = BXM_PRES
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+         
+            IF ( VNAME .EQ. 'WBAR' ) THEN
+               BUFFER(L) = WBAR
+               RETURN
+            ENDIF
+                                
+            IF ( VNAME .EQ. 'SEAICE' ) THEN
+                 BUFFER(L) = BXM_SEAICE
+                 RETURN
+            ENDIF
+
+            IF ( VNAME .EQ. 'CLDT' ) THEN
+               BUFFER(L) = CLDT
+               RETURN
+            ENDIF
+   
+            IF ( VNAME .EQ. 'CLDB' ) THEN
+               BUFFER(L) = CLDB
+               RETURN
+            ENDIF
+   
+            IF ( VNAME .EQ. 'CFRAC' ) THEN
+               BUFFER(L) = CFRAC
+               RETURN
+            ENDIF
+      
+   
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  MET_CRO_3D variables
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            IF ( VNAME .EQ. 'TA' ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER(L) = CELL_TEMP
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+   
+            IF ( VNAME .EQ. 'PRES' ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER(L) = CELL_PRES
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+   
+            IF ( VNAME .EQ. 'QV' ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER(L) = QV
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+   
+            IF ( VNAME .EQ. 'DENS' ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER(L) = DENS
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+   
+            IF ( VNAME .EQ. 'DENSA_J' ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER(L) = DENS_J
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+   
+            IF ( VNAME .EQ. 'ZH' ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER(L) = 50.0
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+   
+   
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  OCEAN_1 variables
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            IF ( VNAME .EQ. 'OPEN' ) THEN
+               BUFFER(L) = BXM_OPEN
+               RETURN
+            ENDIF
+   
+            IF ( VNAME .EQ. 'SURF' ) THEN
+               BUFFER(L) = BXM_SURF
+               RETURN
+            ENDIF
+   
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  GRID_CRO_2D variables
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            IF ( VNAME .EQ. 'LAT' ) THEN
+               BUFFER(L) = LAT
+               RETURN
+            ENDIF
+   
+            IF ( VNAME .EQ. 'LON' ) THEN
+               BUFFER(L) = LON
+               RETURN
+            ENDIF
+                                 
+            IF ( VNAME .EQ. 'OPEN' ) THEN
+               BUFFER(L) = BXM_OPEN
+               RETURN
+            ENDIF
+   
+            IF ( VNAME .EQ. 'SURF' ) THEN
+               BUFFER(L) = BXM_SURF
+               RETURN
+            ENDIF
+   
+            IF ( VNAME .EQ. 'MSFX2' ) THEN
+               BUFFER(L) = 1.0
+               RETURN
+            ENDIF
+   
+            IF ( VNAME .EQ. 'HT' ) THEN
+               BUFFER(L) = HT
+               RETURN
+            ENDIF
+   
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  EMIS_1variables
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!       IF ( FNAME .EQ. EMIS_1 ) THEN
+!           BUFFER(L) = 0.0
+!           RETURN
+!        ENDIF
+
+            BUFFER(L) = 1.0E-30
+            PRINT*,"Interpolate_Var: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
+            PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
+         
+   
+      END DO
+      
+      RETURN
+
+      END SUBROUTINE INTERPOLATE_VAR
+
+
 #endif
 
       END MODULE CENTRALIZED_IO_MODULE
