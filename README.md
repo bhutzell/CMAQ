@@ -17,7 +17,7 @@ The final release of CMAQv6.0 is planned for fall 2026 but subject to availabili
 This CMAQv6.0 alpha release allows community members:
 
 * a preview of science and feature updates developed for the CMAQv6.0 release.
-* help the community by testing, troubleshooting, and debugging this version.
+* an opportunity to help the community by testing, troubleshooting, and debugging this version.
 
 ## New features in CMAQ version 6.0 include:
 * Gas, Aqueous, & Aerosol Chemistry
