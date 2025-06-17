@@ -12,7 +12,7 @@ CMAQ combines current knowledge in atmospheric science and air quality modeling 
 
 The science updates and new features in the alpha version (v6.0a1) are documented in the [CMAQv6.0alpha Release Notes](DOCS/Release_Notes/README.md) and summarized in the **[Release FAQ](DOCS/Release_FAQ/CMAQv6.0-FAQ.md)**.
 
-The final release of CMAQv6.0 is planned for fall 2026 but subject to availability of resources. This pre-release version has gone through preliminary testing on multiple spatial domains however aspects of the system remain uncharacterized. Users assume the risk of unforeseen or undocumented impacts of code changes that have been incorporated since the CMAQv5.5 public release.
+The official release of CMAQv6.0 is targeted for fall 2026, pending the availability of necessary resources. This pre-release version has gone through preliminary testing on multiple spatial domains however aspects of the system remain uncharacterized. Users assume the risk of unforeseen or undocumented impacts of code changes that have been incorporated since the CMAQv5.5 public release.
 
 This CMAQv6.0 alpha release allows community members:
 
