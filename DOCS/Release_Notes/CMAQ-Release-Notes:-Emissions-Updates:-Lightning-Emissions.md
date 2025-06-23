@@ -6,12 +6,7 @@
 **Description**:   
 - Cosmetic code changes to use more meaningful names for environmental variables and variables in the code.
 - Removed the external lightning NOx emissions file in the online lightning NOx module, because this option can be now easily achieved using DESID's capability.
-- Added more options for using satellite GLM flashes/energy and the synergized methodology with WWLLN flashes/energy. These options are fully developed and tested using the 2022v1/12US1/CRACMM3 CMAQv5.5 platform. The environmental variable LNO_OPTION can take 5 values: 1-5.
-  1: Default option, the same as with previouse releases.
-  2: Use only flash data from GLM (the near realtime satellite datasets, good for air quality forecast and near realtime applications)
-  3: Use GLM energy to produce LNOx emissions (https://doi.org/10.1029/2022JD037406).
-  4: Snergizing GLM and WWLLN energy (reduce limitation of data detection from single network).
-  5: Snerigzing GLM and WWLLNs energy with ICCG treatment in the case of WWLLN energy is ued.   
+- Added more options for using satellite GLM flashes/energy and the synergized methodology with WWLLN flashes/energy. These options are developed and tested using the 2022v1/12US1/CRACMM3 CMAQv5.5 platform. There are 5 options (1-5) for the environmental variable LNO_OPTION: **1** Default option, the same as with previouse releases. **2** Use only flash data from GLM (the near realtime satellite datasets, good for air quality forecast and near realtime applications). **3** Use GLM energy to produce LNOx emissions (https://doi.org/10.1029/2022JD037406). **4** Snergizing GLM and WWLLN energy (reduce limitation of data detection from single network). **5** Snerigzing GLM and WWLLN energy with ICCG treatment for WWLLN energy.   
 
 **Significance and Impact**:   
 The default option will not impact model concentrations.  Consistent and meaningful names for environmental variables and code variables are beneficial for users and developers. Removing redundant statements or duplicated codes makes the scripts/code easy to understand and less error-prone. Lightning NOx production options involves GLM and WWLLN data to provide users for more flexibility for different data/feature options. These options have been tested with annual simuations and evaluated for the impact on air qualtiy and the results are being analyzed.
