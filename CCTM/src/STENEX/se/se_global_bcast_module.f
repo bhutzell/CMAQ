@@ -17,9 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-! what(1) key, module and SID; SCCS file; date and time of last delta:
-! %W% %P% %G% %U%
-
 ! --------------------------------------------------------------------------
 ! Purpose:
 !
@@ -43,6 +40,7 @@ C -----------------------------------------------------------------------------
 
           use se_pe_info_ext, only : se_worker_comm, se_myworker_pe, se_numworkers
           use se_domain_info_ext, only : se_gl_ind
+          use mpi
 
           implicit none
 
@@ -59,8 +57,6 @@ C -----------------------------------------------------------------------------
 
             real, intent(in)  :: indata(:,:)
 
-            include "mpif.h"
-
             integer :: data_size, error
 
             data_size = size(indata,1) * size(indata,2)
@@ -74,8 +70,6 @@ C -----------------------------------------------------------------------------
 
             integer, intent(in)  :: indata(:,:)
 
-            include "mpif.h"
-
             integer :: data_size, error
 
             data_size = size(indata,1) * size(indata,2)
@@ -88,8 +82,6 @@ C -----------------------------------------------------------------------------
           subroutine se_global_bcast_2d_l (indata)
 
             logical, intent(in)  :: indata(:,:)
-
-            include "mpif.h"
 
             integer :: data_size, error
 

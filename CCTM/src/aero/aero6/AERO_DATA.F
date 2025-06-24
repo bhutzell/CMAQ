@@ -2144,7 +2144,7 @@ C Local variables:
            IF ( IS_BC ) THEN
               IF ( L_WRITE_WARNING ) THEN
                  L_WRITE_WARNING = .FALSE.
-                 WRITE( XMSG2, '(A)' ),
+                 WRITE( XMSG2, '(A)' )
      &              'ATTENTION: Applying fix to aerosol Boundary' //
      &              ' Conditions for aerosol modes.' //
      &              ' Set verbose_rdbcon preprocessor flag to' //
@@ -2171,7 +2171,7 @@ C Local variables:
            ELSE
               IF ( L_WRITE_WARNING ) THEN
                  L_WRITE_WARNING = .FALSE.
-                 WRITE( XMSG2, '(A)' ),
+                 WRITE( XMSG2, '(A)' )
      &              'ATTENTION: Applying fix to aerosol Initial' //
      &              ' Conditions for aerosol modes.' //
      &              ' Set verbose_loadcgrid preprocessor flag to' //

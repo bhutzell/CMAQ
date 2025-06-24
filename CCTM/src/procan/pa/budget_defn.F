@@ -168,24 +168,24 @@ C-----------------------------------------------------------------------
           
               ! Write CMAQ Header
               CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD, CMAQ_TOC, NCMAQ_TOC  )
-              WRITE( BDG_UNIT, '(A)' ), CMAQ_HEADER( 1:NCMAQ_HEAD )
-              WRITE( BDG_UNIT, '(A1)' ),'#'
+              WRITE( BDG_UNIT, '(A)' ) CMAQ_HEADER( 1:NCMAQ_HEAD )
+              WRITE( BDG_UNIT, '(A1)' ) '#'
           
               ! Write Execution ID and GridName
-              WRITE( BDG_UNIT, '(A1,6x,A,A)' ),'#',"EXEC_ID: ",TRIM(EXECUTION_ID)
-              WRITE( BDG_UNIT, '(A1,6x,A,A)' ),'#',"GRIDNAME: ",TRIM(GRID_NAME)
-              WRITE( BDG_UNIT, '(A1)' ),'#'
+              WRITE( BDG_UNIT, '(A1,6x,A,A)' ) '#',"EXEC_ID: ",TRIM(EXECUTION_ID)
+              WRITE( BDG_UNIT, '(A1,6x,A,A)' ) '#',"GRIDNAME: ",TRIM(GRID_NAME)
+              WRITE( BDG_UNIT, '(A1)' ) '#'
           
-              WRITE( BDG_UNIT, '(A1,6x,A,A)' ),'#','All date-times are in ',
+              WRITE( BDG_UNIT, '(A1,6x,A,A)' ) '#','All date-times are in ',
      &             'YYYY-mm-ddTHH:MM:SSZ format and in UTC time zone.'
-              WRITE( BDG_UNIT, '(A1,6x,A)' ),'#','Delta T (time) Units are hours.' 
-              WRITE( BDG_UNIT, '(A1,6x,A)' ),'#','Gas and Aerosol Mass Units are kg'
-              WRITE( BDG_UNIT, '(A1,6x,A)' ),'#','Aerosol Number Units are total N'
-              WRITE( BDG_UNIT, '(A1,6x,A)' ),'#','Aerosol Surface Area Units are m2'
-              WRITE( BDG_UNIT, '(A1)' ),'#'
+              WRITE( BDG_UNIT, '(A1,6x,A)' ) '#','Delta T (time) Units are hours.' 
+              WRITE( BDG_UNIT, '(A1,6x,A)' ) '#','Gas and Aerosol Mass Units are kg'
+              WRITE( BDG_UNIT, '(A1,6x,A)' ) '#','Aerosol Number Units are total N'
+              WRITE( BDG_UNIT, '(A1,6x,A)' ) '#','Aerosol Surface Area Units are m2'
+              WRITE( BDG_UNIT, '(A1)' ) '#'
           
               ! Write Header
-              WRITE( BDG_UNIT, '(55(A))' ), 'SPECIES',tab,'T_START',tab,
+              WRITE( BDG_UNIT, '(55(A))' ) 'SPECIES',tab,'T_START',tab,
      &         'T_FINAL',tab,'T_DELTA',tab,'M_START',tab,'M_FINAL',tab,
      &         'M_DELTA',tab,'WEST_IN',tab,'WEST_OUT',tab,'EAST_IN',tab,
      &         'EAST_OUT',tab,'SOUTH_IN',tab,'SOUTH_OUT',tab,'NORTH_IN',tab,
@@ -198,7 +198,7 @@ C-----------------------------------------------------------------------
           N_BDG_REG = INDEX1( '', MAX_BUDGET_VARS_NML, BudgetVariables ) - 1
           IF ( N_BDG_REG .LE. 0 ) THEN
              WRITE( LOGDEV, * )
-             WRITE( XMSG, '(A,A)' ),
+             WRITE( XMSG, '(A,A)' )
      &           'No Budget Variables have been selected. All Variables',
      &           'will be output to the budget file.'
              CALL LOG_MESSAGE( LOGDEV, XMSG )     
@@ -511,10 +511,10 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
         BDG_SEC0  =   BDG_JTIME0 - BDG_HOUR0*10000 - BDG_MIN0*100
         BDG_SEC1  =   BDG_JTIME1 - BDG_HOUR1*10000 - BDG_MIN1*100
       
-        WRITE( BDG_TIME0, '(I4,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1)' ), 
+        WRITE( BDG_TIME0, '(I4,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1)' ) 
      &         BDG_YEAR0,'-',BDG_MONTH0,'-',BDG_DAY0,'T',BDG_HOUR0,':',
      &         BDG_MIN0,':',BDG_SEC0,'Z'
-        WRITE( BDG_TIME1, '(I4,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1)' ), 
+        WRITE( BDG_TIME1, '(I4,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1)' ) 
      &         BDG_YEAR1,'-',BDG_MONTH1,'-',BDG_DAY1,'T',BDG_HOUR1,':',
      &         BDG_MIN1,':',BDG_SEC1,'Z'
       END IF
@@ -564,7 +564,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          ! Write Species Process Changes to tab-separated file
          DO I = 1,N_BDG_VAR
             ! Default
-            WRITE( BDG_UNIT,'(3(A,A),F7.3,A,24(E15.8,A) )' ),TRIM(BDGSPEC(I)),tab, 
+            WRITE( BDG_UNIT,'(3(A,A),F7.3,A,24(E15.8,A) )' ) TRIM(BDGSPEC(I)),tab, 
      &         BDG_TIME0,tab,BDG_TIME1,tab, DT,tab, (BDG_BURDEN_OUT(I,J),tab,J=1,3 ),
      &         ( ADV_FLUXES_OUT(I,J),tab,J=1,8 ),
      &         ( BDG_PROC_OUT(I,J),tab,J=3,NPRCS ), RESID_F(I)

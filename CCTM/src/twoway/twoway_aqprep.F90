@@ -140,10 +140,9 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
   use se_comm_info_ext
   use utilio_defn
   use const
+  use mpi
 
   IMPLICIT NONE
-
-  INCLUDE SUBST_MPI
 
   TYPE(domain), INTENT(IN)                :: grid
   TYPE (grid_config_rec_type), INTENT(IN) :: config_flags

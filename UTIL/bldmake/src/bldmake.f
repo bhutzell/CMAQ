@@ -520,7 +520,7 @@
 
          Write( lfn, '(/" IOAPI  = -L$(LIB)/",a,1x,a)' ) Trim( lib_4 ), Trim( ioapi )
          Write( lfn, '( " NETCDF = -L$(LIB)/",a,1x,a, " -L$(LIB)/",a,1x,a)' ) 
-     &     ,"netcdff/lib", Trim( netcdff ), "netcdf/lib", Trim(netcdf)
+     &     "netcdff/lib", Trim( netcdff ), "netcdf/lib", Trim(netcdf)
       
          If ( serial ) Then
             Write( lfn, '( " LIBRARIES = $(IOAPI) $(NETCDF)")' )
@@ -751,17 +751,10 @@
       Integer getNumberOfFields
 
 ! parameters
-!     Integer, Parameter :: n_Mac = 4
-!     Integer            :: pathInd( n_Mac ) = (/ 2, 1, 1, 1 /)
-!     Integer, Parameter :: n_Inc = 8
-!     Integer, Parameter :: pathMap( n_Inc ) = (/ 1, 1, 1, 1, 3, 3, 3, 4 /)
-      Integer, Parameter :: n_Mac = 3
-      Integer            :: pathInd( n_Mac ) = (/ 2, 1, 1 /)
-  !   parallel & serial
+      Integer, Parameter :: n_Mac = 2
+      Integer            :: pathInd( n_Mac ) = (/ 2, 1 /)
       Integer, Parameter :: n_Inc = 8
       Integer, Parameter :: pathMap( n_Inc ) = (/ 1, 1, 1, 1, 3, 2, 2, 3 /)
-  !   Integer, Parameter :: n_Inc = 6
-  !   Integer, Parameter :: pathMap( n_Inc ) = (/ 1, 1, 1, 2, 2, 2 /)
 
 ! local variables
       Integer i, j, n
@@ -770,12 +763,10 @@
       Integer n_M
       Character( 8 ) :: pathMacro( n_Mac ) =
      &                         (/'BASE_INC',
-     &                           'PA_INC  ',
-     &                           'MPI_INC '/)
+     &                           'PA_INC  '/)
       Character( EXT_LEN ) :: pathChk( n_Mac ) =
      &                         (/'SUBST_PE_COMM ',
-     &                           'SUBST_PACTL_ID',
-     &                           'SUBST_MPI     '/)
+     &                           'SUBST_PACTL_ID'/)
       Character( EXT_LEN ) :: pathStr( n_Mac )
       Logical              :: hasPaths
 
@@ -849,11 +840,7 @@
           Write( lfn, '(1x)' )
           Do i = 1, n_M
             If ( pathStr( i ) .Ne. ' ' ) Then
-              If ( pathMacro( i ) .EQ. "MPI_INC " ) Then
-                  Write( lfn, '(1x,a," = ",a)' ) pathMacro( i ), "$(LIB)/mpi/include"
-              Else
-                  Write( lfn, '(1x,a," = ",a)' ) pathMacro( i ), Trim( pathStr( i ) )
-              End If
+              Write( lfn, '(1x,a," = ",a)' ) pathMacro( i ), Trim( pathStr( i ) )
             End If
           End Do
         End If
@@ -871,7 +858,6 @@
 !  SUBST_PACTL_ID = ./PA_CTL.EXT             <- PA_INC
 !  SUBST_PACMN_ID = ./PA_CMN.EXT             <- PA_INC
 !  SUBST_PADAT_ID = ./PA_DAT.EXT             <- PA_INC
-!  SUBST_MPI = /home/wdx/lib_sol/x86_64/intel/mpich/include/mpif.h
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
       Do n = 1, n_includes

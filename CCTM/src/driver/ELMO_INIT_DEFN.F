@@ -233,7 +233,7 @@
       CHARACTER( 16 ), SAVE :: PNAME = 'READ_ELMO_NML'
       CHARACTER( 200 )   :: XMSG
       CHARACTER( 200 )   :: TMPLINE
-      INTEGER IOS, IFL, N_VARS, VALUE, N, IKEY
+      INTEGER IOS, IFL, N_VARS, N, IKEY
       CHARACTER( 5 )     :: CFIL
 
       NAMELIST / ELMO_INIT  / N_Files, N_Max_Output_Variables,
@@ -252,7 +252,7 @@
         
       ! Retrieve the Name of the CMAQ Control File
       IF ( CMAQ_CTRL .EQ. "CMAQ_CTRL_NML" ) THEN
-          WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A)"),
+          WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A)")
      &           'You have chosen not to indicate the location of a',
      &           'CMAQ_Control.nml namelist file. No ELMO output files ',
      &           'will be created.'
@@ -268,7 +268,7 @@
 
       ! Check for Error in File Open Process
       IF ( STAT .NE. 0 ) THEN
-          WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
+          WRITE( XMSG, '(A,A,A)' ) 'ERROR: Could not read ',
      &           'CMAQ Control namelist file: ',TRIM( CMAQ_CTRL )
           CALL M3EXIT( PNAME,0,0,XMSG,1 )
       END IF
@@ -360,14 +360,14 @@
         ELSE IF ( FTYPE( IFL ) .EQ. 'UNSTRUCTURED' ) THEN
             ELMO_FILE( IFL )%STRUCT     = 1
         ELSE
-            WRITE( XMSG, "(A,I3.3,A)"),
+            WRITE( XMSG, "(A,I3.3,A)")
      &             'An ELMO file may only be gridded or unstructured.  '//
      &             'Please revise the value of Ftype(',IFL,') in ELMO_FILE.'
             CALL M3EXIT ( PNAME, 0, 0, XMSG, 1 ) 
         END IF
 
         ! Set ELMO Output File Name with Path and File Logical      
-        WRITE( CFIL, '(I0)' ), IFL
+        WRITE( CFIL, '(I0)' ) IFL
         ELMO_FILE( IFL )%SHORTNAME = 'ELMO' // TRIM(CFIL) // '_' //
      &                              TRIM( FLABEL(IFL) ) 
         ELMO_FILE( IFL )%FILENAME = 'CCTM_ELMO' // TRIM(CFIL) // '_' //
@@ -378,7 +378,10 @@
      &                                  TRIM( ELMO_FILE( IFL )%FILENAME )
         END IF
 #ifndef mpas
-        VALUE = SETENVVAR( ELMO_FILE( IFL )%FLOGICAL, ELMO_FILE( IFL )%FILENAME )
+        IF ( .NOT. SETENVVAR( ELMO_FILE( IFL )%FLOGICAL, ELMO_FILE( IFL )%FILENAME ) ) THEN
+            WRITE( XMSG, '(A,I3)' ) 'ERROR: Could not set environment variable for ELMO file # ', IFL
+            CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
+        END IF
 #endif
 
         ! Output Time Step
@@ -1249,7 +1252,7 @@
       ! Write out all ELMO variables organized by output file
       CALL LOG_MESSAGE( LOGDEV,'' )
       CALL LOG_SUBHEADING( LOGDEV, 'ELMO Output Variable Report' )
-      WRITE( LOGDEV,'(7x,A,8(/,13x,A))' ),
+      WRITE( LOGDEV,'(7x,A,8(/,13x,A))' )
      &                              'Note: these are populated using rules from the',
      &                              'CMAQ Control File supplied by the User. ',
      &                              'When variables are indented, they are components ',
@@ -1270,8 +1273,8 @@
              CTMODE = 'Aggregate'
          END IF
 
-         WRITE( LOGDEV, '(/,5x,A,A)'   ),'>',REPEAT('-',80 )
-         WRITE( LOGDEV,'(5x,A,I2,A,A,/,5x,A,A,/,8x,A,I2,A,I2,/,8x,A,I5)' ),
+         WRITE( LOGDEV, '(/,5x,A,A)'   ) '>',REPEAT('-',80 )
+         WRITE( LOGDEV,'(5x,A,I2,A,A,/,5x,A,A,/,8x,A,I2,A,I2,/,8x,A,I5)' )
      &       'Output File Num: "',IFL,'" | Temporality: ',TRIM(CTMODE),
      &       'Output Filename: ',TRIM(ELMO_FILE(IFL)%SHORTNAME),
      &       ' Bottom Layer: ',ELMO_FILE( IFL )%LAY_BOT,
@@ -1280,14 +1283,14 @@
 
          ! Print all variables on the file and their contents if they have
          ! components 
-         WRITE( LOGDEV, '(/,8x,A,12x,A,12x,A,8x,A)' ),
+         WRITE( LOGDEV, '(/,8x,A,12x,A,12x,A,8x,A)' )
      &       'Variable','Type','Unit','Description'
-         WRITE( LOGDEV, '(8x,A,3x,A,2x,A,4x,A)' ),
+         WRITE( LOGDEV, '(8x,A,3x,A,2x,A,4x,A)' )
      &       '-----------------','--------------','--------','--------------'
 
          DO IVAR = 1,ELMO_FILE( IFL )%N_VARS 
             J = ELMO_FILE( IFL )%TABID( IVAR )
-            WRITE ( LOGDEV,'(8x,A16,4x,A14,2x,A8,4x,A)'),
+            WRITE ( LOGDEV,'(8x,A16,4x,A14,2x,A8,4x,A)')
      &              ELMO_TABLE( J )%OUT_NAME,
      &              CETYPE( ELMO_TABLE( J )%VAR_TYPE ),
      &              ELMO_TABLE( J )%CUNIT,
@@ -1314,7 +1317,7 @@
                   IF ( IMODE .NE. 0 ) L_MODE = ELMO_COMP( J )%L_MODE( IMODE )
 
                   IF ( L_MODE ) THEN
-                     WRITE( FORMULA, '(A,A1,SPES9.2,A1,A)' ),TRIM(FORMULA),
+                     WRITE( FORMULA, '(A,A1,SPES9.2,A1,A)' ) TRIM(FORMULA),
      &                  ' ',ELMO_COMP( J )%COEFF(ICOMP),'*',
      &                  TRIM( ELMO_TABLE( TABID )%OUT_NAME )
 
@@ -1322,7 +1325,7 @@
                      ! to add the FPM[dp]_[mode] to the formula
                      IF ( ELMO_TABLE( TABID )%VAR_TYPE .EQ. ET_CONC .AND.
      &                    IMODE .NE. 0 .AND.INLET .NE. 0 ) THEN
-                        WRITE( FORMULA, '(A,A2,A,A1,A)' ),TRIM(FORMULA),'*F',
+                        WRITE( FORMULA, '(A,A2,A,A1,A)' ) TRIM(FORMULA),'*F',
      &                     TRIM( ELMO_INLET(INLET)%CINLET ),'_',
      &                     TRIM(AEROMODE( IMODE )%SUFF)
                      END IF
@@ -1343,7 +1346,7 @@
                ! Write the formula for total aerosol metrics
                IF ( ORG_OP .EQ. OT_OMOC .OR. ORG_OP .EQ. OT_OTOC ) THEN
                    ! Begin with a parenthesis
-                   WRITE( FORMULA, '(A,A2)' ),TRIM(FORMULA),'( '
+                   WRITE( FORMULA, '(A,A2)' ) TRIM(FORMULA),'( '
                END IF
 
                ! Add each aerosol species
@@ -1371,33 +1374,33 @@
 
                         ! Add Deposition Prefixes if applicable
                         IF ( ORG_OP .EQ. OT_DD_OA .OR. ORG_OP .EQ. OT_DD_OC ) THEN
-                           WRITE( FORMULA, '(A,A5)' ),TRIM(FORMULA),' +DD_'
+                           WRITE( FORMULA, '(A,A5)' ) TRIM(FORMULA),' +DD_'
                         ELSE IF ( ORG_OP .EQ. OT_WD_OA. OR. ORG_OP .EQ. OT_WD_OC) THEN
-                           WRITE( FORMULA, '(A,A5)' ),TRIM(FORMULA),' +WD_'
+                           WRITE( FORMULA, '(A,A5)' ) TRIM(FORMULA),' +WD_'
                         ELSE
-                           WRITE( FORMULA, '(A,A2)' ),TRIM(FORMULA),' +'
+                           WRITE( FORMULA, '(A,A2)' ) TRIM(FORMULA),' +'
                         END IF
 
                         ! Add Species Name and Coefficient
                         IF ( ORG_OP .EQ. 0 .OR. ORG_OP .EQ. OT_OA .OR.
      &                       ORG_OP .EQ. OT_DD_OA .OR. ORG_OP .EQ. OT_WD_OA ) THEN 
-                           WRITE( FORMULA, '(A,A)' ),TRIM(FORMULA),
+                           WRITE( FORMULA, '(A,A)' ) TRIM(FORMULA),
      &                        TRIM( AEROSPC(IAER)%NAME(IM) )
                         ELSE IF ( ORG_OP .EQ. OT_OC .OR. ORG_OP .EQ. OT_DD_OC .OR. 
      &                            ORG_OP .EQ. OT_WD_OC ) THEN
-                           WRITE( FORMULA, '(A,A,A1,ES8.2)' ),TRIM(FORMULA),
+                           WRITE( FORMULA, '(A,A,A1,ES8.2)' ) TRIM(FORMULA),
      &                        TRIM( AEROSPC(IAER)%NAME(IM) ),'/',OASPC(IOA)%OMtoOC
                         ELSE IF ( ORG_OP .EQ. OT_OMOC ) THEN
-                           WRITE( FORMULA, '(A,ES8.2,A1,A)' ),TRIM(FORMULA),
+                           WRITE( FORMULA, '(A,ES8.2,A1,A)' ) TRIM(FORMULA),
      &                        OASPC(IOA)%OMtoOC,'*',TRIM(AEROSPC(IAER)%NAME(IM) )
                         ELSE IF ( ORG_OP .EQ. OT_OTOC ) THEN
-                           WRITE( FORMULA, '(A,ES8.2,A1,A)' ),TRIM(FORMULA),
+                           WRITE( FORMULA, '(A,ES8.2,A1,A)' ) TRIM(FORMULA),
      &                        OASPC(IOA)%OtoC,'*',TRIM( AEROSPC(IAER)%NAME(IM) )
                         END IF
 
                         ! Multiply by inlet fraction if applicable
                         IF ( INLET .GT. 0 ) 
-     &                     WRITE( FORMULA, '(A,A2,A,A1,A)' ),TRIM(FORMULA),'*F',
+     &                     WRITE( FORMULA, '(A,A2,A,A1,A)' ) TRIM(FORMULA),'*F',
      &                        TRIM( ELMO_INLET(INLET)%CINLET ),'_',
      &                        TRIM(AEROMODE( IM )%SUFF)
                      END IF
@@ -1407,15 +1410,15 @@
                ! Add Denominator For OM:OC and O:C
                IF ( ORG_OP .EQ. OT_OMOC .OR. ORG_OP .EQ. OT_OTOC ) THEN
                    ! Begin with a parenthesis
-                   WRITE( FORMULA, '(A,A5)' ),TRIM(FORMULA),') / ('
+                   WRITE( FORMULA, '(A,A5)' ) TRIM(FORMULA),') / ('
                    IF ( INLET .EQ. 0 ) 
-     &                WRITE( FORMULA, '(A,A,A1)' ),TRIM(FORMULA),
+     &                WRITE( FORMULA, '(A,A,A1)' ) TRIM(FORMULA),
      &                   TRIM( CMODE( ELMO_DRVD_TAB(K)%MODE ) ),'_'
-                   WRITE( FORMULA, '(A,A2)' ),TRIM(FORMULA),'OA'
+                   WRITE( FORMULA, '(A,A2)' ) TRIM(FORMULA),'OA'
                    IF ( INLET .NE. 0 ) 
-     &                WRITE( FORMULA, '(A,A2,A)' ),TRIM(FORMULA),'*F',
+     &                WRITE( FORMULA, '(A,A2,A)' ) TRIM(FORMULA),'*F',
      &                   TRIM( ELMO_INLET(INLET)%CINLET )
-                   WRITE( FORMULA, '(A,A1)' ),TRIM(FORMULA),')'
+                   WRITE( FORMULA, '(A,A1)' ) TRIM(FORMULA),')'
                END IF
 
             END IF  
@@ -1431,14 +1434,14 @@
 
                   FTEMP = FORMULA( 1:LAST_SPACE )
 
-                  WRITE( LOGDEV, '(10x,A)'), FTEMP
+                  WRITE( LOGDEV, '(10x,A)') FTEMP
                   FORMULA = '  '//FORMULA( LAST_SPACE+1:LEN(FORMULA) )
                   FORM_SIZE = LEN_TRIM( FORMULA )
                
                END DO
 
                ! Write Last Line
-               WRITE( LOGDEV, '(10x,A)' ), FORMULA(1:FORM_SIZE)
+               WRITE( LOGDEV, '(10x,A)' ) FORMULA(1:FORM_SIZE)
             END IF
             WRITE( LOGDEV, * )
          END DO
