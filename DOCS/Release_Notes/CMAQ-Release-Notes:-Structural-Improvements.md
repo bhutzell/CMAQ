@@ -2,7 +2,7 @@
 
 ### Improvements to compiling with GCC 
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Code cleanup   
+**Type of update**: Compilation  
 **Release Version/Date**: CMAQv6.0
 
 **Description**:   
@@ -18,14 +18,10 @@ The types of warnings that have been addressed are:
 7. MEGAN include files have many species names longer than the declared length of 16. I deleted extra spaces to make them fit where possible, but left unchanged those where the string itself is longer than 16.
 
 **Significance and Impact**:   
-1. Beginning with version 10, the GCC compiler enforced stricter checking of the data types and ranks of arguments. Several CMAQ code files in the PARIO and STENEX modules had compilation errors involving their MPI routines. A workaround was added to the CCTM build so that the -std=legacy flag was included if the GCC compiler was being used; this turned these compilation errors into warnings.
+Beginning with version 10, the GCC compiler enforced stricter checking of the data types and ranks of arguments. Several CMAQ code files in the PARIO and STENEX modules had compilation errors involving their MPI routines. A workaround was added to the CCTM build so that the -std=legacy flag was included if the GCC compiler was being used; this turned these compilation errors into warnings. Upon investigation, it appears that the previous practice of using INCLUDE 'mpif.h' is now considered obsolete. Instead, one should use the MPI module. This allows the compiler to "see" the  proper interface blocks for all MPI routines, which can be used for several different data types and ranks (i.e., scalars and arrays). Otherwise the user needs to write their own interface  blocks, which is tricky and error-prone, or use the "legacy" flag. With the minor mods in this PR, the -std=legacy flag is no longer necessary, and no warnings are generated from these routines.
+Additionally, I removed the -DSUBST_MPI=$(BASE_INC)/mpif.h from bldmake. That extra indirection was never a good idea, and we mostly stopped using it several years ago. (per #1)        
 
-Upon investigation, it appears that the previous practice of using INCLUDE 'mpif.h' is now considered obsolete. Instead, one should use the MPI module. This allows the compiler to "see" the proper interface blocks for all MPI routines, which can be used for several different data types and ranks (i.e., scalars and arrays). Otherwise the user needs to write their own interface blocks, which is tricky and error-prone, or use the "legacy" flag.
-
-With the minor mods in this PR, the -std=legacy flag is no longer necessary, and no warnings are generated from these routines.
-Additionally, I removed the -DSUBST_MPI=$(BASE_INC)/mpif.h from bldmake. That extra indirection was never a good idea, and we mostly stopped using it several years ago.
-
-2-7. Generally, warnings should be addressed when possible. You never know when GCC might become even more militant and convert warnings to errors.
+Generally, warnings should be addressed when possible. You never know when GCC might become even more militant and convert warnings to errors. (per #2-7)
  
 |Merge Commit | Internal record|
 |:------:|:-------:|
