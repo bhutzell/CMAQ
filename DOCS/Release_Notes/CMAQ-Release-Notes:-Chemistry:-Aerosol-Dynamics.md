@@ -1,5 +1,22 @@
 # Aerosol Dynamics
 
+### Generalized Dynamic and Equilibrium Partitioning of Inorganic Aerosols
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Science Update  
+**Release Version/Date**:  CMAQv6.0 
+
+**Description**:  
+Currently, CMAQ solves mass transfer of inorganic species (sulfate, ammonium, nitrate, chloride) to and from particles using an equilibrium approach for the Aitken and Accumulation modes, and a dynamic approach for the Coarse mode.
+
+As horizontal resolution increases and time steps get very small, it becomes advantageous to use the dynamic approach for all modes. The computation time savings for the equilibrium approach is negligible, and the assumption of equilibrium across sub-5 min time steps becomes uncertain.
+
+**Significance and Impact**:   
+The base code is unstable at very short time steps because the equilibrium assumption for fine aerosols leads to too much mass transferring to/from particles in one time step. There is no significant and persistent impact on model results when the hybrid configuration is selected. The quantitative impact of forcing all modes to be dynamic or equilibrium is still to be determined.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1340](https://github.com/USEPA/CMAQ/commit/447d8f3a585b6e7f1839fbd26aaecc2c2e9ac524) | [PR#1340](https://github.com/USEPA/CMAQ_Dev/pull/1340)  | 
+
 ### SOA Mapping: Revise Logfile Output
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Logfile Messaging  
