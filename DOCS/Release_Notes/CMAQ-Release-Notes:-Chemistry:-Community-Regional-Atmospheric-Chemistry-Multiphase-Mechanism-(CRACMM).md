@@ -12,6 +12,11 @@ CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version buil
 **Significance and Impact**:   
 CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enable a wider range of applications of CRACMM.
 
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ_Dev/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269)  | 
+|[Merge for PR#1335](https://github.com/USEPA/CMAQ_Dev/commit/3ae05d2ac3094493a0c4748659fb8a2a4a08b60c) | [PR#1335](https://github.com/USEPA/CMAQ_Dev/pull/1335)  | 
+
 ### Heterogeneous chemistry of sulfur species
 [Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science update  
