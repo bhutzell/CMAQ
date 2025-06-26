@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ======================= CCTMv5.5.X Build Script ========================= 
+# ======================= CCTMv6.X Build Script ========================= 
 # Usage: bldit_cctm.csh <compiler> >&! bldit.cctm.log                          
 # Requirements: I/O API & netCDF libraries, a Fortran compiler,               
 #               and MPI for multiprocessor computing                     
@@ -90,11 +90,11 @@ set make_options = "-j"                #> additional options for make command if
 
 #> Working directory and Version IDs
  if ( $?ISAM_CCTM ) then
-     set VRSN  = v55_ISAM             #> model configuration ID for CMAQ_ISAM
+     set VRSN  = v6a1_ISAM             #> model configuration ID for CMAQ_ISAM
  else if ( $?DDM3D_CCTM ) then
-     set VRSN = v55_DDM3D             #> model configuration ID for CMAQ_DDM
+     set VRSN = v6a1_DDM3D             #> model configuration ID for CMAQ_DDM
  else
-     set VRSN = v55                   #> model configuration ID for CMAQ
+     set VRSN = v6a1                   #> model configuration ID for CMAQ
  endif
  
  set EXEC  = CCTM_${VRSN}.exe          #> executable name
