@@ -1,4 +1,24 @@
 
+### KMT2 rate updates and minor bugfix
+[Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Rate coefficient update and bug fix  
+**Release Version/Date**: CMAQv6.0  
+
+**Description**: 
+This PR updates rate coefficients for the glyoxylic acid and glyoxylate reactions with hydroxyl in cloud water following Tan et al., 2009. Additionally, there was a minor bug fix (removal of a parenthesis) following a recent update. 
+
+**Significance and Impact**:  
+Impacts are expected to be minor. Now the rate coefficients are more consistent with those used in Fahey et al. (2025).
+
+**Internal PRs**: [PR#1339](https://github.com/USEPA/CMAQ_Dev/pull/1339)  
+
+**References**: 
+Fahey, K.M., Sareen, N., Carlton, A.G., and Hutzell, W.T.: Updated In-Cloud Secondary Aerosol Production in the Northern Hemisphere Predicted by the Community Multiscale Air Quality Modeling System. ACS Earth and Space Chemistry, 9 (5), 1043-1059,
+doi: 10.1021/acsearthspacechem.4c00370, 2025.
+ 
+Tan, Y., Perri, M.J., Seitzinger, S.P., Turpin, B.J.: Effects of precursor concentration and acidic sulfate in aqueous glyoxal-OH radical oxidation and implications for secondary organic aerosol. Env. Sci. Technol.,
+43, 8105-8112, doi: 10.1021/es901742f, 2009.
+
 ### Streamline Mapping to Default Cloud Chemistry Solver
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Infrastructure Improvement  
