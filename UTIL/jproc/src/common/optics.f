@@ -43,10 +43,7 @@ C*********************************************************************
 
       IMPLICIT NONE
 
-C...........PARAMETERS and their descriptions
-
-      INTEGER, PARAMETER :: MXWL = 130  ! number of wavelength bands
-      INTEGER, PARAMETER :: NJ = 200    ! maximum levels
+      INCLUDE 'JVALPARMS.EXT'    ! jproc parameters
 
 C...........ARGUMENTS and their descriptions
 

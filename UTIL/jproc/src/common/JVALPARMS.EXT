@@ -33,8 +33,8 @@ c    MXWLIN   = maximum number of wavelength bands on input files
 C    NJ       = maximum number of vertical levels
 C    MXLEV    = maximum number of vertical levels
 
-      INTEGER, PARAMETER :: MXWL   = 200
-      INTEGER, PARAMETER :: MXWLIN = 600
+      INTEGER, PARAMETER :: MXWL   = 601
+      INTEGER, PARAMETER :: MXWLIN = 2000
       INTEGER, PARAMETER :: NJ     = 200
       INTEGER, PARAMETER :: MXLEV  = 51
 
