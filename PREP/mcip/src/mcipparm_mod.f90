@@ -149,7 +149,7 @@ MODULE mcipparm
 !                        MCIPv5.1 to MCIPv5.3.3. (T. Spero)
 !           12 Jul 2022  Updated version stamp. (M. Mallard)
 !           19 Sep 2024  Updated version stamp. (T. Spero)
-!           14 May 2025  Added runtime variable, MAKEGRID. Updated version
+!           26 Jun 2025  Added runtime variable, MAKEGRID. Updated version
 !                        stamp. (T. Spero)
 !-------------------------------------------------------------------------------
 
@@ -322,7 +322,7 @@ MODULE mcipparm
 
   CHARACTER(LEN=80)                 :: fdesc      ( mxdesc3 )
   CHARACTER(LEN=16),  PARAMETER     :: progname   = 'MCIP'
-  CHARACTER(LEN=10),  PARAMETER     :: vdate      = '05/14/2025'
+  CHARACTER(LEN=10),  PARAMETER     :: vdate      = '06/26/2025'
   CHARACTER(LEN=8),   PARAMETER     :: ver        = 'V6.0 ALP'
 
 END MODULE mcipparm

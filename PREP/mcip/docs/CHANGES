@@ -1,20 +1,21 @@
 CHANGES for MCIP
 
-MCIP Version 6.0 Alpha (14 May 2025)
+MCIP Version 6.0 Alpha (26 Jun 2025)
 
 - Updated MCIP to process WRF land use classifications that include the
   urban local climate zones (LCZs) that were implemented in WRFv4.3. The
   LCZs are 11 categories that are appended to USGS, MODIS, and MODIFIED IGBP
   MODIS NOAH classifications in WRF. (There is no option to use LCZs in WRF
   with NLCD.) The LCZs were added as categories 31-41 in WRFv4.3, and those
-  categories were changed to 51-61 beginning with WRFv4.2.2.
+  categories were changed to 51-61 beginning with WRFv4.4.2.
 
   In addition, MCIP was changed to distinguish MODIS from MODIFIED IGBP MODIS
-  NOAH, where category 21 is either "lakes" or "unassigned".
+  NOAH, where category 21 is either "Lakes" or "Unassigned".
 
   Changed files:  PREP/mcip/src/getluse.f90
                   PREP/mcip/src/lucats_mod.f90
                   PREP/mcip/src/setup_wrfem.f90
+                  PREP/mcip/src/setgriddefs.f90
 
 
 - Corrected MCIP internal calculations of latitude and longitude for polar
@@ -25,6 +26,8 @@ MCIP Version 6.0 Alpha (14 May 2025)
   Changed files:  PREP/mcip/src/rdwrfem.f90
                   PREP/mcip/src/setup_wrfem.f90
                   PREP/mcip/src/Makefile
+                  PREP/mcip/src/xy2ll_lam.f90
+                  PREP/mcip/src/xy2ll_merc.f90
 
   New file:       PREP/mcip/src/xy2ll_ps.f90
 

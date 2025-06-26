@@ -172,6 +172,10 @@ SUBROUTINE setgriddefs
 !                        spacing that is not a multiple of 1 km. Now using a
 !                        constraint of 5 meters to allow for "neater" XORIG
 !                        and YORIG values across compilers. (T. Spero)
+!           26 Jun 2025  Added note to the log that the urban category was
+!                        repopulated with the aggregated LCZs to allow proper
+!                        treatment in CMAQ until there is specific handling
+!                        for those categories. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE mcipparm
@@ -221,6 +225,9 @@ SUBROUTINE setgriddefs
 
   CHARACTER(LEN=256), PARAMETER :: f6180 = &
       "(/, 1x, a, ' was ', a, ' used in the meteorology model')"
+
+  CHARACTER(LEN=256), PARAMETER :: f6190 = &
+      "(/, 1x, 'LCZs in the land use. Regular urban category aggregated.')"
 
   CHARACTER(LEN=256), PARAMETER :: f6200 = &
       "(1x, a, ' domain dimensions (col, row, lay):', 3(2x, i3))"
@@ -780,6 +787,10 @@ SUBROUTINE setgriddefs
     yesno = 'NOT'
   ENDIF
   WRITE (*,f6180) 'HYBRID VERTICAL COORDINATE', TRIM(yesno)
+
+  IF ( TRIM(xlusrc) == 'USGS_LCZ' .OR. TRIM(xlusrc) == 'MODIS_LCZ' )
+    WRITE (*, f6190)
+  ENDIF
 
   WRITE (*,'(/)')
   WRITE (*,f6200) 'Met   ', met_nx,  met_ny,  metlay

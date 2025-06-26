@@ -19,9 +19,9 @@
 SUBROUTINE rdwrfem (mcip_now)
 
 !-------------------------------------------------------------------------------
-! Name:     Read WRFv2 and WRFv3 (Eulerian Mass Core) Output
-! Purpose:  Reads incoming WRFv2 and WRFv3 output files for use in MCIP.
-! Notes:    Adapted from S.-B. Kim's get_wrf.F in WCIP.
+! Name:     Read WRFv2, WRFv3, and WRFv4 (Eulerian Mass Core) Output
+! Purpose:  Reads incoming WRFv2, WRFv3, and WRFv4 output files for use in MCIP.
+! Notes:    Original code for WRFv2 adapted from S.-B. Kim's get_wrf.F in WCIP.
 ! Revised:  31 Mar 2005  Original version.  (T. Otte)
 !           15 Jul 2005  Modified variable retrievals so that the code will
 !                        stop if a variable is not found.  Corrected print
@@ -190,10 +190,12 @@ SUBROUTINE rdwrfem (mcip_now)
 !                        for select compilers. (T. Spero)
 !           13 Dec 2023  Removed redundant NF90_OPEN/NF90_CLOSE couplet to
 !                        improve efficiency and memory management. (T. Spero)
-!           14 May 2025  Corrected the latitude and longitude calculations for
+!           26 Jun 2025  Corrected the latitude and longitude calculations for
 !                        polar stereographic projection. Added constraints on
 !                        northing and easting for all projections to limit to
-!                        0.0 for very small numbers. (T. Spero)
+!                        0.0 for very small numbers. Changed local variables
+!                        XXIN and YYIN from single-precision to double-precision
+!                        real. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE date_pack
@@ -210,7 +212,7 @@ SUBROUTINE rdwrfem (mcip_now)
   INTEGER                           :: cdfidg
   REAL                              :: deg2rad
   INTEGER                           :: dimids     ( nf90_max_var_dims )
-  REAL,               PARAMETER     :: distmin    = 1.0e-7
+  REAL(8),            PARAMETER     :: distmin    = 1.0d-7
   REAL,    SAVE,      ALLOCATABLE   :: dum2d      ( : , : )
   INTEGER, SAVE,      ALLOCATABLE   :: dum2d_i    ( : , : )
   REAL,    SAVE,      ALLOCATABLE   :: dum2d_u    ( : , : )
@@ -280,9 +282,9 @@ SUBROUTINE rdwrfem (mcip_now)
   CHARACTER(LEN=19),SAVE,ALLOCATABLE:: times      ( : )
   REAL,               PARAMETER     :: twoomega   = 2.0 * 7.2921e-5 ! [s-1]
   REAL                              :: xoff
-  REAL                              :: xxin
+  REAL(8)                           :: xxin
   REAL                              :: yoff
-  REAL                              :: yyin
+  REAL(8)                           :: yyin
 
   ! Define roughness length as functions of land use and season in case
   ! it is not available in WRF output.
@@ -2055,16 +2057,16 @@ SUBROUTINE rdwrfem (mcip_now)
         DO j = 1, met_ny
           DO i = 1, met_nx
 
-            xxin = met_xxctr -  &
-                   ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
-            IF ( ABS(xxin) < distmin ) THEN
-              xxin = 0.0
+            xxin = DBLE ( met_xxctr -  &
+                   ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln )
+            IF ( DABS(xxin) < distmin ) THEN
+              xxin = 0.0d0
             ENDIF
 
-            yyin = met_yyctr -  &
-                   ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
-            IF ( ABS(yyin) < distmin ) THEN
-              yyin = 0.0
+            yyin = DBLE ( met_yyctr -  &
+                   ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln )
+            IF ( DABS(yyin) < distmin ) THEN
+              yyin = 0.0d0
             ENDIF
 
             CALL xy2ll_lam (xxin, yyin, met_tru1, met_tru2, met_proj_clon,  &
@@ -2083,16 +2085,16 @@ SUBROUTINE rdwrfem (mcip_now)
           DO j = 1, met_ny  ! use all Y to fill array; last row outside domain
             DO i = 1, met_nx
 
-              xxin = met_xxctr -  &
-                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
-              IF ( ABS(xxin) < distmin ) THEN
-                xxin = 0.0
+              xxin = DBLE ( met_xxctr -  &
+                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln )
+              IF ( DABS(xxin) < distmin ) THEN
+                xxin = 0.0d0
               ENDIF
 
-              yyin = met_yyctr -  &
-                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
-              IF ( ABS(yyin) < distmin ) THEN
-                yyin = 0.0
+              yyin = DBLE ( met_yyctr -  &
+                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln )
+              IF ( DABS(yyin) < distmin ) THEN
+                yyin = 0.0d0
               ENDIF
 
               CALL xy2ll_lam (xxin, yyin, met_tru1, met_tru2, met_proj_clon,  &
@@ -2109,16 +2111,16 @@ SUBROUTINE rdwrfem (mcip_now)
           DO j = 1, met_ny
             DO i = 1, met_nx  ! use all X to fill array; last col outside domain
 
-              xxin = met_xxctr -  &
-                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
-              IF ( ABS(xxin) < distmin ) THEN
-                xxin = 0.0
+              xxin = DBLE ( met_xxctr -  &
+                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln )
+              IF ( DABS(xxin) < distmin ) THEN
+                xxin = 0.0d0
               ENDIF
 
-              yyin = met_yyctr -  &
-                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
-              IF ( ABS(yyin) < distmin ) THEN
-                yyin = 0.0
+              yyin = DBLE ( met_yyctr -  &
+                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln )
+              IF ( DABS(yyin) < distmin ) THEN
+                yyin = 0.0d0
               ENDIF
 
               CALL xy2ll_lam (xxin, yyin, met_tru1, met_tru2, met_proj_clon,  &
@@ -2140,16 +2142,16 @@ SUBROUTINE rdwrfem (mcip_now)
         DO j = 1, met_ny
           DO i = 1, met_nx
 
-            xxin = met_xxctr -  &
-                   ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
-            IF ( ABS(xxin) < distmin ) THEN
-              xxin = 0.0
+            xxin = DBLE ( met_xxctr -  &
+                   ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln )
+            IF ( DABS(xxin) < distmin ) THEN
+              xxin = 0.0d0
             ENDIF
 
-            yyin = met_yyctr -  &
-                   ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
-            IF ( ABS(yyin) < distmin ) THEN
-              yyin = 0.0
+            yyin = DBLE ( met_yyctr -  &
+                   ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln )
+            IF ( DABS(yyin) < distmin ) THEN
+              yyin = 0.0d0
             ENDIF
 
             CALL xy2ll_ps (xxin, yyin, met_tru1, met_proj_clon,  &
@@ -2168,16 +2170,16 @@ SUBROUTINE rdwrfem (mcip_now)
           DO j = 1, met_ny  ! use all Y to fill array; last row outside domain
             DO i = 1, met_nx
 
-              xxin = met_xxctr -  &
-                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
-              IF ( ABS(xxin) < distmin ) THEN
-                xxin = 0.0
+              xxin = DBLE ( met_xxctr -  &
+                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln )
+              IF ( DABS(xxin) < distmin ) THEN
+                xxin = 0.0d0
               ENDIF
 
-              yyin = met_yyctr -  &
-                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
-              IF ( ABS(yyin) < distmin ) THEN
-                yyin = 0.0
+              yyin = DBLE ( met_yyctr -  &
+                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln )
+              IF ( DABS(yyin) < distmin ) THEN
+                yyin = 0.0d0
               ENDIF
 
               CALL xy2ll_ps (xxin, yyin, met_tru1, met_proj_clon,  &
@@ -2194,16 +2196,16 @@ SUBROUTINE rdwrfem (mcip_now)
           DO j = 1, met_ny
             DO i = 1, met_nx  ! use all X to fill array; last col outside domain
 
-              xxin = met_xxctr -  &
-                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
-              IF ( ABS(xxin) < distmin ) THEN
-                xxin = 0.0
+              xxin = DBLE ( met_xxctr -  &
+                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln )
+              IF ( DABS(xxin) < distmin ) THEN
+                xxin = 0.0d0
               ENDIF
 
-              yyin = met_yyctr -  &
-                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
-              IF ( ABS(yyin) < distmin ) THEN
-                yyin = 0.0
+              yyin = DBLE ( met_yyctr -  &
+                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln )
+              IF ( DABS(yyin) < distmin ) THEN
+                yyin = 0.0d0
               ENDIF
 
               CALL xy2ll_ps (xxin, yyin, met_tru1, met_proj_clon,  &
@@ -2225,16 +2227,16 @@ SUBROUTINE rdwrfem (mcip_now)
         DO j = 1, met_ny
           DO i = 1, met_nx
 
-            xxin = met_xxctr -  &
-                   ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
-            IF ( ABS(xxin) < distmin ) THEN
-              xxin = 0.0
+            xxin = DBLE ( met_xxctr -  &
+                   ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln )
+            IF ( DABS(xxin) < distmin ) THEN
+              xxin = 0.0d0
             ENDIF
 
-            yyin = met_yyctr -  &
-                   ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
-            IF ( ABS(yyin) < distmin ) THEN
-              yyin = 0.0
+            yyin = DBLE ( met_yyctr -  &
+                   ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln )
+            IF ( DABS(yyin) < distmin ) THEN
+              yyin = 0.0d0
             ENDIF
 
             CALL xy2ll_merc (xxin, yyin, met_proj_clon,  &
@@ -2253,16 +2255,16 @@ SUBROUTINE rdwrfem (mcip_now)
           DO j = 1, met_ny  ! use all Y to fill array; last row outside domain
             DO i = 1, met_nx
 
-              xxin = met_xxctr -  &
-                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
-              IF ( ABS(xxin) < distmin ) THEN
-                xxin = 0.0
+              xxin = DBLE ( met_xxctr -  &
+                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln )
+              IF ( DABS(xxin) < distmin ) THEN
+                xxin = 0.0d0
               ENDIF
 
-              yyin = met_yyctr -  &
-                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
-              IF ( ABS(yyin) < distmin ) THEN
-                yyin = 0.0
+              yyin = DBLE ( met_yyctr -  &
+                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln )
+              IF ( DABS(yyin) < distmin ) THEN
+                yyin = 0.0d0
               ENDIF
 
               CALL xy2ll_merc (xxin, yyin, met_proj_clon,  &
@@ -2279,16 +2281,16 @@ SUBROUTINE rdwrfem (mcip_now)
           DO j = 1, met_ny
             DO i = 1, met_nx  ! use all X to fill array; last col outside domain
 
-              xxin = met_xxctr -  &
-                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
-              IF ( ABS(xxin) < distmin ) THEN
-                xxin = 0.0
+              xxin = DBLE ( met_xxctr -  &
+                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln )
+              IF ( DABS(xxin) < distmin ) THEN
+                xxin = 0.0d0
               ENDIF
 
-              yyin = met_yyctr -  &
-                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
-              IF ( ABS(yyin) < distmin ) THEN
-                yyin = 0.0
+              yyin = DBLE ( met_yyctr -  &
+                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln )
+              IF ( DABS(yyin) < distmin ) THEN
+                yyin = 0.0d0
               ENDIF
 
               CALL xy2ll_merc (xxin, yyin, met_proj_clon,  &
