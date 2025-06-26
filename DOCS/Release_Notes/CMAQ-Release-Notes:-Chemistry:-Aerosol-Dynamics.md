@@ -32,7 +32,7 @@ No impact on results.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1186](https://github.com/USEPA/CMAQ_Dev/commit/99d4354f5f4f16956f45c9a276f357e942b555cc) | [PR#1186](https://github.com/USEPA/CMAQ_Dev/pull/1186)  | 
+|[Merge for PR#1186](https://github.com/USEPA/CMAQ/commit/99d4354f5f4f16956f45c9a276f357e942b555cc) | [PR#1186](https://github.com/USEPA/CMAQ_Dev/pull/1186)  | 
   
 
 ### Remove option for Aerosol Initial Condition surface area and update settings for Boundary Condition Surface Area
