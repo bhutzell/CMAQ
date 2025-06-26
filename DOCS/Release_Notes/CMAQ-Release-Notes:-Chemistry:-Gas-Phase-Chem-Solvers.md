@@ -1,13 +1,13 @@
-###  Remove a Loss Process for Formaldehyde, Acetaldehyde, and Acrolein Emission Tracers in Reactive Tracers Module and other updates to the cracmmhaps mechanism.
+### Formaldehyde, Acetaldehyde, and Acrolein configuration in CRACMM3HAPS Reactive Tracers Module
 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
 
 **Type of update**:     
 **Release Version/Date**: CMAQ version 6.0    
 
-**Description**: This update removes the loss process (via reaction with monatomic chlorine) of emissions tracers for formaldehyde, acetaldehyde, and acrolein emissions tracers in default versions of the cracmm mechanism. Why? The cracmm3 does include monoatomic chlorine but does not include reactions between formaldehyde, acetaldehyde, and acrolein. The update has an exception the marine version of cracmm3, cracmm3m, because the mehaniism does include reactions between formaldehyde, acetaldehyde, and acrolein.
+**Description**: In cracmm3 form/acet/arco do not react with monoatomic chlorine although chlorine was present in the chemistry. To keep the reactive tracer module consistent with the default cracmm3 chemistry, form/acet/acro primary emissions in the cracmm3haps reactive tracers module do not react with monoatomic chlorine. Note, in the cracmm3m mechanism reactions between formaldehyde, acetaldehyde, and acrolein with monoatomic chlorine are encoded.
 
-**Significance and Impact**: The update increases predictions emission tracers of formaldehyde, acetaldehyde, and acrolein emissions in the cracmm3haps mechanism. Without the update's correction, predictions from the cracmm3haps mechanism will incorrectly represent the amount secondary production in concentrations in total concentrations of formaldehyde, acetaldehyde, and acrolein.
+**Significance and Impact**: This update maintains consistency between the cracmm3haps and cracmm3 mechanism.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
