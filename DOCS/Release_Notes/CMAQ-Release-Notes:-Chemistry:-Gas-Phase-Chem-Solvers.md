@@ -1,18 +1,3 @@
-### Formaldehyde, Acetaldehyde, and Acrolein configuration in CRACMM3HAPS Reactive Tracers Module
-
-[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
-
-**Type of update**:     
-**Release Version/Date**: CMAQ version 6.0    
-
-**Description**: In cracmm3 form/acet/arco do not react with monoatomic chlorine although chlorine was present in the chemistry. To keep the reactive tracer module consistent with the default cracmm3 chemistry, form/acet/acro primary emissions in the cracmm3haps reactive tracers module do not react with monoatomic chlorine. Note, in the cracmm3m mechanism reactions between formaldehyde, acetaldehyde, and acrolein with monoatomic chlorine are encoded.
-
-**Significance and Impact**: This update maintains consistency between the cracmm3haps and cracmm3 mechanism.
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-| Merge for PR#1346 | [PR#1346](https://github.com/USEPA/CMAQ_Dev/pull/1346)  |
-
 ### Tuning up the Gear Solver
 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
