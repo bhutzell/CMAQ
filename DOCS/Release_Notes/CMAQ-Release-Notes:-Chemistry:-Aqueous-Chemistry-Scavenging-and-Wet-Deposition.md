@@ -19,7 +19,7 @@ Tan, Y., Perri, M.J., Seitzinger, S.P., Turpin, B.J.: Effects of precursor conce
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1339](https://github.com/USEPA/CMAQ_Dev/commit/ccb92633ebe4cd73ef738e4f16899c4eb95e2f0d) | [PR#1339](https://github.com/USEPA/CMAQ_Dev/pull/1339)  |
+|[Merge for PR#1339](https://github.com/USEPA/CMAQ/commit/ccb92633ebe4cd73ef738e4f16899c4eb95e2f0d) | [PR#1339](https://github.com/USEPA/CMAQ_Dev/pull/1339)  |
 
 
 
@@ -28,7 +28,8 @@ Tan, Y., Perri, M.J., Seitzinger, S.P., Turpin, B.J.: Effects of precursor conce
 ### Streamline Mapping to Default Cloud Chemistry Solver
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Infrastructure Improvement  
-**Release Version/Date**: CMAQv6.0 
+**Release Version/Date**: CMAQv6.0    
+
 **Description**:  
 This current PR is aimed at some minor updates to simplify the mapping of cldproc vectors to the aqueous chemistry routine via **AQ_DATA**.  
 - High-level variables have been renamed for less confusion. For example, ngas is replaced with n_aq_gas to indicate it is relevant to the aqueous chemistry solver. Likewise naddaer and naer are replaced with one variable, n_aq_aer.
