@@ -2,14 +2,12 @@
 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
 
-**Type of update**: Bug Fix    
+**Type of update**:     
 **Release Version/Date**: CMAQ version 6.0    
 
-**Description** Updates revises the cracmm3haps mechanism to give predictions matching the cracmm3 mechanism for model species such as ozone, formaldehyde, acrolein, acetaldehyde and aerosol sulfate. 
+**Description**: This update removes the loss process (via reaction with monatomic chlorine) of emissions tracers for formaldehyde, acetaldehyde, and acrolein emissions tracers in default versions of the cracmm mechanism. Why? The cracmm3 does include monoatomic chlorine but does not include reactions between formaldehyde, acetaldehyde, and acrolein. The update has an exception the marine version of cracmm3, cracmm3m, because the mehaniism does include reactions between formaldehyde, acetaldehyde, and acrolein.
 
-They remove chemical losses in reactive tracers of formaldehyde, acetaldehyde, and acrolein emissions via a monatomic chlorine reaction in default versions of cracmm based mechanism, i.e., cracmm3 or lower. Why? The cracmm3 mechanism includes monoatomic chlorine but does not include reactions between formaldehyde, acetaldehyde, and acrolein. The update has an exception for the marine version of cracmm3 because the mehanism does include reactions between formaldehyde, acetaldehyde, and acrolein. Other revisions corrected the cracmm3haps Chemistry Control and aerosol species name lists. Molecular chlorine emissions were added to the control file. In the cracmm3haps aerosol namelist, wet scavenging factors were changed from minus one to plus one for inorganic and organic water aerosols.
-
-**Significance and Impact**: The updates allow the cracmm3haps mechanism predict large set of hazardous air pollutants and predict criteria air pollutants matching the cracmm3 mechanism. 
+**Significance and Impact**: The update increases predictions emission tracers of formaldehyde, acetaldehyde, and acrolein emissions in the cracmm3haps mechanism. Without the update's correction, predictions from the cracmm3haps mechanism will incorrectly represent the amount secondary production in concentrations in total concentrations of formaldehyde, acetaldehyde, and acrolein.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
