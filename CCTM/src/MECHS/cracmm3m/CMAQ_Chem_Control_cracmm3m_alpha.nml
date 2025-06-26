@@ -517,6 +517,10 @@ CMPST =
                 'ug m-3', 'COARSE', 
                 '0.0320 * ASEACAT + 0.0838 * ASOIL + 0.0562 * ACORS',
 
+'PMC_BR'      , 'Coarse-Mode Bromine', 
+                'ug m-3', 'COARSE', 
+                'ABR',
+
 !-- Fine-Mode Particle Composites --!
 'PMF_SO4'     , 'Fine-Mode Sulfate', 
                 'ug m-3',  'FINE', 
@@ -574,6 +578,14 @@ CMPST =
                 'ug m-3', 'FINE', 
                 'AMN',
 
+'PMF_BR'      , 'Fine-Mode Bromine',
+                'ug m-3', 'FINE', 
+                'ABR',
+
+'PMF_HMS'     , 'Fine-Mode Hydroxymethanesulfonate',
+                'ug m-3', 'FINE', 
+                'AHMS',
+
 'PMF_H2O'     , 'Fine-ModeParticle Water',
                 'ug m-3', 'FINE', 
                 'AH2O',
@@ -584,11 +596,11 @@ CMPST =
                 
 'PMF_OTHWNC'  , 'Unspeciated PM including non-carbon organic mass',
                 'ug m-3', 'FINE', 
-                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OC -1.0*PMF_RCSOIL',
+                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*AHMS -1.0*ABR -1.0*PMF_OC -1.0*PMF_RCSOIL',
 
 'PMF_OTH'     , 'Unspeciated PM excluding non-carbon organic mass',
                 'ug m-3', 'FINE', 
-                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OA -1.0*PMF_RCSOIL',
+                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*AHMS -1.0*ABR -1.0*PMF_OA -1.0*PMF_RCSOIL',
 
 'PMF_HP'      , 'Fine-Mode H+ Ion',
                 'umol m-3', 'FINE', 
@@ -626,10 +638,6 @@ CMPST =
                 'ug m-3', 'FINE', 
                 'PMF_OC + PMF_EC',
 		
-'PMF_HMS'     , 'Fine-Mode Hydroxymethanesulfonate',
-                'ug m-3', 'FINE', 
-                'AHMS',	
-
 !-- Particle Composites Projected to Aerosol Mass Spectrometer --!
 'PMAMS_SO4'   , 'Sulfate Collected by the AMS',
                 'ug m-3', 'PMAMS', 
@@ -652,10 +660,6 @@ CMPST =
                 'ug m-3', 'PM1', 
                 'ASO4',
 		
-'PM1_HMS'     , 'PM1 Hydroxymethanesulfonate',
-                'ug m-3', 'PM1', 
-                'AHMS',	
-
 'PM1_NO3'     , 'PM1 Nitrate',
                 'ug m-3', 'PM1', 
                 'ANO3',
@@ -712,13 +716,21 @@ CMPST =
                 'ug m-3', 'PM1', 
                 'AAL',
 
+'PM1_BR'      , 'PM1 Bromine',
+                'ug m-3', 'PM1', 
+                'ABR',
+
+'PM1_HMS'     , 'PM1 Hydroxymethanesulfonate',
+                'ug m-3', 'PM1', 
+                'AHMS',
+
 'PM1_RCSOIL'  ,'PM1 Reconstructed Soil <1 um (Malm et al., 1994; Eqn 5)',
                 'ug m-3', 'PM1', 
                 'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
 
 'PM1_OTHWNC'  , 'PM1 Unspeciated Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM1', 
-                'PM1 - ASO4 - AHMS - ANO3 - ANH4 - ACL - ANA - AEC - PM1_OC - PM1_RCSOIL',
+                'PM1 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - AHMS - ABR - PM1_OC - PM1_RCSOIL',
 
 'PM1_UNSPCRS' , 'PM1 Unspeciated Coarse-Mode Mass',
                 'ug m-3', 'PM1', 
@@ -733,10 +745,6 @@ CMPST =
                 'ug m-3', 'PM25', 
                 'ASO4',
 		
-'PM25_HMS'    , 'PM2.5 Hydroxymethanesulfonate',
-                'ug m-3', 'PM25', 
-                'AHMS',
-
 'PM25_NO3'    , 'PM2.5 Nitrate',
                 'ug m-3', 'PM25', 
                 'ANO3',
@@ -793,13 +801,21 @@ CMPST =
                 'ug m-3', 'PM25', 
                 'AAL',
 
+'PM25_BR'     , 'PM2.5 Bromine',
+                'ug m-3', 'PM25', 
+                'ABR',
+
+'PM25_HMS'    , 'PM2.5 Hydroxymethanesulfonate',
+                'ug m-3', 'PM25', 
+                'AHMS',
+
 'PM25_RCSOIL' ,'PM2.5 Reconstructed Soil <2.5 um (Malm et al., 1994; Eqn 5)',
                 'ug m-3', 'PM25', 
                 'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
 
 'PM25_OTHWNC'  ,'PM2.5 Unspeciated Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM25', 
-                'PM25 - PM25_SO4 - PM25_HMS - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_OC - PM25_RCSOIL',
+                'PM25 - PM25_SO4 - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_HMS - PM25_BR - PM25_OC - PM25_RCSOIL',
 
 'PM25_UNSPCRS', 'PM2.5 Unspeciated Coarse Mass',
                 'ug m-3', 'PM25', 
