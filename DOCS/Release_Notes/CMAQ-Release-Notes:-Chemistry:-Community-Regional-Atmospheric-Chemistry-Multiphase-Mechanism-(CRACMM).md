@@ -113,6 +113,7 @@ The update supports risk assessments to human health from air emissions and seco
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1279](https://github.com/USEPA/CMAQ/commit/d8707a4fa10a8f23ad6b99453fbcf1bdb9df51dd) | [PR#1279](https://github.com/USEPA/CMAQ_Dev/pull/1279)  |
+|[Merge for PR#1346](https://github.com/USEPA/CMAQ/commit/0134aa61b8065f7a72ac1a609cb4c94da599d3a8) | [PR#1346](https://github.com/USEPA/CMAQ_Dev/pull/1346)  |
 
 
 
