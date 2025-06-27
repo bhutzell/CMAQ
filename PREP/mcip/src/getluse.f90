@@ -464,6 +464,8 @@ SUBROUTINE getluse
       ENDDO
     ENDDO
 
+  ENDIF
+
 !-------------------------------------------------------------------------------
 ! Fill percentage of urban area (PURB) based on amount of land in grid cell.
 ! When urban canopy model is used in WRF, use fraction of urban area in
