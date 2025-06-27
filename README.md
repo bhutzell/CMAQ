@@ -3,48 +3,56 @@ CMAQv6.0 ALPHA
 
 US EPA Community Multiscale Air Quality Model (CMAQ) Website: https://www.epa.gov/cmaq
 
-CMAQ is an open-source development project of the U.S. EPA that consists of a suite of programs for conducting air quality model simulations. CMAQ is supported by the CMAS Center: http://www.cmascenter.org
+CMAQ is an open-source development project of the U.S. EPA that consists of a suite of programs for conducting air quality model simulations. CMAQ combines emerging knowledge in atmospheric science and air quality modeling with advances in computational techniques in an open-source framework to deliver scientifically sound estimates of ozone, particulates and toxics in the air we breathe, as well as deposition of pollutants such as acids and nutrients to our land and water.
 
-CMAQ combines current knowledge in atmospheric science and air quality modeling with multi-processor computing techniques in an open-source framework to deliver scientifically sound estimates of ozone, particulates and toxics in the air we breathe, as well as deposition of pollutants such as acids and nutrients to our land and water.
-
+CMAQ is supported by the CMAS Center: http://www.cmascenter.org 
 
 ## CMAQ version 6.0 Alpha Overview:
 
 The science updates and new features in the alpha version (v6.0a1) are documented in the [CMAQv6.0alpha Release Notes](DOCS/Release_Notes/README.md) and summarized in the **[Release FAQ](DOCS/Release_FAQ/CMAQv6.0-FAQ.md)**.
 
-The official release of CMAQv6.0 is targeted for fall 2026, pending the availability of necessary resources. This pre-release version has gone through preliminary testing on multiple spatial domains however aspects of the system remain uncharacterized. Users assume the risk of unforeseen or undocumented impacts of code changes that have been incorporated since the CMAQv5.5 public release.
+The official release of CMAQv6.0 is targeted for fall 2026, pending the availability of necessary resources. This pre-release version has been preliminarily tested on multiple spatial domains – however aspects of the system remain uncharacterized. Users assume the risk of unforeseen or undocumented impacts of code improvements that have been incorporated since the CMAQv5.5 public release.
 
 This CMAQv6.0 alpha release allows community members:
 
 * a preview of science and feature updates developed for the CMAQv6.0 release.
 * an opportunity to help the community by testing, troubleshooting, and debugging this version.
 
+
 ## New features in CMAQ version 6.0 include:
-* Gas, Aqueous, & Aerosol Chemistry
-  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 which adds chlorine chemistry, heterogeneous sulfur chemistry, and particle nitrate (pNO3) photolysis as well as other updates
-  * CRACMM3M with detailed halogen chemistry to improve the representation of gas-phase and aerosol chemistry in marine environments.
-  * CRACMM3HAPS with additional gas and particle Hazardous Air Pollutants.
-  *	Henry’s law rate constant updates
-  * Photolysis rate constant updates 
-* Transport Processes & Land Surface Exchange 
-  * Changes to runtime minimum eddy diffusivity option (KZMIN) 
-* Emissions
-  * Corrections to estimation of marine-gas halogen emissions 
-  * Corrections to estimation of windblown dust emissions for NLCD40 land-use specification 
-  * Release of MetEmis Module to dynamically calculate meteorology-induced on-road mobile emissions within CMAQ (**community contribution based on [Baek et al., 2023](https://doi.org/10.5194/gmd-16-4659-2023))
-  * New lightning options 
-* Instrumented Models (CMAQ-ISAM & CMAQ-DDM3D)
-  * Introducing CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M 
-  * Additional development to improve robustness for all chemical mechanisms 
-  * Fixes to DDM3D instabilities relating to propagating sensitivity fields through heterogenous chemistry due to inconsistent unit conversions 
-* Diagnostic Model Output
-  * Upgrade from ELMOv1.0 to ELMOv2.1 – added new capabilities for model output 
-  * Updates to photolysis diagnostic outputs (CCTM_PHOTDIAG1 & CCTM_PHOTDIAG3 ) 
-* Coupled model system
-  * First public release of unified coupler to couple WRF-CMAQ and MPAS-CMAQ in a consistent “one-code” framework 
-* Structural Improvements 
-  * Moved CONST.EXT (defines define model fundamental physical, chemical, and mathematical constants) to Fortran module and updated constants to latest 2019 NIST and SI standards 
-  * Rewrote HLCONST to use integer tokens instead of strings reducing model runtime by approximately 8% 
+* **CRACMM3: new state-of-the-science chemical mechanisms**
+  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 adds chlorine chemistry, heterogeneous sulfur chemistry, and particle nitrate (pNO3) photolysis. In addition, it updates reactions for several systems including radical cycling and photolytic loss for semivolatile organic compounds. 
+  * (Sentence about impact of updates in first bullet. Maybe something like, “These and other features improve...” Maybe something highlighting formaldehyde, source apportionment, model sensitivity, model responsiveness in the context of multi-decade emission decreases, etc.) *CRACMM3 is now CMAQ’s default chemical mechanism.* 
+  * CRACMM3M offers detailed halogen chemistry to improve the representation of gas-phase and aerosol chemistry in marine environments.
+CRACMM3HAPS provides additional gas and particle Hazardous Air Pollutants.
+
+* **Major advancements in windblow dust estimates**
+  * Dramatic improvement of windblown dust emissions for NLCD40 land-use specification address high bias in dust estimates from earlier CMAQ versions
+  * New satellite-based global vegetation dataset accounts for the effect of previously underestimated brown vegetation and further improves dust estimates for many regions in the US and Northern Hemisphere.
+  * These improvements apply to both the U.S. and hemispheric scale simulations.
+  * The CMAQ Team now recommends activating wind-blown dust predictions for ALL applications!
+
+* **Improvements to source apportionment tools, CMAQ-ISAM and CMAQ-DDM3D** 
+  * Tagged source apportionment modeling via CMAQ-ISAM is now compatible with the most up-to-date chemistry CRACMM2, CRACMM3, CRACMM3M, & CRACMM3HAPS
+  * Sensitivity-based source apportionment via DDM3D is now more robust after instabilities from heterogenous chemistry have been resolved.
+
+* **New customization options and simplified user experience.**
+  * The Explicit and Lumped air quality Model Output module (ELMO) version 2 offers:
+    * expanded features for gas and deposition species. ELMOv1 focused on support for aerosol species.
+    * full flexibility for defining aggregates (e.g., VOC, NOY, NOz, etc.) and assigning them to output files.
+    * new chemical and meteorological diagnostic variables available for output. Tutorials are provided to support users in adding custom variables themselves.
+    * automatic logging of the composition of aggregate output variables like PM2.5, fine-mode organic aerosol (PMF_OA), total Nitrogen deposition, etc.
+    * new support for source apportionment tools, CMAQ-ISAM and CMAQ-DDM3D. For example, source-resolved PM2.5 and NOx may now be output directly.  Users no longer have to prescribe manually how to sum source-resolved species together.
+  * Consolidated list of chemical mechanisms, highlighting the completion of CRACMM development milestones. See https://www.epa.gov/cmaq/cracmm for more details.
+  * Two dry deposition modules, STAGE and M3DRY, are now both built in model executables and may be selected at run-time.
+  * Direct user specification of inorganic aerosol mass transfer is now possible! Previously, CMAQ only supported hybrid mass transfer (dynamic for coarse, equilibrium for fine). Now users can assess trade-offs by forcing all modes to dynamic or equilibrium and compare to the default approach.
+
+* **Improved methods for land-surface impacts on deposition, emissions, and dilution** 
+  *	the resistance to dry deposition of volatile carbon-containing compounds has been increased consistent with their vapor-pressures. This increases VOC and CO concentrations across model applications.
+  * the new Soil-Atmosphere Gaseous Emissions (SAGE) module improves soil NO and HONO emissions with a simple, meteorologically dependent approach.
+  * boundary-layer mixing dynamics in stable conditions have been made consistent with upstream meteorological models
+  * Enhanced options for online coupling of CMAQ chemistry to meteorological modelsFirst public release of a unified coupler to support WRF-CMAQ and MPAS-CMAQ in a harmonized framework
+  * (Impact statement about the coupled model platforms) 
 
 ## Getting the CMAQ Repository
 This CMAQ Git archive is organized with each version stored as a branch on the main USEPA/CMAQ repository. The most recently released official version of the model will always be on the branch called 'main'. 
