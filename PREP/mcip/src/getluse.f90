@@ -457,7 +457,7 @@ SUBROUTINE getluse
 
         ! Update the dominant land use category.
 
-        IF ( xdluse(col,row) >= lczst .AND xdluse(col,row) <= nummetlu ) THEN
+        IF ( xdluse(col,row) >= lczst .AND. xdluse(col,row) <= nummetlu ) THEN
           xdluse(col,row) = met_lu_urban
         ENDIF
 

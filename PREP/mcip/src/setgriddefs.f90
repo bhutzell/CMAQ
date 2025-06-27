@@ -788,7 +788,7 @@ SUBROUTINE setgriddefs
   ENDIF
   WRITE (*,f6180) 'HYBRID VERTICAL COORDINATE', TRIM(yesno)
 
-  IF ( TRIM(xlusrc) == 'USGS_LCZ' .OR. TRIM(xlusrc) == 'MODIS_LCZ' )
+  IF ( TRIM(xlusrc) == 'USGS_LCZ' .OR. TRIM(xlusrc) == 'MODIS_LCZ' ) THEN
     WRITE (*, f6190)
   ENDIF
 

@@ -46,8 +46,8 @@ SUBROUTINE xy2ll_merc (xx, yy, lambda0, phi, lambda)
   REAL(8)                      :: piover2    ! pi/2
   REAL(8)                      :: piover4    ! pi/4
   REAL(8)                      :: rad2deg
-  REAL(8)        INTENT(IN)    :: xx         ! X-coordinate from origin
-  REAL(8)        INTENT(IN)    :: yy         ! Y-coordinate from origin
+  REAL(8),       INTENT(IN)    :: xx         ! X-coordinate from origin
+  REAL(8),       INTENT(IN)    :: yy         ! Y-coordinate from origin
 
 !-------------------------------------------------------------------------------
 ! Compute constants.
