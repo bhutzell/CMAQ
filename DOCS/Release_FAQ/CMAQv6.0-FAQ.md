@@ -61,7 +61,7 @@ CMAQv6.0alpha includes many scientific enhancements and new features that we are
 
 #### Post-processors
 
-* CMAQv6.0alpha introduces expanded functionality of the CALC_TMETRIC tool. These updates improve efficiency when processing large data sets and provide the ability to produce additional metrics of interest to users (i.e., min/max over a selected period, etc.). 
+* CMAQv6.0alpha introduces expanded functionality of the CALC_TMETRIC tool. These updates improve efficiency when processing large data sets and provide the ability to produce additional metrics of interest to users (i.e., min/max over a selected period, etc.) ([Release Note](../Release_Notes/CMAQ-Release-Notes:-Postprocessors.md#expand-functionality-of-calc_tmetric)). 
 
 <a id=update_v55_v60b></a>
 ## What do I need to do to update from v5.5 to v6.0alpha?
