@@ -13,12 +13,11 @@
 
 <a id=what_alpha></a>
 ## What is an alpha version?
-We are making this early version of the code available for testing, evaluation, and demonstration purposes before the official, general release. It is also intended to facilitate community contributions. This alpha version may be unstable, contain bugs, and may not function in the same way that it will in the final release. 
+We are making this early version of the code available for testing, evaluation, and demonstration purposes before the official, general release. We also intend this version to facilitate community contributions. While this alpha version has undergone preliminary testing, it may contain bugs and may not function in the same way that it will in the final release. 
+
 <a id=update_v55_v60b></a>
 ## Do I need to update from v5.5 to v6.0alpha?
-No, CMAQv6.0alpha is not intended as a replacement for CMAQv5.5.
-
-CMAQv6.0alpha includes many scientific enhancements and new features that we are making available for testing, evaluation, and demonstration purposes. See the CMAQ Release Notes for a complete description of each change.   
+CMAQv6.0alpha is not intended as an immediate replacement for CMAQv5.5. However, CMAQv6.0alpha does contain advances in both scientific and user-support algorithms.
 
 #### Instrumented Models (CMAQ-ISAM, CMAQ-DDM3D)
 * CMAQv6.0alpha introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as well as several improvements that target CMAQ-ISAM robustness for all chemical mechanisms. Please see the [ISAM release notes](../Release_Notes/CMAQ-Release-Notes%3A-Instrumented-Models%3A-CMAQ-ISAM.md).
@@ -26,7 +25,7 @@ CMAQv6.0alpha includes many scientific enhancements and new features that we are
 * CMAQv6.0alpha fixes DDM3D instability in sensitivity fields after hetereogenous chemistry due to inconsistent unit conversions. Please see the [DDM3D release note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md).
 
 #### Chemistry
-* CMAQv6.0alpha introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates are primarily intended to improve the representation of gas-phase and aerosol chemistry in marine environments. In addition to the base CRACMM3 mechanism,  CMAQv6.0alpha includes CRACMM3M, with extended marine chemistry, and CRACMM3HAPS which includes gas chemistry for additional Hazardous Air Pollutants.  If you are interested in learning more, please see the [CRACMM3 release notes](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3).
+* CMAQv6.0alpha introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates improve the representation of gas-phase and aerosol chemistry in multiple environments. In addition to the base CRACMM3 mechanism, CMAQv6.0alpha includes CRACMM3M, with extended marine chemistry, and CRACMM3HAPS which includes additional Hazardous Air Pollutants.  If you are interested in learning more, please see the [CRACMM3 release notes](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3).
 
 * A bug fix to the cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the model species styrene, a hazardous air pollutant. No other model species are impacted. See the [release note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Carbon-Bond-6-Mechanism-(CB6)-with-Hazardous-Air-Pollutants.md#correct-loss-of-reactive-tracer-styrene-from-ozone-reaction) for additional information.
   
@@ -65,23 +64,22 @@ CMAQv6.0alpha includes many scientific enhancements and new features that we are
 
 <a id=update_v55_v60b></a>
 ## What do I need to do to update from v5.5 to v6.0alpha?
-* If you have already successfully migrated to v5.5, you will not need any additional input to run with the analogous options in v6.0. However, users should note that the CCTM runscripts have changed, so older user-created runscripts may need to be adapted to be compatible with v6.0. Additionally, if you are trying to run with the newest released version of CRACMM in v6.0, users will have to generate or map existing emissions to CRACMMv3.0. For additional information on emissions for CRACMMv3.0 please see the CRACMM GitHub page.
+* If you have already successfully migrated to v5.5, you will not need any additional input to run with the analogous options in v6.0. However, users should note that the CCTM runscripts have changed, so older user-created runscripts  may need to be adapted to be compatible with v6.0. Additionally, if you are trying to run with the newest released version of CRACMM in v6.0, users will have to generate or map existing emissions to CRACMMv3.0. For additional information on emissions for CRACMM please see the CRACMM GitHub page ( https://usepa.github.io/CRACMM/).
   
 <a id=diff_v55_v60b_input_files></a>
 ### What differences should I expect in the required model input files?
-* If you have already successfully migrated to v5.5, you will not need any additional input files to run with the analogous options in v6.0 alpha.  CRACMM2 emissions inputs can be used to run CMAQv6.0 alpha with the new CRACMM3 mechanism without any modifications. 
+* If you have already migrated to v5.5, you will not need any additional input files to run with the analogous options in v6.0 alpha.  CRACMM2 emission inputs can be used to run CMAQv6.0 alpha with the new CRACMM3 mechanism without any modifications. 
 
 * CRACMM1 emissions inputs can be mapped to CRACMM2 species with minor adjustments following this guidance: https://usepa.github.io/CRACMM/emissions/README.html
 
+* Users should always check the main log file and at least one processor log file for any new simulation to verify emissions were properly configured for the simulation.
+
+
 <a id=diff_v55_v60b_output_files></a>
 ### What differences should I expect in my model output files?
+* CMAQv6.0alpha updates to ELMOv2 replace ELMOv1.0 diagnostic output files. The CCTM defaults now produce the CCTM_ELMO1 which supersedes older CCTM_ELMO files while adding additional gas and particle phase diagnostic aggregates not available in ELMOv1.0. ELMOv2.1 also produces a CCTM_ELMO2_DEP file which includes gas and particle phase dry and wet deposition hourly aggregates.
+  
 * CMAQv6.0alpha updates two of the three photolysis diagnostic files (CCTM_PHOTDIAG1 and CCTM_PHOTDIAG3). The CCTM_PHOTDIAG1 file remains largely unchanged, with the only changes being in the diagnostic variables: AOD_W550_ANGST (Aerosol Optical Depth at 550 nm based on an Angstrom Interpolation) and AAOD_W550_ANGST (Aerosol Absorption Optical Depth at 550 nm based on an Angstrom Interpolation). The updates now enable calculation of AOD_550 values when the sun is below the horizon. The CCTM_PHOTDIAG3 file changed in three different ways. (1) The variable representing total extinction, the sum of absorption and scattering at various wavelengths from gas, aerosols and clouds, is no longer reported; this variable is now replaced by the cloud extinction; the total extinction can be computed manually as the sum of gas, aerosol and cloud extinction. (2) The photolysis diagnostic variable names "EXT_AERO_W" are changed to "AERO_EXT_W", making the naming convention consistent with how the gas is reported. (3)  The photolysis diagnostics for AOD_550 and aerosol asymmetry and extinction are now available at all simulation hours, independent of the position of the sun.  ([Release Note #1](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Photolysis.md#remove-uninitialized-variable-and-correct-a-diagnostic-in-cctms-inline-module-for-photolysis-frequencies),  [Release Note #2](../Release_Notes/CMAQ-Release-Notes:-Photolysis.md#remove-uninitialized-variable-and-correct-a-diagnostic-in-cctms-inline-module-for-photolysis-frequencies))
-
-
-
-* CMAQv6.0alpha updates to ELMO replace ELMOv1.0 diagnostic output files. The CCTM defaults now produce the CCTM_ELMO1 which supersedes older CCTM_ELMO files while adding additional gas and particle phase diagnostic aggregates not available in ELMOv1.0. ELMOv2.1 also produces a CCTM_ELMO2_DEP file which includes gas and particle phase dry and wet deposition hourly aggregates. ([Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#elmo-version-21))
- 
-
   
 <a id=data_and_docs></a>
 ## Are there new benchmark data and documentation updates?
@@ -93,7 +91,7 @@ CMAQv6.0alpha includes many scientific enhancements and new features that we are
 
 <a id=how_to_cite></a>
 ## How to Cite CMAQ
-Please see our 'How to Cite CMAQ' page if you are interested in referencing one of our released model versions, scientific algorithms, or model output in your own publication: https://www.epa.gov/cmaq/how-cite-cmaq
+Please see our 'How to Cite CMAQ' page if you are interested in referencing one of our released model versions, scientific algorithms, or model output in your own publication: https://www.epa.gov/cmaq/how-cite-cmaq. We recommend you cite both the code (using a zenodo doi) for transparency in model version and the peer-reviewed literature supporting the updates (journal article(s)) to credit the scientific work relevant to your simulation.
 
 <a id=additional_faq></a>
 ## Additional FAQ
