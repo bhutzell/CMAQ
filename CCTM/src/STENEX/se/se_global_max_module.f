@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/STENEX/src/se_snl/se_global_max_module.f,v 1.2 2006/02/15 14:41:56 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C --------------------------------------------------------------------------
 C Purpose:
 C
@@ -47,14 +41,12 @@ C
 C   max   -- maximum value among all processors
 C   error -- error code of mpi call
 C
-C Include Files:
-C
-C   mpif.h
 C -----------------------------------------------------------------------------
 
         module se_global_max_module
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
@@ -71,8 +63,6 @@ C -----------------------------------------------------------------------------
 
         integer :: se_global_imax_result
         integer, intent(in) :: var
-
-        include "mpif.h"
 
         integer :: max, error
 
@@ -93,8 +83,6 @@ C -----------------------------------------------------------------------------
 
         real :: se_global_rmax_result
         real, intent(in) :: var
-
-        include "mpif.h"
 
         real :: max
         integer :: error

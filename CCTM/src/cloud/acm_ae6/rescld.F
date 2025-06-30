@@ -233,7 +233,7 @@ C...........External Functions:
            REAL,    INTENT( IN )    :: POLC ( : )
            REAL,    INTENT( INOUT ) :: REMOVAC
            REAL,    INTENT( INOUT ) :: CEND( : ), REMOV( : )
-           REAL,    INTENT( IN )    :: ALFA0, ALFA2, ALFA3, COSZ	
+           REAL,    INTENT( IN )    :: ALFA0, ALFA2, ALFA3, COSZ
         END SUBROUTINE AQ_MAP
       END INTERFACE
 C-----------------------------------------------------------------------

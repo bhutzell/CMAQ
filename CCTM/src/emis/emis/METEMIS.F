@@ -297,7 +297,7 @@
                FIRSTIME = .FALSE.
             END IF
 
-            WRITE( MESG, '(A,I8)' ),
+            WRITE( MESG, '(A,I8)' )
      &         '     Processing Met-modulated '
      &          //'emissions table for date:', JDATE
             CALL LOG_MESSAGE( LOGDEV, MESG )

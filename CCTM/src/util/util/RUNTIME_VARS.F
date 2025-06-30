@@ -268,7 +268,7 @@
       LOGICAL :: EMIS_SYM_DATE = .FALSE.  ! Overrider CMAQ not to check
                                           ! if the dates on the emissions file match that of 
                                           ! the interal model (representative day case)
-      CHARACTER(  16 ), SAVE, ALLOCATABLE :: PLAY_BASE( : ) ! Use for Plume Rise Calculation
+      CHARACTER(  16 ), ALLOCATABLE :: PLAY_BASE( : ) ! Use for Plume Rise Calculation
 
       LOGICAL :: USE_MARINE_GAS_EMISSION = .FALSE.
 
@@ -332,13 +332,14 @@
       USE M3UTILIO
 #endif
 
+#ifdef parallel
+      USE MPI
+#endif
+
       IMPLICIT NONE                         
 
       INCLUDE SUBST_FILES_ID             ! file name parameters
 
-#ifdef parallel      
-      include 'mpif.h'
-#endif
  
       INTEGER, INTENT( In )  :: JDATE       
       INTEGER, INTENT( In )  :: JTIME  
@@ -382,8 +383,8 @@
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_HEADING( OUTDEV, "Environment Variable Report" )
          CALL LOG_SUBHEADING( OUTDEV, "Grid and High-Level Model Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+         WRITE( OUTDEV, '(6x,A)' ) '  ---Env Variable---  |  ---Value---'
+         WRITE( OUTDEV, '(6x,A)' ) REPEAT( '-',80 )
       END IF
 
        ! Get Logfile Directory
@@ -453,8 +454,8 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Multiprocess control, output and error checking" )
-         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+         WRITE( OUTDEV, '(6x,A)' ) '  ---Env Variable---  |  ---Value---'
+         WRITE( OUTDEV, '(6x,A)' ) REPEAT( '-',80 )
       END IF
 
       ! PRINT_PROC_TIME
@@ -628,8 +629,8 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Chemistry and Photolysis" )
-         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+         WRITE( OUTDEV, '(6x,A)' ) '  ---Env Variable---  |  ---Value---'
+         WRITE( OUTDEV, '(6x,A)' ) REPEAT( '-',80 )
       END IF
 
       ! Get Filename for Chemical Mechanism
@@ -691,8 +692,8 @@
       
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Aerosols" )
-         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+         WRITE( OUTDEV, '(6x,A)' ) '  ---Env Variable---  |  ---Value---'
+         WRITE( OUTDEV, '(6x,A)' ) REPEAT( '-',80 )
       END IF
 
       ! Get flag for setting aerosol mass transfer approach
@@ -725,8 +726,8 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Cloud Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+         WRITE( OUTDEV, '(6x,A)' ) '  ---Env Variable---  |  ---Value---'
+         WRITE( OUTDEV, '(6x,A)' ) REPEAT( '-',80 )
       END IF
 
       ! FLag for outputting cloud diagnostics
@@ -738,8 +739,8 @@
  
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Air-Surface Exchange Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+         WRITE( OUTDEV, '(6x,A)' ) '  ---Env Variable---  |  ---Value---'
+         WRITE( OUTDEV, '(6x,A)' ) REPEAT( '-',80 )
       END IF
 
       ! Check if using PX version of MCIP
@@ -795,8 +796,8 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Transport Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+         WRITE( OUTDEV, '(6x,A)' ) '  ---Env Variable---  |  ---Value---'
+         WRITE( OUTDEV, '(6x,A)' ) REPEAT( '-',80 )
       END IF
 
       ! Flag for writing vertical diffusion diagnostic file and possibly gravitational settling diagnostic file
@@ -830,8 +831,8 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Emissions Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+         WRITE( OUTDEV, '(6x,A)' ) '  ---Env Variable---  |  ---Value---'
+         WRITE( OUTDEV, '(6x,A)' ) REPEAT( '-',80 )
       END IF
 
       ! Get Name of Emission Control File
@@ -959,8 +960,8 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Process Analysis Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+         WRITE( OUTDEV, '(6x,A)' ) '  ---Env Variable---  |  ---Value---'
+         WRITE( OUTDEV, '(6x,A)' ) REPEAT( '-',80 )
       END IF
 
       ! Flag for Using Process Analysis
@@ -1118,10 +1119,10 @@
       WRITE( FMT2,'("(", I0, "x,A,)")' ) LOG_MAJOR_TAB
 
       LDASH = 2*8 + LEN_TRIM( CHEAD )
-      WRITE( FUNIT, FMT2 ), REPEAT( '=', LDASH )
-      WRITE( FUNIT, FMT ),
+      WRITE( FUNIT, FMT2 ) REPEAT( '=', LDASH )
+      WRITE( FUNIT, FMT )
      &       '|>---   ',TRIM( CHEAD ),'   ---<|'
-      WRITE( FUNIT, FMT2 ), REPEAT( '=', LDASH )
+      WRITE( FUNIT, FMT2 ) REPEAT( '=', LDASH )
 
       END SUBROUTINE LOG_HEADING
       
@@ -1144,7 +1145,7 @@
 
       ! Write the sub-heading to the log file
       WRITE( FMT, '("(/,", I0, "x,A,A,A)")' ) LOG_MAJOR_TAB
-      WRITE( FUNIT, FMT ),'|> ',TRIM( CHEAD ),':'
+      WRITE( FUNIT, FMT ) '|> ',TRIM( CHEAD ), ':'
       LDASH = 2*3 - 1 + LEN_TRIM( CHEAD )
 
       WRITE( FMT, '("(", I0, "x,A,A)")' ) LOG_MAJOR_TAB
@@ -1193,7 +1194,7 @@
          CTEMP = CMSG( 1:LAST_SPACE-1 )
 
          WRITE( FMT, '("(", I0, "x,A)")' ) NTAB
-         WRITE( FUNIT, FMT ), CTEMP
+         WRITE( FUNIT, FMT ) CTEMP
 
          CMSG = CMSG( LAST_SPACE+1:LEN( CMSG ) )
          MSG_SIZE = LEN_TRIM( CMSG )
@@ -1204,7 +1205,7 @@
 
       ! Write Last Line
       WRITE( FMT, '("(", I0, "x,A)")' ) NTAB
-      WRITE( FUNIT, FMT ), TRIM( CMSG )
+      WRITE( FUNIT, FMT ) TRIM( CMSG )
 
 
       END SUBROUTINE LOG_MESSAGE
@@ -1212,13 +1213,11 @@
       REAL( 8 ) FUNCTION SET_CPU_TIMING()
 
 ! Function set cpu time
-      
+#ifdef parallel
+      USE MPI 
+#endif
        IMPLICIT NONE
 
-#ifdef parallel
-      INCLUDE 'mpif.h'
-#endif
-      
  ! local:      
       REAL( 8 )  :: CPU_TIME_FINISH
 #ifndef parallel
@@ -1236,13 +1235,13 @@
 !.........................................................................
       SUBROUTINE TIMING_DELTA( CPU_TIME_START, CPU_TIME_DELTA )
       
-         IMPLICIT NONE
-
 #ifdef parallel
-      INCLUDE 'mpif.h'
+      USE MPI
 #endif
-        REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_START
-        REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_DELTA
+      IMPLICIT NONE
+
+      REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_START
+      REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_DELTA
       
  ! local:      
       REAL( 8 )  :: CPU_TIME_FINISH
@@ -1280,11 +1279,11 @@
 !  character string input for customizing that message. 
 !.........................................................................
  
+#ifdef parallel
+      USE MPI
+#endif
       IMPLICIT NONE
 
-#ifdef parallel
-      INCLUDE 'mpif.h'
-#endif
       REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_START
       INTEGER,   INTENT( IN   )  :: IMSG   ! What kind of checkpoint this is
       CHARACTER( * ), INTENT(IN), OPTIONAL :: CPROCIN
@@ -1321,24 +1320,24 @@
       SELECT CASE ( IMSG )
       CASE ( 1 )
           ! Write Out The Time to Complete Each Sub-Process
-          WRITE( XMSG, 1002 ),TRIM( CPROC ), CPU_TIME_FINISH-CPU_TIME_START
+          WRITE( XMSG, 1002 ) TRIM( CPROC ), CPU_TIME_FINISH-CPU_TIME_START
 1002      FORMAT ( 2x, A15, ' completed... ', F12.4, ' seconds' )
 
       CASE ( 2 ) 
           ! Write out the time to complete the entire master time step
-          WRITE( XMSG, '(7x,A16)' ),'Master Time Step'
+          WRITE( XMSG, '(7x,A16)' ) 'Master Time Step'
           CALL LOG_MESSAGE( LOGDEV, XMSG )
 #ifndef twoway
           IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
 #endif
-          WRITE( XMSG, '(7x,A24,F12.4,A8)' ),'Processing completed... ',
+          WRITE( XMSG, '(7x,A24,F12.4,A8)' ) 'Processing completed... ',
      &                     (CPU_TIME_FINISH-CPU_TIME_START),' seconds'
           CALL LOG_MESSAGE( LOGDEV, XMSG )
           WRITE( LOGDEV, * )
 
       CASE ( 3 ) 
           ! Write out the time to complete the output procedure
-          WRITE( XMSG, '(1x,A32,F10.4,A)' ), '=--> Data Output completed...   ',
+          WRITE( XMSG, '(1x,A32,F10.4,A)' ) '=--> Data Output completed...   ',
      &                     (CPU_TIME_FINISH-CPU_TIME_START),' seconds'
           CALL LOG_MESSAGE( LOGDEV, XMSG )
           WRITE( LOGDEV, * )

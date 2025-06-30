@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/STENEX/src/se_snl/se_init_module.F,v 1.1 2006/02/15 14:56:48 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C-----------------------------------------------------------------------
 
       module se_init_module
@@ -102,10 +96,9 @@ C-----------------------------------------------------------------------
         use se_bndy_copy_info_ext
 !       use se_ori_ext
         use se_internal_util_module
+        use mpi
 
         implicit none
-
-        include 'mpif.h'
 
         integer, intent( in ) :: numprocs, npdimi, npdimj
         integer, intent( in ) :: gl_ndimis, gl_ndimjs, gl_ndimks, gl_ndimls

@@ -1181,17 +1181,17 @@ C     These are arrays
          ! and for tundra [Jacob et al., 1992].  All surface resistance 
          ! components are normalized to a leaf area index of unity.
          !--------------------------------------------------------------
-	!Set biometype
+      !Set biometype
          
             K = LANDTYPE( C,R )
             
             ! Set second loop variable to K to allow snow/ice correction
-	     KK = K
+            KK = K
 
             ! If the surface is snow or ice, then set K=3
             IF ( SNOCOV(C,R) .EQ. 1 ) KK = 3
 
-		!USE new MODIS/KOPPEN Biometypes to read data
+            !USE new MODIS/KOPPEN Biometypes to read data
 
             ! Read the internal resistance RI (minimum stomatal resistance 
             ! for water vapor, per unit area of leaf) from the IRI array; 

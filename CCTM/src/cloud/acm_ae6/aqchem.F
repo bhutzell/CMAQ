@@ -445,7 +445,7 @@ C...for sulfur tracking
 
       REAL( 8 ) :: FE_SOL          ! Fractional Fe solubility, GS - July 1, 2011
       REAL( 8 ) :: MN_SOL          ! Fractional Mn solubility, GS - July 1, 2011
-					    
+
       REAL( 8 ) :: TRACI, POAI, PRII, SOAI
 
       REAL( 8 ), SAVE :: SOIL_FE_FAC  ! Fe molar fraction of ASOIL
@@ -940,7 +940,7 @@ C...   = Initial amount - amount deposited  (mol/liter)
         NUMCOR  = LOADING( LNUM,  ICOR ) - WETDEP( LNUMCORL  ) * XC1
 !       A       = 3.0D0 * FE
 !       B       = 2.0D0 * MN
-	
+
         TRACI = LOADING( LTRACER, IAIT ) - WETDEP( LTRACIL ) * XC1
         POAI = LOADING( LPOA, IAIT ) - WETDEP( LPOAIL ) * XC1
         PRII = LOADING( LPRI, IAIT ) - WETDEP( LPRIIL ) * XC1
@@ -1009,12 +1009,12 @@ C...don't allow aerosol concentrations to go below zero
         PRIM    = MAX( PRIM,    0.0D0 )
 !       PRIMCOR = MAX( PRIMCOR, 0.0D0 )
         NUMCOR  = MAX( NUMCOR,  0.0D0 )
-	
+
         TRACI    = MAX( TRACI,     0.0D0 )
         POAI     = MAX( POAI,     0.0D0 )
         PRII     = MAX( PRII,     0.0D0 )
         SOAI     = MAX( SOAI,     0.0D0 )
-	
+
         FE_OX = FE_III * FE_SOL * FE     ! GS 01July2011
         MN_OX = MN_II  * MN_SOL * MN     ! GS 01July2011
 
@@ -1645,7 +1645,7 @@ C...load the liquid concentration array with current values
         LIQUID( LSEASCL   ) = SEASCOR ! AE6 - SLN 16March2011
         LIQUID( LFEACCL   ) = FEACC   ! AE6 - SLN 22March2011
         LIQUID( LMNACCL   ) = MNACC   ! AE6 - SLN 22March2011
-	
+
         LIQUID( LTRACIL ) = TRACI
         LIQUID( LPOAIL ) = POAI
         LIQUID( LPRIIL ) = PRII

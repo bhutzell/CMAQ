@@ -349,7 +349,7 @@ C-----------------------------------------------------------------------
 
           end do
 
-          write( xmsg, '(A,I3)' ), 'Total number of aerosol species: ',nsp2
+          write( xmsg, '(A,I3)' ) 'Total number of aerosol species: ',nsp2
           Call log_message( LOGDEV, '' )
           Call log_message( LOGDEV, xmsg )
           Call log_message( LOGDEV, '' )

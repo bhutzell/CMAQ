@@ -2442,7 +2442,7 @@
           
            ! Check for Error in File Open Process
            IF ( IOST .NE. 0 ) THEN
-               WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
+               WRITE( XMSG, '(A,A,A)' ) 'ERROR: Could not read ',
      &                'CMAQ control namelist file: ',TRIM( CMAQ_CTRL )
                CALL M3EXIT( 'DESID_READ_NAMELIST',0,0,XMSG,1 )
            END IF
@@ -2451,7 +2451,7 @@
            REWIND( FUNIT )
            READ( NML = Budget_Options, UNIT = FUNIT, IOSTAT= IOST )
            IF ( IOST .EQ. -1 ) THEN
-               WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
+               WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" )
      &                'Note: The BudgetOptions section of the CMAQ Control File ',
      &                'is missing. Default values for this section will be ',
      &                'assumed.'
@@ -2503,7 +2503,7 @@
            
            ! Check for Error in File Open Process
            IF ( IOST .NE. 0 ) THEN
-               WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
+               WRITE( XMSG, '(A,A,A)' ) 'ERROR: Could not read ',
      &                'emissions control namelist file: ',TRIM( CMAQ_CHEM_CTRL )
                CALL M3EXIT( 'DESID_READ_NAMELIST',0,0,XMSG,1 )
            END IF
@@ -2590,7 +2590,7 @@
                IF( DESID_RULES_NML( IRULE )%OP .NE. 'a' .AND. DESID_RULES_NML( IRULE )%OP .NE. 'A' .AND.
      &              DESID_RULES_NML( IRULE )%OP .NE. 'o' .AND. DESID_RULES_NML( IRULE )%OP .NE. 'O'.AND.
      &              DESID_RULES_NML( IRULE )%OP .NE. 'm' .AND. DESID_RULES_NML( IRULE )%OP .NE. 'M' ) THEN
-                 WRITE( XMSG, '(A23,I4,A27,A3)'),'Emission Scaling Rule #',IRULE,
+                 WRITE( XMSG, '(A23,I4,A27,A3)') 'Emission Scaling Rule #',IRULE,
      &                ' has a bad operator value: ',DESID_RULES_NML(IRULE)%OP
                  call m3exit ( 'DESID_READ_NAMELIST', 0, 0, XMSG, 1 )
                END IF
@@ -2620,7 +2620,7 @@
 
          ! Check for Error in File Open Process
          IF ( IOST .NE. 0 ) THEN
-             WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
+             WRITE( XMSG, '(A,A,A)' ) 'ERROR: Could not read ',
      &              'emissions control namelist file: ',TRIM( CMAQ_CTRL )
              CALL M3EXIT( 'DESID_READ_NAMELIST',0,0,XMSG,1 )
          END IF
@@ -6131,7 +6131,7 @@ C Read the various categories of normalized emissions
 
           IF ( .NOT. OCEAN_CHEM ) THEN
 
-             WRITE( LOGDEV, '(/,5x,A,/,5x,A,/5x,A)' ), 
+             WRITE( LOGDEV, '(/,5x,A,/,5x,A,/5x,A)' ) 
      &              'CTM_OCEAN_CHEM set to FALSE. Open ocean and surf zone',
      &              'fractions will be set to 0. There will be no oceanic',
      &              'halogen-mediated loss of ozone, dms chemistry, or sea spray aerosol emissions.'
@@ -6149,8 +6149,9 @@ C Read the various categories of normalized emissions
                 XMSG = 'CTM_OCEAN_CHEM must be set to TRUE when using CRACMM3M mechanism' 
                 Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
              endif
-	     
+     
           ELSE
+
 
              IF ( .NOT. OPEN3( OCEAN_1, FSREAD3, PNAME ) ) THEN
                 XMSG = 'Could not open ' // OCEAN_1
