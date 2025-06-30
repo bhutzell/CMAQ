@@ -16,8 +16,9 @@
     setenv compilerVrsn $2
  else
     echo "usage: $0 <compiler>"
-    echo " where <compiler> is intel, pgi or gcc"
-    exit(2)
+    echo "using default compiler: intel"
+    setenv compiler intel 
+    setenv compilerVrsn Empty
  endif
 
 #> Source the config.cmaq file.csh to set the build environment
@@ -34,7 +35,7 @@
 
  set VRSN     = v55 
  set MECH     = cb6r5_ae7_aq 
-#set MECH     = saprc07tic_ae7i_aq 
+ #set MECH     = cracmm3
  set APPL     = ${VRSN}_${MECH}
  set EXEC     = JPROC_${APPL}_${compiler}${compilerVrsn}    #> executable name
  set CFG      = cfg.$EXEC                                   #> configuration file name
@@ -48,8 +49,8 @@
 
 #> JPROC run dates (produces one file per day)
 
- set STDATE   = 2018182         #> the beginning day for this run
- set ENDATE   = 2018182         #> the ending day
+ set STDATE   = 20180701  #> the beginning day for this run
+ set ENDATE   = 20180702  #> the ending day
 
 # =====================================================================
 #> Input/Output Directories
@@ -60,7 +61,7 @@
  set PROFpath   = $CMAQ_DATA # PROF input data
  set ETpath     = $CMAQ_DATA # ET input data
  set TOMSpath   = $CMAQ_DATA # TOMS input data
- set OUTDIR     = $BASE/jtable_${APPL}         # Output directory
+ set OUTDIR     = $BASE/jtable_${APPL}     # Output directory
 
 # =====================================================================
 #> Input Files
@@ -124,17 +125,30 @@
 
  unalias rm
  
- @ Date = $STDATE
- while ( $Date <= $ENDATE )         # Loop thru all the days to run
-    setenv JPROC_STDATE $Date
-    echo "   Running for $Date ..."
-    set JVfile = JTABLE_${Date}     # Daily output file name
+set TODAYG = ${STDATE}
+set TODAYJ = `date -ud "${STDATE}" +%Y%j` #> Convert YYYY-MM-DD to YYYYJJJ
+set START_DAY = ${TODAYJ}
+set STOP_DAY = `date -ud "${ENDATE}" +%Y%j` #> Convert YYYY-MM-DD to YYYYJJJ
+
+ while ( $TODAYJ <= $STOP_DAY )         # Loop thru all the days to run
+
+    setenv JPROC_STDATE $TODAYJ
+    echo "   Running for $TODAYJ ..."
+    set JVfile = JTABLE_${TODAYJ}     # Daily output file name
     setenv JVALUES $OUTDIR/$JVfile
     if ( -e $JVALUES ) rm $JVALUES  # Remove existing output file
 
 #   Executable call:
     time $BLD/$EXEC
-    @ Date = $Date + 1
+    if ( ${status} )then
+       echo "runtime ERROR executing ${BLD}/${EXEC}"
+    else
+       echo "created ${JVfile}"
+    endif
+
+    set TODAYG = `date -ud "${TODAYG}+1days" +%Y-%m-%d` #> Add a day for tomorrow
+    set TODAYJ = `date -ud "${TODAYG}" +%Y%j` #> Convert YYYY-MM-DD to YYYYJJJ
+
  end
 
  exit() 
