@@ -149,7 +149,7 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 #> Science Options
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
-setenv CTM_WB_DUST N         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
+setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
 setenv CTM_BROWN_VEG Y       #> when using CTM_WB_DUST, use non-photosynthetic (brown) vegetation input files to limit dust emissions [ default: N ]
 setenv CTM_LNO_ONLINE Y      #> turn on lightning NOx emissions [ default: N ]
                              #> alternatively LNOx emissions can also be read in as external emissions inputs,
@@ -178,6 +178,7 @@ setenv CTM_BIOGEMIS_MG N     #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N         #> turns on BDSNP soil NO emissions [ default: N ]
 setenv USE_SAGE_N Y          #> turns on EPA soil NO and HONO emissions [ default: N ]
 setenv USE_SAGE_N_EF N       #> Use BEIS input emission factor file for soil NO and HONO [ default: N ]
+                             #> Note, we do not have a SAGE EF file for this domain.
 
 setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affecting photolysis
                              #> frequencies ( 3 is the default value )
@@ -447,7 +448,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   if( $USE_SAGE_N == 'Y' ) then
      setenv SAGE_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
      if( $USE_SAGE_N_EF == 'Y') then
-        setenv SAGE_EF ${INPDIR}/surface/BEIS4_SAGE_beld6_norm_emis_12SE1.ncf
+        setenv SAGE_EF ${INPDIR}/land/BEIS4_SAGE_beld6_norm_emis_12SE1.ncf #this file does not exist
      endif
   endif
 
