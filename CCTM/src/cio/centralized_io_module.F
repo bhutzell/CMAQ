@@ -6150,7 +6150,8 @@ C Read the various categories of normalized emissions
                 Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
              endif
      
-          ELSEIF ( OCEAN_CHEM .AND. .NOT. USE_MARINE_GAS_EMISSION ) THEN
+          ELSE
+
 
              IF ( .NOT. OPEN3( OCEAN_1, FSREAD3, PNAME ) ) THEN
                 XMSG = 'Could not open ' // OCEAN_1
@@ -6178,38 +6179,7 @@ C Read the various categories of normalized emissions
                 WHERE ( ocean .LT. 0.001 ) ocean = 0.0  ! ensure values are nonnegative and greater than 0.001
                 WHERE ( szone .LT. 0.001 ) szone = 0.0  ! ensure values are nonnegative and greater than 0.001  
 
-                dmsl  = 0.0          
-                chlr  = 0.0
-             
-             ENDIF
-
-          ELSEIF ( OCEAN_CHEM .AND. USE_MARINE_GAS_EMISSION ) THEN
-
-             IF ( .NOT. OPEN3( OCEAN_1, FSREAD3, PNAME ) ) THEN
-                XMSG = 'Could not open ' // OCEAN_1
-                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-             ELSE 
-                n_opened_file = n_opened_file + 1
-
-                call subhfile ( OCEAN_1, gxoff, gyoff,
-     &                          startcol, endcol, startrow, endrow )
-
-                IF ( .NOT. XTRACT3( OCEAN_1, 'OPEN',
-     &                        1, 1, startrow, endrow, startcol, endcol,
-     &                        0, 0, ocean ) ) Then
-                   XMSG = 'Could not read OPEN from ' // OCEAN_1
-                   CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                END IF
-
-                IF ( .NOT. XTRACT3( OCEAN_1, 'SURF',
-     &                        1, 1, startrow, endrow, startcol, endcol,
-     &                        0, 0, szone ) ) Then
-                   XMSG = 'Could not interpolate SURF from ' // OCEAN_1
-                   CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                END IF                
-
-                WHERE ( ocean .LT. 0.001 ) ocean = 0.0  ! ensure values are nonnegative and greater than 0.001
-                WHERE ( szone .LT. 0.001 ) szone = 0.0  ! ensure values are nonnegative and greater than 0.001 
+                IF ( USE_MARINE_GAS_EMISSION ) THEN
      
                    If ( .Not. XTRACT3( OCEAN_1, 'CHLO',
      &                                 1, 1, startrow, endrow, startcol, endcol,
@@ -6225,9 +6195,12 @@ C Read the various categories of normalized emissions
                       Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
                    End If
 
+                ELSE
+                   dmsl  = 0.0          
+                   chlr  = 0.0
+                END IF
              END IF
           END IF
-
         end subroutine retrieve_ocean_data
 
 ! -------------------------------------------------------------------------
