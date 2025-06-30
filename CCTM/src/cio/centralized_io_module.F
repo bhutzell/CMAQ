@@ -7458,12 +7458,12 @@ C  REVISION  HISTORY: INTERP3 was created Prototype created by Jerry Gipson IN J
 C
 C***********************************************************************
       USE DRIVER_INPUTS
+      USE SCENE_DATA
 
       IMPLICIT NONE
 
 C...........   INCLUDES:
        INCLUDE SUBST_FILES_ID  ! I/O definitions and declarations 
-       INCLUDE 'SCENDATA.EXT'
 
 
 C...........   ARGUMENTS and their descriptions:
@@ -7522,7 +7522,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ENDIF
          
             IF ( VNAME .EQ. 'WBAR' ) THEN
-               BUFFER(L) = WBAR
+               BUFFER(L) = BXM_WBAR
                RETURN
             ENDIF
                                 
@@ -7532,17 +7532,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ENDIF
 
             IF ( VNAME .EQ. 'CLDT' ) THEN
-               BUFFER(L) = CLDT
+               BUFFER(L) = BXM_CLDT
                RETURN
             ENDIF
    
             IF ( VNAME .EQ. 'CLDB' ) THEN
-               BUFFER(L) = CLDB
+               BUFFER(L) = BXM_CLDB
                RETURN
             ENDIF
    
             IF ( VNAME .EQ. 'CFRAC' ) THEN
-               BUFFER(L) = CFRAC
+               BUFFER(L) = BXM_CFRAC
                RETURN
             ENDIF
       
@@ -7616,12 +7616,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  GRID_CRO_2D variables
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IF ( VNAME .EQ. 'LAT' ) THEN
-               BUFFER(L) = LAT
+               BUFFER(L) = BXM_LAT
                RETURN
             ENDIF
    
             IF ( VNAME .EQ. 'LON' ) THEN
-               BUFFER(L) = LON
+               BUFFER(L) = BXM_LON
                RETURN
             ENDIF
                                  
@@ -7641,7 +7641,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ENDIF
    
             IF ( VNAME .EQ. 'HT' ) THEN
-               BUFFER(L) = HT
+               BUFFER(L) = BXM_HT
                RETURN
             ENDIF
    
