@@ -2,6 +2,23 @@
 
 ### Runtime Deposition Options
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Diagnostic Update 
+**Release Version/Date**:  V6.0
+
+**Description and/or issue being addressed**:  
+Agricultural and biogenic NH3 emissions diagnostics added to the DRYDEP output file. Users will be able to get these diagnostic outputs when the NH3 bidirectional exchange flag is turned on in the run script for CONUS runs 2023 and later.
+
+**Significance and Impact**:  
+This only adds diagnostic data and does not change results or impact run time.
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1362](https://github.com/USEPA/CMAQ/commit/87987a81d6c9a3975082fd25268af6db3e23fc40) | [PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1362)  |
+| | [PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1366)  |
+
+### Runtime Deposition Options
+[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**:  Science Update, Documentation  
 **Release Version/Date**:  V6.0
 

@@ -1,5 +1,21 @@
 # Process Analysis and Sulfur Tracking Model (STM)
 
+## Fix to Process Analysis Tool
+[Ben Murphy](mailto:Murphy.Ben@epa.gov), U.S. Environmental Protection Agency  
+**Type of Update**: Bug Fix   
+**Release Version**: CMAQv6.0  
+
+**Description**: When the Budget Tool was integrated into the model:
+
+1. Emission rates were not correctly multiplied by DT, and
+2. the CSAV array was not initialized before VDIF was called if the Budget Tool was turned off.
+
+**Significance and Impact**:
+   
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1340](https://github.com/USEPA/CMAQ_Dev/commit/447d8f3a585b6e7f1839fbd26aaecc2c2e9ac524) | [PR#1340](https://github.com/USEPA/CMAQ_Dev/pull/1340)  |
+
 ## Fix to option for Sulfur Tracking Model
 [William T. Hutzell](mailto:Hutzell.Bill@epa.gov), U.S. Environmental Protection Agency  
 **Type of Update**: Bug Fix   

@@ -20,6 +20,34 @@ Was not tested given no access to a parallel file system, however, not anticipat
 |[Merge for PR#1352](https://github.com/USEPA/CMAQ/commit/68bb51c3e00840e5b7f93347d67c4f9c6d33eb1f) | [PR#1352](https://github.com/USEPA/CMAQ_Dev/pull/1352)  |   
 
 
+### Improvements to compiling with GCC 
+[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Compilation  
+**Release Version/Date**: CMAQv6.0
+
+**Description**:   
+Compiling the CCTM with gcc has always generated a daunting number of WARNING messages. There are so many that we have ignored them. This PR resolves many of those warnings, with the hope that developers or integrators might notice and address new ones that are created.
+
+The types of warnings that have been addressed are:
+1. no longer need "-std=legacy" workaround with GCC compiler.
+2. unnecessary commas preceding I/O lists in WRITE and READ statements
+3. unnecessary SAVE attributes in module variables (module variables are always saved, that's the point of putting them in a module) tab characters have been removed
+4. The IOAPI function SETENVVAR returns a logical rather than an integer. Code has been modified to use the logical rather than do an implicit conversion and ignoring the result.
+5. Parentheses are added when multiplying by a negative quantity, i.e., x * (-y)
+6. Having a shared do loop continuation statement is apparently a deleted feature. I removed one instance of this in the photolysis module, but there are many instances of this construct in ISORROPIA that I left alone.
+7. MEGAN include files have many species names longer than the declared length of 16. I deleted extra spaces to make them fit where possible, but left unchanged those where the string itself is longer than 16.
+
+**Significance and Impact**:   
+Beginning with version 10, the GCC compiler enforced stricter checking of the data types and ranks of arguments. Several CMAQ code files in the PARIO and STENEX modules had compilation errors involving their MPI routines. A workaround was added to the CCTM build so that the -std=legacy flag was included if the GCC compiler was being used; this turned these compilation errors into warnings. Upon investigation, it appears that the previous practice of using INCLUDE 'mpif.h' is now considered obsolete. Instead, one should use the MPI module. This allows the compiler to "see" the  proper interface blocks for all MPI routines, which can be used for several different data types and ranks (i.e., scalars and arrays). Otherwise the user needs to write their own interface  blocks, which is tricky and error-prone, or use the "legacy" flag. With the minor mods in this PR, the -std=legacy flag is no longer necessary, and no warnings are generated from these routines.
+Additionally, I removed the -DSUBST_MPI=$(BASE_INC)/mpif.h from bldmake. That extra indirection was never a good idea, and we mostly stopped using it several years ago. (per #1)        
+
+Generally, warnings should be addressed when possible. You never know when GCC might become even more militant and convert warnings to errors. (per #2-7)
+ 
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1357](https://github.com/USEPA/CMAQ/commit/bd7939748b87668227ebf0371c7e864a48182331) | [PR#1357](https://github.com/USEPA/CMAQ_Dev/pull/1357)  | 
+|[Merge for PR#1358](https://github.com/USEPA/CMAQ/commit/ce939e79d4cda7961a5813578ee7de784a00e0b9) | [PR#1358](https://github.com/USEPA/CMAQ_Dev/pull/1358)  |  
+
 ### Replace CONST.EXT include file with module and update constant values  
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Restructure   
