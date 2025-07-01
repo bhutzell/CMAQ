@@ -385,13 +385,13 @@ set make_options = "-j"                #> additional options for make command if
 #> then move the include files as well and direct the Makefile
 #> to the current directory.
  if ( $?CopySrc ) then
-    /bin/cp -fp ${ICL_PAR}/*   ${Bld}
-    /bin/cp -fp ${ICL_CONST}/* ${Bld}
-    /bin/cp -fp ${ICL_FILES}/* ${Bld}
-    /bin/cp -fp ${ICL_EMCTL}/* ${Bld}
-    #/bin/cp -fp ${ICL_PA}/*    ${Bld}
+    cp -fp ${ICL_PAR}/*   ${Bld}
+    cp -fp ${ICL_CONST}/* ${Bld}
+    cp -fp ${ICL_FILES}/* ${Bld}
+    cp -fp ${ICL_EMCTL}/* ${Bld}
+    #cp -fp ${ICL_PA}/*    ${Bld}
     if ( $?ParOpt ) then
-       /bin/cp -fp ${ICL_MPI}/mpif.h ${Bld}
+       cp -fp ${ICL_MPI}/mpif.h ${Bld}
     endif
 
     set ICL_PAR   = .
@@ -786,7 +786,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     ln -s Makefile.mpas_cmaq Makefile
  else if ( ! $?build_wrf_cmaq ) then
     mv Makefile Makefile.$compilerString
-    if ( -e Makefile.$compilerString && -e Makefile ) rm Makefile
+    if ( -e Makefile.$compilerString) rm Makefile
     ln -s Makefile.$compilerString Makefile
  endif
 
