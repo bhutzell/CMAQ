@@ -46,6 +46,7 @@ CMAQv6.0alpha is not intended as an immediate replacement for CMAQv5.5. However,
 * CMAQv6.0alpha introduces the MetEmis module to dynamically calculate meteorology-induced hourly gridded on-road mobile emissions within CMAQ, using simulated meteorology without any computational burden to the CMAQ modeling system. The impact is to improve the spatiotemporal representation of mobile emissions based on the simulated meteorology inputs when compared to the static scenario. For detailed information see Baek et al., 2023. ([Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Online-Met-Dependent-Emission-(MetEmis)-Module.md#implement-online-met-dependent-emission-module-metemis))
 
 #### Diagnostic Options
+
 * CMAQv6.0alpha introduces ELMO version 2.1 expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining custom aggregates of raw model species (e.g., NOY, NOz, etc.) and assigning them to output files. ([Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#elmo-version-2))
 
 * CMAQv6.0alpha revises model default from `Budget_Diag = .TRUE.` to `Budget_Diag = .FALSE.`. This change turns off the budget diagnostic tool reducing rutime by 10%. ([Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#changes-in-henrys-law-computation-and-budget-tool))
@@ -57,6 +58,7 @@ CMAQv6.0alpha is not intended as an immediate replacement for CMAQv5.5. However,
 
 #### On-line coupling of CMAQ with meteorological models
 * CMAQv6.0alpha introduces the unified coupler to couple WRF-CMAQ and MPAS-CMAQ in a consistent "one-code" framework. Previously, the WRF-CMAQ implementation was built using [I/O API buffered](https://www.cmascenter.org/ioapi/documentation/all_versions/html/BUFFERED.html#buf) files to transfer data from the two models during runtime. Users should note to implement such a system, a number of infrastructure changes were made. See the [WRF-CMAQ release note](../Release_Notes/CMAQ-Release-Notes:-WRF-CMAQ-Coupled-Model.md#wrf-cmaq-coupled-model).
+
 
 #### Post-processors
 

@@ -17,6 +17,23 @@ CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enab
 |[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269)  | 
 |[Merge for PR#1335](https://github.com/USEPA/CMAQ/commit/3ae05d2ac3094493a0c4748659fb8a2a4a08b60c) | [PR#1335](https://github.com/USEPA/CMAQ_Dev/pull/1335)  | 
 
+
+
+### Removal of Formaldehyde, Acetaldehyde, and Acrolein by monoatomic Cl 
+[Bill Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Science Update    
+**Release Version/Date**:  CMAQv6.0  
+
+**Description**:    
+This update removes losses processes of emission tracers: formaldehyde, acetaldehyde, and acrolein emissions tracers via a monatomic chlorine reaction. This update is for default versions of the CRACMM mechanism and the CRACMM3HAP mechanism. It should be noted that the cracmm3m mechanisms should have this loss process.
+
+**Significance and Impact**:   
+The update increases predictions of emission tracers: formaldehyde, acetaldehyde, and acrolein emissions in the CRACMM3HAP mechanism.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1346](https://github.com/USEPA/CMAQ/commit/0134aa61b8065f7a72ac1a609cb4c94da599d3a8)) | [PR#1346](https://github.com/USEPA/CMAQ_Dev/pull/1346)  |
+
 ### Heterogeneous chemistry of sulfur species
 [Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science update  
@@ -36,6 +53,7 @@ Simpson, W. R., Mao, J., Fochesatto, G. J., Law, K. S., DeCarlo,P. F., Schmale, 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1337](https://github.com/USEPA/CMAQ/commit/f0e2d42087e93ff5f37e79d987f5d23e46acac4e) | [PR#1337](https://github.com/USEPA/CMAQ_Dev/pull/1337)  |
+
 
 ### Halogen chemistry in CRACMM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
@@ -61,6 +79,7 @@ Update in MGEMIS.F has minimal impacts on ozone and sulfate over the contiguous 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1212](https://github.com/USEPA/CMAQ/commit/8d512cc361675212430b579adc766c010309bdd1) | [PR#1212](https://github.com/USEPA/CMAQ_Dev/pull/1212)  |
+
 
 ### Photolysis of aerosol nitrate in CRACMM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
@@ -176,7 +195,7 @@ In CRACMM3, photolysis of BALD (benzaldehyde), only proceeds with one pathway:
 
 The process is updated to include 2 different pathways as follows:
 <R027a> BALD  = BEN  + CO                        # 1.0/<BALD1_CALVERT11>;
-<R027b> BALD  = BENP + CO + HO2          # 1.0/<BALD2_CALVERT11>;
+<R027b> BALD  = BAL1 + CO + HO2                  # 1.0/<BALD2_CALVERT11>;
 
 The photolysis frequencies of BALD are also updated to use absorption cross-section and quantum yield data from Calvert et al. (2011).
 

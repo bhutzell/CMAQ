@@ -1,4 +1,24 @@
 # Structural Improvements
+### Enable parallel I/O for Lightning and ELMO files
+[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Fix/added feature  
+**Release Version/Date**: CMAQv6.0
+
+**Description**:   
+When using a parallel file system (e.g., Lustre), a code block is needed to ensure that the file is open on all processors. Otherwise, the model crashes.
+See this thread on the user forum. @dwongepa initially submitted PR #1350 to address this, but that was built on top of v5.5 code and it was easier to port the changes to this new PR.
+
+**Significance and Impact**:   
+Was not tested given no access to a parallel file system, however, not anticipated to change results
+
+**References**:   
+[CMAS Forum Post](https://forum.cmascenter.org/t/unable-to-write-to-aelmo-even-though-new-aelmo-file-successfully-created/5762/20)
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+| | [PR#1350](https://github.com/USEPA/CMAQ_Dev/pull/1350) | 
+|[Merge for PR#1352](https://github.com/USEPA/CMAQ/commit/68bb51c3e00840e5b7f93347d67c4f9c6d33eb1f) | [PR#1352](https://github.com/USEPA/CMAQ_Dev/pull/1352)  |   
+
 
 ### Improvements to compiling with GCC 
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
