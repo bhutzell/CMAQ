@@ -369,17 +369,13 @@ CMPST =
                 'ppmV', 'GAS', 
                 'NO + NO2', 
 
-'ISOPNS'      , 'Gas-Phase Isoprene Nitrates',
-                'ppmV', 'GAS',
-                'ISOPND + ISOPNB + NIT1 + NISOPOOH + MVKN + MACRN + ETHLN + RNO3I + PROPNN + 2.0*ISOPNN',
-
 'NTR'         , 'Gas-Phase Organic Nitrates', 
                 'ppmV', 'GAS', 
-                'ISOPNS + RNO3 + MTNO3', 
+                'RNO3', 
 
 'PANS'        , 'Peroxy-Acetyl Nitrates', 
                 'ppmV', 'GAS', 
-                'PAN + PAN2 + PBZN + MAPAN + IMAPAN', 
+                'PAN + PAN2 + PBZN + MAPAN', 
 
 'HNO3_UGM3'   , 'Gas-Phase Nitric Acid',
                 'ug m-3', 'GAS', 
@@ -518,7 +514,7 @@ CMPST =
 
 'PMF_CLDGLY'  , 'Fine-Mode SOA from glyoxal and methylglyoxal',
                 'ug m-3', 'FINE', 
-                'AORGC + AGLY',
+                'AORGC',
 
 'PMF_ISOPSOA' , 'Fine-Mode Isoprene SOA excl IEPOX SOA',
                 'ug m-3', 'FINE', 
@@ -528,13 +524,9 @@ CMPST =
                 'ug m-3', 'FINE', 
                 'AISO3',
 
-'PMF_MTNSOA'  , 'Fine-Mode Monoterpene Nitrate SOA',
-                'ug m-3', 'FINE', 
-                'AMTNO3 + AMTHYD',
-
 'PMF_MTSOA'   , 'Fine-Mode Monoterpene SOA excl Nitrates',
                 'ug m-3', 'FINE', 
-                'AMT1 + AMT2 + AMT3 + AMT4 + AMT5 + AMT6',
+                'ATRP1 + ATRP2',
 
 'PMF_TC'      , 'Total Carbon (OC + EC)',
                 'ug m-3', 'FINE', 
@@ -785,13 +777,11 @@ CMPST =
 !-- Nitrate --!
 'TSP_NO3_PPM' , 'Total Inorganic and Organic Particulate Nitrate',
                 'ppmV', 'TSP',
-                'ANO3 + AMTNO3 + AISOPNN',
-
-
+                'ANO3',
 
 'NOY'         , 'NOy Concentration', 
                 'ppmV', 'TSP', 
-                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + HNO4 + ANO3 + AMTNO3 + AISOPNN + PANS + NTR + CLNO + CLONO + CLNO2 + CLONO2', 
+                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + HNO4 + ANO3 + PANS + NTR + CLNO + CLONO + CLNO2 + CLONO2', 
              
 'PMF_TNO3'    , 'Fine-Mode Nitrate plus Nitric Acid', 
                 'ug m-3', 'FINE', 
@@ -809,9 +799,9 @@ CMPST =
                 'umol m-3', 'TSP', 
                 'ANO3 + HNO3',
 
-'TNO3TOT'     , 'Total Nitrate only including Organics', 
-                'umol m-3', 'TSP', 
-                'ANO3 + HNO3 + AMTNO3',
+!'TNO3TOT'     , 'Total Nitrate only including Organics', 
+!                'umol m-3', 'TSP', 
+!                'ANO3 + HNO3',
 
 
 !------------------------!
@@ -839,20 +829,20 @@ CMPST =
 !-- Organic Nitrates --!
 'DD_NTR'      , 'Dry Dep of Organic Nitrates', 
                 'kg ha-1', 'DEP', 
-                'DD_ISOPND + DD_ISOPNB + DD_NIT1 + DD_NISOPOOH + DD_MVKN + DD_MACRN + DD_ETHLN + DD_RNO3I + DD_PROPNN + DD_ISOPNN + DD_RNO3 + DD_MTNO3',
+                'DD_RNO3',
 
 'WD_NTR'      , 'Wet Dep of Organic Nitrates', 
                 'kg ha-1', 'DEP', 
-                'WD_ISOPND + WD_ISOPNB + WD_NIT1 + WD_NISOPOOH + WD_MVKN + WD_MACRN + WD_ETHLN + WD_RNO3I + WD_PROPNN + WD_ISOPNN + WD_RNO3 + WD_MTNO3',
+                'WD_RNO3',
 
 !-- PAN --!
 'DD_PANT'     , 'Dry Dep of Total PAN', 
                 'kg ha-1', 'DEP', 
-                'DD_PAN + DD_PAN2 + DD_PBZN + DD_MAPAN + DD_IMAPAN',
+                'DD_PAN + DD_PAN2 + DD_PBZN + DD_MAPAN',
 
 'WD_PANT'     , 'Wet Dep of Total PAN', 
                 'kg ha-1', 'DEP', 
-                'WD_PAN + WD_PAN2 + WD_PBZN + WD_MAPAN + WD_IMAPAN',
+                'WD_PAN + WD_PAN2 + WD_PBZN + WD_MAPAN',
 
 
 !-----------------------------!
@@ -897,15 +887,6 @@ CMPST =
 'WD_TSP_SO4'  , 'Wet Dep of Particulate Sulfate', 
                 'kg ha-1', 'DEP', 
                 'WD_ASO4',
-
-!-- Monoterpene Nitrate --!
-'DD_PMF_MTNO3', 'Dry Dep of Fine-Mode Monoterpene Nitrate', 
-                'kg ha-1', 'DEP_FINE', 
-                'DD_AMTNO3',
-
-'WD_TSP_MTNO3', 'Wet Dep of Particulate Monoterpene Nitrate', 
-                'kg ha-1', 'DEP', 
-                'WD_AMTNO3',
 
 !-- Elemental Carbon --!
 'DD_PMF_EC'   , 'Dry Dep of Fine-Mode Elemental Carbon', 
@@ -1159,11 +1140,11 @@ CMPST =
 
 'DD_OXN_ORGN' , 'Dry Dep of Oxidized Nitrogen from Organic Nitrate', 
                 'kgN ha-1', 'DEP', 
-                '0.10770*DD_NTR + 0.10770*DD_ISOPNN + DD_OXN_PANT', 
+                '0.10770*DD_NTR + DD_OXN_PANT', 
 
 'WD_OXN_ORGN' , 'Wet Dep of Oxidized Nitrogen from Organic Nitrate', 
                 'kgN ha-1', 'DEP', 
-                '0.10770*WD_NTR + 0.10770*WD_ISOPNN + WD_OXN_PANT', 
+                '0.10770*WD_NTR + WD_OXN_PANT', 
 
 'DD_OXN_OTHR' , 'Dry Dep of Oxidized Nitrogen from Other Components', 
                 'kgN ha-1', 'DEP', 

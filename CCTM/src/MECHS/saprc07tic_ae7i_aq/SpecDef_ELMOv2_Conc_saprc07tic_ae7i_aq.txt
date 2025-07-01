@@ -27,10 +27,7 @@
 ! model. If you are processing WRF-CMAQ results, a different Species Definition
 ! file is required.
 
-/ File [1]: CMAQ conc/aconc file
-/ File [2]: METCRO3D file
-/ File [3]: ELMO/AELMO file
-/ File [4]: METCRO2D file
+/ File [1]: ELMO file
 /
 /new species    ,units     ,expression
                                          
@@ -120,8 +117,6 @@ AHPLUSIJ        ,umol m-3  ,PMF_HP[1]
 ANAK            ,ug m-3    ,PMC_NA[1]
 AMGK            ,ug m-3    ,PMC_MG[1]
 AKK             ,ug m-3    ,PMC_K[1]
-AFEK            ,ug m-3    ,PMC_FE[1]
-AMNK            ,ug m-3    ,PMC_MN[1]  
 ACAK            ,ug m-3    ,PMC_CA[1]
 ACLIJ           ,ug m-3    ,PMF_CL[1]
 AECIJ           ,ug m-3    ,PMF_EC[1]
