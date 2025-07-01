@@ -372,14 +372,14 @@
                 'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
                 'SEASPRAY_SULFUR_DEP','DD_CLNO2','WD_CLNO2',
                 'DD_PMF_CL','DD_PMC_CL','DD_TSP_CL','DD_TCL',
-                'WD_TSP_CL','DD_CL2','WD_CL2','DD_HCL','WD_HCL','DD_HOCL','WD_HOCL'
+                'WD_TSP_CL','WD_CL2','DD_HCL','WD_HCL','DD_HOCL','WD_HOCL'
 
   Keywd_name(75) = 'DEFAULT_DEP_SAPRC07TC_AE6_AQ'
   Keywd(75,:) = 'PRECIP','GAS_DEP','PM_DEP_NO_MTNO3','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
                 'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
                 'SEASPRAY_SULFUR_DEP','DD_CLNO2','WD_CLNO2',
                 'DD_PMF_CL','DD_PMC_CL','DD_TSP_CL','DD_TCL',
-                'WD_TSP_CL','DD_CL2','WD_CL2','DD_HCL','WD_HCL','DD_HOCL','WD_HOCL'
+                'WD_TSP_CL','WD_CL2','DD_HCL','WD_HCL','DD_HOCL','WD_HOCL'
 
 
   Keywd_name(42) = 'DEFAULT_DEP_CRACMM2'
