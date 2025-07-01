@@ -35,7 +35,7 @@ echo 'Start Model Run At ' `date`
 #> Set General Parameters for Configuring the Simulation
  set VRSN      = v6a1              #> Code Version
  set PROC      = mpi               #> serial or mpi
- setenv MECH     cb6r5_ae7_aq      #> Mechanism ID
+ setenv MECH     cracmm3           #> Mechanism ID
  set APPL      = Bench_2018_12NE3  #> Application Name (e.g. Gridname)
 
 #> Check that mechanism is cb6 or cracmm
