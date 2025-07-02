@@ -1,4 +1,17 @@
 # Integrated Source Apportionment Method (ISAM)
+##  Add cracmm3m to mechanisms supported by ISAM
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Science Update      
+**Release Version**: CMAQv6.0  
+
+**Description**: Code changes allow  CCTM-ISAM simulations to use the cracmm3m chemical mechanism.
+
+**Significance and Impact**: The update adds information to the ISAM module so CCTM-ISAM simulations can use the cracmm3m chemical mechanism.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1313](https://github.com/USEPA/CMAQ/commit/ff9a728b28c0776e04e2e1463567e9f286e95dd7) | [PR#1313](https://github.com/USEPA/CMAQ_Dev/pull/1313)  |
+
 
 ### Improve stability in ISAM apportionment output
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
