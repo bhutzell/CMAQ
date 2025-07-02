@@ -414,7 +414,7 @@
   Keywd(45,:) = 'FINE_DDEP','COARSE_DDEP','TSP_DDEP','PM_WDEP'
 
   Keywd_name(76) = 'PM_DEP_NO_MTNO3'
-  Keywd(76,:) = 'FINE_DDEP_NO_MTNO3','COARSE_DDEP','TSP_DDEP','PM_WDEP'
+  Keywd(76,:) = 'FINE_DDEP_NO_MTNO3','COARSE_DDEP','TSP_DDEP','PM_WDEP_NO_MTNO3'
  
   Keywd_name(46) = 'FINE_DDEP'
   Keywd(46,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
@@ -425,7 +425,7 @@
                 'DD_ANAJ'
 
   Keywd_name(77) = 'FINE_DDEP_NO_MTNO3'
-  Keywd(76,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_EC',
+  Keywd(77,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_EC',
                 'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL','DD_PMF_SI',
                 'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K',
                 'DD_PMF_OC','WD_PMF_OC','DD_PMF_POC','WD_PMF_POC','DD_PMF_SOC','WD_PMF_SOC',
