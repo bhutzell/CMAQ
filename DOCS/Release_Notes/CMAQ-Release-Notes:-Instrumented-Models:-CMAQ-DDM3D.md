@@ -1,5 +1,22 @@
 # Decoupled Direct Method in Three Dimensions (CMAQ-DDM-3D)
 
+### DDM-3D Sensitivity Fix
+[Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Bug fix    
+**Release Version/Date**: CMAQv6.0   
+  
+**Description**:    
+This update addresses a reported issue with DDM-3D sensitivity fields becoming unstable (increasing to unreasonable numbers) with the addition of aerosol nitrate photolysis as a heterogeneous reaction in the cracmm mechanism. After the investigation, it was found that all heterogeneous reactions produce erroneous results in the sensitivity fields due to inconsistent unit conversion. The most recently added heterogeneous reaction manifested the issue most dramatically by going unstable.
+
+**Significance and Impact**:  
+Base model results will not changes. The fix will help prevent some of the unstable results in the sensitivity fields.
+
+|Merge Commit | Internal record|  
+|:------:|:-------:|
+|[Merge for PR#1312](https://github.com/USEPA/CMAQ/commit/d21ad770f33b87eba55df5fe84c2e5924f40965a)) | [PR#1312](https://github.com/USEPA/CMAQ_Dev/pull/1312)  |
+
+
+
 ### DDM-3D control file character limit increase
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Functionality expansion    
