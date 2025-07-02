@@ -1,9 +1,10 @@
 # STAGE
 
-### Runtime Deposition Options
+### Diagnostic NH3 Emissions from Agriculture and Biogenic Sources
+
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Diagnostic Update 
-**Release Version/Date**:  V6.0
+**Type of update**: Diagnostic Update   
+**Release Version/Date**:  CMAQv6.0
 
 **Description and/or issue being addressed**:  
 Agricultural and biogenic NH3 emissions diagnostics added to the DRYDEP output file. Users will be able to get these diagnostic outputs when the NH3 bidirectional exchange flag is turned on in the run script for CONUS runs 2023 and later.
@@ -20,7 +21,7 @@ This only adds diagnostic data and does not change results or impact run time.
 ### Runtime Deposition Options
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**:  Science Update, Documentation  
-**Release Version/Date**:  V6.0
+**Release Version/Date**:  CMAQv6.0
 
 **Description and/or issue being addressed**:  
 Allows the user to specify M3Dry (default) or STAGE dry deposition options from the run script. 
@@ -47,7 +48,7 @@ STAGE was modified to support DDM-3D.
 ### Update to Minimum Kz and Kz0ut in the STAGE deposition option
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**:  Science Update, Documentation  
-**Release Version/Date**:  V6.0
+**Release Version/Date**:  CMAQv6.0
 
 **Description**:   
 This pull request updates minimum Kz value to only be applied in the PBL and sets the minimum Kz0ut value from 1 m2/s to 0.01 m2/s in accordance to WRF 4 PX and YSU PBL schemes. 
@@ -65,7 +66,7 @@ The revised Kz0ut results in substantially more O3 titration and higher NOx and 
 ### Restored the impact of dry deposition factor on diagnostic deposition velocity outputs
 **Primary Contact**: [Jesse Bash(mailto:bash.jesse@epa.gov)], U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix   
-**Release Version/Date**:  v6.0
+**Release Version/Date**:  CMAQv6.0
 
 **Description**:  
 This update is needed for the dry deposition velocity diagnostic file to represent model sensitivities in which the user selects a dry deposition factor that is not unity.  
@@ -83,7 +84,7 @@ If the user selects a dry deposition factor for a surrogate deposition velocity 
 ### Model stop if STAGECTRL_NML environmental variable is missing
  [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix   
-**Release Version/Date**:  v6.0
+**Release Version/Date**:  CMAQv6.0
 
 **Description**:   
 This pull request modifies CMAQ to alert the user if the STAGECTRL_NML is not set in the runscript when the STAGE deposition option is used. 
@@ -100,7 +101,7 @@ Model results are unchanged.
 ### STAGE gcc debug flag bug fix  
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix   
-**Release Version/Date**:  v6.0
+**Release Version/Date**:  CMAQv6.0
 
 **Description**:  
 STAGE with bidirectional NH3 exchange will currently crash when using a gcc build compiled with debug flags due to uninitialized F1_NH4 and F2_NH4 arrays in centralized_io_module.F. This occurs only when with the environment variable NEW_START = TRUE and these arrays are not populated but checked for NaNs in NH3_BIDI_MOD.F.  This pull request initialized  these arrays allowing the model to run when compiled with gcc debug flags.
@@ -118,7 +119,7 @@ This bugfix allows the user to run the model compiled with gcc debug flags using
 ### Correction in an Underflow STAGE Emerson Aerosol Dry Deposition Option
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
-**Release Version/Date**: CMAQ 5.5  
+**Release Version/Date**: CMAQv5.5  
 
 **Description**:   
 This pull request resolves an underflow issue in calculating the bounce correction term (R1) in the [Emerson et al. 2020](https://www.pnas.org/doi/10.1073/pnas.2014761117) (equation 2) aerosol dry deposition option in STAGE.   
@@ -134,7 +135,7 @@ This allows for CMAQ simulations using the STAGE Emersion aerosol dry deposition
 ### STAGE Minor Bugfix
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
-**Release Version/Date**: CMAQ 5.5  
+**Release Version/Date**: CMAQv5.5  
 
 **Description**:  
  This pull request address three issues in the STAGE deposition option.   
@@ -155,7 +156,7 @@ This pull request corrects a units typo in the  CMAQ_Control_STAGE.nml and the F
 ### Land Use and Deposition Species Mapping 
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency   
 **Type of update**: Bug Fix, New Feature   
-**Release Version/Date**: CMAQ 5.4   
+**Release Version/Date**: CMAQv5.4   
 
 **Description**:   
 This update to STAGE has three primary parts: 
@@ -174,7 +175,7 @@ Overall, these result in a reduction in model run time, particularly when the MO
 ### Updates to Gaseous and Aerosol Dry Deposition
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency   
 **Type of update**: Bug fix, New feature   
-**Release Version/Date**: CMAQ 5.4   
+**Release Version/Date**: CMAQv5.4   
 
 **Description**:   
 The STAGE option in CMAQ v5.5 now allows the user to specify key land use parameters for gaseous and aerosol dry deposition process using the CMAQ_Control_STAGE.nml name list. Default values have been populated using median observations from the TRY Plant Trait Database. These updates reduce the bias in summertime NH3 concentrations by approximately half.
