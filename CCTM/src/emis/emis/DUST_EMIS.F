@@ -944,6 +944,7 @@ C---Vegetation fraction based on the WRF/MCIP VEG variable. In WRF that would be
 C-- for the case of PX and VEGFRA in the case of other LSMs. In more recent WRFv4+ versions
 C-- high resolution MODIS veg data is availiable and can be used in PX with pxlsm_modis_veg = 1
                vegfrac( c,r ) = max( min( Met_Data%veg(c,r), 0.95 ), 0.005)
+               vegfree = 1.0 - vegfrac( c,r )
                lambdav = -0.35 * log( vegfree ) ! Shao et al. [Aus. J. Soil Res.,1996]
             END IF
 
