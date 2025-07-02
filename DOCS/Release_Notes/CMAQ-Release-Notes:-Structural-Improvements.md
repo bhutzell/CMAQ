@@ -71,8 +71,8 @@ NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds
 
 ### Cap log_message at 1000 lines  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
-**Type of update**: Bug Fixe  
-**Release Version/Date**:  v6.0 
+**Type of update**: Bug Fix 
+**Release Version/Date**:  CMAQv6.0 
 
 **Description**:   
 When excessively long character strings are sent to log_message, it has the potential to reach an infinite loop. This update establishes a cap on the log_message at 1000 lines.
@@ -85,9 +85,9 @@ No impact on results.
 |[Merge for PR#1267](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e) | [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  |   
 
 ### Correct desid_module.F for serial version of CCTM
-[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency
-**Type of update**: Bug Fix
-**Release Version**:  v6.0
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Bug Fix  
+**Release Version**:  CMAQv6.0  
 
 **Description**:
 The update removes a CCTM compile error from the desid_module.F file when the build script compiles a serial version. The error comes from lines getting a grid cell's column and row number in the simulation domain. The method only works for parallel version because it uses a PARIO routine. The fix inserts a ifdef-else block to consider parallel and non-parallel cases.
@@ -101,7 +101,7 @@ The update removes a CCTM compile error from the desid_module.F file when the bu
 ### GNU build flag update to enable compilation with GNU versions 10+
 [Fahim Sidi](mailto:sidi.fahim@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**:  v5.5   
+**Release Version/Date**:  CMAQv5.5   
 
 **Description**:  Starting GNU version 10+, GNU no longer allows rank mismatches between the callee and the calling function. The exact verbiage from the GNU change logs:"Mismatches between actual and dummy argument lists in a single file are now rejected with an error. Use the new option -fallow-argument-mismatch to turn these errors into warnings; this option is implied with -std=legacy. -Wargument-mismatch has been removed.” (https://gcc.gnu.org/gcc-10/changes.html)
 
@@ -111,7 +111,6 @@ Depending on their nature, argument mismatches have the potential to cause the g
 
 The non-FORTRAN explanation boils down to the ability to pass 1-D arrays, 2-D arrays, 3-D arrays, etc., into a subroutine or function and have the called routine set up so that that it "does the right thing". This is in fact a common occurrence, where the callee "single-indexes" multi-dimensional arrays.
 
-**References**:  n/a
 |Merge Commit | Internal record|
 |:------:|:-------:|
 | [Merge for PR#1154](https://github.com/USEPA/CMAQ/commit/c31983b72a3049d708138da3f57227875333eb39) |  [PR#1154](https://github.com/USEPA/CMAQ_Dev/pull/1154) |
@@ -119,7 +118,7 @@ The non-FORTRAN explanation boils down to the ability to pass 1-D arrays, 2-D ar
 ### Emissions Diagnostics and Log Output
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Diagnostic and Log Updates  
-**Release Version**:  v5.5 
+**Release Version**:  CMAQv5.5 
  
 **Description**:   
 Several issues with emissions diagnostics were identified by internal developers and external users. These have been resolved. Issues include:
@@ -141,7 +140,7 @@ These updates improve consistency among diagnostic output files and improve read
 ## Add precision to timing metrics in logfiles 
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency   
 **Type of update**: Improvement (Minor log formatting change)   
-**Release Version/Date**: v5.5    
+**Release Version/Date**: CMAQv5.5    
 
 **Description**:   
 This PR adds three decimal places of precision to the process-level timing metrics in the ascii logfile.
