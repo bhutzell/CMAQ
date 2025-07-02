@@ -1,4 +1,22 @@
 # Structural Improvements
+
+### Reorganize Aero Module  
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Restructure  
+**Release Version/Date**:  CMAQv6.0  
+
+**Description**:   
+This update restructures the code in the Aerosol module.    The routines in aero_subs file has been split up, grouping the routines in the orignal file into more intuitive places, making the code more digestible.
+
+This update also renames SOA_DEFN to ORG_DEFN because it's been a long time since SOA_DEFN only treated SOA. It treats all organics. The name is updated both in the module and everywhere the module is used.
+
+**Significance and Impact**:   
+No impact on results.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1291](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e) | [PR#1291](https://github.com/USEPA/CMAQ_Dev/pull/1291)  |   
+
 ### Enable parallel I/O for Lightning and ELMO files
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Fix/added feature  
