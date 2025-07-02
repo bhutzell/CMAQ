@@ -1,6 +1,6 @@
 # Decoupled Direct Method in Three Dimensions (CMAQ-DDM-3D)
 
-### DDM-3D Sensitivity Fix
+### DDM-3D Sensitivity Fix Related to Heterogeneous Reactions
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Bug fix    
 **Release Version/Date**: CMAQv6.0   
