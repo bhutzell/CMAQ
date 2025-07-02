@@ -16,7 +16,6 @@ Was not tested given no access to a parallel file system, however, not anticipat
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-| | [PR#1350](https://github.com/USEPA/CMAQ_Dev/pull/1350) | 
 |[Merge for PR#1352](https://github.com/USEPA/CMAQ/commit/68bb51c3e00840e5b7f93347d67c4f9c6d33eb1f) | [PR#1352](https://github.com/USEPA/CMAQ_Dev/pull/1352)  |   
 
 
