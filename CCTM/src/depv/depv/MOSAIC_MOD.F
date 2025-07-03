@@ -88,8 +88,11 @@ C Buffer variables
          Real,            Allocatable :: WRES   ( :,: )  ! Soil residual moisture point
          Real,            Allocatable :: WFC    ( :,: )  ! soil field capacity 
 !> Mean grid cell output 
-         Real,            Allocatable :: Grd_Vd     ( :,:,: ) ! Grid mean gaseous and aerosol deposition velocity
-         Real,            Allocatable :: Bidi_Emis  ( :,:,: ) ! Grid bidirectional Emissions
+         Real,            Allocatable :: Grd_Vd        ( :,:,: ) ! Grid mean gaseous and aerosol deposition velocity
+         Real,            Allocatable :: Bidi_Emis     ( :,:,: ) ! Grid bidirectional Emissions
+         Real,            Allocatable :: Bidi_Emis_Bio ( :,:,: ) ! Grid bidirectional Emissions from biogenic sources
+         Real,            Allocatable :: Bidi_Emis_Ag  ( :,:,: ) ! Grid bidirectional Emissions from natural sources
+
 !> Aggrigated fractional land use       
          Real,            Allocatable :: LUfrac     ( :,:,: ) ! land use fraction (ratio)
 !> Variables below are only allocated if 
@@ -208,13 +211,15 @@ C Prevent initializing the code twice
          Tile_Data%Aleaf        = STAGE_LU_Data( 1:n_stage_lu )%Aleaf
 
          N_GAS_DEPV = N_GC_DEPV + N_NR_DEPV + N_TR_DEPV
-         Allocate ( Tile_Data%Grd_Vd    ( ncols,nrows,N_SPC_DEPV ),  
-     &              Tile_Data%Bidi_Emis ( ncols,nrows,N_SPC_DEPV ),
-     &              Tile_Data%LUfrac    ( ncols,nrows,Tile_Data%n_lufrac ),
-     &              Tile_Data%Vd_Name   ( N_SPC_DEPV ),
-     &              Tile_Data%Vd_Fac    ( N_SPC_DEPV ),
-     &              Tile_Data%Vd_Out    ( N_SPC_DEPV ),        
-     &              Tile_Data%dep2vdiff ( N_SPC_DEPV ),  
+         Allocate ( Tile_Data%Grd_Vd        ( ncols,nrows,N_SPC_DEPV ),  
+     &              Tile_Data%Bidi_Emis     ( ncols,nrows,N_SPC_DEPV ),
+     &              Tile_Data%Bidi_Emis_Bio ( ncols,nrows,N_SPC_DEPV ),
+     &              Tile_Data%Bidi_Emis_Ag  ( ncols,nrows,N_SPC_DEPV ),
+     &              Tile_Data%LUfrac        ( ncols,nrows,Tile_Data%n_lufrac ),
+     &              Tile_Data%Vd_Name       ( N_SPC_DEPV ),
+     &              Tile_Data%Vd_Fac        ( N_SPC_DEPV ),
+     &              Tile_Data%Vd_Out        ( N_SPC_DEPV ),        
+     &              Tile_Data%dep2vdiff     ( N_SPC_DEPV ),  
      &              STAT = ALLOCSTAT ) 
          If ( ALLOCSTAT .Ne. 0 ) Then
             XMSG = 'Failure allocating MOSAIC deposition velocities'
@@ -222,6 +227,8 @@ C Prevent initializing the code twice
          End If
          Tile_Data%Grd_Vd    = 0.0
          Tile_Data%Bidi_Emis = 0.0
+         Tile_Data%Bidi_Emis_Bio = 0.0
+         Tile_Data%Bidi_Emis_ag  = 0.0
          Tile_Data%Vd_Fac    = 0.0  
          Tile_Data%dep2vdiff = 0        
 

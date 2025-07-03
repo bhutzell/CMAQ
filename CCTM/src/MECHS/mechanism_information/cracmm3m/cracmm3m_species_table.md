@@ -6,7 +6,7 @@ Note that for each particulate species in CMAQ, a letter will be appended to the
  <sub>Species</sub> | <sub>Description</sub> | <sub>Phase</sub> | <sub>Molecular Weight (g/mol)</sub> | <sub>Explicit/ Lumped</sub> | <sub>Representative Structure</sub> | <sub>SMILES</sub> 
  ----- | ----- | ----- | ----- | ----- | ----- | ----- 
 AAL|Aluminum ion|P|27.0|E|Aluminum ion|[\[Al+3\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID70912343)
-ABR||P|79.9|E|Bromide ion|[\[Br-\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID6043967)
+ABR| Bromide ion|P|79.9|E|Bromide ion|[\[Br-\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID6043967)
 ACA|Calcium ion|P|40.1|E|Calcium ion|[\[Ca++\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID7037638)
 ACD|Acetaldehyde |G|44.0|E|Acetaldehyde|[CC=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID5039224)
 ACE|Acetylene |G|26.0|E|Acetylene|[C#C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID6026379)
@@ -23,6 +23,7 @@ AFE|Iron ion|P|55.8|E|Iron ion|[\[Fe++\]](https://comptox.epa.gov/dashboard/chem
 AGLYOLIG|SOA from reactive uptake of glyoxal on particles|P|66.4|L|2-(4,5-dihydroxy-1,3-dioxolan-2-yl)-1,3-dioxolane-4,5-diol|OC2OC\(C1OC\(O\)C\(O\)O1\)OC2O
 AH2O|Water associated with particulate inorganic compounds|P|18.0|E|Water|[O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID6026296)
 AH3OP|Hydronium ion tracer|P|19.0|E|Hydronium ion|[\[OH3+\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID20893597)
+AHMS| Hydroxymethanesulfonate ion|P|111.1|E|Hydroxymethanesulfonate ion|[C\(O\)S\(=O\)\(=O\)\[O-\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID20225910)
 AISO3NOS|Non-sulfated SOA from IEPOX uptake|P|136.2|L|2-methylbutane-1,2,3,4-tetrol|C\(O\)C\(O\)\(C\)C\(O\)CO
 AISO3OS|Organosulfate SOA from IEPOX uptake|P|216.2|L|(1,3,4-trihydroxy-2-methylbutan-2-yl)oxysulfonic acid|C\(O\)C\(OS\(O\)\(=O\)\(=O\)\)\(C\)C\(O\)CO
 AISO4|Multifunctional product from heterogeneous uptake of IPX|P|168.1|L|4-hydroperoxy-3-methylbutane-1,1,2,3-tetrol|CC\(O\)\(COO\)C\(O\)C\(O\)O

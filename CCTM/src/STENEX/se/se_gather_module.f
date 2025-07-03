@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/STENEX/src/se_snl/se_gather_module.f,v 1.2 2006/02/15 14:41:56 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C --------------------------------------------------------------------------
 C Purpose:
 C
@@ -164,11 +158,10 @@ C --------------------------------------------------------------------------
         subroutine se_setup_gather (ptr, locptr, pec, locpec, gn, n, locn)
 
         use se_pe_info_ext
+        use mpi
 
         integer, intent(in) :: ptr(:), pec(:), gn, n 
         integer, intent(out) :: locptr(:), locpec(:), locn
-
-        include "mpif.h"
 
         integer, allocatable :: bufptr(:), locnarray(:)
         integer :: i, j, k, low, high, error, allocate_status
@@ -237,7 +230,7 @@ C --------------------------------------------------------------------------
         use se_pe_info_ext
         use se_slice_module
         use se_global_sum_module
-
+        
         implicit none
 
         real, intent(inout) :: data(:)

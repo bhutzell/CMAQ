@@ -113,7 +113,7 @@
 
       ! Check for Error in File Open Process
       IF ( STAT .NE. 0 ) THEN
-          WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
+          WRITE( XMSG, '(A,A,A)' ) 'ERROR: Could not read ',
      &           'CMAQ Chemical Control namelist file: ',TRIM( CMAQ_CHEM_CTRL )
           CALL M3EXIT( 'READ_FAMILIES',0,0,XMSG,1 )
       END IF
@@ -223,7 +223,7 @@
       ! Populate and Error Check All Family and Member Names
       DO IFAM = 1,N_Chem_Fams
           IF ( ChemFamilyName(IFAM) .EQ. '' ) THEN
-             WRITE( XMSG, '(A,I3,A,A,A)' ),'ERROR: The number of Chemical Families ',
+             WRITE( XMSG, '(A,I3,A,A,A)' ) 'ERROR: The number of Chemical Families ',
      &              N_Chem_Fams, ' is larger than the number of fields ',
      &              'provided in the ChemFamilyName array. Reduce N_Chem_Fams ',
      &              'in the CMAQ_CH_CTRL_NML file or provide more Chemical Families.'
@@ -256,7 +256,7 @@
 
       ! Check for Error in File Open Process
       IF ( STAT .NE. 0 ) THEN
-          WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
+          WRITE( XMSG, '(A,A,A)' ) 'ERROR: Could not read ',
      &           'CMAQ control namelist file: ',TRIM( CMAQ_CTRL )
           CALL M3EXIT( 'READ_FAMILIES',0,0,XMSG,1 )
       END IF
@@ -324,7 +324,7 @@
       ! Capitalize All Family and Member Names
       DO IFAM = 1,Desid_N_Stream_Fams
           IF ( StreamFamilyName(IFAM) .EQ. '' ) THEN
-             WRITE( XMSG, '(A,I3,A,A,A)' ),'ERROR: The number of Stream Families ',
+             WRITE( XMSG, '(A,I3,A,A,A)' ) 'ERROR: The number of Stream Families ',
      &              Desid_N_Stream_Fams, ' is larger than the number of fields ',
      &              'provided in StreamFamilyName array. Reduce Desid_N_Stream_Fams ',
      &              'in the CMAQ_CTRL_NML file or provide more Stream Families.'
@@ -405,7 +405,7 @@
       ! Capitalize All Family and Member Names
       DO IFAM = 1,Desid_N_Reg_Fams
           IF ( RegionFamilyName(IFAM) .EQ. '' ) THEN
-             WRITE( XMSG, '(A,I3,A,A,A)' ),'ERROR: The number of Region Families ',
+             WRITE( XMSG, '(A,I3,A,A,A)' ) 'ERROR: The number of Region Families ',
      &              Desid_N_Reg_Fams, ' is larger than the number of fields ',
      &              'provided in RegionFamilyName array. Reduce Desid_N_Reg_Fams ',
      &              'in the CMAQ_CTRL_NML file or provide more Region Families.'
@@ -492,7 +492,7 @@
                IF ( KDX .NE. 0 ) OUT_VEC( KDX ) = .TRUE.
              END DO
            ELSE
-             WRITE( LOGDEV, '(/,19A,A,1A,A,A,/,A,/,A,/,A,/,A,/,A,/,A)' ),
+             WRITE( LOGDEV, '(/,19A,A,1A,A,A,/,A,/,A,/,A,/,A,/,A,/,A)' )
      &         'Attention: Species ',TRIM(SPECIES),':',TRIM(CHEM_NAME(ICHEM)),
      &         ' was used in the CMAQ Chemical',
      &         ' Control Instructions but it is not a valid CMAQ ',
