@@ -56,10 +56,14 @@ Also, See the CMAQv6.0 Release Note on **[Remove option for Aerosol Initial Cond
  ### ICON C Compiler fix
 **Primary Contact**: [Barron H. HEnderson](mailto:henderson.barronl@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**: CMAQv6.0
-**Description**:  Updating build script to include c_compiler in configuration if cc was not aliased or on the users path. The update adds c_compiler set to CC. This approach has more fail safes and is used in many other bldit scripts (bcon, cctm, etc).  
-**Significance and Impact**: Makes it easier to get ICON compiled  
-**References**:   N/A
+**Release Version/Date**: CMAQv6.0  
+
+**Description**:   
+Updating build script to include c_compiler in configuration if cc was not aliased or on the users path. The update adds c_compiler set to CC. This approach has more fail safes and is used in many other bldit scripts (bcon, cctm, etc).
+
+**Significance and Impact**:  
+Makes it easier to get ICON compiled  
+
 **Internal PRs**: [PR#1161](https://github.com/USEPA/CMAQ_Dev/pull/1161)
  
 
