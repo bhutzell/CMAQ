@@ -2,15 +2,12 @@
 
 ### Increase JPROC parameters for input file size
 
- [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+ **Type of update**: Bug Fix   
+**Release Version/Date**:  CMAQv6.0
 
- **Primary Contact**:  [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
-
-**Type of update**: Bug Fix   
-
-**Release Version/Date**:  CMAQ version 6.0
-
-**Description**:  The update makes two changes to the JPROC utility.    
+**Description**:   
+The update makes two changes to the JPROC utility.    
 
 1.  Increases parameters in JVALPARMS.EXT based on the inline_phot_preproc utility.
 2.  Makes the srband.f and optics.f files include JVALPARMS.EXT for the maximum number of wavelengths for calculating photolysis frequencies.
@@ -19,7 +16,8 @@ Changes are motivated by a problem encountered for the cracmm3 based mechanisms.
 
 Besides increasing JPROC parameters, the update modified two JPROC subroutines so parameters are consistent between subroutines. 
 
-**Significance and Impact**:  The JPROC updates remove errors in output JTABLEs when input files for photolysis frequency use more 600 wavelengths to describe it. 
+**Significance and Impact**:   
+The JPROC updates remove errors in output JTABLEs when input files for photolysis frequency use more 600 wavelengths to describe it. 
 
 | [Merge for PR#1361](https://github.com/USEPA/CMAQ/commit/dae84d5bdb43edf5c2086df7a8f7a515a894bdca) | [PR#1361](https://github.com/USEPA/CMAQ_Dev/pull/1361)  | 
 
