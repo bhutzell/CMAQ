@@ -19,15 +19,68 @@ We are making this early version of the code available for testing, evaluation, 
 ## Do I need to update from v5.5 to v6.0alpha?
 CMAQv6.0alpha is not intended as an immediate replacement for CMAQv5.5. However, CMAQv6.0alpha does contain advances in both scientific and user-support algorithms.
 
-#### Instrumented Models (CMAQ-ISAM, CMAQ-DDM3D)
-* CMAQv6.0alpha introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as well as several improvements that target CMAQ-ISAM robustness for all chemical mechanisms. Please see the [ISAM release notes](../Release_Notes/CMAQ-Release-Notes%3A-Instrumented-Models%3A-CMAQ-ISAM.md).
+### Instrumented Models (CMAQ-ISAM, CMAQ-DDM3D)
+- **Add ISAM support for all CRACMM versions**  
+CMAQv6.0alpha introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as well as several improvements that target CMAQ-ISAM robustness for all chemical mechanisms. [Release Note](../Release_Notes/CMAQ-Release-Notes%3A-Instrumented-Models%3A-CMAQ-ISAM.md)
+ 
+- **Improve stability in ISAM apportionment output**   
+  Addresses errors in aerosol/gas partitioning in ISAM, preventing mass from being incorrectly allocated to distant tags.  
+  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#improve-stability-in-isam-apportionment-output)
   
-* CMAQv6.0alpha fixes DDM3D instability in sensitivity fields after hetereogenous chemistry due to inconsistent unit conversions. Please see the [DDM3D release note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md).
+- **Fix ISAM erroneous mass attribution**  
+  Fixes a bug that caused tagged mass to appear far from emission sources due to improper handling of aerosol mass concentrations.  
+  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#erroneous-mass-attribution)
 
-#### Chemistry
-* CMAQv6.0alpha introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates improve the representation of gas-phase and aerosol chemistry in multiple environments. In addition to the base CRACMM3 mechanism, CMAQv6.0alpha includes CRACMM3M, with extended marine chemistry, and CRACMM3HAPS which includes additional Hazardous Air Pollutants.  If you are interested in learning more, please see the [CRACMM3 release notes](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3).
+- **Address DDM3D instability in sensitivity fields**  
+   CMAQv6.0 fixes DDM3D instablity in after hetereogenous chemistry due to inconsistent unit conversions. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md)
 
-* A bug fix to the cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the model species styrene, a hazardous air pollutant. No other model species are impacted. See the [release note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Carbon-Bond-6-Mechanism-(CB6)-with-Hazardous-Air-Pollutants.md#correct-loss-of-reactive-tracer-styrene-from-ozone-reaction) for additional information.
+- **DDM3D control file character limit increase**  
+  Increases the character limit for specification strings in the DDM-3D control file to support more complex applications.  
+  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md#ddm-3d-control-file-character-limit-increase)
+  
+### Chemistry
+- **Updates to Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM)**
+CMAQv6.0alpha introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates improve the representation of gas-phase and aerosol chemistry in multiple environments. In addition to the base CRACMM3 mechanism, CMAQv6.0alpha includes CRACMM3M, with extended marine chemistry, and CRACMM3HAPS which includes additional Hazardous Air Pollutants.  If you are interested in learning more, please see the CRACMM3 release notes:
+  - **CRACMM3 Overview**  
+ [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3)
+
+  - **Heterogeneous chemistry of sulfur species**  
+  Adds heterogeneous sulfur chemistry to improve particulate sulfur predictions in areas with high winter PM pollution. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#heterogeneous-chemistry-of-sulfur-species)
+  - **Adding chlorine chemistry in CRACMM3**  
+  Incorporates chlorine chemistry from CRACMM3M into CRACMM3, using a reduced set of organic reactions to limit computational demand. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#adding-chlorine-chemistry-in-cracmm3)
+
+  - **Photolysis of aerosol nitrate in CRACMM3**  
+  Adds photolysis of aerosol nitrate and a new aerosol species to CRACMM3, with updated molecular weights and solver enhancements. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#photolysis-of-aerosol-nitrate-in-cracmm3)
+
+  - **Photolysis update in CRACMM3 and CRACMM3M**  
+  Updates photolysis data and reactions for several species, adds new reactions, and incorporates recent scientific findings for improved accuracy. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#photolysis-update-in-cracmm3-and-cracmm3m)
+
+  - **Halogen chemistry in CRACMM3M**  
+  Fixes errors in NOY definition, adds halogen chemistry and a new marine mechanism, and introduces a new EBI solver. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#halogen-chemistry-in-cracmm3m)
+
+  - **Photolysis of aerosol nitrate in CRACMM3M**  
+  Adds photolysis of aerosol nitrate to the marine mechanism, following recent scientific procedures and solver updates. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#photolysis-of-aerosol-nitrate-in-cracmm3m)
+
+  - **Updating the condensed halogen chemistry and renaming of "INO2" to "ISONP"**  
+  Renames a chemical species to avoid conflicts and re-derives condensed halogen chemistry using updated hemispheric results. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updating-the-condensed-halogen-chemistry-and-renaming-of-ino2-to-isonp)
+
+  - **Consistent treatment of styrene and ethylbenzene across CMAQ**  
+  Aligns the treatment of styrene and ethylbenzene chemistry in CRACMM3 with the reactive tracer module, ensuring consistency for air toxics modeling. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#consistent-treatment-of-styrene-and-ethylbenzene-across-cmaq)
+
+  - **Correct conservation of nitrogen for 4 reactions in CRACMM3**  Implements fixes to ensure nitrogen conservation in four specific reactions, based on expert recommendations.  
+  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#correct-conservation-of-nitrogen-for-4-reactions-in-cracmm3)
+
+  - **CRACMM Reaction Metadata File**  
+ Provides a metadata file documenting updates to CRACMM chemistry at the reaction level.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#cracmm-reaction-metadata-file)
+
+  - **Streamline chemical mechanisms**
+CMAQv6.0alpha no longer supports the following mechanisms: CB6R3_AE7_AQ, CRACMM1_AQ, CRACMM1AMORE_AQ, RACM2_AE6_AQ, and SAPRC07TIC_AE7i_AQKMT2. The update ensures consistency across remaining mechanisms and utilities. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#delete-obsolete-chemical-mechanisms)
+
+- **Updates to CarbonBond 6 Mechanism with Hazardous Air Pollutants (CB6r5HAP)**
+    - **Correct rate constant for styrene's reaction with ozone**   
+Bug fix to cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the model species styrene, a hazardous air pollutant. No other model species are impacted. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Carbon-Bond-6-Mechanism-(CB6)-with-Hazardous-Air-Pollutants.md#correct-loss-of-reactive-tracer-styrene-from-ozone-reaction)
+  
+
   
 * CMAQv6.0alpha no longer supports the following mechanisms: CB6R3_AE7_AQ, CRACMM1_AQ, CRACMM1AMORE_AQ, RACM2_AE6_AQ, and SAPRC07TIC_AE7i_AQKMT2. Users that are interested in using these mechanisms will need to downgrade their CMAQ version. 
   
