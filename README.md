@@ -47,11 +47,11 @@ CRACMM3HAPS provides additional gas and particle Hazardous Air Pollutants.
   * Direct user specification of inorganic aerosol mass transfer is now possible! Previously, CMAQ only supported hybrid mass transfer (dynamic for coarse, equilibrium for fine). Now users can assess trade-offs by forcing all modes to dynamic or equilibrium and compare to the default approach.
 
 * **Improved methods for land-surface impacts on deposition, emissions, and dilution** 
-  *	the resistance to dry deposition of volatile carbon-containing compounds has been increased consistent with their vapor-pressures. This increases VOC and CO concentrations across model applications.
-  * the new Soil-Atmosphere Gaseous Emissions (SAGE) module improves soil NO and HONO emissions with a simple, meteorologically dependent approach.
-  * boundary-layer mixing dynamics in stable conditions have been made consistent with upstream meteorological models
-  * Enhanced options for online coupling of CMAQ chemistry to meteorological modelsFirst public release of a unified coupler to support WRF-CMAQ and MPAS-CMAQ in a harmonized framework
-  * (Impact statement about the coupled model platforms) 
+  *	The resistance to dry deposition of volatile carbon-containing compounds has been increased consistent with their vapor-pressures. This increases VOC and CO concentrations across model applications.
+  * The new Soil-Atmosphere Gaseous Emissions (SAGE) module improves soil NO and HONO emissions with a simple, meteorologically dependent approach.
+  * Boundary-layer mixing dynamics in stable conditions have been made consistent with upstream meteorological models.
+  * Enhanced options for online coupling of CMAQ chemistry to meteorological modelsFirst public release of a unified coupler to support WRF-CMAQ and MPAS-CMAQ in a harmonized framework.
+ 
 
 ## Getting the CMAQ Repository
 This CMAQ Git archive is organized with each version stored as a branch on the main USEPA/CMAQ repository. The most recently released official version of the model will always be on the branch called 'main'. 
