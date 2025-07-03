@@ -26,13 +26,13 @@ This CMAQv6.0 alpha release allows community members:
 CRACMM3HAPS provides additional gas and particle Hazardous Air Pollutants.
 
 * **Major advancements in windblow dust estimates**
-  * Dramatic improvement of windblown dust emissions for NLCD40 land-use specification address high bias in dust estimates from earlier CMAQ versions
+  * Dramatic improvement of windblown dust emissions for NLCD40 land-use specification address high bias in dust estimates from earlier CMAQ versions.
   * New satellite-based global vegetation dataset accounts for the effect of previously underestimated brown vegetation and further improves dust estimates for many regions in the US and Northern Hemisphere.
   * These improvements apply to both the U.S. and hemispheric scale simulations.
   * The CMAQ Team now recommends activating wind-blown dust predictions for ALL applications!
 
 * **Improvements to source apportionment tools, CMAQ-ISAM and CMAQ-DDM3D** 
-  * Tagged source apportionment modeling via CMAQ-ISAM is now compatible with the most up-to-date chemistry CRACMM2, CRACMM3, CRACMM3M, and CRACMM3HAPS
+  * Tagged source apportionment modeling via CMAQ-ISAM is now compatible with the most up-to-date chemistry CRACMM2, CRACMM3, CRACMM3M, and CRACMM3HAPS.
   * Sensitivity-based source apportionment via DDM3D is now more robust after instabilities from heterogenous chemistry have been resolved. In addition, CMAQ-DDM3D now supports using the STAGE dry deposition module.
 
 * **New customization options and simplified user experience.**
