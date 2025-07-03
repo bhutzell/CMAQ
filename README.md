@@ -32,8 +32,8 @@ CRACMM3HAPS provides additional gas and particle Hazardous Air Pollutants.
   * The CMAQ Team now recommends activating wind-blown dust predictions for ALL applications!
 
 * **Improvements to source apportionment tools, CMAQ-ISAM and CMAQ-DDM3D** 
-  * Tagged source apportionment modeling via CMAQ-ISAM is now compatible with the most up-to-date chemistry CRACMM2, CRACMM3, CRACMM3M, & CRACMM3HAPS
-  * Sensitivity-based source apportionment via DDM3D is now more robust after instabilities from heterogenous chemistry have been resolved.
+  * Tagged source apportionment modeling via CMAQ-ISAM is now compatible with the most up-to-date chemistry CRACMM2, CRACMM3, CRACMM3M, and CRACMM3HAPS
+  * Sensitivity-based source apportionment via DDM3D is now more robust after instabilities from heterogenous chemistry have been resolved. In addition, CMAQ-DDM3D now supports using the STAGE dry deposition module.
 
 * **New customization options and simplified user experience.**
   * The Explicit and Lumped air quality Model Output module (ELMO) version 2 offers:
