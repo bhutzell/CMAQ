@@ -26,13 +26,13 @@ This CMAQv6.0 alpha release allows community members:
 CRACMM3HAPS provides additional gas and particle Hazardous Air Pollutants.
 
 * **Major advancements in windblow dust estimates**
-  * Dramatic improvement of windblown dust emissions for NLCD40 land-use specification address high bias in dust estimates from earlier CMAQ versions
+  * Dramatic improvement of windblown dust emissions for NLCD40 land-use specification address high bias in dust estimates from earlier CMAQ versions.
   * New satellite-based global vegetation dataset accounts for the effect of previously underestimated brown vegetation and further improves dust estimates for many regions in the US and Northern Hemisphere.
   * These improvements apply to both the U.S. and hemispheric scale simulations.
   * The CMAQ Team now recommends activating wind-blown dust predictions for ALL applications!
 
 * **Improvements to source apportionment tools, CMAQ-ISAM and CMAQ-DDM3D** 
-  * Tagged source apportionment modeling via CMAQ-ISAM is now compatible with the most up-to-date chemistry CRACMM2, CRACMM3, CRACMM3M, and CRACMM3HAPS
+  * Tagged source apportionment modeling via CMAQ-ISAM is now compatible with the most up-to-date chemistry CRACMM2, CRACMM3, CRACMM3M, and CRACMM3HAPS.
   * Sensitivity-based source apportionment via DDM3D is now more robust after instabilities from heterogenous chemistry have been resolved. In addition, CMAQ-DDM3D now supports using the STAGE dry deposition module.
 
 * **New customization options and simplified user experience.**
@@ -47,11 +47,11 @@ CRACMM3HAPS provides additional gas and particle Hazardous Air Pollutants.
   * Direct user specification of inorganic aerosol mass transfer is now possible! Previously, CMAQ only supported hybrid mass transfer (dynamic for coarse, equilibrium for fine). Now users can assess trade-offs by forcing all modes to dynamic or equilibrium and compare to the default approach.
 
 * **Improved methods for land-surface impacts on deposition, emissions, and dilution** 
-  *	the resistance to dry deposition of volatile carbon-containing compounds has been increased consistent with their vapor-pressures. This increases VOC and CO concentrations across model applications.
-  * the new Soil-Atmosphere Gaseous Emissions (SAGE) module improves soil NO and HONO emissions with a simple, meteorologically dependent approach.
-  * boundary-layer mixing dynamics in stable conditions have been made consistent with upstream meteorological models
-  * Enhanced options for online coupling of CMAQ chemistry to meteorological modelsFirst public release of a unified coupler to support WRF-CMAQ and MPAS-CMAQ in a harmonized framework
-  * (Impact statement about the coupled model platforms) 
+  *	The resistance to dry deposition of volatile carbon-containing compounds has been increased consistent with their vapor-pressures. This increases VOC and CO concentrations across model applications.
+  * The new Soil-Atmosphere Gaseous Emissions (SAGE) module improves soil NO and HONO emissions with a simple, meteorologically dependent approach.
+  * Boundary-layer mixing dynamics in stable conditions have been made consistent with upstream meteorological models.
+  * Enhanced options for online coupling of CMAQ chemistry to meteorological modelsFirst public release of a unified coupler to support WRF-CMAQ and MPAS-CMAQ in a harmonized framework.
+ 
 
 ## Getting the CMAQ Repository
 This CMAQ Git archive is organized with each version stored as a branch on the main USEPA/CMAQ repository. The most recently released official version of the model will always be on the branch called 'main'. 
