@@ -21,8 +21,7 @@ This CMAQv6.0 alpha release allows community members:
 
 ## New features in CMAQ version 6.0 include:
 * **CRACMM3: new state-of-the-science chemical mechanisms**
-  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 adds chlorine chemistry, heterogeneous sulfur chemistry, and particle nitrate (pNO3) photolysis. In addition, it updates reactions for several systems including radical cycling and photolytic loss for semivolatile organic compounds. 
-  * (Sentence about impact of updates in first bullet. Maybe something like, “These and other features improve...” Maybe something highlighting formaldehyde, source apportionment, model sensitivity, model responsiveness in the context of multi-decade emission decreases, etc.) *CRACMM3 is now CMAQ’s default chemical mechanism.* 
+  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 adds chlorine chemistry, heterogeneous sulfur chemistry, and particle nitrate (pNO3) photolysis. In addition, it updates reactions for several systems including radical cycling and photolytic loss for semivolatile organic compounds. *CRACMM3 is now CMAQ’s default chemical mechanism.* 
   * CRACMM3M offers detailed halogen chemistry to improve the representation of gas-phase and aerosol chemistry in marine environments.
 CRACMM3HAPS provides additional gas and particle Hazardous Air Pollutants.
 
