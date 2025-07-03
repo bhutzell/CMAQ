@@ -116,6 +116,25 @@ The update removes a CCTM compile error from the desid_module.F file when the bu
 |:------:|:-------:|
 | Merge for PR#1331 |  [PR#1331](https://github.com/USEPA/CMAQ_Dev/pull/1331) |
 
+
+### Simplify RETRIEVE_OCEAN_DATA
+[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**:  Simplify code
+**Release Version/Date**: CMAQv6.0
+
+**Description**:   
+Simplified the logic in CCTM/src/cio/centralized_io_module.F for subroutine retrieve_ocean_data.
+
+
+**Significance and Impact**:   
+No impact on model results.
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1365](https://github.com/USEPA/CMAQ/commit/f13dddf27a1920ddacd3c7a8cf918735184776df) | [PR#1365](https://github.com/USEPA/CMAQ/pull/1365)  |   
+
+
 ### GNU build flag update to enable compilation with GNU versions 10+
 [Fahim Sidi](mailto:sidi.fahim@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
