@@ -1,5 +1,18 @@
 # Integrated Source Apportionment Method (ISAM)
 
+##  Add cracmm3m to mechanisms supported by ISAM
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Science Update      
+**Release Version**: CMAQv6.0  
+
+**Description**: Code changes allow  CCTM-ISAM simulations to use the cracmm3m chemical mechanism.
+
+**Significance and Impact**: The update adds information to the ISAM module so CCTM-ISAM simulations can use the cracmm3m chemical mechanism.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1313](https://github.com/USEPA/CMAQ/commit/ff9a728b28c0776e04e2e1463567e9f286e95dd7) | [PR#1313](https://github.com/USEPA/CMAQ_Dev/pull/1313)  |
+
 ### Improve stability in ISAM apportionment output
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**:  Improve stability  
@@ -17,20 +30,6 @@ The changes to the source apportionment routines in the aerosol and cloud module
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1305](https://github.com/USEPA/CMAQ/commit/32cd44f4046eb704504a012cdae32de04f04e1d8) | [PR#1305](https://github.com/USEPA/CMAQ_Dev/pull/1305)  |
-
-
-##  Add cracmm3m to mechanisms supported by ISAM
-[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency      
-**Type of update**: Science Update      
-**Release Version**: CMAQv6.0  
-
-**Description**: Code changes allow  CCTM-ISAM simulations to use the cracmm3m chemical mechanism.
-
-**Significance and Impact**: The update adds information to the ISAM module so CCTM-ISAM simulations can use the cracmm3m chemical mechanism.
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1313](https://github.com/USEPA/CMAQ/commit/ff9a728b28c0776e04e2e1463567e9f286e95dd7) | [PR#1313](https://github.com/USEPA/CMAQ_Dev/pull/1313)  |
 
 ### Erroneous mass attribution  
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency 
@@ -112,21 +111,7 @@ The SOA predictions for the non-contiguous regions show dramatically large maxim
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-
-| | [PR#1317](https://github.com/USEPA/CMAQ_Dev/pull/1317)  |
-
-##  Add cracmm3m to mechanisms supported by ISAM
-[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency      
-**Type of update**: Science Update    
-**Release Version**: CMAQv6.0  
-
-**Description**: Code changes allow  CCTM-ISAM simulations to use the cracmm3m chemical mechanism.
-
-**Significance and Impact**: The update adds information to the ISAM module so CCTM-ISAM simulations can use the cracmm3m chemical mechanism.
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-| | [PR#1313](https://github.com/USEPA/CMAQ_Dev/pull/1313)  |
+|[Merge for PR#1317](https://github.com/USEPA/CMAQ/commit/7cef46fcef095f760b8d39b61d85e6e21b42b609) | [PR#1317](https://github.com/USEPA/CMAQ_Dev/pull/1317)  |
 
 
 ##  Source Apportionment of SOA
