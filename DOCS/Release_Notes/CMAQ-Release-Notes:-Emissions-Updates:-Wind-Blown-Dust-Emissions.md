@@ -12,7 +12,7 @@ The addition of NPV to the windblown dust model reduces 2022 annual dust emissio
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1181](https://github.com/USEPA/CMAQ/commit/b506277bdf8aaedc567348b8604e2bb854f3a707) | [PR#1181](https://github.com/USEPA/CMAQ_Dev/pull/1181)  |
+|[Merge for PR#1336](https://github.com/USEPA/CMAQ/commit/c2b3f39eec76029f29e4895aab9c8d2bec3d8c6f) | [PR#1336](https://github.com/USEPA/CMAQ_Dev/pull/1336)  |
 
 
 ### Correction for NLCD40 Land Use Mapping in Windblown Dust Module
