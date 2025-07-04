@@ -50,7 +50,9 @@ The following limited updates were made to **aqchem**:
 
 **Internal PRs**: [PR#1130](https://github.com/USEPA/CMAQ_Dev/pull/1130)  
 
-
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1130](https://github.com/USEPA/CMAQ/commit/8d607848cdfe7b1f1b139dbb968145f092fb9714) | [PR#1130](https://github.com/USEPA/CMAQ_Dev/pull/1130)  |
 
 ### Removal of acm_ae6_mp Cloud Module
 **Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
