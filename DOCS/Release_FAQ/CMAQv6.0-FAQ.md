@@ -20,27 +20,30 @@ We are making this early version of the code available for testing, evaluation, 
 CMAQv6.0alpha is not intended as an immediate replacement for CMAQv5.5. However, CMAQv6.0alpha does contain advances in both scientific and user-support algorithms.
 
 ### Instrumented Models (CMAQ-ISAM, CMAQ-DDM3D)
-- **Add ISAM support for all CRACMM versions**  
-CMAQv6.0alpha introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as well as several improvements that target CMAQ-ISAM robustness for all chemical mechanisms. [Release Note](../Release_Notes/CMAQ-Release-Notes%3A-Instrumented-Models%3A-CMAQ-ISAM.md)
- 
-- **Improve stability in ISAM apportionment output**   
+- **Updates to the Integrated Source Apportionment Method (CMAQ-ISAM)**  
+CMAQv6.0 introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as well as several improvements that target CMAQ-ISAM robustness for all chemical mechanisms.
+  - **Add ISAM support for CRACMM3M**  
+  (Fill in summary) [Release Note](../Release_Notes/CMAQ-Release-Notes%3A-Instrumented-Models%3A-CMAQ-ISAM.md#add-cracmm3m-to-mechanisms-supported-by-isam)
+
+  - **Improve stability in ISAM apportionment output**   
   Addresses errors in aerosol/gas partitioning in ISAM, preventing mass from being incorrectly allocated to distant tags.  
   [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#improve-stability-in-isam-apportionment-output)
-  
-- **Fix ISAM erroneous mass attribution**  
+
+  - **Fix ISAM erroneous mass attribution**  
   Fixes a bug that caused tagged mass to appear far from emission sources due to improper handling of aerosol mass concentrations.  
   [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#erroneous-mass-attribution)
 
-- **Address DDM3D instability in sensitivity fields**  
-   CMAQv6.0 fixes DDM3D instablity in after hetereogenous chemistry due to inconsistent unit conversions. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md)
+- **Updates to the Decoupled Direct Method in Three Dimensions (CMAQ-DDM3D)**  
+  - **Address DDM3D instability in sensitivity fields**  
+   Fixes DDM3D instablity in after hetereogenous chemistry due to inconsistent unit conversions. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md)
 
-- **DDM3D control file character limit increase**  
+  - **DDM3D control file character limit increase**  
   Increases the character limit for specification strings in the DDM-3D control file to support more complex applications.  
   [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md#ddm-3d-control-file-character-limit-increase)
   
 ### Chemistry
 - **Updates to Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM)**  
-CMAQv6.0alpha introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates improve the representation of gas-phase and aerosol chemistry in multiple environments. In addition to the base CRACMM3 mechanism, CMAQv6.0alpha includes CRACMM3M, with extended marine chemistry, and CRACMM3HAPS which includes additional Hazardous Air Pollutants.  If you are interested in learning more, please see the CRACMM3 release notes:
+CMAQv6.0 introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates improve the representation of gas-phase and aerosol chemistry in multiple environments. In addition to the base CRACMM3 mechanism, CMAQv6.0alpha includes CRACMM3M, with extended marine chemistry, and CRACMM3HAPS which includes additional Hazardous Air Pollutants.  If you are interested in learning more, please see the CRACMM3 release notes:
   - **CRACMM3 Overview**  
  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3)
 
@@ -68,13 +71,14 @@ CMAQv6.0alpha introduces CRACMM version 3. CRACMM3 includes several updates to C
   - **Consistent treatment of styrene and ethylbenzene across CMAQ**  
   Aligns the treatment of styrene and ethylbenzene chemistry in CRACMM3 with the reactive tracer module, ensuring consistency for air toxics modeling. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#consistent-treatment-of-styrene-and-ethylbenzene-across-cmaq)
 
-  - **Correct conservation of nitrogen for 4 reactions in CRACMM3**  Implements fixes to ensure nitrogen conservation in four specific reactions, based on expert recommendations. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#correct-conservation-of-nitrogen-for-4-reactions-in-cracmm3)
+  - **Correct conservation of nitrogen for 4 reactions in CRACMM3**  
+Implements fixes to ensure nitrogen conservation in four specific reactions, based on expert recommendations. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#correct-conservation-of-nitrogen-for-4-reactions-in-cracmm3)
 
   - **CRACMM Reaction Metadata File**  
- Provides a metadata file documenting updates to CRACMM chemistry at the reaction level.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#cracmm-reaction-metadata-file)
+Provides a metadata file documenting updates to CRACMM chemistry at the reaction level.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#cracmm-reaction-metadata-file)
 
   - **Streamline chemical mechanisms**  
-CMAQv6.0alpha no longer supports the following mechanisms: CB6R3_AE7_AQ, CRACMM1_AQ, CRACMM1AMORE_AQ, RACM2_AE6_AQ, and SAPRC07TIC_AE7i_AQKMT2. The update ensures consistency across remaining mechanisms and utilities. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#delete-obsolete-chemical-mechanisms)
+CMAQv6.0 no longer supports the following mechanisms: CB6R3_AE7_AQ, CRACMM1_AQ, CRACMM1AMORE_AQ, RACM2_AE6_AQ, and SAPRC07TIC_AE7i_AQKMT2. The update ensures consistency across remaining mechanisms and utilities. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#delete-obsolete-chemical-mechanisms)
 
 - **Bug fix to CarbonBond 6 Mechanism with Hazardous Air Pollutants (CB6r5HAP)**
     - **Correct rate constant for styrene's reaction with ozone**   
@@ -125,13 +129,13 @@ The KZMIN option, first introduced in CMAQv4.5, is a parameterization to allow t
 
 ### Emissions
 - **Introducing new soil emissions module**  
-CMAQv6.0 introduces the Soil – Atmosphere Gaseous Emissions (SAGE) module for estimating soil NO and HONO emissions generally following the BDSNP parameterization (Hudman et al. 2012). SAGE  provides a simple, meteorological dependent soil NO and HONO emissions for regional to global applications. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Soil-Atmospheric-Gaseous-Emissions-(SAGE)-Emissions.md#introducing-new-soil-emissions-module)
+Introduces the Soil – Atmosphere Gaseous Emissions (SAGE) module for estimating soil NO and HONO emissions generally following the BDSNP parameterization (Hudman et al. 2012). SAGE  provides a simple, meteorological dependent soil NO and HONO emissions for regional to global applications. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Soil-Atmospheric-Gaseous-Emissions-(SAGE)-Emissions.md#introducing-new-soil-emissions-module)
 
 - **New global vegetation dataset improves windblown dust emissions**   
-CMAQv6.0 introduces a new satellite-based global vegetation dataset to modulate windblown dust emissions. The vegetation dataset accounts for the effect of non-photosynthetic vegetation (or brown vegetation) by updating vegetation fraction, the vegetation height, and the vegetation roughness following the method outlined in [Huang and Foroutan (2022, HF22)](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2021JD035243). The overall impact is to reduce windblown dust emissions. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Wind-Blown-Dust-Emissions.md)
+Introduces a new satellite-based global vegetation dataset to modulate windblown dust emissions. The vegetation dataset accounts for the effect of non-photosynthetic vegetation (or brown vegetation) by updating vegetation fraction, the vegetation height, and the vegetation roughness following the method outlined in [Huang and Foroutan (2022, HF22)](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2021JD035243). The overall impact is to reduce windblown dust emissions. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Wind-Blown-Dust-Emissions.md)
 
 - **Correction for NLCD40 Land Use Mapping in Windblown Dust Module**    
-CMAQv6.0 fixes a bug related to the estimation of windblown dust emissions within CMAQ when using the NLCD40 land-use classification scheme. To estimate the emissions of windblown dust, grid cell land-use information along with meteorological conditions are needed. In this case, when using WRF with NLCD40 land-use, two categories of NLCD40 (“shrub/scrub” and “dwarf scrub”) were being mapped to the wrong internal categories (“barren or sparsely vegetated” instead of “shrubland”). These internal categories are used in the windblown dust module to assign parameter values controlling erodibility, which in this case was overestimated. Depending on the domain, year and approach to specify vegetation fraction in WRF, this bug fix corrects excessive "soil" PM2.5 and total PM2.5 mass concentrations when using NLCD40 land-use. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Wind-Blown-Dust-Emissions.md#correction-for-nlcd40-land-use-mapping-in-windblown-dust-module)
+Fixes a bug related to the estimation of windblown dust emissions within CMAQ when using the NLCD40 land-use classification scheme. To estimate the emissions of windblown dust, grid cell land-use information along with meteorological conditions are needed. In this case, when using WRF with NLCD40 land-use, two categories of NLCD40 (“shrub/scrub” and “dwarf scrub”) were being mapped to the wrong internal categories (“barren or sparsely vegetated” instead of “shrubland”). These internal categories are used in the windblown dust module to assign parameter values controlling erodibility, which in this case was overestimated. Depending on the domain, year and approach to specify vegetation fraction in WRF, this bug fix corrects excessive "soil" PM2.5 and total PM2.5 mass concentrations when using NLCD40 land-use. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Wind-Blown-Dust-Emissions.md#correction-for-nlcd40-land-use-mapping-in-windblown-dust-module)
 
 - **Bug fix for the estimation of marine-gas halogen emissions**  
 To estimate the emissions of gaseous halogens in marine environments, the grid cell area covering the spatial extent within the domain is needed. Because CMAQ horizontal domains are defined by projecting a map onto a 2-D plane a map-scale factor must be applied when converting physical areas to projected space, which was not taken into account when estimating halogen emissions within this module. This bug fix impacts halogen emission estimates in grid cells in which map scale factors are not unity. For example, if using a northern polar stereographic map projection, this will lead to increased ozone (less ozone is destroyed by halogens) and decreases sulfate (less is produced via dimethyl sulfide) mostly over lower latitude areas.
@@ -158,7 +162,7 @@ Revises model default from `Budget_Diag = .TRUE.` to `Budget_Diag = .FALSE.`. Th
 Replaces the CONST.EXT file with a Fortran module to define model fundamental physical, chemical, and mathematical constants (e.g., PI, MWAIR, etc.). Additionally, the values of several constants have been updated to be consistent with 2019 NIST and SI standards, and an approximation to the error function ERF has been removed.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#replace-constext-include-file-with-module-and-update-constant-values)
 
 
--**Reduce model runtime by rewriting HLCONST module**  
+- **Reduce model runtime by rewriting HLCONST module**  
 The HLCONST module computes Henry's Law constants used in CCTM, to use integer tokens instead of strings. Restructing the code in this module reduces model runtime by approximately 8%. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#changes-in-henrys-law-computation-and-budget-tool)
 
 - **Improvements to compiling with GCC**  
