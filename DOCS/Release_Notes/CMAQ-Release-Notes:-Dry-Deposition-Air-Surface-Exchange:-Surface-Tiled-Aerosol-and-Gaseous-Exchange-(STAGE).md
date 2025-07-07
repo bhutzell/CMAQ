@@ -37,7 +37,6 @@ STAGE and M3DRY deposition modules are now both built in model executables and m
 |[Merge for PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321/commits/d387fd332650055d71fb4de373dc25d92ab86730) | [PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321)  |
 
 ### Diagnostic NH3 Emissions from Agriculture and Biogenic Sources
-
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Diagnostic Update     
 **Release Version/Date**:  CMAQv6.0  
@@ -52,7 +51,6 @@ This only adds diagnostic data and does not change results or impact run time.
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1362](https://github.com/USEPA/CMAQ/commit/87987a81d6c9a3975082fd25268af6db3e23fc40) | [PR#1362](https://github.com/USEPA/CMAQ_Dev/pull/1362)  |
-
 
 
 ### Update to Minimum Kz and Kz0ut in the STAGE deposition option
@@ -107,7 +105,6 @@ Model results are unchanged.
 |[Merge for PR#1242](https://github.com/USEPA/CMAQ/commit/dd8fa43dbac447332e54d56a8cc100733ae1ce96) | [PR#1242](https://github.com/USEPA/CMAQ_Dev/pull/1242)  |
  
 
-
 ### STAGE gcc debug flag bug fix  
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix     
@@ -122,8 +119,6 @@ This bugfix allows the user to run the model compiled with gcc debug flags using
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1227](https://github.com/USEPA/CMAQ/commit/9d9d871b6921443c270f7eebea2e1893d6f25822) | [PR#1227](https://github.com/USEPA/CMAQ_Dev/pull/1227)  |
-
-
 
 
 ### Correction in an Underflow STAGE Emerson Aerosol Dry Deposition Option
