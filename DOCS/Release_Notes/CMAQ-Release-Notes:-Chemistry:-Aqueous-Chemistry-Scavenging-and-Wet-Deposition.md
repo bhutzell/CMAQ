@@ -60,9 +60,12 @@ The following limited updates were made to **aqchem**:
 **Release Version/Date**:  CMAQv6.0   
 
 **Description**:  The acm_ae6_mp cloud mechanism was previously used with multipollutant configurations of the CMAQ model. However, it no longer works with any existing chemical mechanism and is scientifically obsolete. This unused option is removed in this PR.  
-**Significance and Impact**: Since it has not been possible to use this option for several model releases, its removal is not expected to have any significant impacts on the user community.  
-**Internal PRs**: [PR#1236](https://github.com/USEPA/CMAQ_Dev/pull/1236)  
 
+**Significance and Impact**: Since it has not been possible to use this option for several model releases, its removal is not expected to have any significant impacts on the user community.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1236](https://github.com/USEPA/CMAQ/commit/72f92b2a7e26b4d9ef16f2f7fbaa976bf77fbac3) | [PR#1236](https://github.com/USEPA/CMAQ_Dev/pull/1236)  |
 
 ###  Cleanup of unit conversions and wetdep output mapping  
 [Ben Murphy](mailto:murphy.benjamin@epa.gov), U.S. Environmental Protection Agency      
