@@ -57,7 +57,8 @@ The following limited updates were made to **aqchem**:
 ### Removal of acm_ae6_mp Cloud Module
 **Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Maintenance  
-**Release Version/Date**:  CMAQv6.0  
+**Release Version/Date**:  CMAQv6.0   
+
 **Description**:  The acm_ae6_mp cloud mechanism was previously used with multipollutant configurations of the CMAQ model. However, it no longer works with any existing chemical mechanism and is scientifically obsolete. This unused option is removed in this PR.  
 **Significance and Impact**: Since it has not been possible to use this option for several model releases, its removal is not expected to have any significant impacts on the user community.  
 **Internal PRs**: [PR#1236](https://github.com/USEPA/CMAQ_Dev/pull/1236)  
@@ -66,7 +67,7 @@ The following limited updates were made to **aqchem**:
 ###  Cleanup of unit conversions and wetdep output mapping  
 [Ben Murphy](mailto:murphy.benjamin@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Science Update    
-**Release Version/Date**: CMAQv5.5  
+**Release Version/Date**: CMAQv5.5   
 
 **Description**:  
 In CMAQv5.4 and prior, there are at least 3 or 4 different mapped vectors through which data is passed when translating from CGRID to the local arrays within scavwdep and aqchem. Each of these steps constrains the flexibility to expand gas and aerosol components and necessitates the differentiation of codes to maintain separate modules. For example, 'mp', and 'kmt' flavors require special versions of AQ_DATA and/or aq_map to handle mapping. Unfortunately, when the various optional modules for cloud chemistry diverge, it becomes much less likely that instrumented codes like STM and ISAM will be applied across all options. It is also more difficult to keep cloud process codes like CONVCLD and RESCLD consistent across all options.
