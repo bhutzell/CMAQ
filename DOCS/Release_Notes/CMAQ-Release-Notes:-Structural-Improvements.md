@@ -3,7 +3,7 @@
 ### Reorganize Aero Module  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Restructure  
-**Release Version/Date**:  CMAQv6.0  
+**Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
 This update restructures the code in the Aerosol module.    The routines in aero_subs file has been split up, grouping the routines in the orignal file into more intuitive places, making the code more digestible.
@@ -19,8 +19,8 @@ No impact on results.
 
 ### Enable parallel I/O for Lightning and ELMO files
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Fix/added feature  
-**Release Version/Date**: CMAQv6.0
+**Type of update**: Fix/added feature    
+**Release Version/Date**: CMAQv6.0  
 
 **Description**:   
 When using a parallel file system (e.g., Lustre), a code block is needed to ensure that the file is open on all processors. Otherwise, the model crashes.
@@ -39,8 +39,8 @@ Was not tested given no access to a parallel file system, however, not anticipat
 
 ### Improvements to compiling with GCC 
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Compilation  
-**Release Version/Date**: CMAQv6.0
+**Type of update**: Compilation    
+**Release Version/Date**: CMAQv6.0  
 
 **Description**:   
 Compiling the CCTM with gcc has always generated a daunting number of WARNING messages. There are so many that we have ignored them. This PR resolves many of those warnings, with the hope that developers or integrators might notice and address new ones that are created.
@@ -67,8 +67,8 @@ Generally, warnings should be addressed when possible. You never know when GCC m
 
 ### Replace CONST.EXT include file with module and update constant values  
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Restructure   
-**Release Version/Date**: CMAQv6.0
+**Type of update**: Restructure     
+**Release Version/Date**: CMAQv6.0  
 
 **Description**:   
 In this PR, the code is restructured to define and use a CONST module in lieu of the CONST.EXT include file. 
@@ -89,8 +89,8 @@ NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds
 
 ### Cap log_message at 1000 lines  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
-**Type of update**: Bug Fix 
-**Release Version/Date**:  CMAQv6.0 
+**Type of update**: Bug Fix   
+**Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
 When excessively long character strings are sent to log_message, it has the potential to reach an infinite loop. This update establishes a cap on the log_message at 1000 lines.
@@ -104,8 +104,8 @@ No impact on results.
 
 ### Correct desid_module.F for serial version of CCTM
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Bug Fix  
-**Release Version**:  CMAQv6.0  
+**Type of update**: Bug Fix    
+**Release Version**:  CMAQv6.0    
 
 **Description**:
 The update removes a CCTM compile error from the desid_module.F file when the build script compiles a serial version. The error comes from lines getting a grid cell's column and row number in the simulation domain. The method only works for parallel version because it uses a PARIO routine. The fix inserts a ifdef-else block to consider parallel and non-parallel cases.
@@ -119,8 +119,8 @@ The update removes a CCTM compile error from the desid_module.F file when the bu
 
 ### Simplify RETRIEVE_OCEAN_DATA
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**:  Simplify code
-**Release Version/Date**: CMAQv6.0
+**Type of update**:  Simplify code  
+**Release Version/Date**: CMAQv6.0  
 
 **Description**:   
 Simplified the logic in CCTM/src/cio/centralized_io_module.F for subroutine retrieve_ocean_data.
@@ -137,8 +137,8 @@ No impact on model results.
 
 ### GNU build flag update to enable compilation with GNU versions 10+
 [Fahim Sidi](mailto:sidi.fahim@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Bug Fix  
-**Release Version/Date**:  CMAQv5.5   
+**Type of update**: Bug Fix    
+**Release Version/Date**:  CMAQv5.5     
 
 **Description**:  Starting GNU version 10+, GNU no longer allows rank mismatches between the callee and the calling function. The exact verbiage from the GNU change logs:"Mismatches between actual and dummy argument lists in a single file are now rejected with an error. Use the new option -fallow-argument-mismatch to turn these errors into warnings; this option is implied with -std=legacy. -Wargument-mismatch has been removed.” (https://gcc.gnu.org/gcc-10/changes.html)
 
@@ -154,8 +154,8 @@ The non-FORTRAN explanation boils down to the ability to pass 1-D arrays, 2-D ar
 
 ### Emissions Diagnostics and Log Output
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Diagnostic and Log Updates  
-**Release Version**:  CMAQv5.5 
+**Type of update**: Diagnostic and Log Updates    
+**Release Version**:  CMAQv5.5   
  
 **Description**:   
 Several issues with emissions diagnostics were identified by internal developers and external users. These have been resolved. Issues include:
@@ -176,8 +176,8 @@ These updates improve consistency among diagnostic output files and improve read
 
 ## Add precision to timing metrics in logfiles 
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency   
-**Type of update**: Improvement (Minor log formatting change)   
-**Release Version/Date**: CMAQv5.5    
+**Type of update**: Improvement (Minor log formatting change)     
+**Release Version/Date**: CMAQv5.5      
 
 **Description**:   
 This PR adds three decimal places of precision to the process-level timing metrics in the ascii logfile.
@@ -191,8 +191,8 @@ At high computational efficiency, the default precision provided for the timing 
 
 ## Improvement of Logfile output and error reporting
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Bug Fix and Log File Improvements   
-**Release Version**: CMAQv5.4   
+**Type of update**: Bug Fix and Log File Improvements    
+**Release Version**: CMAQv5.4    
 
 **Description**:   
 - Propagated SHA ID from git repository to configuration file and execution ID to support versioning and matching code state to results.
