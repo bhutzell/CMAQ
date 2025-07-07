@@ -6,9 +6,9 @@
 **Release Version/Date**:  CMAQv6.0  
 
 **Description**:   
-This update restructures the code in the Aerosol module.    The routines in aero_subs file has been split up, grouping the routines in the orignal file into more intuitive places, making the code more digestible.
+This update cosmetically restructures the lcoations of subroutines in the Aerosol module. The subroutines in the aero_subs file have been split up, and these subroutines have been grouped into more intuitive places, making the code more digestible. For example, the subroutines relevant for calculating the fraction of mass for each aerosol species that is captured with a particular inlet (e.g. PM1, PM2.5, PM10) are now located in the file called aerosol_inlet.F.
 
-This update also renames SOA_DEFN to ORG_DEFN because it's been a long time since SOA_DEFN only treated SOA. It treats all organics. The name is updated both in the module and everywhere the module is used.
+This update also renames SOA_DEFN to ORG_DEFN. When this file was first created, it only treated the physics and chemistry needed for SOA formation. However, since its introduction, it has taken on the partitioning of POA species as well. As such, its name needed to be reconsidered for clarity. The name is updated both in the module and everywhere the module is used.
 
 **Significance and Impact**:   
 No impact on results.
