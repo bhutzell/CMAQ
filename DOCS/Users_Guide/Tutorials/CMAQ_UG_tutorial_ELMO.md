@@ -136,7 +136,7 @@ At the end of the list, around line 337
 
     &ELDTP( 'SOILT_2      ',ID_SOILT_2,    ET_MET,      F, 'K     ', 'Layer 2 soil temperature' ),  ! modify the last line by removing the /) and adding a comma
 
-     &ELDTP( 'GHG          ',ID_GHG,        ET_DRVD,     T, 'ppmV', ', 'Greenhouse Gas' /)          ! add your new ELMO derived variable
+     &ELDTP( 'GHG          ',ID_GHG,        ET_DRVD,     T, 'ppmV', ' Greenhouse Gas') /)          ! add your new ELMO derived variable
 
 
 
