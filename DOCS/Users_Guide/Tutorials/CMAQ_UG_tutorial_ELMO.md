@@ -174,7 +174,7 @@ of the ELMO_DATA module and only update your own variable.
 
 Example:
 
-            USE ELMO_DATA, ONLY : GHG
+            USE ELMO_DATA, ONLY : ELMO_GHG
 
 #### STEP 6: Propagate Data to ELMO Output Arrays
 
