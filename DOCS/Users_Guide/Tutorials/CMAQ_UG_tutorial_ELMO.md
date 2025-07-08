@@ -14,16 +14,67 @@ Create a new line and set the value of Keywd_name(x) equal to the name of your n
 index indicating the position of your Keyword in the full Keyword list. There is nothing consequential about the order 
 of ELMO Keywords, but indices cannot repeat. If you choose a number in the middle of the existing list, you must increment 
 the index of every Keyword after it in the list. The easiest choice is just to make x equal to 1 greater than the 
-current largest Keyword index.  
+current largest Keyword index. Also increment the total number of keywords specified: N_Keywords in ELMO_INIT Field. 
 
-#### STEP 2: Add Contents for Your Keyword  
+#### STEP 2: Increment the Number of keywords, and Specify Your Keyword Components
+
+Increment N_Keywords by one in the ELMO_INIT Fields to N_Keywords is defined as number of keywords 
+
+Example:
+
+&ELMO_INIT
+  N_Files = 2
+  N_Max_Output_Variables = 400
+  N_Keywords = 74                     ! Modified from 73 to 74
+  N_Max_Keyword_Variables = 150
+/
+
 
 Populate Keywd(x,:) with a list of comma-separated, quoted strings. These strings can be CMAQ species, ELMO derived 
 variables, meteorological variables, other Keywords, or any other variable type ELMO knows of.
 
+Example: 
+
+ !-----------------------------------------------------!
+ !----- DEFINE ELMO KEYWORDS FOR USE IN FILE_VARS -----!
+ !-----------------------------------------------------!
+
+  Keywd_name(74) = 'GHG'         ! Step 1 
+
+  Keywd(74,:) = 'ECH4','CO2'  ! Step 2  Specify components of GHG as Methane, Carbon Dioxide
+
+
 #### STEP 3: Use Your New Keyword
 
 Your Keyword is ready for use in File_Vars to activate variables for your simulation's output files.
+
+Add an additional output ELMO output file and write your Keyword. Is this correct, or do you add your new keyword to another output file?
+
+Example:
+
+&ELMO_Files
+
+ !
+ !-- Set Properties and Contents for each ELMO Output File
+ !
+
+  Flabel(1)= 'DEFAULT'
+  Tmode(1) = 'aggregate'
+  Lay_Bot(1) = 1
+  Lay_Top(1) = 1
+  File_Vars(1,:) = 'DEFAULT'
+
+  Flabel(2)= 'DEFAULT_DEP'
+  Tmode(2) = 'aggregate'
+  Lay_Bot(2) = 1
+  Lay_Top(2) = 1
+  File_Vars(2,:) = 'DEFAULT_DEP'
+
+  Flabel(3)= 'GHG'
+  Tmode(3) = 'aggregate'
+  Lay_Bot(3) = 1
+  Lay_Top(3) = 1
+  File_Vars(3,:) = 'GHG'
 
 ------------
 
@@ -35,7 +86,13 @@ Go to [ELMO_DATA.F][link_elmo_data]. Beginning around line 70, you will find a l
 derived ELMO variables and other diagnostics. Add an index for your new variable to the end of the list. We recommend 
 prefixing it with ID_.
 
-#### STEP 2: Add New Variable Attributes to ELMO_LIST  
+Example:
+
+around line 191 add
+
+      INTEGER, PARAMETER :: ID_GHG =    115
+
+#### STEP 2: Add New Variable Attributes to ELMO_LIST and increment N_ELMO_LIST
 
 Below the list of ID_ indices is a table called ELMO_LIST which holds the attributes for every ELMO derived variable. 
 Because each variable maps to an ID_, this list is order-independent. Add a row in any location you prefer. This row 
@@ -56,15 +113,41 @@ This name can also be used in the contents of any Keyword to activate it with a 
     - ET_MET - a meteorological variable (e.g. temperature, rain data, etc.)
     - ET_CHEM - a chemical reaction property for heterogeneous reactions like gamma uptake coefficient.
 
+Example:
+
+      INTEGER, PARAMETER :: ID_GHG =    115       ! add
+
+      INTEGER, PARAMETER :: N_ELMO_LIST = 115     ! increment
+
+
+      TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
+
+     &ELDTP( 'GHG        ',ID_GHG,      ET_DRVD, ppmV, '      ', 'Greenhouse Gas,     ! add line after the 
+
+
+
 #### STEP 3: Declare Array for New Variable
 
 Declare an allocatable array in the ELMO_DATA module that will store the values for your new variable so they may be accessed by ELMO. 
 Use ELMO_AOD_550 as an example. This particular variable is defined with two dimensions. Use three dimensions if your variable is 
 dependent on height.  
 
+Example:
+
+After about line 650 add
+
+       REAL, ALLOCATABLE, SAVE :: ELMO_GHG(:,:,:) ! Greenhouse gas accumulated per timestep
+
+
 #### STEP 4: Allocate and Initialize New Variable
 
 Add your variable to the subroutine elmo_init_shared. Again, you may use ELMO_AOD_550 as an example.  
+
+Example:
+
+After about line 770 add
+
+       allocate( elmo_ghg(ncols, nrows, nlays ), stat=ios)
 
 #### STEP 5: Populate New Variable in CMAQ
 
@@ -72,16 +155,32 @@ Use the new array defined and allocated in Steps 3/4 in a CMAQ module to store t
 be used in the subroutine you modify if it is not already. We recommend using the 'Use ELMO_DATA, Only:' approach to protect the rest 
 of the ELMO_DATA module and only update your own variable.  
 
+Example:
+
+???
+
 #### STEP 6: Propagate Data to ELMO Output Arrays
 
 In ELMO_DERIVED_CALC.F, add a case to the select case statement for the variable IDG. Your case should reference the new ID_ index of 
 your variable. Within the case, set outval equal to the value of your new variable in the current local grid cell (C1,R1,L1), and 
 make any appropriate modifications. Again, use the approach for ELMO_AOD_550 as a guide.  
 
+Example: (note this variable has data for column, row, and layers, so differs slightly from ELMO_AOD_550 which only has columns and rows)??
+
+add the following around line 391
+
+         ! Retrieve GHG 
+         CASE ( ID_GHG )
+         OUTVAL = ELMO_GHG( C1,R1,L1 )
+
+
 #### STEP 7: Add Variable Name to CMAQ Control File
 
 ELMO is now equipped to output your variable. You may add it to File_Vars in [CMAQ_Control.nml][link_cmaq_ctrl] for any custom output file you like, or 
 you may add it to the contents of any ELMO Keyword.  
+
+Note: this was done above in the steps followed for ADD ELMO KEYWORDS
+
 
 
 <!-- START_OF_COMMENT -->
