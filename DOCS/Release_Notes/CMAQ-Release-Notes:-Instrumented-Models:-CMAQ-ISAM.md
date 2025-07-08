@@ -72,6 +72,9 @@ No impact on any output files for both ISAM and the base model. Some minor chang
 **Description**:  
 ISAM encounters several floating-point exceptions when run in debug mode across all mechanisms. These are resolved by adding a minimum value to the denominator in each case.
 
+**Significance and Impact**:   
+This change will resolve unstable growth of small numerical noise in ISAM runs, which can sometimes appear as source-apportioned mass far away from the source it is attributed to.
+
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1225](https://github.com/USEPA/CMAQ/commit/63afe25a706aed7ad3273d4718b2eedd2f242cea) | [PR#1225](https://github.com/USEPA/CMAQ_Dev/pull/1225)  |
