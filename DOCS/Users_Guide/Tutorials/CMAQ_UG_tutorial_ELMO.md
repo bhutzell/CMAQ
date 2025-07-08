@@ -1,4 +1,4 @@
-## CMAQ Tutorial ##
+## CMAQ ELMO Add New Output Variable Tutorial ##
 ### Add ELMO Keywords and Derived Variables ###
 Purpose: This tutorial will step you through the processes of adding ELMO Keywords to the CMAQ Control Namelist and 
 adding new derived variables to the ELMO source code.  
