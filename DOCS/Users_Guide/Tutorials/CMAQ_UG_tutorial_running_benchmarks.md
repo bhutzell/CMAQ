@@ -13,3 +13,4 @@ following upgrades to your system kernel, Fortran/C compiler, netCDF library, or
   - [Running the WRF-CMAQ Test Case](CMAQ_UG_tutorial_WRF-CMAQ_Benchmark.md)
   - [Build and run the MPAS-CMAQ Test Case using gcc](CMAQ_UG_tutorial_MPAS-CMAQ_Benchmark_gcc.md)
   - [Build and run the MPAS-CMAQ Test Case using intel](CMAQ_UG_tutorial_MPAS-CMAQ_Benchmark_intel.md)
+  - [Add New ELMO Derived Variable to ELMO Output File](CMAQ_UG_tutorial_ELMO.md) 
