@@ -31,6 +31,9 @@ CMAQv6.0 introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as
   - **Fix ISAM erroneous mass attribution**  
   Fixes a bug that caused tagged mass to appear far from emission sources due to improper handling of aerosol mass concentrations.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#erroneous-mass-attribution)
 
+ - **Add pcVOC and NOy species to ISAM species lists**
+   (Fill in description). [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#adds-pcvoc-and-noy-species-to-isam-species-lists)
+  
   - **ISAM control file**  
   Increases control file character limits and improves logging for ISAM tag summaries, aiding troubleshooting. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#isam-control-file)
   
@@ -56,6 +59,9 @@ CMAQv6.0 introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM
   - **Photolysis of aerosol nitrate in CRACMM3**  
   Adds photolysis of aerosol nitrate and a new aerosol species to CRACMM3, with updated molecular weights and solver enhancements. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#photolysis-of-aerosol-nitrate-in-cracmm3)
 
+   - **Add CRACMM3HAPS Chemical mechanism**
+     (Fill in description.) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).mdd#add-cracmm3haps-chemical-mechanism]
+     
   - **Photolysis update in CRACMM3 and CRACMM3M**  
   Updates photolysis data and reactions for several species, adds new reactions, and incorporates recent scientific findings for improved accuracy. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#photolysis-update-in-cracmm3-and-cracmm3m)
 
