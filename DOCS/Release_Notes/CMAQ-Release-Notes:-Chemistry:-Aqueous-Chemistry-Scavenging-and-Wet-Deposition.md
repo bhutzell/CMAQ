@@ -54,6 +54,23 @@ The following limited updates were made to **aqchem**:
 |:------:|:-------:|
 |[Merge for PR#1130](https://github.com/USEPA/CMAQ/commit/8d607848cdfe7b1f1b139dbb968145f092fb9714) | [PR#1130](https://github.com/USEPA/CMAQ_Dev/pull/1130)  |
 
+### Minor bug fixes to cloud processing
+**Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Maintenance  
+**Release Version/Date**:  CMAQv6.0   
+
+**Description**:  
+Two issues are addressed.   
+
+(1) The model crashes when compiled in column mode with gcc in debug mode. The problem is that two arrays are added together that don't have the same dimension lengths. An explicit loop is added to address this.
+
+(2) The model crashes with Sulfur-Tracking on. The aqueous chemistry surrogate for SULF_ICBC does not exist, and has never existed. Before the cloud chemistry mapping was updated, there was no check for this error. Now the model correctly crashes because this error exists. 
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1263](https://github.com/USEPA/CMAQ/commit/2f07b7813e6a632f256041c3d901f39e1fd96d90) | [PR#1263](https://github.com/USEPA/CMAQ_Dev/pull/1263)  |
+
 ### Removal of acm_ae6_mp Cloud Module
 **Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Maintenance  
