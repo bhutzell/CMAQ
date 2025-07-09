@@ -26,20 +26,20 @@ CMAQv6.0 introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as
   (Fill in summary) [Release Note](../Release_Notes/CMAQ-Release-Notes%3A-Instrumented-Models%3A-CMAQ-ISAM.md#add-cracmm3m-to-mechanisms-supported-by-isam)
 
   - **Improve stability in ISAM apportionment output**   
-  Addresses errors in aerosol/gas partitioning in ISAM, preventing mass from being incorrectly allocated to distant tags.  
-  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#improve-stability-in-isam-apportionment-output)
+  Addresses errors in aerosol/gas partitioning in ISAM, preventing mass from being incorrectly allocated to distant tags. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#improve-stability-in-isam-apportionment-output)
 
   - **Fix ISAM erroneous mass attribution**  
-  Fixes a bug that caused tagged mass to appear far from emission sources due to improper handling of aerosol mass concentrations.  
-  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#erroneous-mass-attribution)
+  Fixes a bug that caused tagged mass to appear far from emission sources due to improper handling of aerosol mass concentrations.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#erroneous-mass-attribution)
 
+  - **ISAM control file**  
+  Increases control file character limits and improves logging for ISAM tag summaries, aiding troubleshooting. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#isam-control-file)
+  
 - **Updates to the Decoupled Direct Method in Three Dimensions (CMAQ-DDM3D)**  
   - **Address DDM3D instability in sensitivity fields**  
    Fixes DDM3D instablity in after hetereogenous chemistry due to inconsistent unit conversions. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md)
 
   - **DDM3D control file character limit increase**  
-  Increases the character limit for specification strings in the DDM-3D control file to support more complex applications.  
-  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md#ddm-3d-control-file-character-limit-increase)
+  Increases the character limit for specification strings in the DDM-3D control file to support more complex applications.   [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md#ddm-3d-control-file-character-limit-increase)
   
 ### Chemistry
 - **Updates to Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM)**  
@@ -48,7 +48,7 @@ CMAQv6.0 introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM
  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3)
 
   - **Heterogeneous chemistry of sulfur species**  
-  Adds heterogeneous sulfur chemistry to improve particulate sulfur predictions in areas with high winter PM pollution. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#heterogeneous-chemistry-of-sulfur-species)
+  Adds heterogeneous sulfur chemistry to CRACMM3, improving model performance in high PM pollution areas during winter.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#heterogeneous-chemistry-of-sulfur-species)
 
   - **Adding chlorine chemistry in CRACMM3**  
   Incorporates chlorine chemistry from CRACMM3M into CRACMM3, using a reduced set of organic reactions to limit computational demand. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#adding-chlorine-chemistry-in-cracmm3)
@@ -74,6 +74,9 @@ CMAQv6.0 introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM
   - **Correct conservation of nitrogen for 4 reactions in CRACMM3**  
 Implements fixes to ensure nitrogen conservation in four specific reactions, based on expert recommendations. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#correct-conservation-of-nitrogen-for-4-reactions-in-cracmm3)
 
+  - **Removal of Formaldehyde, Acetaldehyde, and Acrolein by monoatomic Cl**  
+  Removes loss processes for certain emission tracers via monatomic chlorine in default CRACMM mechanisms, aligning with intended chemistry.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#removal-of-formaldehyde-acetaldehyde-and-acrolein-by-monoatomic-cl)
+
   - **CRACMM Reaction Metadata File**  
 Provides a metadata file documenting updates to CRACMM chemistry at the reaction level.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#cracmm-reaction-metadata-file)
 
@@ -81,13 +84,12 @@ Provides a metadata file documenting updates to CRACMM chemistry at the reaction
 CMAQv6.0 no longer supports the following mechanisms: CB6R3_AE7_AQ, CRACMM1_AQ, CRACMM1AMORE_AQ, RACM2_AE6_AQ, and SAPRC07TIC_AE7i_AQKMT2. The update ensures consistency across remaining mechanisms and utilities. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#delete-obsolete-chemical-mechanisms)
 
 - **Bug fix to CarbonBond 6 Mechanism with Hazardous Air Pollutants (CB6r5HAP)**
-    - **Correct rate constant for styrene's reaction with ozone**   
+    - **Correct loss of reactive tracer styrene from ozone reaction**   
 Bug fix to cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the model species styrene, a hazardous air pollutant. No other model species are impacted. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Carbon-Bond-6-Mechanism-(CB6)-with-Hazardous-Air-Pollutants.md#correct-loss-of-reactive-tracer-styrene-from-ozone-reaction)
 
 - **Bug fix to State Air Pollution Research Center (SAPRC) mechanisms**
   - **Fix bug preventing CMAQ from running using SAPRC mechanisms**  
-  Resolves an inconsistency so that CLNO2 now undergoes dry deposition as specified in the SAPRC mechanisms.  
-  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-State-Air-Pollution-Research-Center-(SAPRC).md#fix-bug-preventing-cmaq-from-running-using-saprc-mechanisms)
+  Resolves an inconsistency so that CLNO2 now undergoes dry deposition as specified in the SAPRC mechanisms. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-State-Air-Pollution-Research-Center-(SAPRC).md#fix-bug-preventing-cmaq-from-running-using-saprc-mechanisms)
 
 - **Updates to Aqueous Chemistry Scavenging and Wet Deposition**
   - **KMT2 rate updates and minor bugfix**  
@@ -103,6 +105,13 @@ Bug fix to cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the mo
   - **Generalized Dynamic and Equilibrium Partitioning of Inorganic Aerosols**  
   Extends the dynamic approach for mass transfer of inorganic aerosols to all modes, improving accuracy for high-resolution, short time step simulations. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#generalized-dynamic-and-equilibrium-partitioning-of-inorganic-aerosols)
 
+  - **SOA Mapping: Revise Logfile Output**  
+  Refines logfile messaging to only warn when required species are missing, reducing unnecessary warnings and improving clarity. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#soa-mapping-revise-logfile-output)
+
+  - **Remove option for Aerosol Initial Condition surface area and update settings for Boundary Condition Surface Area**  
+  Updates and simplifies run script options for aerosol surface area in initial and boundary conditions, clarifying usage and compatibility. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#remove-option-for-aerosol-initial-condition-surface-area-and-update-settings-for-boundary-condition-surface-area)
+  
+
 - **Updates to Photolysis**
   - **Fix photolysis loss process in reactive tracer module**  
   Corrects unit conversion and initialization errors in the reactive tracer module’s photolysis loss process, and updates a conversion factor for consistency with gas phase chemistry.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Photolysis.md#fix-photolysis-loss-process-in-reactive-tracer-module)
@@ -116,16 +125,27 @@ Bug fix to cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the mo
   - **Updates to diagnostics for Inline Photolysis**  
   (Fill in description) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Photolysis.md#updates-to-diagnostics-for-inline-photolysis)
 
-  - **SOA Mapping: Revise Logfile Output**  
-  Refines logfile messaging to only alert users when a required species is missing, and adds messages for successful species mapping. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#soa-mapping-revise-logfile-output)
 
-  - **Remove option for Aerosol Initial Condition surface area and update settings for Boundary Condition Surface Area**  
-  Removes obsolete run script options for aerosol surface area and updates guidance for boundary condition settings, clarifying usage in the User Guide.   [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#remove-option-for-aerosol-initial-condition-surface-area-and-update-settings-for-boundary-condition-surface-area)
-
-      
 ### Dry Deposition Air Surface Exchange  
-- **Impvrove behavior of the runtime minimum eddy diffusivity option called KZMIN**  
-The KZMIN option, first introduced in CMAQv4.5, is a parameterization to allow the mixing in the planetary boundary layer (PBL) to respond to the land-use characteristics. If the runtime environmental variable KZMIN is set to 'True/Yes', the land-use based parameterized minimum eddy diffusivity will now be applied through the PBL, whereas previously it was limited to 500 meters above ground. If KZMIN is set to 'False/No', a constant minimum value of 0.01 m<sup>2</sup>/s is applied everywhere at all times. This change primarily impacts nighttime concentrations, specifically in grid cells where the PBL is lower than 500 meters. In those grid cells, primary emitted species concentrations will increase, whereas ozone mixing ratios will decrease due to increased NOx titration. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-Surface-Tiled-Aerosol-and-Gaseous-Exchange-(STAGE).md#update-to-minimum-kz-and-kz0ut-in-the-stage-deposition-option)
+
+- **Impvrove behavior of the runtime minimum eddy diffusivity option called KZMIN in STAGE and M3DRY**  
+The KZMIN option, first introduced in CMAQv4.5, is a parameterization to allow the mixing in the planetary boundary layer (PBL) to respond to the land-use characteristics. If the runtime environmental variable KZMIN is set to 'True/Yes', the land-use based parameterized minimum eddy diffusivity will now be applied through the PBL, whereas previously it was limited to 500 meters above ground. If KZMIN is set to 'False/No', a constant minimum value of 0.01 m<sup>2</sup>/s is applied everywhere at all times. This change primarily impacts nighttime concentrations, specifically in grid cells where the PBL is lower than 500 meters. In those grid cells, primary emitted species concentrations will increase, whereas ozone mixing ratios will decrease due to increased NOx titration. [STAGE Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-Surface-Tiled-Aerosol-and-Gaseous-Exchange-(STAGE).md#update-to-minimum-kz-and-kz0ut-in-the-stage-deposition-option) | [M3DRY Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-M3DRY.md#updates-of-minimum-kz-for-m3dry)
+
+- **Additional STAGE Updates**  
+  - **Fill in title**
+    Fill in description. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-Surface-Tiled-Aerosol-and-Gaseous-Exchange-(STAGE).md#stage-updates-and-bug-fix)
+  
+  - **Diagnostic NH3 Emissions from Agriculture and Biogenic Sources**  
+  Adds diagnostics for NH3 emissions from agricultural and biogenic sources in the STAGE module (no further description provided). [Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-Surface-Tiled-Aerosol-and-Gaseous-Exchange-(STAGE).md#diagnostic-nh3-emissions-from-agriculture-and-biogenic-sources)
+
+  - **Add Support for DDM-3D**  
+  Adds DDM-3D support to the STAGE module.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-Surface-Tiled-Aerosol-and-Gaseous-Exchange-(STAGE).md#runtime-deposition-options-and-add-support-for-ddm-3d)
+
+  - **Restored the impact of dry deposition factor on diagnostic deposition velocity outputs**  
+  Ensures diagnostic outputs reflect user-selected dry deposition factors, improving sensitivity analysis. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-Surface-Tiled-Aerosol-and-Gaseous-Exchange-(STAGE).md#restored-the-impact-of-dry-deposition-factor-on-diagnostic-deposition-velocity-outputs)
+
+  - **STAGE gcc debug flag bug fix**  
+  Fixes a crash caused by uninitialized arrays when running STAGE with gcc debug flags and bidirectional NH3 exchange.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-Surface-Tiled-Aerosol-and-Gaseous-Exchange-(STAGE).md#stage-gcc-debug-flag-bug-fix)
 
 ### Emissions
 - **Introducing new soil emissions module**  
@@ -146,6 +166,15 @@ To estimate the emissions of gaseous halogens in marine environments, the grid c
  - **Improve DESID Error Checking for Negative Emissions**  
  Relaxes tolerances for negative emissions, improves error reporting, and provides more precise gridcell location information for detected issues. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Detailed-Emissions-Scaling-Isolation-and-Diagnostics-Module-(DESID).md#improve-desid-error-checking-for-negative-emissions)
 
+- **DESID Area-Normalized Conversion Factor**  
+  Corrects an inversion error in the area-normalized conversion factor for emissions.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Detailed-Emissions-Scaling-Isolation-and-Diagnostics-Module-(DESID).md#desid-area-normalized-conversion-factor)
+
+- **Streamline Emissions Unit Conversions in DESID**  
+  Centralizes and standardizes unit conversions for emissions, simplifying maintenance and improving consistency across platforms. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Detailed-Emissions-Scaling-Isolation-and-Diagnostics-Module-(DESID).md#streamline-emissions-unit-conversions-in-desid)
+
+- **Streamlining DESID code**  
+  Removes unnecessary variables for online emission streams, making it easier to add new modules. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Detailed-Emissions-Scaling-Isolation-and-Diagnostics-Module-(DESID).md#streamlining-desid-code)
+
 - **Implement Online Met-Dependent Emission Module (MetEmis)** ***[community contribution]***  
 CMAQv6.0 introduces the MetEmis module to dynamically calculate meteorology-induced hourly gridded on-road mobile emissions within CMAQ, using simulated meteorology without any computational burden to the CMAQ modeling system. The impact is to improve the spatiotemporal representation of mobile emissions based on the simulated meteorology inputs when compared to the static scenario. For detailed information see Baek et al., 2023. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Online-Met-Dependent-Emission-(MetEmis)-Module.md#implement-online-met-dependent-emission-module-metemis)
 
@@ -154,19 +183,32 @@ CMAQv6.0 introduces the MetEmis module to dynamically calculate meteorology-indu
 - **Introducing ELMO version 2.1**  
 CMAQv6.0alpha introduces ELMO version 2.1 expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining custom aggregates of raw model species (e.g., NOY, NOz, etc.) and assigning them to output files. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#elmo-version-2)
 
+- **Bugfix to the Budget Tool output file** Prevents crashes by correcting the log header output in the Budget Tool's ASCII output file. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#bugfix-to-the-budget-tool-output-file)
+
 - **Reduce model runtime by changing default settings**  
 Revises model default from `Budget_Diag = .TRUE.` to `Budget_Diag = .FALSE.`. This change turns off the budget diagnostic tool reducing rutime by 10%. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#changes-in-henrys-law-computation-and-budget-tool)
   
 ### Structural Improvements
+- **Reorganize Aero Module**  
+  Refactors the Aerosol module for better code organization and clarity, including renaming and regrouping routines.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#reorganize-aero-module)
+  
 - **Replace CONST.EXT include file with module and update constant values**  
 Replaces the CONST.EXT file with a Fortran module to define model fundamental physical, chemical, and mathematical constants (e.g., PI, MWAIR, etc.). Additionally, the values of several constants have been updated to be consistent with 2019 NIST and SI standards, and an approximation to the error function ERF has been removed.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#replace-constext-include-file-with-module-and-update-constant-values)
-
 
 - **Reduce model runtime by rewriting HLCONST module**  
 The HLCONST module computes Henry's Law constants used in CCTM, to use integer tokens instead of strings. Restructing the code in this module reduces model runtime by approximately 8%. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#changes-in-henrys-law-computation-and-budget-tool)
 
 - **Improvements to compiling with GCC**  
 Reduces compiler warnings and updates code to be more compatible with GCC, making it easier to spot new issues.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#improvements-to-compiling-with-gcc)
+
+- **Enable parallel I/O for Lightning and ELMO files**  
+  Ensures files are opened on all processors when using parallel file systems, preventing model crashes. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#enable-parallel-io-for-lightning-and-elmo-files)
+
+- **Cap log_message at 1000 lines**  
+  Adds a safeguard to prevent infinite loops by capping log_message output at 1000 lines. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#cap-log_message-at-1000-lines)
+
+- **Simplify RETRIEVE_OCEAN_DATA**  
+  Streamlines the logic for retrieving ocean data in the centralized I/O module.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#simplify-retrieve_ocean_data)
 
 ### On-line coupling of CMAQ with meteorological models
 - **Introducing a new unified coupler for WRF-CMAQ and MPAS-CMAQ**
@@ -175,6 +217,9 @@ New module couples WRF-CMAQ and MPAS-CMAQ in a consistent "one-code" framework. 
 ### Utilities
 - **Add species composition data to RXNS modules and add new reactive rate constant type**  
   (Fill in description) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Utilities.md#add-species-composition-data-to-rxns-modules-and-add-new-reactive-rate-constant-type)
+
+- **Increase JPROC parameters for input file size**  
+  Increases parameter limits in the JPROC utility to support more wavelengths, resolving issues with new mechanisms. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Utilities.md#increase-jproc-parameters-for-input-file-size)
   
 ### Pre-processors
 - **Update to Meteorology - Chemistry Interface Processor (MCIP)**  
