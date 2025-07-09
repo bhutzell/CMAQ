@@ -31,10 +31,10 @@ CMAQv6.0 introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as
   - **Fix ISAM erroneous mass attribution**  
   Fixes a bug that caused tagged mass to appear far from emission sources due to improper handling of aerosol mass concentrations.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#erroneous-mass-attribution)
 
- - **Add pcVOC and NOy species to ISAM species lists**
+  - **Add pcVOC and NOy species to ISAM species lists**
    (Fill in description). [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#adds-pcvoc-and-noy-species-to-isam-species-lists)
   
-  - **ISAM control file**  
+   - **ISAM control file**  
   Increases control file character limits and improves logging for ISAM tag summaries, aiding troubleshooting. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#isam-control-file)
   
 - **Updates to the Decoupled Direct Method in Three Dimensions (CMAQ-DDM3D)**  
@@ -134,7 +134,7 @@ Bug fix to cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the mo
 
 ### Dry Deposition Air Surface Exchange  
 
-- **Impvrove behavior of the runtime minimum eddy diffusivity option called KZMIN in STAGE and M3DRY**  
+- **Improve behavior of the runtime minimum eddy diffusivity option called KZMIN in STAGE and M3DRY**  
 The KZMIN option, first introduced in CMAQv4.5, is a parameterization to allow the mixing in the planetary boundary layer (PBL) to respond to the land-use characteristics. If the runtime environmental variable KZMIN is set to 'True/Yes', the land-use based parameterized minimum eddy diffusivity will now be applied through the PBL, whereas previously it was limited to 500 meters above ground. If KZMIN is set to 'False/No', a constant minimum value of 0.01 m<sup>2</sup>/s is applied everywhere at all times. This change primarily impacts nighttime concentrations, specifically in grid cells where the PBL is lower than 500 meters. In those grid cells, primary emitted species concentrations will increase, whereas ozone mixing ratios will decrease due to increased NOx titration. [STAGE Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-Surface-Tiled-Aerosol-and-Gaseous-Exchange-(STAGE).md#update-to-minimum-kz-and-kz0ut-in-the-stage-deposition-option) | [M3DRY Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-M3DRY.md#updates-of-minimum-kz-for-m3dry)
 
 - **Additional STAGE Updates**  
