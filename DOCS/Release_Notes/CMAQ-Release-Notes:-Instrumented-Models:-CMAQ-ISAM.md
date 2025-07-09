@@ -67,7 +67,7 @@ No impact on any output files for both ISAM and the base model. Some minor chang
 ## Avoid floating point exceptions in aerosol source apportionment algorithm
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**:  v6.0 
+**Release Version/Date**:  CMAQv6.0 
 
 **Description**:  
 ISAM encounters several floating-point exceptions when run in debug mode across all mechanisms. These are resolved by adding a minimum value to the denominator in each case.
@@ -83,7 +83,7 @@ This change will resolve unstable growth of small numerical noise in ISAM runs, 
 ## Adds pcVOC and NOy species to ISAM species lists
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**:  v5.5+
+**Release Version/Date**:  CMAQv5.5+
 
 **Description**:  
 The species pcVOC, CRON, and OPAN were missing from the VOC, NOY and NOY species lists in ISAM. This can cause discrepancies when propagating source apportionment through the VOC and NOY systems. For example, with pcVOC missing, an unexplainable magnitude of mass is reclassified into the 'OTHER' category. It is also impossible for ELMO to calculate ISAM_NOY from CB6 mechanisms because ELMO's definition of NOY (in the chemical control file) does not match the list of species available.
