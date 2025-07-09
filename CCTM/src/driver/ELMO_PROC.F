@@ -270,6 +270,7 @@
       LOGICAL, INTENT( IN ) :: WRITE_STEP
       LOGICAL, INTENT( IN ) :: INIT_STEP
       REAL                  :: DIVFAC
+      REAL                  :: DIVFAC_PH ! special case for averaging particle pH
 
       CHARACTER(250) :: XMSG
       INTEGER        :: XSTAT1
@@ -363,17 +364,21 @@
              OL = L1 - ELMO_FILE( IFL )%LAY_BOT + 1
              DIVFAC = 1.0
              IF ( WRITE_STEP ) DIVFAC = 0.5 / FLOAT( ELMO_NSTEP - 1 )
+             DIVFAC_PH = 1.0
+             IF ( WRITE_STEP ) DIVFAC_PH = 1.0 / FLOAT( ELMO_NSTEP )
+
 
              DO  IVAR = 1,ELMO_FILE( IFL )%N_VARS
                 J   = ELMO_FILE( IFL )%TABID( IVAR )
                 U   = ELMO_FILE( IFL )%USEDID( IVAR )
                 IV  = ELMO_TABLE( J )%VAR_TYPE
                 IDG = ELMO_TABLE( J )%ID
-              
-                IF ( (IV .EQ. ET_DRVD .OR. IV .EQ. ET_ISAM_DRVD 
-     &                                .OR. IV .EQ. ET_DDM_DRVD ) .AND.
-     &               IDG .EQ. ID_PMF_PH .AND.
-     &               ELMO_USED( U ) .LT. -100. ) THEN
+             
+
+!            IF ( (IV .EQ. ET_DRVD .OR. IV .EQ. ET_ISAM_DRVD 
+!    &                                .OR. IV .EQ. ET_DDM_DRVD ) .AND.
+!    &               IDG .EQ. ID_PMF_PH .AND.
+!    &               ELMO_USED( U ) .LT. -100. ) THEN
                    ! Special Averaging for Particle pH
                    ! Add whatever the current average is right now.
                    ! Certainly this is problematic, particularly
@@ -381,17 +386,59 @@
                    ! 0. It's best to either use the instantaneous
                    ! value or recalculate the average fine particle acidity
                    ! offline.
-                   IF ( INIT_STEP ) THEN
-                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
-                   ELSE IF ( WRITE_STEP ) THEN
-                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC * 
-     &                          ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) 
-     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) - ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) )
-                   ELSE 
-                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =
-     &                          ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) 
-     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
+                   ! Averaging for particle pH is done as a simple average
+                   ! rather than a trapezoidal average as is done for other
+                   ! averaged variables.
+!                  IF ( INIT_STEP ) THEN
+!                     ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
+!                  ELSE IF ( WRITE_STEP ) THEN
+!                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC * 
+!    &                          ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) 
+!    &                        + 2.0 * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) - ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) )
+!                  ELSE 
+!                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =
+!    &                          ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) 
+!    &                        + 2.0 * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
+!                  END IF
+
+                IF ( IDG .EQ. ID_PMF_PH ) THEN
+                   ! Special Averaging for Particle pH
+                   ! Add whatever the current average is right now.
+                   ! Certainly this is problematic, particularly
+                   ! at the beginning of an hour where ELMO_AVRG =
+                   ! 0. It's best to either use the instantaneous
+                   ! value or recalculate the average fine particle acidity
+                   ! offline.
+                   ! Averaging for particle pH is done as a simple average
+                   ! rather than a trapezoidal average as is done for other
+                   ! averaged variables.
+
+                   ! special case for pH when there is a physically unrealistic value
+                   IF ( ELMO_USED( U ) .LT. -100 ) THEN
+                      IF ( INIT_STEP ) THEN
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
+                      ELSE IF ( WRITE_STEP ) THEN
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC_PH * ! (elmo_out + avg(elmo_out)) / elmo_nstep
+     &                      ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
+     &                      + ( 1.0 / ( ELMO_NSTEP - 1 ) ) * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) )
+                      ELSE
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =  ! elmo_out + avg(elmo_out)
+     &                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
+     &                      + ( 1.0 / ( ELMO_NSTEP - 1 ) ) * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
+                      END IF
+                   ! if the pH is reasonable then accumulate and take simple average at the write step
+                   ELSE
+                      IF ( INIT_STEP ) THEN
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U )
+                      ELSE IF ( WRITE_STEP ) THEN
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC_PH *
+     &                        ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) + ELMO_USED( U ) )
+                      ELSE
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =
+     &                        ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) + ELMO_USED( U )
+                      END IF
                    END IF
+
               
                 ELSE IF ( IV .EQ. ET_DDEP .OR.
      &                    IV .EQ. ET_ISAM_DDEP .OR.
@@ -420,6 +467,12 @@
                 ELSE
                    ! For all other variables, apply trapezoidal rule for averaging.
                    IF ( INIT_STEP ) THEN
+                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U )
+                   ELSE IF ( ELMO_USED( U ) .LT. -1.0E36 ) THEN ! redo and check for abs(ELMO_BLANK-ELMO_USED) < tinynum?
+                      ! If we got a bad value for ELMO_USED then overwrite ELMO_OUT with
+                      ! with ELMO_USED=ELMO_BLANK=AMISS3=-9.0E36.
+                      ! This prevents the case that large negative values accumulate
+                      ! and overflow to -infinity.
                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U ) 
                    ELSE IF ( WRITE_STEP ) THEN
                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC *
