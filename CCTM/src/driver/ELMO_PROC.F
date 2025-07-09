@@ -393,11 +393,11 @@
                       ELSE IF ( WRITE_STEP ) THEN
                          ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC_PH * ! (elmo_out + avg(elmo_out)) / elmo_nstep
      &                      ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
-     &                      + ( 1.0 / ( ELMO_NSTEP - 1 ) ) * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) )
+     &                      + ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) / ( ELMO_NSTEP - 1 ) ) )
                       ELSE
                          ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =  ! elmo_out + avg(elmo_out)
      &                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
-     &                      + ( 1.0 / ( ELMO_NSTEP - 1 ) ) * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
+     &                      + ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) / ( ELMO_NSTEP - 1 ) )
                       END IF
                    ! if the pH is reasonable then accumulate and take simple average at the write step
                    ELSE
