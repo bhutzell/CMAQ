@@ -374,33 +374,6 @@
                 IV  = ELMO_TABLE( J )%VAR_TYPE
                 IDG = ELMO_TABLE( J )%ID
              
-
-!            IF ( (IV .EQ. ET_DRVD .OR. IV .EQ. ET_ISAM_DRVD 
-!    &                                .OR. IV .EQ. ET_DDM_DRVD ) .AND.
-!    &               IDG .EQ. ID_PMF_PH .AND.
-!    &               ELMO_USED( U ) .LT. -100. ) THEN
-                   ! Special Averaging for Particle pH
-                   ! Add whatever the current average is right now.
-                   ! Certainly this is problematic, particularly
-                   ! at the beginning of an hour where ELMO_AVRG =
-                   ! 0. It's best to either use the instantaneous
-                   ! value or recalculate the average fine particle acidity
-                   ! offline.
-                   ! Averaging for particle pH is done as a simple average
-                   ! rather than a trapezoidal average as is done for other
-                   ! averaged variables.
-!                  IF ( INIT_STEP ) THEN
-!                     ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
-!                  ELSE IF ( WRITE_STEP ) THEN
-!                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC * 
-!    &                          ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) 
-!    &                        + 2.0 * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) - ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) )
-!                  ELSE 
-!                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =
-!    &                          ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) 
-!    &                        + 2.0 * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
-!                  END IF
-
                 IF ( IDG .EQ. ID_PMF_PH ) THEN
                    ! Special Averaging for Particle pH
                    ! Add whatever the current average is right now.
@@ -468,7 +441,7 @@
                    ! For all other variables, apply trapezoidal rule for averaging.
                    IF ( INIT_STEP ) THEN
                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U )
-                   ELSE IF ( ELMO_USED( U ) .LT. -1.0E36 ) THEN ! redo and check for abs(ELMO_BLANK-ELMO_USED) < tinynum?
+                   ELSE IF ( ELMO_USED( U ) .LT. -1.0E36 ) THEN
                       ! If we got a bad value for ELMO_USED then overwrite ELMO_OUT with
                       ! with ELMO_USED=ELMO_BLANK=AMISS3=-9.0E36.
                       ! This prevents the case that large negative values accumulate
