@@ -32,7 +32,7 @@ There should be no impact on results, but users are now given more information t
 The DESID conversion factor assigned to translate area-based emissions is erroneously inverted. This update takes the reciprocal of that value.
 
 **Significance and Impact**:    
-This will dramatically affect predictions for any species that includes emissions normalized to a specific area that is not in units of meters. 
+This will have almost no effect for most simulations and users since area-normalized emission rates are rarely used. However, for cases that utilize area-weight emissions, this fix will dramatically affect predictions for any species that includes emissions normalized to a specific area that is not in units of meters. 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|

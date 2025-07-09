@@ -7,10 +7,11 @@
 
 **Description**: When the Budget Tool was integrated into the model:
 
-1. Emission rates were not correctly multiplied by DT, and
+1. Emission rates were not correctly multiplied by DT before they were added to the variables accumulating this process across the output time step, and
 2. the CSAV array was not initialized before VDIF was called if the Budget Tool was turned off.
 
 **Significance and Impact**:
+With these fixes in place, process rates for emissions and VDIF are reasonable again.
    
 |Merge Commit | Internal record|
 |:------:|:-------:|
