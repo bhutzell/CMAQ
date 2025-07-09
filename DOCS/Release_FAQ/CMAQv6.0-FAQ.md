@@ -189,6 +189,9 @@ CMAQv6.0 introduces the MetEmis module to dynamically calculate meteorology-indu
 - **Introducing ELMO version 2.1**  
 CMAQv6.0alpha introduces ELMO version 2.1 expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining custom aggregates of raw model species (e.g., NOY, NOz, etc.) and assigning them to output files. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#elmo-version-2)
 
+- **Redirect ELMO for indicator of ozone production regime**
+  (Fill in description.) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#redirect-elmo-for-indicator-of-ozone-production-regime)
+ 
 - **Bugfix to the Budget Tool output file** Prevents crashes by correcting the log header output in the Budget Tool's ASCII output file. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#bugfix-to-the-budget-tool-output-file)
 
 - **Reduce model runtime by changing default settings**  
@@ -216,6 +219,10 @@ Reduces compiler warnings and updates code to be more compatible with GCC, makin
 - **Simplify RETRIEVE_OCEAN_DATA**  
   Streamlines the logic for retrieving ocean data in the centralized I/O module.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#simplify-retrieve_ocean_data)
 
+- **Correct desid_module.F for serial version of CCTM**
+  (Fill in description.)[Release Notes](../Release_Notes/CMAQ-Release-Notes%3A-Structural-Improvements.md#correct-desid_modulef-for-serial-version-of-cctm)
+
+
 ### On-line coupling of CMAQ with meteorological models
 - **Introducing a new unified coupler for WRF-CMAQ and MPAS-CMAQ**
 New module couples WRF-CMAQ and MPAS-CMAQ in a consistent "one-code" framework. Previously, the WRF-CMAQ implementation was built using [I/O API buffered](https://www.cmascenter.org/ioapi/documentation/all_versions/html/BUFFERED.html#buf) files to transfer data from the two models during runtime. A number of infrastructure changes were made were made to implement the system. [Release Note](../Release_Notes/CMAQ-Release-Notes:-WRF-CMAQ-Coupled-Model.md#wrf-cmaq-coupled-model)
@@ -226,7 +233,10 @@ New module couples WRF-CMAQ and MPAS-CMAQ in a consistent "one-code" framework. 
 
 - **Increase JPROC parameters for input file size**  
   Increases parameter limits in the JPROC utility to support more wavelengths, resolving issues with new mechanisms. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Utilities.md#increase-jproc-parameters-for-input-file-size)
-  
+
+- **Remove pgi compile failure for ebi solver for cracmm3m mechanism**  
+ (Fill in description.) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Utilities.md#remove-pgi-compile-failure-for-ebi-solver-for-cracmm3m-mechanism)
+
 ### Pre-processors
 - **Update to Meteorology - Chemistry Interface Processor (MCIP)**  
   (Fill in Description) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Preprocessors.md#additional-mcip-release-notes-can-be-found-under-the-docsmciphttpsgithubcomusepacmaqtreemainprepmcipdocs-folder)
