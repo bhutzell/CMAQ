@@ -22,19 +22,19 @@ CMAQv6.0alpha is not intended as an immediate replacement for CMAQv5.5. However,
 ### Instrumented Models (CMAQ-ISAM, CMAQ-DDM3D)
 - **Updates to the Integrated Source Apportionment Method (CMAQ-ISAM)**  
 CMAQv6.0 introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as well as several improvements that target CMAQ-ISAM robustness for all chemical mechanisms.
-  - **Add ISAM support for CRACMM3M**  
-  (Fill in summary) [Release Note](../Release_Notes/CMAQ-Release-Notes%3A-Instrumented-Models%3A-CMAQ-ISAM.md#add-cracmm3m-to-mechanisms-supported-by-isam)
+  - **Add ISAM support for CRACMM3M**
+    Code changes allow CCTM-ISAM simulations to use the cracmm3m chemical mechanism. [Release Note](../Release_Notes/CMAQ-Release-Notes%3A-Instrumented-Models%3A-CMAQ-ISAM.md#add-cracmm3m-to-mechanisms-supported-by-isam)
 
   - **Improve stability in ISAM apportionment output**   
   Addresses errors in aerosol/gas partitioning in ISAM, preventing mass from being incorrectly allocated to distant tags. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#improve-stability-in-isam-apportionment-output)
 
-  - **Fix ISAM erroneous mass attribution**  
+  - **Fix ISAM erroneous mass attribution**   
   Fixes a bug that caused tagged mass to appear far from emission sources due to improper handling of aerosol mass concentrations.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#erroneous-mass-attribution)
 
-  - **Add pcVOC and NOy species to ISAM species lists**
-   (Fill in description). [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#adds-pcvoc-and-noy-species-to-isam-species-lists)
+  - **Add pcVOC and NOy species to ISAM species lists**  
+   The addition of pcVOC, CRON, and OPAN to the ISAM VOC and NOy species lists corrects discrepancies in source apportionment, ensuring comprehensive accounting of SOA precursors and NOy species in PM and ozone analyses. This update improves the accuracy of ISAM results, particularly for fine PM and SOA predictions, with only minor effects on ozone. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#adds-pcvoc-and-noy-species-to-isam-species-lists)
   
-   - **ISAM control file**  
+   - **ISAM control file**   
   Increases control file character limits and improves logging for ISAM tag summaries, aiding troubleshooting. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-ISAM.md#isam-control-file)
   
 - **Updates to the Decoupled Direct Method in Three Dimensions (CMAQ-DDM3D)**  
@@ -47,8 +47,6 @@ CMAQv6.0 introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as
 ### Chemistry
 - **Updates to Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM)**  
 CMAQv6.0 introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates improve the representation of gas-phase and aerosol chemistry in multiple environments. In addition to the base CRACMM3 mechanism, CMAQv6.0alpha includes CRACMM3M, with extended marine chemistry, and CRACMM3HAPS which includes additional Hazardous Air Pollutants.  If you are interested in learning more, please see the CRACMM3 release notes:
-  - **CRACMM3 Overview**  
- [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3)
 
   - **Heterogeneous chemistry of sulfur species**  
   Adds heterogeneous sulfur chemistry to CRACMM3, improving model performance in high PM pollution areas during winter.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#heterogeneous-chemistry-of-sulfur-species)
@@ -59,9 +57,33 @@ CMAQv6.0 introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM
   - **Photolysis of aerosol nitrate in CRACMM3**  
   Adds photolysis of aerosol nitrate and a new aerosol species to CRACMM3, with updated molecular weights and solver enhancements. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#photolysis-of-aerosol-nitrate-in-cracmm3)
 
-   - **Add CRACMM3HAPS Chemical mechanism**
-     (Fill in description.) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).mdd#add-cracmm3haps-chemical-mechanism]
-     
+  - **Updates to aromatic system chemical compound identity**   
+   The identities and representative structures of aromatic oxidation products in CMAQv6.0 were updated to better reflect their sources and yields, with phenol and catechol now explicitly represented and emission mappings revised for improved chemical accuracy.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updates-to-aromatic-system-chemical-compound-identity)
+
+  - **Peroxy radical products from monoterpene ozonolysis and monoterpene aldehyde photolysis**   
+  The formation of highly oxygenated organic molecules (HOM) from monoterpene ozonolysis and monoterpene aldehyde photolysis was enhanced by updating peroxy radical product yields and reaction pathways. These changes increase organic aerosol concentrations, particularly in regions with high biogenic emissions, with the largest impact from monoterpene ozonolysis. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#peroxy-radical-products-from-monoterpene-ozonolysis-and-monoterpene-aldehyde-photolysis)
+
+  - **Peroxy radical reaction rate updates for temperature**  
+    Temperature dependence was added to several peroxy radical reaction rates in CRACMM3, resulting in increased ozone formation, especially during summer in Southern California and the Midwest US. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#peroxy-radical-reaction-rate-updates-for-temperature)
+
+  - **Photolysis of monoterpene derived SOA**   
+    Photolysis of monoterpene-derived secondary organic aerosol (SOA) was implemented in CRACMM3, incorporating laboratory-based yields and a photo-recalcitrant fraction to better represent SOA losses. This update decreases organic aerosol concentrations and improves model agreement with observations. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md##photolysis-of-monoterpene-derived-soa)
+ 
+  - **CRACMM3 Benzaldehyde chemistry**    
+ The benzaldehyde chemistry in CRACMM3 was updated to align with the Master Chemical Mechanism (MCM), including the addition of missing reactions and improved structural assignments. These changes result in minor ozone increases (<0.1 ppb) and ensure proper carbon mass conservation in oxidation product reactions.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#cracmm3-benzaldehyde-chemistry)
+
+  - **Updates to CRACMM based on carbon balance**   
+  Several CRACMM reactions were updated to improve carbon balance by adding CO₂ as a product, adjusting CO yields, and correcting aldehyde product assignments. These changes enhance carbon tracking with minimal impact on ozone, particulate matter, or other key species.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updates-to-cracmm-based-on-carbon-balance)
+
+  - **Updates to Henry's Law constants for CRACMM3**   
+    Henry's Law constants for CRACMM3 species were updated to use measured or OPERA model-calculated values instead of surrogate species values. This change better reflects the properties of representative compounds and has minimal impact on ozone and PM2.5 concentrations. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updates-to-henrys-law-constants-for-cracmm3)
+    
+  - **Add CRACMM3HAPS Chemical mechanism**
+     The CRACMM3HAPS chemical mechanism was added to extend CRACMM3 with the ability to simulate hazardous air pollutants (HAPs), including hydrogen cyanide and mercury species, for improved risk assessment applications. This mechanism aligns with the latest atmospheric chemistry science and supports studies like EPA's AirToxScreen, while maintaining consistency with criteria pollutant predictions from CRACMM3.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).mdd#add-cracmm3haps-chemical-mechanism]
+   
+  - **Representative structures for CRACMM3HAPs tracers**
+     Representative chemical structures were assigned to all CRACMM3HAPs species, including explicit HAPs and nine lumped PAH groups, to better communicate species information and support property assignments like solubility. For each lumped PAH, a representative structure was selected based on EPA documentation and chemical similarity searches.  [Release Note](../Release_Notes/)
+   
   - **Photolysis update in CRACMM3 and CRACMM3M**  
   Updates photolysis data and reactions for several species, adds new reactions, and incorporates recent scientific findings for improved accuracy. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#photolysis-update-in-cracmm3-and-cracmm3m)
 
@@ -80,11 +102,17 @@ CMAQv6.0 introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM
   - **Correct conservation of nitrogen for 4 reactions in CRACMM3**  
 Implements fixes to ensure nitrogen conservation in four specific reactions, based on expert recommendations. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#correct-conservation-of-nitrogen-for-4-reactions-in-cracmm3)
 
-  - **Removal of Formaldehyde, Acetaldehyde, and Acrolein by monoatomic Cl**  
-  Removes loss processes for certain emission tracers via monatomic chlorine in default CRACMM mechanisms, aligning with intended chemistry.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#removal-of-formaldehyde-acetaldehyde-and-acrolein-by-monoatomic-cl)
-
   - **CRACMM Reaction Metadata File**  
 Provides a metadata file documenting updates to CRACMM chemistry at the reaction level.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#cracmm-reaction-metadata-file)
+
+  - **Updated visibility index information to follow IMPROVE**    
+   The visibility index values for aerosol species in CMAQ were updated to align with the [Second IMPROVE equation](https://vista.cira.colostate.edu/Improve/the-improve-algorithm/), specifically adjusting "small organic mass" values from 4.0 to 2.8. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-visibility-index-information-to-follow-improve)
+
+  - **Updated CRACMM species names**    
+ CRACMM species names were updated to consistently use V/A prefixes for gas and aerosol phases, and AGLY was renamed to AGLYOLIG to clarify its structure. These changes are cosmetic and do not affect model concentrations, but users should update species mappings when using initial or boundary conditions from previous versions. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-cracmm-species-names)
+
+  - **Remove duplicate OP3 reaction with OH**   
+A duplicate reaction of OP3 with OH that was present in CRACMM1 and CRACMM2 was removed from CRACMM2 to correct an error carried over from earlier versions. This bug fix has a negligible impact on model results, with changes in PM2.5 averaging less than 0.01 µg/m³.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#remove-duplicate-op3-reaction-with-oh)
 
   - **Streamline chemical mechanisms**  
 CMAQv6.0 no longer supports the following mechanisms: CB6R3_AE7_AQ, CRACMM1_AQ, CRACMM1AMORE_AQ, RACM2_AE6_AQ, and SAPRC07TIC_AE7i_AQKMT2. The update ensures consistency across remaining mechanisms and utilities. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#delete-obsolete-chemical-mechanisms)
@@ -103,9 +131,6 @@ Bug fix to cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the mo
 
   - **Streamline Mapping to Default Cloud Chemistry Solver**  
  Simplifies and clarifies variable naming and mapping for cloud chemistry routines, and updates the aerosol surrogate table for explicit species definition.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Aqueous-Chemistry-Scavenging-and-Wet-Deposition.md#streamline-mapping-to-default-cloud-chemistry-solver)
-
-  - **Removal of acm_ae6_mp Cloud Module**  
-  (Fill in description)  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Aqueous-Chemistry-Scavenging-and-Wet-Deposition.md#removal-of-acm_ae6_mp-cloud-module)
 
 - **Updates to Aerosol Dynamics**
   - **Generalized Dynamic and Equilibrium Partitioning of Inorganic Aerosols**  
@@ -129,7 +154,7 @@ Bug fix to cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the mo
   Fixes a double conversion error for total extinction and resolves a model crash caused by uninitialized variables in certain cloud conditions. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Photolysis.md#remove-uninitialized-variable-and-correct-a-diagnostic-in-cctms-inline-module-for-photolysis-frequencies)
 
   - **Updates to diagnostics for Inline Photolysis**  
-  (Fill in description) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Photolysis.md#updates-to-diagnostics-for-inline-photolysis)
+  This update improves the Inline Photolysis diagnostics by replacing total extinction coefficients with cloud extinction coefficients and adding calculations for aerosol properties when the sun is below the horizon. These changes correct a unit conversion error and provide more informative and comprehensive diagnostic data for evaluating light attenuation and aerosol optical properties. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Photolysis.md#updates-to-diagnostics-for-inline-photolysis)
 
 
 ### Dry Deposition Air Surface Exchange  
@@ -186,15 +211,16 @@ CMAQv6.0 introduces the MetEmis module to dynamically calculate meteorology-indu
 
 
 ### Diagnostic Options
-- **Introducing ELMO version 2.1**  
+- **Introducing ELMO version 2.1**   
 CMAQv6.0alpha introduces ELMO version 2.1 expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining custom aggregates of raw model species (e.g., NOY, NOz, etc.) and assigning them to output files. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#elmo-version-2)
 
-- **Redirect ELMO for indicator of ozone production regime**
-  (Fill in description.) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#redirect-elmo-for-indicator-of-ozone-production-regime)
+- **Redirect ELMO for indicator of ozone production regime**  
+  This update streamlines the process for determining whether the ozone production regime is VOC- or NOx-limited by moving the relevant output variable setting from the EBI solver subroutines to the ISAM routine. The change reduces redundant computations and simplifies code maintenance by centralizing the regime indicator logic. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#redirect-elmo-for-indicator-of-ozone-production-regime)
  
-- **Bugfix to the Budget Tool output file** Prevents crashes by correcting the log header output in the Budget Tool's ASCII output file. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#bugfix-to-the-budget-tool-output-file)
+- **Bugfix to the Budget Tool output file**   
+  Prevents crashes by correcting the log header output in the Budget Tool's ASCII output file. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#bugfix-to-the-budget-tool-output-file)
 
-- **Reduce model runtime by changing default settings**  
+- **Reduce model runtime by changing default settings**   
 Revises model default from `Budget_Diag = .TRUE.` to `Budget_Diag = .FALSE.`. This change turns off the budget diagnostic tool reducing rutime by 10%. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#changes-in-henrys-law-computation-and-budget-tool)
   
 ### Structural Improvements
@@ -220,7 +246,7 @@ Reduces compiler warnings and updates code to be more compatible with GCC, makin
   Streamlines the logic for retrieving ocean data in the centralized I/O module.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#simplify-retrieve_ocean_data)
 
 - **Correct desid_module.F for serial version of CCTM**
-  (Fill in description.)[Release Notes](../Release_Notes/CMAQ-Release-Notes%3A-Structural-Improvements.md#correct-desid_modulef-for-serial-version-of-cctm)
+  This update fixes a compile error in desid_module.F that occurred when building a serial version of CCTM by adding logic to handle both parallel and non-parallel cases. As a result, users can now successfully compile and run CCTM in serial mode for debugging and diagnostics.  [Release Notes](../Release_Notes/CMAQ-Release-Notes%3A-Structural-Improvements.md#correct-desid_modulef-for-serial-version-of-cctm)
 
 
 ### On-line coupling of CMAQ with meteorological models
@@ -228,14 +254,14 @@ Reduces compiler warnings and updates code to be more compatible with GCC, makin
 New module couples WRF-CMAQ and MPAS-CMAQ in a consistent "one-code" framework. Previously, the WRF-CMAQ implementation was built using [I/O API buffered](https://www.cmascenter.org/ioapi/documentation/all_versions/html/BUFFERED.html#buf) files to transfer data from the two models during runtime. A number of infrastructure changes were made were made to implement the system. [Release Note](../Release_Notes/CMAQ-Release-Notes:-WRF-CMAQ-Coupled-Model.md#wrf-cmaq-coupled-model)
 
 ### Utilities
-- **Add species composition data to RXNS modules and add new reactive rate constant type**  
-  (Fill in description) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Utilities.md#add-species-composition-data-to-rxns-modules-and-add-new-reactive-rate-constant-type)
+- **Add species composition data to RXNS modules and add new reactive rate constant type**   
+  This update adds species composition data to the RXNS modules, enabling assessment of elemental conservation in CRACMM-based mechanisms, and introduces a new reactive rate constant type to address a limitation in the previous implementation. These changes improve chemical mechanism documentation and flexibility but do not affect CMAQ model predictions.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Utilities.md#add-species-composition-data-to-rxns-modules-and-add-new-reactive-rate-constant-type)
 
 - **Increase JPROC parameters for input file size**  
   Increases parameter limits in the JPROC utility to support more wavelengths, resolving issues with new mechanisms. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Utilities.md#increase-jproc-parameters-for-input-file-size)
 
-- **Remove pgi compile failure for ebi solver for cracmm3m mechanism**  
- (Fill in description.) [Release Note](../Release_Notes/CMAQ-Release-Notes:-Utilities.md#remove-pgi-compile-failure-for-ebi-solver-for-cracmm3m-mechanism)
+- **Remove pgi compile failure for ebi solver for cracmm3m mechanism**   
+This update modifies the create_ebi utility to fix a compile error with the pgi/nvhpc compiler for the cracmm3m EBI solver, caused by exceeding the allowed number of line continuations. As a result, users can now run source apportionment simulations with ISAM and cracmm3m using these compilers.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Utilities.md#remove-pgi-compile-failure-for-ebi-solver-for-cracmm3m-mechanism)
 
 ### Pre-processors
 - **Update to Meteorology - Chemistry Interface Processor (MCIP)**  
