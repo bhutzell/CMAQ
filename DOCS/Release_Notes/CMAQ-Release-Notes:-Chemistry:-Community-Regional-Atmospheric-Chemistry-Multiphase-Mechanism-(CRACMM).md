@@ -312,10 +312,21 @@ Errors in conservation of nitrogen for select reactions ported from RACM2 into C
 **Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
-Metadata file to document updates to CRACMM chemistry at the reaction level.  
+A Metadata file has been added to document updates to CRACMM chemistry at the reaction level. The file is named MECH_rxn_metadata.csv and resides in the mechanism_information folder for the MECH. This has only been implemented for CRACMM2 and CRACMM3. CRACMM3 information is not yet complete. The file is a csv file with the following columns:
+- reaction_id: letter/number combination from mech.def file that labels reaction        
+- reactants: reactants from mech.def file
+- products: products from from mech.def file         
+- rate_constant: from mechanism markdown file (at 298 K)  
+- reaction_family: this describes where the reaction originated, current values are RACM2, CRACMM1, CRACMM2, CRACMM3          
+- reaction_phase: gas, mixed, particle options        
+- publication_string: “Author et al., year” citation for where the reaction came from/was first documented for CRACMM            
+- publication_doi: link to article in above field         
+- underlying_data_publication_string: “Author et al., year” citation that provides a critical piece of data upon which the CRACMM reaction was built. This could be an experimental paper, another mechanism (e.g., MCM), or other work that helps document the underlying basis
+- underlying_data_publication_doi: link to article in above field      
+- Notes: information on how reaction was developed such as if coefficients represent a weighted mixture of compounds or if a specific simplification technique was used. This field allows for several sentences.
 
 **Significance and Impact**:   
-This file provides information on CRACMM updates at the reaction level. This file will be posted on github.com/USEPA/CRACMM upon public release of CRACMM in CMAQ. This file will feed efforts to link chemical reactions across EPA and specifically the Chemical Transformations Database (CheT, https://ccte-cced-chet.epa.gov/).
+This file provides information on CRACMM updates at the reaction level. This file will be posted on github.com/USEPA/CRACMM upon public release of CRACMM in CMAQ. This file will feed efforts to link chemical reactions across EPA such as the Chemical Transformations Database (CheT, https://ccte-cced-chet.epa.gov/).
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
