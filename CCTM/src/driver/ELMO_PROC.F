@@ -367,7 +367,8 @@
              IF ( WRITE_STEP ) DIVFAC = 0.5 / FLOAT( ELMO_NSTEP - 1 )
              DIVFAC1_PH = 1.0
              IF ( WRITE_STEP ) DIVFAC1_PH = 1.0 / FLOAT( ELMO_NSTEP )
-             DIVFAC2_PH = 1.0 / FLOAT( ELMO_NSTEP - 1 )
+             DIVFAC2_PH = 1.0
+             IF ( ELMO_NSTEP .GT. 1 ) DIVFAC2_PH = 1.0 / FLOAT( ELMO_NSTEP - 1 )
 
 
              DO  IVAR = 1,ELMO_FILE( IFL )%N_VARS
@@ -443,8 +444,9 @@
                    ! For all other variables, apply trapezoidal rule for averaging.
                    IF ( INIT_STEP ) THEN
                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U )
-                   ELSE IF ( ELMO_USED( U ) .LE. 0.999 * ELMO_BLANK ) THEN
-                      ! If we returned ELMO_BLANK for ELMO_USED then overwrite ELMO_OUT with
+                   ELSE IF ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) .LE. 0.999 * ELMO_BLANK
+     &                      .OR. ELMO_USED( U ) .LE. 0.999 * ELMO_BLANK ) THEN
+                      ! If ELMO_OUT or ELMO_USED are ELMO_BLANK then overwrite ELMO_OUT with
                       ! with ELMO_BLANK = AMISS3 = -9.0E36.
                       ! This prevents the case where large negative values can accumulate
                       ! and overflow to -infinity.
