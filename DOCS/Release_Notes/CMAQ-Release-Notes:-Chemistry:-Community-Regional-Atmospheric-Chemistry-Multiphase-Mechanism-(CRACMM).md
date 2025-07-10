@@ -242,6 +242,24 @@ Several photolytic reactions are updated to support CRACMM3 development and impl
 |:------:|:-------:|
 |[Merge for PR#1275](https://github.com/USEPA/CMAQ/commit/56d21d2efa4f3a8221c470b345e4be97af4dc7b5) | [PR#1275](https://github.com/USEPA/CMAQ_Dev/pull/1275)  |
 
+### Minor species definition corrections for CRACMM2/CMAQ 5.5 implementation 
+[Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix      
+**Release Version/Date**:  CMAQv5.5+ and CMAQv6.0 
+
+**Description**:  
+CMAQ provides species definitions files (SpecDef files) to convert raw model concentration output to aggregated species such as PM2.5. The CMAQv5.5 release of CRACMM2 was missing 4 SOA species in the SpecDef_Conc_cracmm2.txt file used to post-process CONC and ACONC data. The missing species represent 4 types of SOA from isoprene and monoterpene oxidation (AISO4, AISO5, AHONIT, ATRPN). In addition, ACLK was missing from the CRACMM2 SpecDef but used for some AMET post processing.
+
+**Significance and Impact**:   
+This update does not affect model results processed from ELMO output. For model results processed from CONC/ACONC, updating to the new SpecDef results in a small increase of OC, SOA, and PM2.5 with the largest effects (up to 5% increase in mass) in biogenic source regions in summer (e.g., southeast US). This update also adds ACLK which allows certain AMET configurations to run.
+
+**References**: none
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1232](unknown) | [PR#1232](https://github.com/USEPA/CMAQ_Dev/pull/1232)  |
+|[Merge for PR#1246](unknown) | [PR#1246](https://github.com/USEPA/CMAQ_Dev/pull/1246)  |
+
 ### Updating the condensed halogen chemistry and renaming of "INO2" to "ISONP"  
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update      
