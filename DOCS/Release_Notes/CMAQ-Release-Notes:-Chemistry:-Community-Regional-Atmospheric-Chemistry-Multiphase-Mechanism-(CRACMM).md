@@ -257,8 +257,8 @@ This update does not affect model results processed from ELMO output. For model 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1232](unknown) | [PR#1232](https://github.com/USEPA/CMAQ_Dev/pull/1232)  |
-|[Merge for PR#1246](unknown) | [PR#1246](https://github.com/USEPA/CMAQ_Dev/pull/1246)  |
+|[Merge for PR#1232](https://github.com/USEPA/CMAQ_Dev/commit/36c095484c23e158287e559ef8d8b4cd39f10d25) | [PR#1232](https://github.com/USEPA/CMAQ_Dev/pull/1232)  |
+|[Merge for PR#1246](https://github.com/USEPA/CMAQ_Dev/commit/c940efe9c7d3e091bdecd6c37649cdead4605a6e) | [PR#1246](https://github.com/USEPA/CMAQ_Dev/pull/1246)  |
 
 ### Updating the condensed halogen chemistry and renaming of "INO2" to "ISONP"  
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency    
