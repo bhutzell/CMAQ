@@ -8,135 +8,12 @@
 **Description**:  
 CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version builds on the CMAQv5.5 release of CRACMM2. With the release of CRACMM3, CRACMM1 versions have been deprecated and removed from CMAQv6.0. CRACMM2 remains functional in CMAQv6.0. CRACMM3 is available in 3 versions: a base CRACMM3, CRACMM3HAPs, and CRACMM3M. All three versions share the same core chemistry while two versions have expanded capabilities for specific applications. CRACMM3HAPs includes additional hazardous air pollutants and follows strategies similar to previous versions of CMAQ where several species are added external to the radical budget. Specifically, additional HAPs beyond the base HAPs included in CRACMM3 are included in the "nonreactive" (NR) namelist or included in the aerosol namelist as tracers. The additional HAPs undergo transport, removal, and chemical decay, if applicable. CRACMM3 for marine environments (CRACMM3M) includes additional halogen reactions for environments (not limited to marine) where that chemistry is important. In base CRACMM3, the halogen chemistry is represented by one parameterized reaction as in CRACMM1 but with updated parameters. See the individual release notes for more information.
  
-
 **Significance and Impact**:   
 CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enable a wider range of applications of CRACMM.
 
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269)  | 
-|[Merge for PR#1335](https://github.com/USEPA/CMAQ/commit/3ae05d2ac3094493a0c4748659fb8a2a4a08b60c) | [PR#1335](https://github.com/USEPA/CMAQ_Dev/pull/1335)  | 
-
-
-
-### Removal of Formaldehyde, Acetaldehyde, and Acrolein by monoatomic Cl 
-[Bill Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Science Update    
-**Release Version/Date**:  CMAQv6.0  
-
-**Description**:    
-This update removes losses processes of emission tracers: formaldehyde, acetaldehyde, and acrolein emissions tracers via a monatomic chlorine reaction. This update is for default versions of the CRACMM mechanism and the CRACMM3HAP mechanism. It should be noted that the cracmm3m mechanisms should have this loss process.
-
-**Significance and Impact**:   
-The update increases predictions of emission tracers: formaldehyde, acetaldehyde, and acrolein emissions in the CRACMM3HAP mechanism.
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1346](https://github.com/USEPA/CMAQ/commit/0134aa61b8065f7a72ac1a609cb4c94da599d3a8)) | [PR#1346](https://github.com/USEPA/CMAQ_Dev/pull/1346)  |
-
 ### Heterogeneous chemistry of sulfur species
 [Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Science update  
-**Release Version/Date**: CMAQv6.0  
-
-**Description**: 
-In certain areas with high PM pollution in the winter (e.g., Fairbanks, AK, the North China Plain, etc.), chemical transport models can significantly underpredict particulate sulfur concentrations. Recent studies have suggested that heterogeneous sulfur chemistry in/on aqueous aerosols may contribute significant amounts of sulfur PM. Here we add the oxidation of SO2 to sulfate and the production/loss of hydroxymethanesulfonate (HMS) in aqueous aerosol to CRACMM3.
-
-**Significance and Impact**:  
-CMAQ underpredicts particulate sulfur in and around Fairbanks, Alaska, an area affected by severe PM pollution episodes during the winter. During cold, dark Fairbanks winters, CMAQ's existing secondary sulfate production pathways are not very active; however, adding heterogeneous production of sulfate and HMS in aerosol water significantly reduces the model underprediction. With this update, HMS and sulfate predictions compare well with intensive measurements during the ALPACA winter air quality study (Simpson et al., 2024). The impacts of the additional chemistry vary with location and season. Excluding locations with high coincident SO2 and HCHO, monthly average PM sulfur concentrations do not exhibit very large changes over CONUS. Larger effects are noted on the 1.33 km resolution Fairbanks domain and over Asia during the winter. This update should have mixed results on evaluation over CONUS.
-
-**References**:  
-Farrell, S. L., Pye, H. O. T., Gilliam, R., Pouliot, G., Huff, D., Sarwar, G., Vizuete, W., Briggs, N., Duan, F., Ma, T., Zhang, S., and Fahey, K.: Predicted impacts of heterogeneous chemical pathways on particulate sulfur over Fairbanks (Alaska), the Northern Hemisphere, and the Contiguous United States, Atmos. Chem. Phys., 25, 3287-3312, 2025.
-
-Simpson, W. R., Mao, J., Fochesatto, G. J., Law, K. S., DeCarlo,P. F., Schmale, J., Pratt, K. A., Arnold, S. R., Stutz, J., Dibb, J. E., et al.: Overview of the alaskan layered pollution and chemical analysis(ALPACA) field experiment, ACS ES&T Air 2024, 1, 200?222, 2024.
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1337](https://github.com/USEPA/CMAQ/commit/f0e2d42087e93ff5f37e79d987f5d23e46acac4e) | [PR#1337](https://github.com/USEPA/CMAQ_Dev/pull/1337)  |
-
-
-### Halogen chemistry in CRACMM3M
-[Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update  
-**Release Version/Date**: CMAQv6.0   
-
-**Description**:  
-This update contains four different items: (1) NOY definition in the current SpecDef files for CRACMM2 and CRACMM3 contain an error which is now fixed (2) It adds halogen (Cl, Br, I) chemistry to CRACMM3 and creates a new marine mechanism (CRACMM3M). Current model (MGEMIS.F) contains an error for grid-cell area calculation for halogen emissions which is fixed in the pull request. A new Euler Backward Iterative (EBI) solver is developed. (3) CMAQ with cb6r5m_ae7_aq did not compile due to changes made in CRACMM3M. Several heterogeneous reactions in cb6r5m_ae7_aq are relabeled (without making any chemistry changes). Update made in MGEMIS.F for grid-cell area calculation also affects halogen emissions in cb6r5m_ae7_aq. (4) CMAQ with cb6r5_ae7_aq was also tested due to the update in MGEMIS.F. 
-
-**Significance and Impact**:  
-Item #1: Correcting NOY definition:  
-It does not directly affect CMAQ results and no test involving CMAQ was performed.
-
-Item #2: Halogen chemistry with CRACMM3 (CRACMM3M):  
-Halogen chemistry reduces O3 over seawater and land by up to 8.0 ppb. Larger reductions occur over seawater than over land. Halogen chemistry reduces surface O3 by 13% over seawater (annually). However, halogen chemistry has marginal effects on model PM2.5 concentrations. 
-
-Item #3: Updates in cb6r5m_ae7_aq:  
-Update in MGEMIS.F increases ozone and reduces sulfate over low latitude areas due to the changes in grid-cell area estimates. Incorporation of the map-scale factor (msfx2) into the calculation lowers the grid-cell area estimates near the equator and subsequently reduces halogen and DMS emissions. 
-
-Item #4: Updates in cb6r5_ae7_aq:  
-Update in MGEMIS.F has minimal impacts on ozone and sulfate over the contiguous US.
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1212](https://github.com/USEPA/CMAQ/commit/8d512cc361675212430b579adc766c010309bdd1) | [PR#1212](https://github.com/USEPA/CMAQ_Dev/pull/1212)  |
-
-
-### Photolysis of aerosol nitrate in CRACMM3M
-[Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Science Update  
-**Release Version/Date**:  CMAQv6.0   
-
-**Description**:  
-This updates adds photolysis of aerosol nitrate (ANO3) to the CRACMM3 marine mechanism (CRACMM3M) following the procedure described in Sarwar et al., 2024. A new Euler Backward Iterative (EBI) solver is developed.
-
-**Significance and Impact**:   
-Model ozone (O3) concentrations without the photolysis of aerosol nitrate are shown in Figure 1a. Higher values are predicted over land than over seawater. Model O3 enhancements with the photolysis of aerosol nitrate are shown in Figure 1b. Consistent with the results shown in Sarwar et al. (2024) for CB6, aerosol nitrate photolysis enhances O3 over seawater and land by large margins. Larger enhancements occur over the western U.S. than over the eastern U.S.
-
-![Sarwar_CRACMM_I](https://github.com/user-attachments/assets/fa1aac70-5816-41d7-a6eb-0b6d0431577c)
-Figure 1: (a) CMAQ predicted O3 with CRACMM2M (without aerosol nitrate photolysis) in May (b) Impact of aerosol nitrate photolysis on O3 compared to without aerosol nitrate photolysis
-
-Monthly Mean Bias was calculated by using model predicted daily maximum 8 hour average (MDA8) O3 and observed data from the AQS monitoring network over the western and eastern U.S (Figure 2(a-b)). Over the western U.S., the model without aerosol nitrate photolysis underpredicts observed data in most months while model with aerosol nitrate photolysis eliminates the negative bias. Over the eastern U.S., the model without aerosol nitrate photolysis has mixed model performance with negative bias in January-May and positive bias in June-December. The model with aerosol nitrate photolysis eliminates the negative bias in January-May, but slightly deteriorates bias in June-December.
-
-![Sarwar_CRACMM3M_II](https://github.com/user-attachments/assets/85f7f03b-d05a-4812-9d7f-f876e44d1990)
-Figure 2: (a) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the western U.S. (b) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. 
-
-Model PM2.5 concentrations without the photolysis of aerosol nitrate are shown in Figure 3a. Higher values are predicted over land than over seawater. Changes in model PM2.5 concentrations with the photolysis of aerosol nitrate are shown in Figure 3b. It only affects model PM2.5 concentrations by small margins. Reductions occur due to the loss of aerosol nitrate by photolysis while enhancements occur from the changes in secondary aerosols due to the changes in oxidant levels. 
-
-![Sarwar_CRACMM3M_III](https://github.com/user-attachments/assets/c33e60ea-ece7-4754-b8d6-d65243d271f3)
-Figure 3: (a) CMAQ predicted mean PM2.5 wth CRACMM2M (without the aerosol nitrate photolysis) in May (b) Impact of the aerosol nitrate photolysis on PM2.5 compared to those without the aerosol nitrate photolysis in May
-
-Monthly Mean Bias was calculated by using predicted daily mean PM2.5 and observed data from the AQS monitoring network over the western and eastern U.S (Figure 4(a-b)). Bias without and with the aerosol nitrate photolysis in each month is similar over western and eastern U.S. Thus, the aerosol nitrate photolysis has low impacts on model performance for PM2.5.
-
-![Sarwar_CRACMM3M_IV](https://github.com/user-attachments/assets/3ca7e37d-6e1c-4d4c-b254-0c9e0b77abbd)
-Figure 4: (a) Monthly Mean Bias of daily mean PM2.5  without and with aerosol nitrate photolysis at AQS sites over the western U.S. (b) Monthly Mean Bias of daily mean PM2.5  without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. 
-
-**References**:   
-Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A., B., Lee, J., Carpenter, L. J.: Examining the Impact of the photolysis of aerosol nitrate over Northern Hemisphere, Science of the Total Environment, 917, 170406, 2024. 
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1214](https://github.com/USEPA/CMAQ/commit/f807233e2354b0d270aba2b2207393ddacb4a1af) | [PR#1214](https://github.com/USEPA/CMAQ_Dev/pull/1214)  |
-
-
-### Add CRACMM3HAPS Chemical mechanism
-[William T. Hutzll](mailto:hutzell.bill@epa.gov)], U.S. Environmental Protection Agency    
-**Type of update**: Science Update, Documentation, New Feature  
-**Release Version/Date**: CMAQ version 6.0   
-
-**Description**:   
-The update adds a new mechanism (cracmm3haps) that extends the cracmm3 mechanism for gas chemistry. The extension allows CCTM simulations using cracmm3 species and reactions that includes Hazardous Air Pollutants (HAPs) as in the cb6r5hap_ae7_aq mechanism for gas chemistry. The new mechanism has one more HAP than cb6r5hap_ae7_aq. The model species simulates the transport and fate of hydrogen cyanide (HCN) emissions. The chemical destruction of HCN is simulated using the reactive tracer module in CCTM so has no impact on the results from cracmm3. Like cb6r5hap_ae7_aq, cracmm3haps should give the same predictions of criteria air pollutant as cracmm3. Also, cracmm3haps has species that track emissions of formaldehyde, acetaldehyde, and acrolein. Unlike cb6r5hap_ae7_aq, cracmm3haps only tracks emission of elemental gaseous mercury, oxidized gaseous mercury and particulate mercury as nonreactive tracer of emissions. As a result, the mechanism does not have secondary production of oxidized and particulate mercury. The main goal of cracmm3 supports risk assessments to human health from air emissions and secondary production of HAPs such as EPA's AirToxScreen studies.
-
-**Significance and Impact**:   
-The update supports risk assessments to human health from air emissions and secondary production of HAPs such as EPA's AirToxScreen studies. It provides an alternative to using the cb6r5hap_ae7_aq mechanism whose core chemistry is less in sync than the current state of science for atmospheric chemistry.
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1279](https://github.com/USEPA/CMAQ/commit/d8707a4fa10a8f23ad6b99453fbcf1bdb9df51dd) | [PR#1279](https://github.com/USEPA/CMAQ_Dev/pull/1279)  |
-|[Merge for PR#1346](https://github.com/USEPA/CMAQ/commit/0134aa61b8065f7a72ac1a609cb4c94da599d3a8) | [PR#1346](https://github.com/USEPA/CMAQ_Dev/pull/1346)  |
-
-### Heterogeneous chemistry of sulfur species
-[Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Science update  
 **Release Version/Date**: CMAQv6.0  
 
 **Description**: 
@@ -157,7 +34,7 @@ Simpson, W. R., Mao, J., Fochesatto, G. J., Law, K. S., DeCarlo,P. F., Schmale, 
 
 ### Adding chlorine chemistry in CRACMM3 
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Science Update    
+**Type of update**: Science Update     
 **Release Version/Date**:  CMAQv6.0  
 
 **Description**:    
@@ -197,12 +74,241 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 |:------:|:-------:|
 |[Merge for PR#1185](https://github.com/USEPA/CMAQ/commit/189dc7f9b7e60b87efe76f5ff9af53088c2b469a) | [PR#1185](https://github.com/USEPA/CMAQ_Dev/pull/1185)  |
 
+
+### Updates to aromatic system chemical compound identity
+**Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov)], U.S. Environmental Protection Agency      
+**Type of update**: Science Update     
+**Release Version/Date**:  CMAQv6.0  
+
+**Description**:   
+Representative structures for first and second generation aromatic oxidation species are updated. 
+
+PHEN is recast from a lumped species to explicit phenol which is consistent with how it is produced in the chemical mechanism (exclusively from oxidation of explicit benzene). In addition, the cracmm2 major representative for PHEN (resorcinol) should be remapped in emission processing to MCT. 
+
+80% of CSL is estimated to be secondary from oxidation of aromatic VOCs (see Pye et al., 2023 and associated information). The toluene phenolic species (o-cresol) was identified as the major representative species for CSL. For 2017 US conditions, toluene accounts for 38% of the emitted aromatic hydrocarbon VOC mass with xylene isomers being the second largest contributors at about 30% of the total. Toluene has a fairly high phenolic yield of 25% while xylenes (16-17% yield of phenolics) and increasing substitutions on the ring (e.g., trimethylbenzenes) result in even lower yields (3-4%). As a result, toluene is estimated to produce ~60% of secondary CSL and ~50% of all CSL making its phenolic channel the most representative structure.
+
+The catechol yield from benzene, toluene, and xylene-derived CSL+PHEN is similar at 80%. Given the emission abundance of benzene, the benzene catechol species is the most abundant secondary MCT species. In cases where wood burning emissions are high, MCT would be dominated by emissions with resorcinol the most abundant structure. Given resorcinol and catechol have the same molecular weight, catechol is chosen as the representative for MCT. In addition, the cracmm2 major representative for PHEN (resorcinol) should be remapped in emission processing to MCT. 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269)  | 
+
+
+
+### CRACMM3 Benzaldehyde chemistry
+**Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Science Update   
+**Release Version/Date**:  CMAQv6.0   
+
+**Description**:   
+Several structures in the benzaldehyde system were aligned with MCM. In addition, several missing reactions such as RO2+HO2 and a PAN formation were added. Chemistry and structures follow MCM. New rates were taken from MCM except RO2+HO2 rates were calculated based on Wennberg et al. 2018.
+
+**Significance and Impact**:  
+Minor increases in ozone (<0.1 ppb) occur. The structures of oxidation products are now correctly specified. Reactions of BALD resulting in BALP (RO2) now conserve carbon mass. Reactions of BAL1 resulting in BAL2 now conserve carbon mass.
+
+**References**:    
+Jenkin, M. E., Saunders, S. M., Wagner, V., and Pilling, M. J.: Protocol for the development of the Master Chemical Mechanism, MCM v3 (Part B): tropospheric degradation of aromatic volatile organic compounds, Atmos. Chem. Phys., 3, 181–193, https://doi.org/10.5194/acp-3-181-2003, 2003.
+
+Master Chemical Mechanism (MCM) v3.3.1, https://mcm.york.ac.uk/MCM/, last access: 27 March 2025.
+
+Wennberg, P. O., Bates, K. H., Crounse, J. D., Dodson, L. G., McVay, R. C., Mertens, L. A., Nguyen, T. B., Praske, E., Schwantes, R. H., Smarte, M. D., St Clair, J. M., Teng, A. P., Zhang, X., and Seinfeld, J. H.: Gas-Phase reactions of isoprene and its major oxidation products, Chem. Rev., 118, 3337-3390, https://doi.org/10.1021/acs.chemrev.7b00439, 2018.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269), [PR#1292](https://github.com/USEPA/CMAQ_Dev/pull/1292)    | 
+
+### Peroxy radical products from monoterpene ozonolysis and monoterpene aldehyde photolysis
+**Primary Contact**: [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Science Update  
+**Release Version/Date**: CMAQv6.0   
+
+**Description**:   
+Prompt formation of HOM from from ozonolysis of monoterpenes is increased by updating the peroxy radical products from ozonolysis of CRACMM species API and LIM to products that have a fixed HOM yield. Peroxy radical products from photolysis of monoterpene aldehydes (CRACMM species PINAL and LIMAL) are updated to ones that have an autoxidation reaction which can go on to form HOM in competition with NO and HO2 reaction pathways.  
+
+**Significance and Impact**: 
+Both of these updates increase organic aerosol, especially in areas with high biogenic emissions. The impacts from monoterpene aldehyde photolysis are small compared to the updates to monoterpene ozonolysis.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269), [PR#1334](https://github.com/USEPA/CMAQ_Dev/pull/1334) |
+
+
+### Peroxy radical reaction rate updates for temperature
+**Primary Contact**: [[Havala Pye](mailto:pye.havala@epa.gov)], U.S. Environmental Protection Agency    
+**Type of update**: Science Update    
+**Release Version/Date**:  CMAQv6.0  
+
+**Description**:   
+Several RO2+NO and RO2+HO2 rate constants were updated from fixed values to temperature dependent values across CRACMM3 mechanisms. RO2+NO rates were updated to the MCM value independent of structure. RO2+HO2 rates were updated to follow work by Wennberg et al. (2018). RO2+HO2 rates were calculated as a function of carbon, oxygen, and nitrogen structure using the CRACMM representative structure for each species.
+
+**Significance and Impact**: 
+Updating and adding temperature dependence to RO2+HO2 and RO2+NO rate constant updates generally causes increased RO2+NO relative to RO2+HO2 with increasing temperature which cycles NO to NO2 more quickly and facilitates ozone. Ozone increases overall with the largest summer ozone increases in Southern California and midwest US of ~0.5 ppb.  
+
+**References**:    
+Wennberg et al. Chem. Rev. 2018, 118, 7, 3337–3390. https://doi.org/10.1021/acs.chemrev.7b00439
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269)  | 
+
+### Photolysis of monoterpene derived SOA
+**Primary Contact**: [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Science Update   
+**Release Version/Date**: CMAQv6.0   
+
+**Description**:   
+Some portion of organic aerosol is expected to undergo losses due to photolysis. Photolysis of monoterpene-derived secondary organic aerosol (SOA) has been observed in laboratory experiments, though some fraction has been observed to be photo-recalcitrant (i.e., not susceptible to photolysis loss) (O'Brien and Kroll 2019; Baboomian et al. 2020). Photolysis of monoterpene SOA has been tested previously in CRACMM and was found to improve the modeled concentration and temperature sensitivity of organic carbon compared to observations (Vannucci et al. 2024). Photolysis of the monoterpene derived SOA species AHOM is implemented in CRACMM3. Products are formic acid and a new semivolatile species (VMTN1/AMTN1) which retains the monoterpene identity and has a saturation vapor pressure of 0.1 ug/m3. A photo-recalcitrant fraction of 80% (based on O'Brien and Kroll 2019) is implemented with an 80% yield of the new AMTN1 species with the remaining 20% assumed to be a fragmentation product. Formic acid is chosen for the fragmentation product because this was the dominant fragmentation product found in a laboratory study of a-pinene derived SOA photolysis (Malecha and Nizkorodov 2016). The photolysis rate was set to 1% of the NO2 photolysis rate. This rate was about the midpoint of a range of SOA photolysis rates found in a chamber study (Zawadowicz et al. 2020).  
+
+**Significance and Impact**:   
+This update decreases organic aerosol. More testing may be done on the CRACMM development branch.  
+
+**References**:  
+O'Brien and Kroll 2019, https://doi.org/10.1021/acs.jpclett.9b01417    
+Baboomian et al. 2020,  https://doi.org/10.1021/acsearthspacechem.0c00088    
+Vannucci et al. 2024, https://doi.org/10.1021/acsearthspacechem.3c00333    
+Malecha and Nizkorodov 2016, https://doi.org/10.1021/acs.est.6b02313  
+Zawadowicz et al. 2020, https://dx.doi.org/10.1021/acs.est.9b07051  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269), [PR#1334](https://github.com/USEPA/CMAQ_Dev/pull/1334) |
+
+
+### Updates to CRACMM based on carbon balance
+**Primary Contact**: [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Science Update  
+**Release Version/Date**: CMAQv6.0    
+
+**Description**:   
+A number reactions are updated in CRACMM for better tracking of carbon balance. These updates fall into three categories.  
+1. Add chemically produced CO2 as a product.
+2. Update chemically produced CO yields for a small number of reactions.
+3. Change product from lumped C3 aldehyde (CRACMM species ALD) to C2 acetaldehyde (CRACMM species ACD) in cases where reactions with a C2 reactant produced a C3 aldehyde product.
+
+**Significance and Impact**:   
+These updates improve the overall balance of carbon in CRACMM. Updates to CO2 and CO have very small impacts on species of interest. Updates involving aldehyde products may result in changes on the order of 10s of ppt of the aldehyde species involved but have negligible impacts on ozone and particulate matter.  
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269), [PR#1255](https://github.com/USEPA/CMAQ_Dev/pull/1255), [PR#1272](https://github.com/USEPA/CMAQ_Dev/pull/1272) |
+
+
+### Updates to Henry's Law constants for CRACMM3
+**Primary Contact**: [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Science Update  
+**Release Version/Date**: CMAQv6.0    
+
+**Description**:     
+For CRACMM species that previously used a surrogate species to specify the Henry's Law constant, the species properties are updated so that the Henry's Law constant for the species is either a measured value or a value calculated by OPERA model (structure-activity relationship based calculation).  
+
+**Significance and Impact**:   
+This update more closely aligns CRACMM species properties with the underlying structure of the species' representative compounds. The impacts on ozone and PM2.5 are small (<0.1 ppb and < 0.1 ug/m3, respectively).  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269), [PR#1316](https://github.com/USEPA/CMAQ_Dev/pull/1316)  |
+
+### Halogen chemistry in CRACMM3M
+[Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Science Update    
+**Release Version/Date**: CMAQv6.0   
+
+**Description**:  
+This update contains four different items: (1) NOY definition in the current SpecDef files for CRACMM2 and CRACMM3 contain an error which is now fixed (2) It adds halogen (Cl, Br, I) chemistry to CRACMM3 and creates a new marine mechanism (CRACMM3M). Current model (MGEMIS.F) contains an error for grid-cell area calculation for halogen emissions which is fixed in the pull request. A new Euler Backward Iterative (EBI) solver is developed. (3) CMAQ with cb6r5m_ae7_aq did not compile due to changes made in CRACMM3M. Several heterogeneous reactions in cb6r5m_ae7_aq are relabeled (without making any chemistry changes). Update made in MGEMIS.F for grid-cell area calculation also affects halogen emissions in cb6r5m_ae7_aq. (4) CMAQ with cb6r5_ae7_aq was also tested due to the update in MGEMIS.F. 
+
+**Significance and Impact**:  
+Item #1: Correcting NOY definition:  
+It does not directly affect CMAQ results and no test involving CMAQ was performed.
+
+Item #2: Halogen chemistry with CRACMM3 (CRACMM3M):  
+Halogen chemistry reduces O3 over seawater and land by up to 8.0 ppb. Larger reductions occur over seawater than over land. Halogen chemistry reduces surface O3 by 13% over seawater (annually). However, halogen chemistry has marginal effects on model PM2.5 concentrations. 
+
+Item #3: Updates in cb6r5m_ae7_aq:  
+Update in MGEMIS.F increases ozone and reduces sulfate over low latitude areas due to the changes in grid-cell area estimates. Incorporation of the map-scale factor (msfx2) into the calculation lowers the grid-cell area estimates near the equator and subsequently reduces halogen and DMS emissions. 
+
+Item #4: Updates in cb6r5_ae7_aq:  
+Update in MGEMIS.F has minimal impacts on ozone and sulfate over the contiguous US.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1212](https://github.com/USEPA/CMAQ/commit/8d512cc361675212430b579adc766c010309bdd1) | [PR#1212](https://github.com/USEPA/CMAQ_Dev/pull/1212)  |
+
+
+### Photolysis of aerosol nitrate in CRACMM3M
+[Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Science Update   
+**Release Version/Date**:  CMAQv6.0    
+
+**Description**:  
+This updates adds photolysis of aerosol nitrate (ANO3) to the CRACMM3 marine mechanism (CRACMM3M) following the procedure described in Sarwar et al., 2024. A new Euler Backward Iterative (EBI) solver is developed.
+
+**Significance and Impact**:   
+Model ozone (O3) concentrations without the photolysis of aerosol nitrate are shown in Figure 1a. Higher values are predicted over land than over seawater. Model O3 enhancements with the photolysis of aerosol nitrate are shown in Figure 1b. Consistent with the results shown in Sarwar et al. (2024) for CB6, aerosol nitrate photolysis enhances O3 over seawater and land by large margins. Larger enhancements occur over the western U.S. than over the eastern U.S.
+
+![Sarwar_CRACMM_I](https://github.com/user-attachments/assets/fa1aac70-5816-41d7-a6eb-0b6d0431577c)
+Figure 1: (a) CMAQ predicted O3 with CRACMM2M (without aerosol nitrate photolysis) in May (b) Impact of aerosol nitrate photolysis on O3 compared to without aerosol nitrate photolysis
+
+Monthly Mean Bias was calculated by using model predicted daily maximum 8 hour average (MDA8) O3 and observed data from the AQS monitoring network over the western and eastern U.S (Figure 2(a-b)). Over the western U.S., the model without aerosol nitrate photolysis underpredicts observed data in most months while model with aerosol nitrate photolysis eliminates the negative bias. Over the eastern U.S., the model without aerosol nitrate photolysis has mixed model performance with negative bias in January-May and positive bias in June-December. The model with aerosol nitrate photolysis eliminates the negative bias in January-May, but slightly deteriorates bias in June-December.
+
+![Sarwar_CRACMM3M_II](https://github.com/user-attachments/assets/85f7f03b-d05a-4812-9d7f-f876e44d1990)
+Figure 2: (a) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the western U.S. (b) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. 
+
+Model PM2.5 concentrations without the photolysis of aerosol nitrate are shown in Figure 3a. Higher values are predicted over land than over seawater. Changes in model PM2.5 concentrations with the photolysis of aerosol nitrate are shown in Figure 3b. It only affects model PM2.5 concentrations by small margins. Reductions occur due to the loss of aerosol nitrate by photolysis while enhancements occur from the changes in secondary aerosols due to the changes in oxidant levels. 
+
+![Sarwar_CRACMM3M_III](https://github.com/user-attachments/assets/c33e60ea-ece7-4754-b8d6-d65243d271f3)
+Figure 3: (a) CMAQ predicted mean PM2.5 wth CRACMM2M (without the aerosol nitrate photolysis) in May (b) Impact of the aerosol nitrate photolysis on PM2.5 compared to those without the aerosol nitrate photolysis in May
+
+Monthly Mean Bias was calculated by using predicted daily mean PM2.5 and observed data from the AQS monitoring network over the western and eastern U.S (Figure 4(a-b)). Bias without and with the aerosol nitrate photolysis in each month is similar over western and eastern U.S. Thus, the aerosol nitrate photolysis has low impacts on model performance for PM2.5.
+
+![Sarwar_CRACMM3M_IV](https://github.com/user-attachments/assets/3ca7e37d-6e1c-4d4c-b254-0c9e0b77abbd)
+Figure 4: (a) Monthly Mean Bias of daily mean PM2.5  without and with aerosol nitrate photolysis at AQS sites over the western U.S. (b) Monthly Mean Bias of daily mean PM2.5  without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. 
+
+**References**:   
+Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A., B., Lee, J., Carpenter, L. J.: Examining the Impact of the photolysis of aerosol nitrate over Northern Hemisphere, Science of the Total Environment, 917, 170406, 2024. 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1214](https://github.com/USEPA/CMAQ/commit/f807233e2354b0d270aba2b2207393ddacb4a1af) | [PR#1214](https://github.com/USEPA/CMAQ_Dev/pull/1214)  |
+
+
+### Add CRACMM3HAPS Chemical mechanism
+[William T. Hutzll](mailto:hutzell.bill@epa.gov)], U.S. Environmental Protection Agency    
+**Type of update**: Science Update, Documentation, New Feature   
+**Release Version/Date**: CMAQv6.0    
+
+**Description**:   
+The update adds a new mechanism (cracmm3haps) that extends the cracmm3 mechanism for gas chemistry. The extension allows CCTM simulations using cracmm3 species and reactions that includes Hazardous Air Pollutants (HAPs) as in the cb6r5hap_ae7_aq mechanism for gas chemistry. The new mechanism has one more HAP than cb6r5hap_ae7_aq. The model species simulates the transport and fate of hydrogen cyanide (HCN) emissions. The chemical destruction of HCN is simulated using the reactive tracer module in CCTM so has no impact on the results from cracmm3. Like cb6r5hap_ae7_aq, cracmm3haps should give the same predictions of criteria air pollutant as cracmm3. Also, cracmm3haps has species that track emissions of formaldehyde, acetaldehyde, and acrolein. Unlike cb6r5hap_ae7_aq, cracmm3haps only tracks emission of elemental gaseous mercury, oxidized gaseous mercury and particulate mercury as nonreactive tracer of emissions. As a result, the mechanism does not have secondary production of oxidized and particulate mercury. The main goal of cracmm3 supports risk assessments to human health from air emissions and secondary production of HAPs such as EPA's AirToxScreen studies.
+
+**Significance and Impact**:   
+The update supports risk assessments to human health from air emissions and secondary production of HAPs such as EPA's AirToxScreen studies. It provides an alternative to using the cb6r5hap_ae7_aq mechanism whose core chemistry is less in sync than the current state of science for atmospheric chemistry.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1279](https://github.com/USEPA/CMAQ/commit/d8707a4fa10a8f23ad6b99453fbcf1bdb9df51dd) | [PR#1279](https://github.com/USEPA/CMAQ_Dev/pull/1279)  |
+|[Merge for PR#1346](https://github.com/USEPA/CMAQ/commit/0134aa61b8065f7a72ac1a609cb4c94da599d3a8) | [PR#1346](https://github.com/USEPA/CMAQ_Dev/pull/1346)  |
+
+
+### Representative structures for CRACMM3HAPs tracers
+**Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
+**Secondary Contact**: [Bill Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Documentation    
+**Release Version/Date**:  CMAQv6.0  
+
+**Description**:    
+Representative structures are provided for all CRACMM species to communicate information about species. If needed, representative structures can also be used to populate properties such as solubility. CRACMM3HAPs includes many explicit HAPs and 9 lumped PAHs of different toxicity. In this PR, representative structures are specified for each lumped PAH based on Table 2-3 of the 2020 AirToxScreen Technical Support Document (TSD, https://www.epa.gov/system/files/documents/2024-05/airtoxscreen_2020-tsd.pdf) and species contained within each lumped group. For 2 groups (PAH_101E2, PAH_114E1) only 1 member species is specified in the TSD and that was used. PAH_176E2 includes 3 isomeric structures and one was chosen. In the case of PAH_192E3, the description of member "coal tar" does not provide specific structures but the molecular weight of PAH_192E3 matched dibenzo[a,h]anthracene (part of PAH_176E3). Using the Chemicals Dashboard (https://comptox.epa.gov/dashboard/), a Tanimoto similarity search was used to identify similar structures. Results were filtered to QC Level 4 or higher and a species of similar molecular weight (278.1 g/mol) was selected for PAH_192E3. For the other PAHs, the molecular weights of the lumped surrogates did not match any individual member; a member with the closest molecular weight was chosen as the representative structure.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1335](https://github.com/USEPA/CMAQ/commit/3ae05d2ac3094493a0c4748659fb8a2a4a08b60c) | [PR#1335](https://github.com/USEPA/CMAQ_Dev/pull/1335)  |
+
+
 ### Photolysis update in CRACMM3 and CRACMM3M
 
 **Primary Contact**: [Golam Sarwar](mailto:sarwar.golam@epa.gov) Atmospheric & Environmental Systems Modeling Division, U.S. EPA  
 **Secondary Contact**: [William T. Hutzell](mailto:Hutzell.Bill@epa.gov), Atmospheric & Environmental Systems Modeling Division, U.S. EPA  
-**Type of update**: Science Update  
-**Release Version/Date**:  CMAQv6.0  
+**Type of update**: Science Update   
+**Release Version/Date**:  CMAQv6.0    
 
 **Description**:   
 CRACMM3 include multiple photolytic reactions. Many of these photolytic reactions were retained from RACM2 which was developed more than 10 years ago. Photolysis frequencies are calculated using absorption cross-sections and quantum yields. Some of the absorption cross-sections and quantum yields data in CRACMM3 are out of date. Here, absorption cross-sections and quantum yields are updated for several chemical species. In addition, two new photolytic reactions of PPN are added. 
@@ -242,10 +348,61 @@ Several photolytic reactions are updated to support CRACMM3 development and impl
 |:------:|:-------:|
 |[Merge for PR#1275](https://github.com/USEPA/CMAQ/commit/56d21d2efa4f3a8221c470b345e4be97af4dc7b5) | [PR#1275](https://github.com/USEPA/CMAQ_Dev/pull/1275)  |
 
+### Updated CRACMM species names  
+**Primary Contact**: [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency     
+**Secondary Contact**: [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Cosmetic Update   
+**Release Version/Date**: CMAQv6.0   
+
+**Description**:   
+For CRACMM species that exist in both gas and particle phases with the same structure, the naming convention is that gas phase species are prepended with a V while aerosol species are prepended with an A (e.g., VROCP1ALK and AROCP1ALK). Five gas phase species that should follow this convention are updated: OP3, HOM, ELHOM, TRPN, HONIT. The gas phase names of these species are updated to follow the V/A prepending conventions.  
+
+Additionally, the naming of the model species AGLY in previous versions of CRACMM may imply that AGLY has the same structure as gas phase species GLY, but this is not the case. AGLY is renamed to AGLYOLIG in CRACMM3 to clarify that it has a different structure from gas phase GLY.  
+
+**Significance and Impact**: 
+No impacts on concentrations are expected since this update only affects model species names.  
+
+If initial and/or boundary conditions are created from a CRACMM2 CMAQv5.5 simulation and used for a CRACMM2 CMAQv6.0 simulation, the species with updated names will need to be mapped to the updated species names or initial and boundary concentrations will be set to 1e-30 by default. Initial and boundary condition mapping can be accomplished by updating the `IC`, `IC_FAC`, `BC`, and `BC_FAC` columns of the species namelist files. See documentation for detailed instructions.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269), [PR#1280](https://github.com/USEPA/CMAQ_Dev/pull/1280)  | 
+
+### Remove duplicate OP3 reaction with OH  
+**Primary Contact**: [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix    
+**Release Version/Date**: CMAQv6.0   
+
+**Description**:   
+Two reactions of OP3 (represented by C8 organic peroxide) with OH were inadvertently included in CRACMM1, and this was carried forward to CRACMM2 as well. One reaction was based on the RACM2 OP2+OH reaction (OP3 wasn't in RACM2; it was added for CRACMM1). The other reaction was based on a ROC aging scheme that was also used for VROC* species reactions with OH. This PR removes the RACM2-based OP3+OH reaction.  
+
+**Significance and Impact**: 
+Impacts are small, <0.01 ug/m3 average PM2.5 for a summer test case.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269), [PR#1325](https://github.com/USEPA/CMAQ_Dev/pull/1325)  |
+
+### Updated visibility index information to follow IMPROVE  
+**Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Science Update     
+**Release Version/Date**:  CMAQv6.0    
+
+**Description**:    
+Each aerosol species has a set of visibility index values based on the IMPROVE algorithm. These values are not currently used for any major model species, but do reside in the code. Several "small organic mass" values were updated from a value of 4.0 to 2.8 consistent with the Second IMPROVE equation (https://vista.cira.colostate.edu/Improve/the-improve-algorithm/). 
+
+**Significance and Impact**:   
+No effect on model concentrations. Should a user decide to access these values, they are now up to date.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269)  | 
+
+
 ### Minor species definition corrections for CRACMM2/CMAQ 5.5 implementation 
 [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Bug Fix      
-**Release Version/Date**:  CMAQv5.5+ and CMAQv6.0 
+**Type of update**: Bug Fix       
+**Release Version/Date**:  CMAQv5.5+ and CMAQv6.0   
 
 **Description**:  
 CMAQ provides species definitions files (SpecDef files) to convert raw model concentration output to aggregated species such as PM2.5. The CMAQv5.5 release of CRACMM2 was missing 4 SOA species in the SpecDef_Conc_cracmm2.txt file used to post-process CONC and ACONC data. The missing species represent 4 types of SOA from isoprene and monoterpene oxidation (AISO4, AISO5, AHONIT, ATRPN). In addition, ACLK was missing from the CRACMM2 SpecDef but used for some AMET post processing.
@@ -257,8 +414,8 @@ This update does not affect model results processed from ELMO output. For model 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1232](https://github.com/USEPA/CMAQ_Dev/commit/36c095484c23e158287e559ef8d8b4cd39f10d25) | [PR#1232](https://github.com/USEPA/CMAQ_Dev/pull/1232)  |
-|[Merge for PR#1246](https://github.com/USEPA/CMAQ_Dev/commit/c940efe9c7d3e091bdecd6c37649cdead4605a6e) | [PR#1246](https://github.com/USEPA/CMAQ_Dev/pull/1246)  |
+|[Merge for PR#1232](https://github.com/USEPA/CMAQ/commit/36c095484c23e158287e559ef8d8b4cd39f10d25) | [PR#1232](https://github.com/USEPA/CMAQ_Dev/pull/1232)  |
+|[Merge for PR#1246](https://github.com/USEPA/CMAQ/commit/c940efe9c7d3e091bdecd6c37649cdead4605a6e) | [PR#1246](https://github.com/USEPA/CMAQ_Dev/pull/1246)  |
 
 ### Updating the condensed halogen chemistry and renaming of "INO2" to "ISONP"  
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency    
@@ -280,8 +437,8 @@ Sarwar, G., Gantt, B., Schwede, D., Foley, K., Mathur, R., Saiz-Lopez, A: Impact
 
 ### Consistent treatment of styrene and ethylbenzene across CMAQ   
 [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Science Update   
-**Release Version/Date**:  CMAQv6.0 
+**Type of update**: Science Update    
+**Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
 The representation of the chemistry of styrene and ethylbenzene in CRACMM3 has been updated to be consistent with the treatment of styrene and ethylbenzene in the CMAQ reactive tracer module. This allows for CRACMM styrene and ethylbenzene species to be used directly in modeling of air toxics without the need for styrene and ethylbenzene reactive tracers. Reactions of styrene with ozone and the nitrate radical have been added in CRACMM3 with chemistry based on the Master Chemical Mechanism. These are minor channels compared to reaction with OH (which was previously added in CRACMM2), but they are being added to ensure consistent treatment of styrene in CRACMM and the CMAQ reactive tracer module. The reaction rate constant of styrene+OH has also been updated to use a value from an experimental study. For ethylbenzene, a reaction with NO3 has been added, and there has been a small change in the rate constant for reaction with OH.
@@ -326,7 +483,7 @@ Errors in conservation of nitrogen for select reactions ported from RACM2 into C
 
 ### CRACMM Reaction Metadata File  
 [[Havala Pye](mailto:pye.havala@epa.gov)], U.S. Environmental Protection Agency    
-**Type of update**: Documentation   
+**Type of update**: Documentation    
 **Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
@@ -354,7 +511,7 @@ This file provides information on CRACMM updates at the reaction level. This fil
 ### Consolidated list of chemical mechanisms
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Maintenance   
-**Release Version/Date**: CMAQv6.0  
+**Release Version/Date**: CMAQv6.0   
 
 **Description**:  
 CMAQv6.0 no longer supports the following mechanisms: CB6R3_AE7_AQ, CRACMM1_AQ, CRACMM1AMORE_AQ, RACM2_AE6_AQ, and SAPRC07TIC_AE7i_AQKMT2. The update ensures consistency across remaining mechanisms and utilities. The CHEMMECH, CREATE_EBI, and INLINE_PHOT_PREPROC utilities have been rerun for each of the remaining chemical mechanisms to ensure internal consistency.  
@@ -391,7 +548,7 @@ Skipper, T. N., D'Ambro, E. L., Wiser, F. C., McNeill, V. F., Schwantes, R. H., 
 
 ### workaround for gcc incompatibility with CRACMM namelists 
 [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Script update    
+**Type of update**: Script Update    
 **Release Version/Date**:  CMAQv5.5   
 
 **Description**:   
@@ -424,8 +581,8 @@ These updates only impact applications that use the CRACMM1 or CRACMM1AMORE chem
 
 ### Bug fixes for CRACMM1 IEPOX uptake rate
 [Kathleen Fahey](mailto:fahey.kathleen@epa.gov) and [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Bug Fix  
-**Release Version/Date**: CMAQv5.5  
+**Type of update**: Bug Fix   
+**Release Version/Date**: CMAQv5.5   
 
 **Description**:   
 A typo in the rate of sulfate catalyzed IEPOX where the nucleophile was HSO4 has been corrected. The incorrect rate resulted in excessive uptake of IEPOX through this pathway.
@@ -444,7 +601,7 @@ Vannucci, P., K. Foley, B. Murphy, C. Hogrefe, R. Cohen and H. Pye: Temperature-
 ### CRACMM DESID Input File Updates  
 [Karl Seltzer](mailto:seltzer.karl@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Input File Update   
-**Release Version/Date**: CMAQv5.5  
+**Release Version/Date**: CMAQv5.5   
 
 **Description**:   
 Added ROC-ALK series of "Emission Surrogates" to ensure emission input files with and without the "ALK" identifier are processed/emitted.  
@@ -459,7 +616,7 @@ Impacts results (SOA and PM2.5 predictions) if emissions were prepared using ROC
 ### The Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) Version 1.0
 [Havala O. T. Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency   
 **Type of update**: Science Update   
-**Release Version/Date**: CMAQv5.4   
+**Release Version/Date**: CMAQv5.4    
 
 **Description**:   
 The Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) builds on the history of the Regional Atmospheric Chemistry Mechanism, Version 2 (RACM2) and aims to couple gas- and particle-phase chemistry by treating the entire pool of atmospheric reactive organic carbon (ROC) relevant to present-day emissions. CRACMM species were developed to represent the total emissions of ROC, considering the OH reactivity, ability to form ozone and secondary organic aerosol (SOA), and other properties of individual emitted compounds. The chemistry of CRACMM, which includes autoxidation, multigenerational oxidation, and the treatment of semivolatile and intermediate volatility compounds, was built using a variety of sources including literature and other mechanisms (MCM, GECKO, and SAPRC18/mechgen). Compared to RACM2, the number of traditional volatile organic carbon species is reduced and the number of oxygenated and semivolatile to intermediate volatility precursors are increased in the mechanism. In addition, explicit hazardous air pollutants (toluene; 1,3-butadiene; and acrolein) are added to better characterize exposures relevant for human health. 
