@@ -1,5 +1,5 @@
 # STAGE
-### STAGE Updates and Bug Fix
+### STAGE Updates
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**:  Science Update, Bug Fix    
 **Release Version/Date**:  CMAQv6.0  
