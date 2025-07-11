@@ -76,7 +76,7 @@ NTR             ,ppbV      ,ISOPNS[0]+1000.0*(RNO3[1]+MTNO3[1])
 PANS            ,ppbV      ,1000.0*(PAN[1]+PAN2[1]+PBZN[1]+MAPAN[1]+IMAPAN[1])
 NOY             ,ppbV      ,1000.0*(NO[1]+NO2[1]+NO3[1]+2*N2O5[1]+HONO[1]+HNO3[1]+   \
                                     HNO4[1]+CLNO[1]+CLONO[1]+CLNO2[1]+CLONO2[1]) +   \
-                                    NTR[0]+PANS[0]+ANO3_PBB[0]
+                                    NTR[0]+PANS[0]+ANO3_PPB[0]
 O3              ,ppbV      ,1000.0*O3[1]
 SO2             ,ppbV      ,1000.0*SO2[1]
 SO2_UGM3        ,ug m-3    ,1000.0*(SO2[1]*(64.0/28.9628)*DENS[2])

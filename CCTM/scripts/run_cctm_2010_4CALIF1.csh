@@ -332,16 +332,16 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set OPTfile = PHOT_OPTICS.dat
 
   #> MCIP meteorology files 
-  setenv GRID_BDY_2D $METpath/GRIDBDY2D.$GRID_NAME.${NZ}L.$YYMMDD  # GRID files are static, not day-specific
-  setenv GRID_CRO_2D $METpath/GRIDCRO2D.$GRID_NAME.${NZ}L.$YYMMDD
-# setenv GRID_CRO_3D $METpath/GRIDCRO3D.$GRID_NAME.${NZ}L.$YYMMDD
+  setenv GRID_BDY_2D $METpath/GRIDBDY2D.4CALIF1.${NZ}L.$YYMMDD  # GRID files are static, not day-specific
+  setenv GRID_CRO_2D $METpath/GRIDCRO2D.4CALIF1.${NZ}L.$YYMMDD
+# setenv GRID_CRO_3D $METpath/GRIDCRO3D.4CALIF1.${NZ}L.$YYMMDD
   setenv GRID_CRO_3D '' # this file not used or available
-  setenv GRID_DOT_2D $METpath/GRIDDOT2D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_CRO_2D  $METpath/METCRO2D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_CRO_3D  $METpath/METCRO3D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_DOT_3D  $METpath/METDOT3D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_BDY_3D  $METpath/METBDY3D.$GRID_NAME.${NZ}L.$YYMMDD
-#  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.$GRID_NAME.${NZ}L.$YYMMDD
+  setenv GRID_DOT_2D $METpath/GRIDDOT2D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_CRO_2D  $METpath/METCRO2D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_CRO_3D  $METpath/METCRO3D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_DOT_3D  $METpath/METDOT3D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_BDY_3D  $METpath/METBDY3D.4CALIF1.${NZ}L.$YYMMDD
+#  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.4CALIF1.${NZ}L.$YYMMDD
 
   #> Control Files
   #>
