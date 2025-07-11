@@ -1,7 +1,7 @@
 # Frequently Asked Questions for Using the CMAQv6.0 ALPHA Version
 
 ## Table of Contents:
-* [What is a alpha version?](#what_alpha)
+* [What is an alpha version?](#what_alpha)
 * [Do I need to update from v5.5 to v6.0alpha?](#update_v55_v60b)
 * [What do I need to do to update from v5.5 to v6.0alpha?](#update_v55_v60b)
   * [What differences should I expect in the required model input files?](#diff_v55_v60b_input_files)
