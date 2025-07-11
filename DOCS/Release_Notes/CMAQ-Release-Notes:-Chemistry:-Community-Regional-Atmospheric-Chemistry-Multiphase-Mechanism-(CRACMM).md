@@ -76,7 +76,7 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 
 
 ### Updates to aromatic system chemical compound identity
-**Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov)], U.S. Environmental Protection Agency      
+**Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Science Update     
 **Release Version/Date**:  CMAQv6.0  
 
@@ -134,7 +134,7 @@ Both of these updates increase organic aerosol, especially in areas with high bi
 
 
 ### Peroxy radical reaction rate updates for temperature
-**Primary Contact**: [[Havala Pye](mailto:pye.havala@epa.gov)], U.S. Environmental Protection Agency    
+**Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update    
 **Release Version/Date**:  CMAQv6.0  
 
@@ -273,7 +273,7 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 
 
 ### Add CRACMM3HAPS Chemical mechanism
-[William T. Hutzll](mailto:hutzell.bill@epa.gov)], U.S. Environmental Protection Agency    
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update, Documentation, New Feature   
 **Release Version/Date**: CMAQv6.0    
 
@@ -362,7 +362,13 @@ Additionally, the naming of the model species AGLY in previous versions of CRACM
 **Significance and Impact**: 
 No impacts on concentrations are expected since this update only affects model species names.  
 
-If initial and/or boundary conditions are created from a CRACMM2 CMAQv5.5 simulation and used for a CRACMM2 CMAQv6.0 simulation, the species with updated names will need to be mapped to the updated species names or initial and boundary concentrations will be set to 1e-30 by default. Initial and boundary condition mapping can be accomplished by updating the `IC`, `IC_FAC`, `BC`, and `BC_FAC` columns of the species namelist files. See documentation for detailed instructions.  
+If boundary conditions are created from a CRACMM2 CMAQv5.5 simulation and used for a CRACMM2 CMAQv6.0 simulation, the species with updated names will need to be mapped to the updated species names or the boundary concentrations will be set to 1e-30 by default. Boundary condition mapping can be accomplished by updating the `BC` and `BC_FAC` columns of the species namelist files. For example to update the boundary condition mapping for species TRPN the `GC_cracmm2.nml` file can be updated as follows:  
+Original line:  
+`'VTRPN', 215.0 ,'' ,-1 ,''     ,-1, 'VD_TRPN', 1, '2NITRO_1BUTNL', 1,'','','Yes' ,'Yes' ,'Yes' ,'Yes',`  
+Updated line:  
+`'VTRPN', 215.0 ,'' ,-1 ,'TRPN' , 1, 'VD_TRPN', 1, '2NITRO_1BUTNL', 1,'','','Yes' ,'Yes' ,'Yes' ,'Yes',`  
+
+The updated line tells CMAQ to use the concentration of species TRPN from the boundary condition file as the boundary concentration for model species VTRPN.  
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
@@ -482,7 +488,7 @@ Errors in conservation of nitrogen for select reactions ported from RACM2 into C
 
 
 ### CRACMM Reaction Metadata File  
-[[Havala Pye](mailto:pye.havala@epa.gov)], U.S. Environmental Protection Agency    
+[Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Documentation    
 **Release Version/Date**:  CMAQv6.0   
 
