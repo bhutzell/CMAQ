@@ -180,7 +180,7 @@ The KZMIN option, first introduced in CMAQv4.5, is a parameterization to allow t
 
 ### Emissions
 - **Introducing new soil emissions module**   
-Introduces the Soil – Atmosphere Gaseous Emissions (SAGE) module for estimating soil NO and HONO emissions generally following the BDSNP parameterization (Hudman et al. 2012). SAGE  provides a simple, meteorological dependent soil NO and HONO emissions for regional to global applications. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Soil-Atmospheric-Gaseous-Emissions-(SAGE)-Emissions.md#introducing-new-soil-emissions-module)
+Introduces the Soil – Atmosphere Gaseous Emissions (SAGE) module for estimating soil NO and HONO emissions generally following the BDSNP parameterization (Hudman et al. 2012). SAGE  provides a simple, meteorological dependent method to calculate soil NO and HONO emissions for regional to global applications. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Soil-Atmospheric-Gaseous-Emissions-(SAGE)-Emissions.md#introducing-new-soil-emissions-module)
 
 - **New global vegetation dataset improves windblown dust emissions**    
 Introduces a new satellite-based global vegetation dataset to modulate windblown dust emissions. The vegetation dataset accounts for the effect of non-photosynthetic vegetation (or brown vegetation) by updating vegetation fraction, the vegetation height, and the vegetation roughness following the method outlined in [Huang and Foroutan (2022, HF22)](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2021JD035243). The overall impact is to reduce windblown dust emissions. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Wind-Blown-Dust-Emissions.md)
@@ -212,7 +212,7 @@ CMAQv6.0 introduces the MetEmis module to dynamically calculate meteorology-indu
 
 ### Diagnostic Options
 - **Introducing ELMO version 2.1**    
-CMAQv6.0alpha introduces ELMO version 2.1 expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining custom aggregates of raw model species (e.g., NOY, NOz, etc.) and assigning them to output files. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#elmo-version-2)
+CMAQv6.0alpha introduces ELMO version 2.1 which expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining custom aggregates of raw model species (e.g., NOY, NOz, etc.) and assigning them to output files. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#elmo-version-2)
 
 - **Redirect ELMO for indicator of ozone production regime**   
   This update streamlines the process for determining whether the ozone production regime is VOC- or NOx-limited by moving the relevant output variable setting from the EBI solver subroutines to the ISAM routine. The change reduces redundant computations and simplifies code maintenance by centralizing the regime indicator logic. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#redirect-elmo-for-indicator-of-ozone-production-regime)
@@ -276,7 +276,7 @@ The shp2cmaq.py script was fixed to work properly as both a module and a standal
 
 ### Post-processors
 - **Expand functionality of calc_tmetric**   
-  Enhances the calc_tmetric tool to support more statistical metrics (i.e., min/max over a selected period, etc.), parallel processing, and improved compatibility with visualization tools. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Postprocessors.md#expand-functionality-of-calc_tmetric)
+  Enhances the calc_tmetric tool to support more statistical metrics (i.e., min/max over a selected period, etc.) and improve computational efficiency. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Postprocessors.md#expand-functionality-of-calc_tmetric)
 
 - **Allow compilation of combine with gcc10+**   
   Enables the combine tool to compile with gcc version 10 and above without special compiler flags. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Postprocessors.md#allow-compilation-of-combine-with-gcc10)
@@ -287,7 +287,7 @@ The shp2cmaq.py script was fixed to work properly as both a module and a standal
 
 <a id=update_v55_v60b></a>
 ## What do I need to do to update from v5.5 to v6.0alpha?
-* If you have already successfully migrated to v5.5, you will not need any additional input to run with the analogous options in v6.0. However, users should note that the CCTM runscripts have changed, so older user-created runscripts  may need to be adapted to be compatible with v6.0. Additionally, if you are trying to run with the newest released version of CRACMM in v6.0, users will have to generate or map existing emissions to CRACMMv3.0. For additional information on emissions for CRACMM please see the CRACMM GitHub page ( https://usepa.github.io/CRACMM/).
+* If you have already successfully migrated to v5.5, you will not need any additional input to run with the analogous options in v6.0. However, users should note that the CCTM runscripts have changed, so older user-created runscripts will need to be adapted to be compatible with v6.0. Additionally, if you are trying to run with the newest released version of CRACMM in v6.0, users will have to generate or map existing emissions to CRACMMv3.0. For additional information on emissions for CRACMM please see the CRACMM GitHub page ( https://usepa.github.io/CRACMM/).
   
 <a id=diff_v55_v60b_input_files></a>
 ### What differences should I expect in the required model input files?
