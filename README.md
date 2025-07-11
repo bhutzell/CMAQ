@@ -50,7 +50,7 @@ CRACMM3HAPS provides additional gas and particle Hazardous Air Pollutants.
   *	The resistance to dry deposition of volatile carbon-containing compounds has been increased consistent with their vapor-pressures. This increases VOC and CO concentrations across model applications.
   * The new Soil-Atmosphere Gaseous Emissions (SAGE) module improves soil NO and HONO emissions with a simple, meteorologically dependent approach.
   * Boundary-layer mixing dynamics in stable conditions have been made consistent with upstream meteorological models.
-  * Enhanced options for online coupling of CMAQ chemistry to meteorological modelsFirst public release of a unified coupler to support WRF-CMAQ and MPAS-CMAQ in a harmonized framework.
+  * Enhanced options for online coupling of CMAQ chemistry to meteorological models. First public release of a unified coupler to support WRF-CMAQ and MPAS-CMAQ in a harmonized framework.
  
 
 ## Getting the CMAQ Repository
