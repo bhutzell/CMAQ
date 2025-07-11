@@ -20,60 +20,138 @@ SUBROUTINE ll2xy_lam (phi, lambda, phi1, phi2, lambda0, phi0, xx, yy)
 
 !-------------------------------------------------------------------------------
 ! Name:     Latitude-Longitude to (X,Y) for Lambert Conformal Projection
-! Purpose:  Determines secant or tangent Lambert conformal case, and calls
-!           appropriate routine.
+! Purpose:  Calculates (X,Y) from origin for a given latitude-longitude pair
+!           and Lambert conformal projection information for secant and
+!           tangent cases.
+! Notes:    Equations taken from "Map Projections: Theory and Applications"
+!           by Frederick Pearson, II (1990), pp. 181-182.
 ! Revised:  03 Jun 2008  Original version.  (T. Otte)
-!           26 Nov 2008  Added argument for reference latitude, PHI0.
-!                        Prevent users from having tangent Lambert conformal
-!                        case until it can be tested with the Spatial
-!                        Allocator.  (Known problem is that the Spatial
-!                        Allocator does not work properly when the
-!                        reference latitude is equal to the first true
-!                        latitude.  Work-around is to set reference latitude
-!                        to average of true latitudes for Lambert conformal.
-!                        But average of true latiudes for tangent Lambert
-!                        conformal case is the first true latitude, which
-!                        will result in the same problem as solution used
-!                        in MCIPv3.4.)  (T. Otte)
-!           01 Sep 2011  Improved error handling.  Changed XX and YY from
-!                        double-precision to single-precision reals.  (T. Otte)
+!           04 Dec 2008  Added argument for reference latitude, PHI0.
+!                        Changed routine so it is no longer hard-wired to
+!                        have a reference latitude at the first true
+!                        latitude.  (T. Otte and J. Pleim)
+!           17 Sep 2009  Corrected inline comments associated with definitions
+!                        of RHO and RHO0.  Corrected calculation of PSI (with
+!                        no impact on results).  (T. Otte)
 !           07 Sep 2011  Updated disclaimer.  (T. Otte)
+!           28 Feb 2024  Combined ll2xy_lam.f90, ll2xy_lam_sec.f90, and
+!                        ll2xy_lam_tan.f90 into this routine. Removed the code
+!                        that disabled the tangent Lambert conformal case,
+!                        even though there may still be risks of segmentation
+!                        fault due to divide-by-zero condition in Spatial
+!                        Allocator. (T. Spero)
 !-------------------------------------------------------------------------------
+
+  USE const, ONLY: rearth
 
   IMPLICIT NONE
 
-  REAL,               INTENT(IN)    :: lambda  ! longitude [deg]
-  REAL,               INTENT(IN)    :: lambda0 ! standard longitude [deg]
-  REAL,               INTENT(IN)    :: phi     ! latitude [deg]
-  REAL,               INTENT(IN)    :: phi0    ! reference latitude [deg]
-  REAL,               INTENT(IN)    :: phi1    ! true latitude 1 [deg]
-  REAL,               INTENT(IN)    :: phi2    ! true latitude 2 [deg]
-  REAL,               PARAMETER     :: phitol  = 0.001  ! tolerance [deg]
-  CHARACTER(LEN=16),  PARAMETER     :: pname   = 'LL2XY_LAM'
-  REAL,               INTENT(OUT)   :: xx      ! X-coordinate from origin
-  REAL,               INTENT(OUT)   :: yy      ! Y-coordinate from origin
+  REAL(8)                      :: deg2rad ! convert degrees to radians
+  REAL(8)                      :: dlambda ! delta lambda
+  REAL(8)                      :: drearth ! double-precision radius of earth [m]
+  REAL,          INTENT(IN)    :: lambda  ! longitude [deg]
+  REAL,          INTENT(IN)    :: lambda0 ! standard longitude [deg]
+  INTEGER                      :: ntrue   ! number of true latitudes
+  REAL,          INTENT(IN)    :: phi     ! latitude [deg]
+  REAL(8)                      :: phirad  ! latitude [rad]
+  REAL,          INTENT(IN)    :: phi0    ! reference latitude [deg]
+  REAL(8)                      :: phi0rad ! reference latitude [rad]
+  REAL,          INTENT(IN)    :: phi1    ! true latitude 1 [deg]
+  REAL(8)                      :: phi1rad ! true latitude 1 [rad]
+  REAL,          INTENT(IN)    :: phi2    ! true latitude 2 [deg]
+  REAL(8)                      :: phi2rad ! true latitude 2 [rad]
+  REAL,          PARAMETER     :: phitol  = 0.001  ! tolerance [deg]
+  REAL(8)                      :: pi
+  REAL(8)                      :: piover4 ! pi/4
+  REAL(8)                      :: psi     ! auxiliary function
+  REAL(8)                      :: rho     ! polar radius to latitude phi
+  REAL(8)                      :: rho0    ! polar radius to origin
+  REAL(8)                      :: term
+  REAL(8)                      :: term0
+  REAL(8)                      :: term1
+  REAL(8)                      :: term2
+  REAL(8)                      :: theta   ! polar angle
+  REAL(8)                      :: sinphi0 ! cone constant
+  REAL,          INTENT(OUT)   :: xx      ! X-coordinate from origin
+  REAL,          INTENT(OUT)   :: yy      ! Y-coordinate from origin
 
 !-------------------------------------------------------------------------------
-! Error, warning, and informational messages.
+! Compute constants.
 !-------------------------------------------------------------------------------
 
-  CHARACTER(LEN=256), PARAMETER :: f9000 = "(/, 1x, 70('*'), &
-    & /, 1x, '*** SUBROUTINE: ', a, &
-    & /, 1x, '***   TANGENT LAMBERT CONFORMAL PROJECTION DETECTED', &
-    & /, 1x, '***   TRUE LATITUDES = ', f8.3, 2x, f8.3, &
-    & /, 1x, '***   MAY NOT WORK PROPERLY IN SPATIAL ALLOCATOR', &
-    & /, 1x, 70('*'))"
+  piover4 = DATAN(1.0d0)
+  pi      = 4.0d0 * piover4
+  deg2rad = pi / 1.8d2
+
+  drearth = DBLE(rearth)
 
 !-------------------------------------------------------------------------------
-! Determine whether Lambert conformal is tangent or secant.
+! Determine if the projection is the secant (two true latitudes) or tangent
+! (one true latitude) variant of Lambert conformal.
 !-------------------------------------------------------------------------------
 
-  IF ( ABS( phi1 - phi2 ) < phitol ) THEN  ! tangent case
-    WRITE (*,f9000) TRIM(pname), phi1, phi2
-    CALL graceful_stop (pname)
-!   CALL ll2xy_lam_tan (phi, lambda, phi1, lambda0, xx, yy)
-  ELSE  ! secant case
-    CALL ll2xy_lam_sec (phi, lambda, phi1, phi2, lambda0, phi0, xx, yy)
+  IF ( ABS( phi1 - phi2 ) < phitol ) THEN  ! one true latitude (tangent)
+    ntrue = 1
+  ELSE  ! two true latitudes (secant)
+    ntrue = 2
   ENDIF
+
+!-------------------------------------------------------------------------------
+! Compute cone constant, SINPHI0.
+! Note:  PHI0 is the reference latitude, which is user-defined.  It is NOT
+!        used in the calculation of SINPHI0, which is the cone constant.
+!-------------------------------------------------------------------------------
+
+  phi0rad = DBLE(phi0) * deg2rad  ! convert PHI0 from degrees to radians
+  phi1rad = DBLE(phi1) * deg2rad  ! convert PHI1 from degrees to radians
+  phi2rad = DBLE(phi2) * deg2rad  ! convert PHI2 from degrees to radians
+
+  term0 = DTAN (piover4 - phi0rad/2.0d0)
+  term1 = DTAN (piover4 - phi1rad/2.0d0)
+  term2 = DTAN (piover4 - phi2rad/2.0d0)
+
+  IF ( ntrue == 1 ) THEN
+    sinphi0 = DSIN (phi1rad)
+  ELSE IF ( ntrue == 2 ) THEN
+    sinphi0 = DLOG ( DCOS(phi1rad) / DCOS(phi2rad) )
+    sinphi0 = sinphi0 / DLOG (term1 / term2)
+  ENDIF
+
+!-------------------------------------------------------------------------------
+! Compute polar angle, THETA.
+!-------------------------------------------------------------------------------
+
+  dlambda = DBLE(lambda - lambda0) * deg2rad
+  theta   = dlambda * sinphi0
+
+!-------------------------------------------------------------------------------
+! Compute polar radius to origin, RHO0, where origin is at PHI0.
+!-------------------------------------------------------------------------------
+
+  IF ( ntrue == 1 ) THEN
+    rho0 = drearth * DCOS(phi1rad) / sinphi0
+  ELSE IF ( ntrue == 2 ) THEN
+    psi  = drearth * DCOS(phi1rad) / sinphi0 / (term1**sinphi0)
+    rho0 = psi * (term0**sinphi0)
+  ENDIF
+
+!-------------------------------------------------------------------------------
+! Compute polar radius to latitude PHI, RHO.
+!-------------------------------------------------------------------------------
+
+  phirad = DBLE(phi) * deg2rad  ! convert PHI from degrees to radians
+  term   = DTAN (piover4 - phirad/2.0d0)
+  IF ( ntrue == 1 ) THEN
+    rho  = rho0 * (( term / term1 )**sinphi0)
+  ELSE IF ( ntrue == 2 ) THEN
+    rho  = psi * (term**sinphi0)
+  ENDIF
+
+!-------------------------------------------------------------------------------
+! Compute Cartesian coordinates, XX and YY.
+!-------------------------------------------------------------------------------
+
+  xx = REAL(        rho * DSIN(theta) )
+  yy = REAL( rho0 - rho * DCOS(theta) )
 
 END SUBROUTINE ll2xy_lam

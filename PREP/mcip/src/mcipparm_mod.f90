@@ -149,6 +149,8 @@ MODULE mcipparm
 !                        MCIPv5.1 to MCIPv5.3.3. (T. Spero)
 !           12 Jul 2022  Updated version stamp. (M. Mallard)
 !           19 Sep 2024  Updated version stamp. (T. Spero)
+!           26 Jun 2025  Added runtime variable, MAKEGRID. Updated version
+!                        stamp. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE m3utilio, ONLY: mxdesc3
@@ -277,6 +279,9 @@ MODULE mcipparm
                              !             1 = Output UWIND and VWIND
                              !                 in addition to UWINDC and VWINDC
 
+  INTEGER :: makegrid        ! user input: 0 = Do not output GRIDCRO file
+                             !             1 = Output GRIDCRO I/O API file
+
 !-------------------------------------------------------------------------------
 ! Grid/Domain Related Parameters
 !-------------------------------------------------------------------------------
@@ -317,7 +322,7 @@ MODULE mcipparm
 
   CHARACTER(LEN=80)                 :: fdesc      ( mxdesc3 )
   CHARACTER(LEN=16),  PARAMETER     :: progname   = 'MCIP'
-  CHARACTER(LEN=10),  PARAMETER     :: vdate      = '09/19/2024'
-  CHARACTER(LEN=8),   PARAMETER     :: ver        = 'V5.5'
+  CHARACTER(LEN=10),  PARAMETER     :: vdate      = '06/26/2025'
+  CHARACTER(LEN=8),   PARAMETER     :: ver        = 'V6.0 ALP'
 
 END MODULE mcipparm

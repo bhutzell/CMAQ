@@ -32,6 +32,8 @@ SUBROUTINE xy2ll_lam (xx, yy, phi1, phi2, lambda0, phi0, phi, lambda)
 !                        divide-by-zero condition for computing latitude along
 !                        the standard longitude.  (T. Otte)
 !           07 Sep 2011  Updated disclaimer.  (T. Otte)
+!           26 Jun 2025  Changed incoming arguments XX and YY to double-
+!                        precision real. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE const, ONLY: rearth
@@ -59,14 +61,15 @@ SUBROUTINE xy2ll_lam (xx, yy, phi1, phi2, lambda0, phi0, phi, lambda)
   REAL(8)                      :: rad2deg
   REAL(8)                      :: rho
   REAL(8)                      :: rho0       ! polar radius to origin
+  REAL(8)                      :: rho0yy     ! rho0 - yy
   REAL(8)                      :: term0
   REAL(8)                      :: term1
   REAL(8)                      :: term2
   REAL(8)                      :: theta      ! polar angle
   REAL(8)                      :: sinphi0    ! cone constant
   REAL(8)                      :: sinphi0inv ! 1/sinphi0
-  REAL,          INTENT(IN)    :: xx         ! X-coordinate from origin
-  REAL,          INTENT(IN)    :: yy         ! Y-coordinate from origin
+  REAL(8),       INTENT(IN)    :: xx         ! X-coordinate from origin
+  REAL(8),       INTENT(IN)    :: yy         ! Y-coordinate from origin
 
 !-------------------------------------------------------------------------------
 ! Compute constants.
@@ -104,13 +107,15 @@ SUBROUTINE xy2ll_lam (xx, yy, phi1, phi2, lambda0, phi0, phi, lambda)
   psi  = drearth * DCOS(phi1rad) * sinphi0inv * (term1**sinphi0)
   rho0 = psi / (term0**sinphi0)
 
+  rho0yy = rho0 - yy
+
 !-------------------------------------------------------------------------------
 ! Compute longitude, LAMBDA.
 !-------------------------------------------------------------------------------
 
   lambda0rad = lambda0 * deg2rad
 
-  theta     = DATAN( DBLE(xx) / (rho0 - DBLE(yy)) )
+  theta     = DATAN( xx / rho0yy )
   lambdarad = lambda0rad + theta * sinphi0inv
   lambda    = REAL(lambdarad * rad2deg)
 
@@ -118,7 +123,7 @@ SUBROUTINE xy2ll_lam (xx, yy, phi1, phi2, lambda0, phi0, phi, lambda)
 ! Compute latitude, PHI.
 !-------------------------------------------------------------------------------
 
-  rho = DSQRT( DBLE(xx)*DBLE(xx) + (rho0-DBLE(yy))*(rho0-DBLE(yy)) )
+  rho = DSQRT( (xx * xx) + (rho0yy * rho0yy) )
   rho = DSIGN(1.0d0, sinphi0) * rho
 
   phirad = (psi / rho)**sinphi0inv
