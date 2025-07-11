@@ -444,8 +444,8 @@
                    ! For all other variables, apply trapezoidal rule for averaging.
                    IF ( INIT_STEP ) THEN
                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U )
-                   ELSE IF ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) .LE. 0.999 * ELMO_BLANK
-     &                      .OR. ELMO_USED( U ) .LE. 0.999 * ELMO_BLANK ) THEN
+                   ELSE IF ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) .LE. ELMO_BLANK_XPT999
+     &                      .OR. ELMO_USED( U ) .LE. ELMO_BLANK_XPT999 ) THEN
                       ! If ELMO_OUT or ELMO_USED are ELMO_BLANK then overwrite ELMO_OUT with
                       ! with ELMO_BLANK = AMISS3 = -9.0E36.
                       ! This prevents the case where large negative values can accumulate

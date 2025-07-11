@@ -653,7 +653,9 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         REAL, PARAMETER :: ELMO_BLANK = -9.000E36
 #else
         REAL, PARAMETER :: ELMO_BLANK = AMISS3
-#endif       
+#endif
+        ! Value for floating point comparisons against ELMO_BLANK
+        REAL, PARAMETER :: ELMO_BLANK_XPT999 = 0.999*ELMO_BLANK
         CONTAINS
 
 !------------------------------------------------------------------------------------------            
