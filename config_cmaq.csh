@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ================= CMAQv5.5.X Configuration Script ================= #
+# ================= CMAQv6.X Configuration Script ================= #
 # Requirements: I/O API & netCDF libraries                            #
 #               PGI, Intel, or Gnu Fortran compiler                   #
 #               MPICH for multiprocessor computing                    #
