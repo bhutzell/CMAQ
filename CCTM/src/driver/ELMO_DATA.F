@@ -804,7 +804,6 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifndef isam
             ! VOC to NOX ratio is only available when ISAM is turned on
             DO IT = 1,N_ELMO_TABLE
-                ! VOC to NOX ratio is only available when ISAM is turned on
                 IF ( ELMO_TABLE( IT )%ID .EQ. ID_VOC_NOX )
      &                  L_ELMO_TABLE( IT ) = .FALSE.
             END DO
