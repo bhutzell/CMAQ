@@ -75,6 +75,26 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 |[Merge for PR#1185](https://github.com/USEPA/CMAQ/commit/189dc7f9b7e60b87efe76f5ff9af53088c2b469a) | [PR#1185](https://github.com/USEPA/CMAQ_Dev/pull/1185)  |
 
 
+### Updates to semi- and intermediate volatility ROCOXY system yields and products
+[Havala Pye](mailto:pye.havala@epa.gov) and Ben Murphy, U.S. Environmental Protection Agency  
+**Type of update**: Science Update  
+**Release Version/Date**: CMAQv6.0  
+
+**Description**: 
+Semi- and intermediate volatility species (S/IVOCs) are emitted from sources such as wood burning as well as formed in the atmosphere from chemical reaction. The ROCOXY system (A/VROCN_OXY_, A/VROCP_OXY_ species) describe these emissions and secondary species. In CRACMM1, their chemistry, including product yields, was informed by the 2-D VBS framework. In CRACMM3, the parameters have been updated. The following updates were made in the ROCOXY system:
+- Reactions with the hydroxyl radical (HO) sequester HO.
+- Unsaturated dicarbonyl products (DCB1) have been replaced by a generic ketone (KET).
+- Acetaldehyde yields have been reduced and corresponding carbon mass split evenly between formaldehyde (HCHO) and acetaldehyde (ACD) (2 moles HCHO for 1 mole ACD).
+- ROCOXY product yields for other ROCOXY species have been recalculated.
+  
+**Significance and Impact**:  
+Reactions of S/IVOC ROCOXY sequester more HO than in CRACMM2. HOx can still be released from further reaction of products. Sources with large ROCOXY emissions (wildland fires) produce less secondary acetaldehyde and more secondary formaldehyde.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269)  | 
+
+
 ### Updates to aromatic system chemical compound identity
 **Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Science Update     
