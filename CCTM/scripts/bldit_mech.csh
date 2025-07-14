@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ================ CCTMv5.5 Mechanism Build Script ==================== 
+# ================ CCTMv6.X Mechanism Build Script ==================== 
 # Usage: bldit_mech.csh >&! bldit_mech.log                                   
 # Requirements: I/O API & netCDF libraries, a Fortran compiler,               
 #               and MPI for multiprocessor computing                     

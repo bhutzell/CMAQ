@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ===================== CCTMv5.4.X Run Script ========================= 
+# ===================== CCTMv6.X Run Script ========================= 
 # Usage: run.cctm >&! cctm_2015_HEMI.log &                                
 #
 # To report problems or request help with this script/program:     
@@ -33,7 +33,7 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v55               #> Code Version
+ set VRSN      = v6a1               #> Code Version
  set PROC      = mpi               #> serial or mpi
  setenv MECH     cb6r5m_ae7_aq     #> Mechanism ID
  set APPL      = 2015_HEMI         #> Application Name (e.g. Gridname)
@@ -150,8 +150,8 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
 setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
-setenv CTM_BROWN_VEG Y       #> use NPV input files to limit dust emissions [ default: N ]
-setenv CTM_LNO_ONLINE N      #> turn on lightning NOx [ default: N 
+setenv CTM_BROWN_VEG Y       #> when using CTM_WB_DUST, use non-photosynthetic (brown) vegetation input files to limit dust emissions [ default: N ]
+setenv CTM_LNO_ONLINE N      #> turn on lightning NOx emissions [ default: N ] 
                              #> alternatively LNOx emissions can also be read in as external emissions inputs,
                              #> in this case, please setenv this variable to N to avoid double counting
 setenv KZMIN Y               #> use Min Kz option in edyintb [ default: Y ], 
@@ -161,7 +161,7 @@ setenv CLM_VERSION N         #> WRF CLM LSM
 setenv NOAH_VERSION N        #> WRF NOAH LSM
 setenv CTM_ABFLUX N          #> ammonia bi-directional flux for in-line deposition 
                              #>    velocities [ default: N ]
-setenv CTM_BIDI_FERT_NH3 F   #> subtract fertilizer NH3 from emissions because it will be handled
+setenv CTM_BIDI_FERT_NH3 N   #> subtract fertilizer NH3 from emissions because it will be handled
                              #>    by the BiDi calculation [ default: Y ]
 setenv CTM_HGBIDI N          #> mercury bi-directional flux for in-line deposition 
                              #>    velocities [ default: N ]
@@ -326,7 +326,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Ozone column data
   set OMIfile   = omi_cmaq_2005through2024_27x27.dat
 
-  # If using BROWN_VEG option, then set the path to the NPV input files
+  # If using BROWN_VEG option, then set the path to the non-photosynthetic vegetation (NPV) input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
        setenv PV_AVG_FILE ${INPDIR}/surface/pv_avg.dat
        setenv NPV_AVG_FILE ${INPDIR}/surface/npv_avg.dat
