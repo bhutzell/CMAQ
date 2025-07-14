@@ -57,6 +57,9 @@ CMAQv6.0 introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM
   - **Photolysis of aerosol nitrate in CRACMM3**   
   Adds photolysis of aerosol nitrate and a new aerosol species to CRACMM3, with updated molecular weights and solver enhancements. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#photolysis-of-aerosol-nitrate-in-cracmm3)
 
+  - **Updates to semi- and intermediate volatility ROCOXY system yields and products**
+  Updates the reaction products in lower volatility ROC systems (ROCN/POXY) to sequester more OH, reduce acetaldehyde, and balance other product coefficients [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#Updates-to-semi--and-intermediate-volatility-ROCOXY-system-yields-and-products)
+
   - **Updates to aromatic system chemical compound identity**    
    The identities and representative structures of aromatic oxidation products in CMAQv6.0 such as phenol and catechol were updated to better reflect their sources and yields for improved chemical accuracy.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updates-to-aromatic-system-chemical-compound-identity)
 
