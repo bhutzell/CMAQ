@@ -394,11 +394,13 @@
                       IF ( INIT_STEP ) THEN
                          ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
                       ELSE IF ( WRITE_STEP ) THEN
-                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC1_PH * ! (elmo_out + avg(elmo_out)) / elmo_nstep
+                         ! elmo_out = (elmo_out + avg(elmo_out)) / elmo_nstep
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC1_PH *
      &                      ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
      &                      + DIVFAC2_PH * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) )
                       ELSE
-                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =  ! elmo_out + avg(elmo_out)
+                         ! elmo_out = elmo_out + avg(elmo_out)
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =
      &                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
      &                      + DIVFAC2_PH * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
                       END IF
