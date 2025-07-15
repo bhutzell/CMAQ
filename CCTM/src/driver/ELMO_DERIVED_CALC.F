@@ -37,6 +37,7 @@
       USE CGRID_SPCS, ONLY : RHOJ_LOC
       USE RUNTIME_VARS, ONLY : PHOTDIAG
       USE ASX_DATA_MOD, ONLY : MET_DATA, GRID_DATA
+      Use LSM_Mod, ONLY : N_SOIL_TYPE
       USE ELMO_DERIVED_FXNS
 
 #ifdef isam
@@ -557,7 +558,7 @@
 
          ! Retrieve Latent Heat Flux 
          CASE ( ID_SWC_1 )
-             IF ( L1 .EQ. 1 ) THEN
+             IF ( L1 .EQ. 1 .AND. Grid_Data%SLTYP(C,R) .LE. N_SOIL_TYPE ) THEN
              OUTVAL = MET_DATA%SOIM1( C1,R1 ) / GRID_DATA%WSAT( C1,R1 ) ! ratio
              ELSE
              OUTVAL = ELMO_BLANK
