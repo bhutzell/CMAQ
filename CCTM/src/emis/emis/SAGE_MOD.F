@@ -601,7 +601,7 @@ C Local variables:
 
 
 C-----------------------------------------------------------------------
-         YEAR     = DATE / 1000
+         YEAR     = INT( FLOAT( DATE ) / 1000. )
          DOY      = FLOAT( DATE ) - YEAR * 1000
          if(DOY .eq. 1.0 ) Then
             DOY_YEST = 365.0
