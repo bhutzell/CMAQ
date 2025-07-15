@@ -601,15 +601,21 @@ C Local variables:
 
 
 C-----------------------------------------------------------------------
-         YEAR     = FLOAT( DATE ) / 1000.0 
+         YEAR     = DATE / 1000  ! integer division (fixed)
          DOY      = FLOAT( DATE ) - YEAR * 1000
          if(DOY .eq. 1.0 ) Then
             DOY_YEST = 365.0
          else 
             DOY_YEST = DOY - 1.0
-         end if 
-         ddldt    = ( DAY_LENGTH(DOY, LAT)  - DAY_LENGTH(DOY_YEST, LAT) ) /
-     &           abs( DAY_LENGTH(81.0, LAT) - DAY_LENGTH(80.0, LAT) )
+         end if
+         ! very near the equator the denominator for the calculation of ddldt
+         ! becomes zero, so avoid division by zero for that case
+         if( abs( DAY_LENGTH(81.0, LAT) - DAY_LENGTH(80.0, LAT) .lt. 1e-30 ) ) Then
+            ddldt = 0
+         else
+            ddldt    = ( DAY_LENGTH(DOY, LAT)  - DAY_LENGTH(DOY_YEST, LAT) ) /
+     &              abs( DAY_LENGTH(81.0, LAT) - DAY_LENGTH(80.0, LAT) )
+         endif
          SDDL     = min(0.9,(115-LAT)/100)
          Fdl      = exp(-(ddldt-1.0)**2/(2.0 * SDDL**2)) 
          FTs      = exp(-0.5*((TS-TMin)/SDT)**2)
