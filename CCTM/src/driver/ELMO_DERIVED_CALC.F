@@ -558,7 +558,7 @@
 
          ! Retrieve Latent Heat Flux 
          CASE ( ID_SWC_1 )
-             IF ( L1 .EQ. 1 .AND. Grid_Data%SLTYP(C,R) .LE. N_SOIL_TYPE ) THEN
+             IF ( L1 .EQ. 1 .AND. Grid_Data%SLTYP(C1,R1) .LE. N_SOIL_TYPE ) THEN
              OUTVAL = MET_DATA%SOIM1( C1,R1 ) / GRID_DATA%WSAT( C1,R1 ) ! ratio
              ELSE
              OUTVAL = ELMO_BLANK
