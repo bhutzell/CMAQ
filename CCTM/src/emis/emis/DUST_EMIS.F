@@ -787,16 +787,16 @@ C-----------------------------------------------------------------------
             !!!!!!!!!!! PV AND NPV INTERPOLATION !!!!!!!!!!!!!!!!!!
             IF (BROWN_VEG) THEN
                 interp_unit = getefile( 'PV_AVG_FILE', .true., .true., pname )
-                do i = 1,ncols 
-                  do j= 1,nrows 
+                do j= 1,nrows 
+                  do i = 1,ncols 
                      call interp_v(jdate, jtime, lat(i,j), lon(i,j), interp_unit, pv(i,j))
                   end do
                 end do
                      call interp_v(jdate, jtime, lat(1,1), lon(1,1), interp_unit, pv(1,1), .true.) ! optional logical says to close the file and deallocate arrays
     
                 interp_unit = getefile( 'NPV_AVG_FILE', .true., .true., pname )
-                do i = 1, ncols
-                  do j= 1, nrows
+                do j= 1, nrows
+                  do i = 1, ncols
                      call interp_v(jdate, jtime, lat(i,j), lon(i,j), interp_unit, npv(i,j))
                   end do
                 end do
@@ -944,6 +944,7 @@ C---Vegetation fraction based on the WRF/MCIP VEG variable. In WRF that would be
 C-- for the case of PX and VEGFRA in the case of other LSMs. In more recent WRFv4+ versions
 C-- high resolution MODIS veg data is availiable and can be used in PX with pxlsm_modis_veg = 1
                vegfrac( c,r ) = max( min( Met_Data%veg(c,r), 0.95 ), 0.005)
+               vegfree = 1.0 - vegfrac( c,r )
                lambdav = -0.35 * log( vegfree ) ! Shao et al. [Aus. J. Soil Res.,1996]
             END IF
 

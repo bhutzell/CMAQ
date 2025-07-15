@@ -108,6 +108,18 @@ SUBROUTINE getluse
 !                        confusion.  (T. Spero)
 !           08 Aug 2018  Corrected bug in setting land use category names in
 !                        MCIP for USGS24 + lakes.  (T. Spero)
+!           26 Jun 2025  Updated land use classifications to distinguish MODIS
+!                        from MODIFIED IGBP MODIS NOAH. Also updated the land
+!                        use to allow for the urban local climate zones (LCZs)
+!                        that were implemented in WRFv4.3. Note: CMAQ is not yet
+!                        set up to handle the indices associated with the LCZs.
+!                        The documentation of the Python package that handles
+!                        LCZs for WRF (doi:10.21105/joss.04432) indicates that
+!                        the LCZs replace the urban category in the WRF land
+!                        use. To accommodate LCZs for now, MCIP will reconstruct
+!                        the urban category by aggregating the LCZs so that they
+!                        are an overlay rather than a comprehensive dataset.
+!                        (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE lucats
@@ -124,8 +136,12 @@ SUBROUTINE getluse
   INTEGER                           :: i
   INTEGER                           :: ii
   INTEGER                           :: jj
+  INTEGER                           :: lczst
+  INTEGER                           :: lczstm1
   INTEGER                           :: lu
   INTEGER                           :: lumax
+  INTEGER                           :: n
+  INTEGER                           :: nlcz
   CHARACTER(LEN=16),  PARAMETER     :: pname     = 'GETLUSE'
   INTEGER                           :: row
   INTEGER                           :: sc
@@ -153,6 +169,8 @@ SUBROUTINE getluse
 ! Set up land-use classification-specific information.
 !-------------------------------------------------------------------------------
 
+  nlcz = SIZE(lulcz)
+
   IF ( nummetlu > SIZE(xluse,3) ) THEN
     WRITE (*,f9000) TRIM(pname), SIZE(xluse,3), nummetlu
     CALL graceful_stop (pname)
@@ -175,18 +193,54 @@ SUBROUTINE getluse
     DO i = 1, nummetlu
       xludesc(i) = TRIM(xlusrc) // ': ' // TRIM(lucatusgs33(i))
     ENDDO
+  ELSE IF ( ( met_lu_src(1:3) == "USG" ) .AND. ( nummetlu == 41 ) ) THEN
+    xlusrc = "USGS_LCZ"
+    DO i = 1, 30
+      xludesc(i) = TRIM(xlusrc) // ': ' // TRIM(lucatusgs33(i))
+    ENDDO
+    DO n = 1, nlcz
+      xludesc(nummetlu-nlcz-1+n) = TRIM(xlusrc) // ': ' // TRIM(lulcz(n))
+    ENDDO
+  ELSE IF ( ( met_lu_src(1:3) == "USG" ) .AND. ( nummetlu == 61 ) ) THEN
+    xlusrc = "USGS_LCZ"
+    DO i = 1, 30
+      xludesc(i) = TRIM(xlusrc) // ': ' // TRIM(lucatusgs33(i))
+    ENDDO
+    xludesc(31:nummetlu-nlcz-1) = TRIM(xlusrc) // ': ' // '~~~unassigned~~~'
+    DO n = 1, nlcz
+      xludesc(nummetlu-nlcz-1+n) = TRIM(xlusrc) // ': ' // TRIM(lulcz(n))
+    ENDDO
   ELSE IF ( ( met_lu_src(1:3) == "OLD" ) .AND. ( nummetlu == 13 ) ) THEN
     xlusrc = "MM513"
     DO i = 1, nummetlu
       xludesc(i) = TRIM(xlusrc) // ': ' // TRIM(lucatold(i))
     ENDDO
-  ELSE IF ( ( met_lu_src(1:3) == "MOD" ) .AND. ( nummetlu == 20 ) .OR.  &
-            ( met_lu_src(1:3) == "MOD" ) .AND. ( nummetlu == 21 ) .OR.  &
-            ( met_lu_src(1:3) == "MOD" ) .AND. ( nummetlu == 33 ) ) THEN
-    xlusrc = "MODIS NOAH"  ! accounts for lake category 21
-    DO i = 1, nummetlu
-      xludesc(i) = TRIM(xlusrc) // ': ' // TRIM(lucatmod(i))
-    ENDDO
+  ELSE IF ( met_lu_src(1:3) == "MOD" ) THEN
+    IF ( met_lu_src(1:5) == "MODIS" ) THEN
+      xlusrc = "MODIS"
+    ELSE IF ( met_lu_src(1:5) == "MODIF" ) THEN
+      xlusrc = "MODIS NOAH"  ! accounts for lake category 21
+    ENDIF
+    IF ( ( nummetlu == 20 ) .OR. ( nummetlu == 21 ) .OR.  &
+         ( nummetlu == 33 ) ) THEN
+      DO i = 1, nummetlu
+        xludesc(i) = TRIM(xlusrc) // ': ' // TRIM(lucatmod(i))
+      ENDDO
+    ELSE IF ( nummetlu == 41 .OR. nummetlu == 61 ) THEN
+      xlusrc = "MODIS_LCZ"
+      DO i = 1, 20
+        xludesc(i) = TRIM(xlusrc) // ': ' // TRIM(lucatmod(i))
+      ENDDO
+      IF ( xlusrc == "MODIS" ) THEN
+        xludesc(21) = TRIM(xlusrc) // ': ' // TRIM(lucatmod(21))
+      ELSE
+        xludesc(21) = TRIM(xlusrc) // ': ' // '~~~unassigned~~~'
+      ENDIF
+      xludesc(22:nummetlu-nlcz-1) = TRIM(xlusrc) // ': ' // '~~~unassigned~~~'
+      DO n = 1, nlcz
+        xludesc(nummetlu-nlcz-1+n) = TRIM(xlusrc) // ': ' // TRIM(lulcz(n))
+      ENDDO
+    ENDIF
   ELSE IF ( ( met_lu_src(1:3) == "NLC" ) .AND. ( nummetlu == 50 ) ) THEN
     xlusrc = "NLCD50"
     DO i = 1, nummetlu
@@ -382,6 +436,37 @@ SUBROUTINE getluse
   ENDIF
 
 !-------------------------------------------------------------------------------
+! If the urban local climate zones (LCZs) are included in the land use
+! classification, aggregate the LCZs to fill the traditional urban category.
+! This converts the LCZs into an overlay of the urban subcategories rather than
+! an extension of the base land use classification.
+!-------------------------------------------------------------------------------
+
+  IF ( TRIM(xlusrc) == "USGS_LCZ" .OR. TRIM(xlusrc) == "MODIS_LCZ" ) THEN
+
+    lczst   = nummetlu - nlcz + 1
+    lczstm1 = nummetlu - nlcz
+
+    DO col = 1, ncols_x
+      DO row = 1, nrows_x
+
+        ! Adjust USGS_LCZ or MODIS_LCZ to repopulate the urban category from
+        ! aggregating the LCZs.
+
+        xluse(col,row,met_lu_urban) = SUM(xluse(col,row,lczst:nummetlu))
+
+        ! Update the dominant land use category.
+
+        IF ( xdluse(col,row) >= lczst .AND. xdluse(col,row) <= nummetlu ) THEN
+          xdluse(col,row) = met_lu_urban
+        ENDIF
+
+      ENDDO
+    ENDDO
+
+  ENDIF
+
+!-------------------------------------------------------------------------------
 ! Fill percentage of urban area (PURB) based on amount of land in grid cell.
 ! When urban canopy model is used in WRF, use fraction of urban area in
 ! cell (FRC_URB) to fill PURB, if PRC_URB is available.
@@ -409,7 +494,8 @@ SUBROUTINE getluse
               xpurb(col,row) = ( ( xluse(col,row,1)  + xluse(col,row,31) +    &
                                    xluse(col,row,32) + xluse(col,row,33) ) /  &
                                  (1.0 - xluse(col,row,met_lu_water)) ) * 100.0
-            ELSE IF ( TRIM(xlusrc) == 'MODIS NOAH' ) THEN
+            ELSE IF ( TRIM(xlusrc) == 'MODIS NOAH' .OR.  &
+                      TRIM(xlusrc) == 'MODIS' ) THEN
               IF ( nummetlu == 33 ) THEN
                 xpurb(col,row) = ( ( xluse(col,row,13) + xluse(col,row,31) +    &
                                      xluse(col,row,32) + xluse(col,row,33) ) /  &
@@ -418,6 +504,20 @@ SUBROUTINE getluse
                 xpurb(col,row) = ( xluse(col,row,13) /  &
                                    (1.0 - xluse(col,row,met_lu_water)) ) * 100.0
               ENDIF
+            ELSE IF ( TRIM(xlusrc) == 'USGS_LCZ' .OR.  &
+                      TRIM(xlusrc) == 'MODIS_LCZ' ) THEN
+              ! No scaling by water because it was eliminated in preproc.
+              xpurb(col,row) = ( xluse(col,row,lczstm1+ 1) * 0.90 +  &
+                                 xluse(col,row,lczstm1+ 2) * 0.90 +  &
+                                 xluse(col,row,lczstm1+ 3) * 0.65 +  &
+                                 xluse(col,row,lczstm1+ 4) * 0.65 +  &
+                                 xluse(col,row,lczstm1+ 5) * 0.65 +  &
+                                 xluse(col,row,lczstm1+ 6) * 0.35 +  &
+                                 xluse(col,row,lczstm1+ 7) * 0.35 +  &
+                                 xluse(col,row,lczstm1+ 8) * 0.35 +  &
+                                 xluse(col,row,lczstm1+ 9) * 0.10 +  &
+                                 xluse(col,row,lczstm1+10) * 0.35 +  &
+                                 xluse(col,row,lczstm1+11) * 0.10 ) * 100.0
             ELSE IF ( TRIM(xlusrc) == 'NLCD50' ) THEN
               xpurb(col,row) = ( ( xluse(col,row,3) * 0.10 +    &
                                    xluse(col,row,4) * 0.35 +    &
