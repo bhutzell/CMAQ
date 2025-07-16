@@ -97,7 +97,11 @@
    'EVERYWHERE', 'ALL'         ,'GLYD'   ,'GLYD'        ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a', 
 
-      ! Marine Halogen Chemistry
+   ! For biogenics:
+   ! Used for MEGAN only
+   'EVERYWHERE', 'ALL'        ,'CH3I'      ,'CH3I'       ,'GAS'  ,0   ,'UNIT','a',
+
+   ! Marine Halogen Chemistry
    'EVERYWHERE', 'MGEM'        ,'HYPOIODUSACID'   ,'HOI'     ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'MGEM'        ,'MOLECULARIODINE' ,'I2'      ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'MGEM'        ,'DIMETHYLSULFIDE' ,'DMS'     ,'GAS'  ,1.  ,'UNIT','a',

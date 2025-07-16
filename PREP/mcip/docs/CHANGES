@@ -1,5 +1,89 @@
 CHANGES for MCIP
 
+MCIP Version 6.0 Alpha (26 Jun 2025)
+
+- Updated MCIP to process WRF land use classifications that include the
+  urban local climate zones (LCZs) that were implemented in WRFv4.3. The
+  LCZs are 11 categories that are appended to USGS, MODIS, and MODIFIED IGBP
+  MODIS NOAH classifications in WRF. (There is no option to use LCZs in WRF
+  with NLCD.) The LCZs were added as categories 31-41 in WRFv4.3, and those
+  categories were changed to 51-61 beginning with WRFv4.4.2.
+
+  In addition, MCIP was changed to distinguish MODIS from MODIFIED IGBP MODIS
+  NOAH, where category 21 is either "Lakes" or "Unassigned".
+
+  Changed files:  PREP/mcip/src/getluse.f90
+                  PREP/mcip/src/lucats_mod.f90
+                  PREP/mcip/src/setup_wrfem.f90
+                  PREP/mcip/src/setgriddefs.f90
+
+
+- Corrected MCIP internal calculations of latitude and longitude for polar
+  stereographic projections in dot-point (Arakawa-B) and face-point (Arakawa-C)
+  grid spaces. (Latitude and longitude on cell centers are taken directly from
+  WRF, and there were no errors in those data.)
+
+  Changed files:  PREP/mcip/src/rdwrfem.f90
+                  PREP/mcip/src/setup_wrfem.f90
+                  PREP/mcip/src/Makefile
+                  PREP/mcip/src/xy2ll_lam.f90
+                  PREP/mcip/src/xy2ll_merc.f90
+
+  New file:       PREP/mcip/src/xy2ll_ps.f90
+
+
+- Restored option for tangent Lambert conformal projections to be processed
+  by MCIP. Combined the three Lambert conformal subroutines into a single
+  subroutine. Note: using a tangent Lambert conformal projection (i.e., with
+  one true latitude) may cause a divide-by-zero condition for users who also
+  require processing in the Spatial Allocator.
+
+  Changed files:  PREP/mcip/src/ll2xy_lam.f90
+                  PREP/mcip/src/Makefile
+
+  Deleted files:  PREP/mcip/src/ll2xy_lam_sec.f90
+                  PREP/mcip/src/ll2xy_lam_tan.f90
+
+
+- Restored option to not output time-independent I/O API files in a single
+  MCIP run. (This option is useful for long simulations because the GRID*
+  files do not change.)
+
+  Changed files:  PREP/mcip/scripts/run_mcip.csh
+                  PREP/mcip/src/gridout.f90
+                  PREP/mcip/src/mcipparm_mod.f90
+                  PREP/mcip/src/readnml.f90
+
+
+- Corrected errors in the inline documentation that accompanies one of the
+  Mercator routines. The documentation previously stated that the routine
+  was for polar stereographic projections.
+
+  Changed files:  PREP/mcip/src/xy2ll_merc.f90
+
+
+- Updated WRF option translation for the MCIP metadata for new physics
+  through WRFv4.7.0.
+
+  Changed files:  PREP/mcip/src/wrfemopts.f90
+
+
+- Moved the writes of the time-independent files into the time-independent
+  section of the main program to avoid redundant writes.
+
+  Changed files:  PREP/mcip/src/mcip.f90
+
+
+- Added compiler options for Intel 24.2, which changed from "ifort" to "ifx".
+
+  Changed files:  PREP/mcip/src/Makefile
+
+
+- Updated version stamp.
+
+  Changed files:  PREP/mcip/src/mcipparm_mod.f90
+
+--------------------------------------------------------------------------------
 
 MCIP Version 5.5 (19 September 2024)
 

@@ -979,6 +979,7 @@ c----------------------------------------------------------
         ! Activate Particulate Ions if Requested
         IF ( INDEX( TAGCLASSES,'PM_IONS' ) .NE. 0 ) THEN
           FOUND_SPECIES = .FALSE.
+          CALL ADD_ISAM_SPEC( 'ACL', FOUND_SPECIES, IMECH )
           CALL ADD_ISAM_SPEC( 'ANA', FOUND_SPECIES, IMECH )
           CALL ADD_ISAM_SPEC( 'AMG', FOUND_SPECIES, IMECH )
           CALL ADD_ISAM_SPEC( 'AK', FOUND_SPECIES, IMECH )

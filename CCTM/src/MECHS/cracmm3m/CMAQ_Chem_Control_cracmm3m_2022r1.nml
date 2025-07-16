@@ -184,7 +184,7 @@
    ! only be applied operationally for Residential Wood Combustion, and not for wild, 
    ! prescribed, or agricultural fires.
    !
-   ! When applying this scaling, check that 'GR_RWC' is updated to correspond to the 
+   ! When applying this scaling, check that 'GR_RES_FIRES' is updated to correspond to the 
    ! stream label the Run Script has assigned to the residential wood combustion 
    ! emission file.
    !
@@ -196,20 +196,20 @@
    !    based on the VBS scheme of the CAMx model (v5.4). Geoscientific Model 
    !    Development, 10, 2303-2320, 2017.
 
-   'EVERYWHERE', 'GR_RWC'      ,'AROCN2OXY4', 'AROCN2OXY4'  ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCN2OXY8', 'AROCN2OXY8'  ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCN1OXY3', 'AROCN1OXY3'  ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCN1OXY6', 'AROCN1OXY6'  ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY2', 'AROCP0OXY2'  ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'AROCP0OXY4'  ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP1OXY1', 'AROCP1OXY1'  ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP1OXY3', 'AROCP1OXY3'  ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP2ALK',  'AROCP2ALK'   ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP2OXY2', 'AROCP2OXY2'  ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP3ALK'   ,'GAS' ,0.363,'MASS','a',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP3OXY2'  ,'GAS' ,0.303,'MASS','a',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP4ALK'   ,'GAS' ,1.650,'MASS','a',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP4OXY2'  ,'GAS' ,0.350,'MASS','a',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCN2OXY4', 'AROCN2OXY4'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCN2OXY8', 'AROCN2OXY8'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCN1OXY3', 'AROCN1OXY3'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCN1OXY6', 'AROCN1OXY6'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCP0OXY2', 'AROCP0OXY2'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCP0OXY4', 'AROCP0OXY4'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCP1OXY1', 'AROCP1OXY1'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCP1OXY3', 'AROCP1OXY3'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCP2ALK',  'AROCP2ALK'   ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCP2OXY2', 'AROCP2OXY2'  ,'FINE',0.6  ,'UNIT','m',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCP0OXY4', 'VROCP3ALK'   ,'GAS' ,0.363,'MASS','a',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCP0OXY4', 'VROCP3OXY2'  ,'GAS' ,0.303,'MASS','a',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCP0OXY4', 'VROCP4ALK'   ,'GAS' ,1.650,'MASS','a',
+   'EVERYWHERE', 'GR_RES_FIRES','AROCP0OXY4', 'VROCP4OXY2'  ,'GAS' ,0.350,'MASS','a',
  
    ! For biogenics:
    ! Used for MEGAN only

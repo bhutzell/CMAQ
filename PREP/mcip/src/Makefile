@@ -46,13 +46,13 @@ MODEL = mcip.exe
 ###          -L$(NETCDF)/lib -lnetcdff -lnetcdf
 
 #...Intel Fortran
-FC      = ifort
-NETCDF = /usr/local/apps/netcdf-4.9.2/intel-21.4
-IOAPI_ROOT = /usr/local/apps/ioapi-3.2/intel-21.4
+FC      = ifx
+NETCDF = /usr/local/apps/netcdf-4.9.2/intel-24.2
+IOAPI_ROOT = /usr/local/apps/ioapi-3.2/intel-24.2
 ###FFLAGS  = -g -O0 -check all -C -traceback -FR -I$(NETCDF)/include  \
 ###          -I$(IOAPI_ROOT)/Linux2_x86_64ifort
 FFLAGS  = -O3 -traceback -FR -I$(NETCDF)/include  \
-	  -I$(IOAPI_ROOT)/Linux2_x86_64ifort
+	  -I$(IOAPI_ROOT)/Linux2_x86_64oneapi
 LIBS    = -L$(IOAPI_ROOT)/lib -lioapi \
 	  -L$(NETCDF)/lib -lnetcdff -lnetcdf
 
@@ -112,8 +112,6 @@ OBJS =\
  julian.o \
  layht.o \
  ll2xy_lam.o \
- ll2xy_lam_sec.o \
- ll2xy_lam_tan.o \
  ll2xy_merc.o \
  ll2xy_ps.o \
  locate.o \
@@ -149,7 +147,8 @@ OBJS =\
  wrfemopts.o \
  wrgdesc.o \
  xy2ll_lam.o \
- xy2ll_merc.o
+ xy2ll_merc.o \
+ xy2ll_ps.o
 
 all:
 	@$(MAKE) $(MODULES)

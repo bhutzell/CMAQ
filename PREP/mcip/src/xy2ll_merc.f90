@@ -19,13 +19,15 @@
 SUBROUTINE xy2ll_merc (xx, yy, lambda0, phi, lambda)
 
 !-------------------------------------------------------------------------------
-! Name:     (X,Y) to Latitude-Longitude for Polar Stereographic Projection
+! Name:     (X,Y) to Latitude-Longitude for Mercator Projection
 ! Purpose:  Calcluates latitude-longitude for a given (X,Y) pair from origin
-!           and polar stereographic projection information.
-! Notes:    Equations taken from "Map Projections: Theory and Applications"
-!           by Frederick Pearson, II (1990), pp. 190-192.
+!           and Mercator projection information.
 ! Revised:  18 Sep 2009  Original version.  (T. Otte)
 !           07 Sep 2011  Updated disclaimer.  (T. Otte)
+!           26 Jun 2025  Corrected Name and Purpose of this routine. Changed
+!                        incoming arguments XX and YY to double-precision
+!                        real and eliminated local double-precision variants
+!                        XXD and YYD. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE const, ONLY: rearth
@@ -44,10 +46,8 @@ SUBROUTINE xy2ll_merc (xx, yy, lambda0, phi, lambda)
   REAL(8)                      :: piover2    ! pi/2
   REAL(8)                      :: piover4    ! pi/4
   REAL(8)                      :: rad2deg
-  REAL,          INTENT(IN)    :: xx         ! X-coordinate from origin
-  REAL(8)                      :: xxd
-  REAL,          INTENT(IN)    :: yy         ! Y-coordinate from origin
-  REAL(8)                      :: yyd
+  REAL(8),       INTENT(IN)    :: xx         ! X-coordinate from origin
+  REAL(8),       INTENT(IN)    :: yy         ! Y-coordinate from origin
 
 !-------------------------------------------------------------------------------
 ! Compute constants.
@@ -62,17 +62,10 @@ SUBROUTINE xy2ll_merc (xx, yy, lambda0, phi, lambda)
   drearth = DBLE(rearth)
 
 !-------------------------------------------------------------------------------
-! Set up geometric constants.
-!-------------------------------------------------------------------------------
-
-  xxd  = DBLE(xx)
-  yyd  = DBLE(yy)
-
-!-------------------------------------------------------------------------------
 ! Compute latitude (PHI).
 !-------------------------------------------------------------------------------
 
-  phirad  = ( 2.0d0 * DATAN ( DEXP(yyd/drearth) ) ) - piover2
+  phirad  = ( 2.0d0 * DATAN ( DEXP(yy/drearth) ) ) - piover2
   phi     = REAL( phirad * rad2deg )
 
 !-------------------------------------------------------------------------------
@@ -80,7 +73,7 @@ SUBROUTINE xy2ll_merc (xx, yy, lambda0, phi, lambda)
 !-------------------------------------------------------------------------------
 
   lambda0rad = DBLE(lambda0) * deg2rad
-  lambdarad  = lambda0rad + xxd/drearth
+  lambdarad  = lambda0rad + xx/drearth
   lambda     = REAL( lambdarad * rad2deg )
 
 END SUBROUTINE xy2ll_merc
