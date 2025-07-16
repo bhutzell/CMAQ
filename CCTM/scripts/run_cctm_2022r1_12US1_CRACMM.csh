@@ -326,7 +326,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Ozone column data
 #  set OMIfile   = OMI_1979_to_2019.dat
-  set OMIfile   = OMI_1979_to_2022.dat
+   set OMIfile   = omi_cmaq_2005through2024_27x27.dat
 
   # If using BROWN_VEG option, then set the path to the non-photosynthetic vegetation (npv) input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
@@ -338,15 +338,15 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set OPTfile = PHOT_OPTICS.dat
 
   #> MCIP meteorology files 
-  setenv GRID_BDY_2D $METpath/GRIDBDY2D.12US1.35L.$YYMMDD.nc4
-  setenv GRID_CRO_2D $METpath/GRIDCRO2D.12US1.35L.$YYMMDD.nc4
-  setenv GRID_CRO_3D $METpath/GRIDCRO3D.12US1.35L.$YYMMDD.nc4
-  setenv GRID_DOT_2D $METpath/GRIDDOT2D.12US1.35L.$YYMMDD.nc4
-  setenv MET_CRO_2D  $METpath/METCRO2D.12US1.35L.$YYMMDD.nc4
-  setenv MET_CRO_3D  $METpath/METCRO3D.12US1.35L.$YYMMDD.nc4
-  setenv MET_DOT_3D  $METpath/METDOT3D.12US1.35L.$YYMMDD.nc4
-  setenv MET_BDY_3D  $METpath/METBDY3D.12US1.35L.$YYMMDD.nc4
-  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.12US1.35L.$YYMMDD.nc4
+  setenv GRID_BDY_2D $METpath/GRIDBDY2D.12US1.35L.$YYMMDD
+  setenv GRID_CRO_2D $METpath/GRIDCRO2D.12US1.35L.$YYMMDD
+  setenv GRID_CRO_3D $METpath/GRIDCRO3D.12US1.35L.$YYMMDD
+  setenv GRID_DOT_2D $METpath/GRIDDOT2D.12US1.35L.$YYMMDD
+  setenv MET_CRO_2D  $METpath/METCRO2D.12US1.35L.$YYMMDD
+  setenv MET_CRO_3D  $METpath/METCRO3D.12US1.35L.$YYMMDD
+  setenv MET_DOT_3D  $METpath/METDOT3D.12US1.35L.$YYMMDD
+  setenv MET_BDY_3D  $METpath/METBDY3D.12US1.35L.$YYMMDD
+  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.12US1.35L.$YYMMDD
 
   #> Control Files
   #>
@@ -504,9 +504,9 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Bidirectional ammonia configuration
   if ( $CTM_ABFLUX == 'Y' ) then
-     setenv E2C_SOIL ${EPICpath}/${YYYY}r1_EPIC0509_12US1_soil.nc4
-     setenv E2C_CHEM ${EPICpath}/${YYYY}r1_EPIC0509_12US1_time${YYYYMMDD}.nc4
-     setenv E2C_LU ${EPICpath}/beld4_12US1_2011.nc4
+     setenv E2C_SOIL ${EPICpath}/${YYYY}r1_EPIC0509_12US1_soil.nc
+     setenv E2C_CHEM ${EPICpath}/${YYYY}r1_EPIC0509_12US1_time${YYYYMMDD}.nc
+     setenv E2C_LU ${EPICpath}/beld4_12US1_2011.nc
   endif
 
 #> Inline Process Analysis 
