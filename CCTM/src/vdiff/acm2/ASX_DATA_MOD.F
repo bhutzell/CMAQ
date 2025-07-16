@@ -784,13 +784,13 @@ C-----------------------------------------------------------------------
          If ( (ABFLUX .or. HGBIDI .or. BIOGEMIS_MEGAN .or. BIOGEMIS_BEIS) .and. .not. PXSOIL_AVAIL) Then
             Forall( C = 1:NCOLS, R = 1:NROWS, Grid_Data%SLTYP(C,R) .Le. N_SOIL_TYPE )
                Grid_Data%WWLT( C,R ) = WWLT( Grid_Data%SLTYP( C,R ) )
-               Grid_Data%WSAT( C,R ) = WSAT( Grid_Data%SLTYP( C,R ) )
             End Forall
          End If
 
          If (.not. PXSOIL_AVAIL) Then
             Forall( C = 1:NCOLS, R = 1:NROWS, Grid_Data%SLTYP(C,R) .Le. N_SOIL_TYPE )
                Grid_Data%WFC ( C,R ) = WFC ( Grid_Data%SLTYP( C,R ) )
+               Grid_Data%WSAT( C,R ) = WSAT( Grid_Data%SLTYP( C,R ) )
             End Forall
          End If
 
