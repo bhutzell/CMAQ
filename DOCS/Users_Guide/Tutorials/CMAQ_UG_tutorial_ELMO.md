@@ -11,12 +11,14 @@ adding new derived variables to the ELMO source code.
 
 Go to the CMAQ Control Namelist ([CMAQ_Control.nml][link_cmaq_ctrl]) under the section &ELMO_INIT and edit the N_Files and N_Keywords
 
+```
 &ELMO_INIT
   N_Files = 3                        ! change from 2 to 3 output files
   N_Max_Output_Variables = 400
   N_Keywords = 74                    ! change from 73 to 74
   N_Max_Keyword_Variables = 150
 /
+```
 
 
 #### STEP 2: Add your new Keyword Name
