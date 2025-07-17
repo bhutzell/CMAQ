@@ -11,12 +11,14 @@ adding new derived variables to the ELMO source code.
 
 Go to the CMAQ Control Namelist ([CMAQ_Control.nml][link_cmaq_ctrl]) under the section &ELMO_INIT and edit the N_Files and N_Keywords
 
+```
 &ELMO_INIT
   N_Files = 3                        ! change from 2 to 3 output files
   N_Max_Output_Variables = 400
   N_Keywords = 74                    ! change from 73 to 74
   N_Max_Keyword_Variables = 150
 /
+```
 
 
 #### STEP 2: Add your new Keyword Name
@@ -32,11 +34,14 @@ current largest Keyword index.
 
 Example:
 
+```
+
  !-----------------------------------------------------!
  !----- DEFINE ELMO KEYWORDS FOR USE IN FILE_VARS -----!
  !-----------------------------------------------------!
 
-  Keywd_name(74) = 'GHG'
+  Keywd_name(74) = 'NEW_VAR'
+```
 
 
 #### STEP 3: Specify your keyword components
@@ -47,11 +52,14 @@ variables, meteorological variables, other Keywords, or any other variable type 
 
 Example: 
 
+```
  !-----------------------------------------------------!
  !----- DEFINE ELMO KEYWORDS FOR USE IN FILE_VARS -----!
  !-----------------------------------------------------!
 
-  Keywd(74,:) = 'ECH4','CO2'  ! Step 2  Specify components of GHG as Methane, Carbon Dioxide
+  Keywd(74,:) = 'NEW_VAR'  ! Step 2  Specify components of NEW_VAR ??
+
+```
 
 
 #### STEP 4: Use Your New Keyword
@@ -63,6 +71,8 @@ Add an additional output ELMO output file and write your Keyword.
 ??Is this correct, or do you add your new keyword to another output file?
 
 Example:
+
+```
 
 &ELMO_Files
 
@@ -82,13 +92,15 @@ Example:
   Lay_Top(2) = 1
   File_Vars(2,:) = 'DEFAULT_DEP'
 
-  Flabel(3)= 'GHG'
+  Flabel(3)= 'NEW_VAR'
   Tmode(3) = 'aggregate'
   Lay_Bot(3) = 1
   Lay_Top(3) = 1
-  File_Vars(3,:) = 'GHG'
+  File_Vars(3,:) = 'NEW_VAR'
 
 ------------
+
+```
 
 ### Add Derived Variables to ELMO Source Code
 
@@ -102,11 +114,15 @@ Example:
 
 around line 191 add
 
-      INTEGER, PARAMETER :: ID_GHG =    115
+```
+      INTEGER, PARAMETER :: ID_NEW_VAR =    115
+```
 
 and modify the following:
 
+```
       INTEGER, PARAMETER :: N_ELMO_LIST = 115     ! (change 114 to 115)
+```
 
 #### STEP 2: Add your ELMO derived variable to the ELMO_LIST
 
@@ -133,10 +149,11 @@ Example:
 
 At the end of the list, around line 337
 
+```
+     &ELDTP( 'SOILT_2      ',ID_SOILT_2,    ET_MET,      F, 'K     ', 'Layer 2 soil temperature' ),  ! modify the last line by removing the /) and adding a comma
 
-    &ELDTP( 'SOILT_2      ',ID_SOILT_2,    ET_MET,      F, 'K     ', 'Layer 2 soil temperature' ),  ! modify the last line by removing the /) and adding a comma
-
-     &ELDTP( 'GHG          ',ID_GHG,        ET_DRVD,     T, 'ppmV', ' Greenhouse Gas') /)          ! add your new ELMO derived variable
+     &ELDTP( 'NEW_VAR          ',ID_NEW_VAR,        ET_DRVD,     T, 'ppmV', ' New Variable') /)          ! add your new ELMO derived variable
+```
 
 
 
@@ -151,7 +168,9 @@ Example:
 
 After about line 650 add
 
-       REAL, ALLOCATABLE, SAVE :: ELMO_GHG(:,:,:) ! Greenhouse gas accumulated per timestep
+```
+       REAL, ALLOCATABLE, SAVE :: ELMO_NEW_VAR(:,:,:) ! Greenhouse gas accumulated per timestep
+```
 
 
 #### STEP 4: Allocate and Initialize New Variable
@@ -162,9 +181,11 @@ Example:
 
 After about line 740  (be sure to keep outside of the ifdef statements, but before the endif of the firsttime)
 
-            allocate( elmo_ghg(ncols, nrows, nlays ), stat=ios)
-            call checkmem( ios, 'ELMO_GHG',pname )
-            elmo_ghg = 0.0
+```
+            allocate( elmo_new_var(ncols, nrows, nlays ), stat=ios)
+            call checkmem( ios, 'ELMO_NEW_VAR',pname )
+            elmo_new_var = 0.0
+```
 
 #### STEP 5: Populate New Variable in CMAQ in the ELMO_DERIVED_CALC.F
 
@@ -174,24 +195,87 @@ of the ELMO_DATA module and only update your own variable.
 
 Example:
 
-            USE ELMO_DATA, ONLY : ELMO_GHG
+```
+            USE ELMO_DATA, ONLY : ELMO_NEW_VAR
+```
 
-#### STEP 6: Propagate Data to ELMO Output Arrays
+#### STEP 6: Define NEW_VAR in ELMO_DATA.F
 
-In ELMO_DERIVED_CALC.F, add a case to the select case statement for the variable IDG. Your case should reference the new ID_ index of 
-your variable. Within the case, set outval equal to the value of your new variable in the current local grid cell (C1,R1,L1), and 
-make any appropriate modifications. Again, use the approach for ELMO_AOD_550 as a guide.  
+In ELMO_DATA (lines 630-645) we define elmo_aod_550 and other variables.
 
-Example: (note this variable has data for column, row, and layers, so differs slightly from ELMO_AOD_550 which only has columns and rows)??
+```
+PUBLIC ::                                                                                        
+     &                             ELMO_NEW_VAR(:,:,:), ! new variable
+     &                             ELMO_AOD_550(:,:),  ! total aerosol optical depth at                                           
+                                                       !   550 nm (Angstrom Interpolation)                                        
+     &                             ELMO_EXT_550(:,:,:),! aerosol extinction at 550 nm for layer [1/m]                             
+     &                             ELMO_NO2COL(:,:),   ! NO2 Column                                                                 
+     &                             ELMO_SO2COL(:,:),   ! SO2 Column                                                                 
+     &                             ELMO_HCHOCOL(:,:),  ! Formaldehyde Column                                                        
+     &                             ELMO_COCOL(:,:),    ! CO Column                                                                  
+     &                             ELMO_VOC_NOX(:,:,:) ! VOC or NOx limited ozone formation     
+```
+
+#### STEP 7: Allocate NEW_VAR in ELMO_DATA.F
+
+In ELMO_DATA (lines 681-683) we allocate and initialize elmo_aod_550.
+
+```
+                                   allocate( elmo_aod_550(ncols, nrows ), stat=ios)
+                                   call checkmem( ios, 'ELMO_AOD_550',pname )
+                                   elmo_aod_550 = 0.0
+```
+
+Do the same for a NEW_VAR
+
+``` 
+                                   allocate( elmo_new_var(ncols, nrows, ncols ), stat=ios)
+                                   call checkmem( ios, 'ELMO_NEW_VAR',pname )
+                                   elmo_new_var = 0.0
+```
+
+
+
+#### STEP 8: Populate NEW_VAR from variable in the phot module.
+
+In PHOT.F populate elmo_aod_550 with the aerosol optical depth from the phot module.
+
+```
+! Store PM Diagnostic AOD and extinction
+      ELMO_AOD_550 = TAU_AERO_550
+      ELMO_EXT_550 = AERO_EXT_550
+```
+
+#### STEP 9: Propagate Data to ELMO Output Arrays
+
+In ELMO_DERIVED_CALC.F, add a case to the select case statement for the variable IDG. Your case should reference the new ID_ index of
+your variable. Within the case, set outval equal to the value of your new variable in the current local grid cell (C1,R1,L1), and
+make any appropriate modifications. Again, use the approach for ELMO_AOD_550 as a guide.
+
+In ELMO_DERIVED_CALC (lines 391-397) we select the value in elmo_aod_550 for the output value on the ELMO file.
+
+```
+         ! Retrieve AOD at 550 nm
+         CASE ( ID_AOD550 )
+             IF ( L1 .EQ. 1 ) THEN
+                 OUTVAL = ELMO_AOD_550( C1,R1 )
+             ELSE
+                 OUTVAL = ELMO_BLANK
+             END IF
+```
+
+Example: (note this variable has data for column, row, and layers, so differs slightly from ELMO_AOD_550 which only has columns and rows)
 
 add the following around line 391
 
-         ! Retrieve GHG 
-         CASE ( ID_GHG )
-         OUTVAL = ELMO_GHG( C1,R1,L1 )
+```
+         ! Retrieve NEW_VAR
+         CASE ( ID_NEW_VAR )
+         OUTVAL = ELMO_NEW_VAR( C1,R1,L1 )
+```
 
 
-#### STEP 7: Add Variable Name to CMAQ Control File
+#### STEP 10: Add Variable Name to CMAQ Control File
 
 ELMO is now equipped to output your variable. You may add it to File_Vars in [CMAQ_Control.nml][link_cmaq_ctrl] for any custom output file you like, or 
 you may add it to the contents of any ELMO Keyword.  
