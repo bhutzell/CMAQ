@@ -163,6 +163,13 @@ SUBROUTINE setup_wrfem (cdfid, ctmlays)
 !           07 Nov 2019  Expanded options to allow for surface analysis
 !                        nudging option 2 (FASDAS), which has been available
 !                        since WRFv3.8.  (T. Spero)
+!           14 May 2025  Added stop condition if any variant of NOAH LSM is
+!                        used with NLCD beginning with WRFv4.3. NCAR added
+!                        local climate zone (LCZs) as supplemental land use
+!                        categories, and there is no compatibility with NLCD
+!                        land use. The LCZs are included in the NOAH LSM.
+!                        Constrained MET_XXCTR and MET_YYCTR to 0.0 if the
+!                        calculation results in a very small number. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE metinfo
@@ -183,6 +190,7 @@ SUBROUTINE setup_wrfem (cdfid, ctmlays)
   CHARACTER(LEN=19)                 :: date_start
   INTEGER                           :: dimid
   INTEGER                           :: dimids     ( nf90_max_var_dims )
+  REAL,               PARAMETER     :: distmin    = 1.0e-7
   REAL,               ALLOCATABLE   :: dum1d      ( : )
   REAL,               ALLOCATABLE   :: dum2d      ( : , : )
   REAL                              :: dx
@@ -246,6 +254,12 @@ SUBROUTINE setup_wrfem (cdfid, ctmlays)
   CHARACTER(LEN=256), PARAMETER :: f9250 = "(/, 1x, 70('*'), &
     & /, 1x, '*** SUBROUTINE: ', a, &
     & /, 1x, '***   ETA/FERRIER SCHEME IS NOT SUPPORTED IN CMAQ', &
+    & /, 1x, 70('*'))"
+
+  CHARACTER(LEN=256), PARAMETER :: f9260 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   NLCD IS NOT COMPATABLE WITH NOAH IN WRFV4.3+', &
+    & /, 1x  '***   LCZs HAVE NOT BEEN INCLUDED IN NOAH WITH NLCD', &
     & /, 1x, 70('*'))"
 
   CHARACTER(LEN=256), PARAMETER :: f9275 = "(/, 1x, 70('*'), &
@@ -505,6 +519,14 @@ SUBROUTINE setup_wrfem (cdfid, ctmlays)
       met_ref_lat  = fillreal                 ! missing
   
   END SELECT
+
+  IF ( ABS(met_xxctr) < distmin ) THEN
+    met_xxctr = 0.0
+  ENDIF
+
+  IF ( ABS(met_yyctr) < distmin ) THEN
+    met_yyctr = 0.0
+  ENDIF
 
 !-------------------------------------------------------------------------------
 ! Extract model run options.
@@ -1492,6 +1514,21 @@ SUBROUTINE setup_wrfem (cdfid, ctmlays)
     ENDIF
   ELSE
     met_hybrid = -1
+  ENDIF
+
+!-------------------------------------------------------------------------------
+! If WRFv4.3+, check for NLCD and any version of NOAH. When NCAR implemented
+! local climate zones (LCZs) as extensions to the land use classifications,
+! they did not include consideration for NLCD. The LCZs are included in NOAH
+! beginning with WRFv4.3.
+!-------------------------------------------------------------------------------
+
+  IF ( TRIM(met_release) >= "V4.3") THEN
+    IF ( met_lu_src(1:3) == "NLC" .AND.  &
+         ( met_soil_lsm == 2 .OR. met_soil_lsm == 4 ) ) THEN
+      WRITE (*,f9260) TRIM(pname)
+      CALL graceful_stop (pname)
+    ENDIF
   ENDIF
 
 END SUBROUTINE setup_wrfem

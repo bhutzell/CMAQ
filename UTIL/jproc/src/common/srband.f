@@ -39,10 +39,10 @@ C*********************************************************************
 
       IMPLICIT NONE
 
+      INCLUDE 'JVALPARMS.EXT'    ! jproc parameters
+
 C...........PARAMETERS and their descriptions
 
-      INTEGER, PARAMETER :: MXWL  = 130 ! number of wavelength bands
-      INTEGER, PARAMETER :: NJ    = 200 ! maximum levels
       INTEGER, PARAMETER :: NWLO2 = 11  ! # of wl bands for O2 SR data
 
 C...........ARGUMENTS and their descriptions

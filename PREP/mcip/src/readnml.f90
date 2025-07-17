@@ -86,6 +86,8 @@ SUBROUTINE readnml
 !                        are on the Arakawa-C staggered grid, and the optional
 !                        additional 3D winds are now on the Arakawa-B staggered
 !                        grid.  (T. Spero)
+!           12 May 2025  Restored runtime option to not output time-independent
+!                        I/O API files, i.e., GRIDCRO. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE mcipparm
@@ -109,7 +111,7 @@ SUBROUTINE readnml
                          eradm, mcip_start, mcip_end, intvl,  &
                          coordnam, grdnam,                    &
                          btrim, lprt_col, lprt_row,           &
-                         wrf_lc_ref_lat
+                         wrf_lc_ref_lat, makegrid
 
   NAMELIST /windowdefs/  x0, y0, ncolsin, nrowsin
 
@@ -196,24 +198,28 @@ SUBROUTINE readnml
 !-------------------------------------------------------------------------------
 ! Set default value for user-selected options.
 !
-!   LPV:     0 = Do not compute and output 3D potential vorticity
-!            1 = Compute and output 3D potential vorticity
+!   LPV:       0 = Do not compute and output 3D potential vorticity
+!              1 = Compute and output 3D potential vorticity
 !
-!   LWOUT:   0 = Do not output vertical velocity
-!            1 = Output vertical velocity
+!   LWOUT:     0 = Do not output vertical velocity
+!              1 = Output vertical velocity
 !
-!   LUVBOUT: 0 = Do not output u- and v-component winds on B-staggered grid
-!            1 = Output u- and v-component winds on B-staggered grid
-!                in addition to the C-staggered grid
+!   LUVBOUT:   0 = Do not output u- and v-component winds on B-staggered grid
+!              1 = Output u- and v-component winds on B-staggered grid
+!                  in addition to the C-staggered grid
 !
-!   IOFORM:  1 = Models-3 I/O API
-!            2 = netCDF
+!   IOFORM:    1 = Models-3 I/O API
+!              2 = netCDF
+!
+!   MAKEGRID:  0 = Do not output time-independent I/O API files (GRIDCRO)
+!              1 = Output time-independent I/O API files (GRIDCRO)
 !-------------------------------------------------------------------------------
 
   lpv        = 0
   lwout      = 0
   luvbout    = 0
   ioform     = 1
+  makegrid   = 1
 
 !-------------------------------------------------------------------------------
 ! Set default value for earth radius in meters (ERADM).  The default value is
@@ -337,6 +343,11 @@ SUBROUTINE readnml
 
   IF ( ( ioform /= 1 ) .AND. ( ioform /= 2 ) ) THEN
     WRITE (*,f9300) TRIM(pname), "IOFORM", ioform
+    CALL graceful_stop (pname)
+  ENDIF
+
+  IF ( ( makegrid /= 0 ) .AND. ( makegrid /= 1 ) ) THEN
+    WRITE (*,f9300) TRIM(pname), "MAKEGRID", makegrid
     CALL graceful_stop (pname)
   ENDIF
 

@@ -45,6 +45,7 @@ SUBROUTINE wrfemopts (txt_cupa, txt_microphys, txt_lwrad, txt_swrad,  &
 !           09 Apr 2024  Updated for options through WRFv4.5.2. Pulled options
 !                        from WRF Users Guide for v4.5. Also included options
 !                        planned for WRFv4.6 from their Git packages. (T. Spero)
+!           12 May 2025  Updated options through WRFv4.7.0. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE metinfo
@@ -176,8 +177,12 @@ SUBROUTINE wrfemopts (txt_cupa, txt_microphys, txt_lwrad, txt_swrad,  &
       txt_microphys = 'WSM 7-Class'
     CASE ( 26 )
       txt_microphys = 'WDM 7-Class'
+    CASE ( 27 )
+      txt_microphys = 'UFS Double Moment (UDM)'
     CASE ( 28 )
       txt_microphys = 'Aerosol-Aware Thompson'
+    CASE ( 29 )
+      txt_microphys = 'RCON scheme'
     CASE ( 30 )
       txt_microphys = 'HUJI spectral bin -- fast'
     CASE ( 32 )

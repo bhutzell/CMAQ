@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ===================== CCTMv5.4.X Run Script ========================= 
+# ===================== CCTMv6.X Run Script ========================= 
 # Usage: run.cctm.csh >&! cctm_2010_4CALIF1.log &                                
 #
 # To report problems or request help with this script/program:     
@@ -33,7 +33,7 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters and Labels for Configuring the Simulation
- set VRSN      = v55               #> Code Version
+ set VRSN      = v6a1             #> Code Version
  set PROC      = mpi                #> serial or mpi
  setenv MECH     saprc07tic_ae7i_aq #> Mechanism ID
  set EMIS      = 2011eh_saprc_10g   #> Emission Inventory Details
@@ -151,7 +151,7 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
 setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
-setenv CTM_BROWN_VEG Y       #> use NPV input files to limit dust emissions [ default: N ]
+setenv CTM_BROWN_VEG Y       #> when using CTM_WB_DUST, use non-photosynthetic (brown) vegetation input files to limit dust emissions [ default: N ]
 setenv CTM_LNO_ONLINE N      #> turn on lightning NOx [ default: N ]
                              #> alternatively LNOx emissions can also be read in as external emissions inputs,
                              #> in this case, please setenv this variable to N to avoid double counting
@@ -322,7 +322,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Ozone column data
   set OMIfile   = omi_cmaq_2005through2024_27x27.dat
 
-  # If using BROWN_VEG option, then set the path to the NPV input files
+  # If using BROWN_VEG option, then set the path to the non-photosynthetic vegetation (NPV) input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
        setenv PV_AVG_FILE ${INPDIR}/surface/pv_avg.dat
        setenv NPV_AVG_FILE ${INPDIR}/surface/npv_avg.dat
@@ -332,16 +332,16 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set OPTfile = PHOT_OPTICS.dat
 
   #> MCIP meteorology files 
-  setenv GRID_BDY_2D $METpath/GRIDBDY2D.$GRID_NAME.${NZ}L.$YYMMDD  # GRID files are static, not day-specific
-  setenv GRID_CRO_2D $METpath/GRIDCRO2D.$GRID_NAME.${NZ}L.$YYMMDD
-# setenv GRID_CRO_3D $METpath/GRIDCRO3D.$GRID_NAME.${NZ}L.$YYMMDD
+  setenv GRID_BDY_2D $METpath/GRIDBDY2D.4CALIF1.${NZ}L.$YYMMDD  # GRID files are static, not day-specific
+  setenv GRID_CRO_2D $METpath/GRIDCRO2D.4CALIF1.${NZ}L.$YYMMDD
+# setenv GRID_CRO_3D $METpath/GRIDCRO3D.4CALIF1.${NZ}L.$YYMMDD
   setenv GRID_CRO_3D '' # this file not used or available
-  setenv GRID_DOT_2D $METpath/GRIDDOT2D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_CRO_2D  $METpath/METCRO2D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_CRO_3D  $METpath/METCRO3D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_DOT_3D  $METpath/METDOT3D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_BDY_3D  $METpath/METBDY3D.$GRID_NAME.${NZ}L.$YYMMDD
-#  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.$GRID_NAME.${NZ}L.$YYMMDD
+  setenv GRID_DOT_2D $METpath/GRIDDOT2D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_CRO_2D  $METpath/METCRO2D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_CRO_3D  $METpath/METCRO3D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_DOT_3D  $METpath/METDOT3D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_BDY_3D  $METpath/METBDY3D.4CALIF1.${NZ}L.$YYMMDD
+#  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.4CALIF1.${NZ}L.$YYMMDD
 
   #> Control Files
   #>
@@ -446,7 +446,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   if( $USE_SAGE_N == 'Y' ) then
      setenv SAGE_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
      if( $USE_SAGE_N_EF == 'Y') then
-        setenv SAGE_EF /work/MOD3APP/ezv/2020_NEI/BEIS4/12US1/BEIS4_SAGE_beld6_norm_emis_4CALIF1.ncf
+        setenv SAGE_EF ${INPDIR}/surface/BEIS4_SAGE_beld6_norm_emis_4CALIF1.ncf
      endif
   endif
 
@@ -467,7 +467,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   if ( $CTM_BIOGEMIS_BE == 'Y' ) then   
      set IN_BEISpath = ${INPDIR}/surface
      setenv GSPRO          $BLD/gspro_biogenics.txt
-     setenv BEIS_NORM_EMIS $IN_BEISpath/b3grd_4CALIF1_2011en_cb6_10.ncf
+     setenv BEIS_NORM_EMIS ${IN_BEISpath}/b3grd_4CALIF1_2011en_cb6_10.ncf
      if ($USE_SAGE_N == 'N') then
         setenv BEIS_SOILINP    $OUTDIR/CCTM_BSOILOUT_${RUNID}_${YESTERDAY}.nc
      endif
