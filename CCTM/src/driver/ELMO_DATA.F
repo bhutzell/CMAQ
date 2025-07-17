@@ -653,7 +653,9 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         REAL, PARAMETER :: ELMO_BLANK = -9.000E36
 #else
         REAL, PARAMETER :: ELMO_BLANK = AMISS3
-#endif       
+#endif
+        ! Value for floating point comparisons against ELMO_BLANK
+        REAL, PARAMETER :: ELMO_BLANK_XPT999 = 0.999*ELMO_BLANK
         CONTAINS
 
 !------------------------------------------------------------------------------------------            
@@ -799,6 +801,13 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          IF ( VARS_NML(1) .EQ. 'ALL' ) THEN
             ! Add All ELMO_TABLE variables to the File
             L_ELMO_TABLE( : ) = .TRUE.
+#ifndef isam
+            ! VOC to NOX ratio is only available when ISAM is turned on
+            DO IT = 1,N_ELMO_TABLE
+                IF ( ELMO_TABLE( IT )%ID .EQ. ID_VOC_NOX )
+     &                  L_ELMO_TABLE( IT ) = .FALSE.
+            END DO
+#endif
 
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_CONC' ) THEN
             ! Activate all CGRID species
@@ -883,6 +892,11 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             DO IT = 1,N_ELMO_TABLE
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_CHEM )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
+#ifndef isam
+                ! VOC to NOX ratio is only available when ISAM is turned on
+                IF ( ELMO_TABLE( IT )%ID .EQ. ID_VOC_NOX )
+     &                  L_ELMO_TABLE( IT ) = .FALSE.
+#endif
             END DO
          
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_MET' ) THEN
