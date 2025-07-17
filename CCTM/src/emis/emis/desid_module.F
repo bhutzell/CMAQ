@@ -356,7 +356,7 @@ C Return From Initialization
             ! Execute DESID Emission Processor in Diagnostic Mode
             ! for the Initial Hour of the Simulation (usually 0Z)
             VDEMIS_DIAG = 0.0
-            WRITE( XMSG, '(A,I10,A,I10)' ),
+            WRITE( XMSG, '(A,I10,A,I10)' )
      &           '  Calling Diagnostic Emissions at Date: ',MDATE,
      &           '  and time: ',MTIME
             CALL LOG_MESSAGE( LOGDEV, XMSG )
@@ -375,7 +375,7 @@ C Return From Initialization
 
            ! Execute DESID Emission Processor in Diagnostic Mode
            VDEMIS_DIAG = 0.0
-           WRITE( XMSG, '(A,I10,A,I10)' ),
+           WRITE( XMSG, '(A,I10,A,I10)' )
      &          '  Calling Diagnostic Emissions at Date: ',MDATE,
      &          '  and time: ',MTIME
            CALL LOG_MESSAGE( LOGDEV, XMSG )
@@ -384,7 +384,7 @@ C Return From Initialization
          END IF
  
          ! Execute DESID Emission Processor in Real Mode
-           WRITE( XMSG, '(A,I10,A,I10)' ),
+           WRITE( XMSG, '(A,I10,A,I10)' )
      &          '  Calling Real Emissions at Date: ',JDATE,
      &          '  and time: ',JTIME
            CALL LOG_MESSAGE( LOGDEV, '' )
@@ -1405,7 +1405,7 @@ C-----------------------------------------------------------------------
            JROW = IROW
 #endif
 
-           WRITE( LOGDEV, '(/,5x,A,/,5x,A,A,A,A/,5x,A,ES10.3,A,A,/,5x,A1,I3,A1,I3,A1,I2,A2)' ),
+           WRITE( LOGDEV, '(/,5x,A,/,5x,A,A,A,A/,5x,A,ES10.3,A,A,/,5x,A1,I3,A1,I3,A1,I2,A2)' )
      &       'ERROR: At least one invalid negative emission rate has been ',
      &       'detected for CMAQ species ',TRIM(DIFF_SPC( ISPC )),'. The ', 
      &       'most negative emission','rate is ',EMIS_MIN,' at domain-wide gridcell',
@@ -1694,15 +1694,15 @@ C-----------------------------------------------------------------------
          CALL LOG_SUBHEADING( LOGDEV, "Regions Available for Scaling" )
 
          ! Print Information about All the Available Regions for Scaling
-         WRITE( LOGDEV,'(8x,A,2x,A,8x,A,10x,A)' ),'Number','Region Label','File Label','Variable'
-         WRITE( LOGDEV,'(8x,A,2x,A,8x,A,10x,A)' ),'------','------------','----------','--------'
+         WRITE( LOGDEV,'(8x,A,2x,A,8x,A,10x,A)' ) 'Number','Region Label','File Label','Variable'
+         WRITE( LOGDEV,'(8x,A,2x,A,8x,A,10x,A)' ) '------','------------','----------','--------'
          DO IRGN = 1,DESID_N_REG
-            WRITE( LOGDEV,'(8x,I3,5x,A18,2x,A18,2x,A)' ),IRGN, DESID_REG(IRGN)%LABEL( 1:18 ),
+            WRITE( LOGDEV,'(8x,I3,5x,A18,2x,A18,2x,A)' ) IRGN, DESID_REG(IRGN)%LABEL( 1:18 ),
      &             DESID_REG( IRGN )%File( 1:18 ), TRIM(DESID_REG( IRGN )%VAR ) 
             IF ( DESID_REG(IRGN)%FILE(1:6) .EQ. 'Family' ) THEN
                  F = INDEX1( DESID_REG(IRGN)%LABEL(1:18), DESID_N_REG_FAMS, REGIONFAMILYNAME )
                  DO IRGN2 = 1,REGIONFAMILYNUM( F )
-                     WRITE( LOGDEV,'(56x,A)' ), REGIONFAMILYMEMBERS( F,IRGN2 )
+                     WRITE( LOGDEV,'(56x,A)' ) REGIONFAMILYMEMBERS( F,IRGN2 )
                  END DO
             END IF
          END DO
@@ -1817,28 +1817,28 @@ C-----------------------------------------------------------------------
  
 ! Write Out All Available Stream Families to the Log File
          CALL LOG_SUBHEADING( LOGDEV, 'Emission Stream Families' )
-         WRITE( LOGDEV,'(8x,A19,15x,A)' ),'Stream Family Label','Stream Family Members'
-         WRITE( LOGDEV,'(8x,A19,15x,A)' ),'-------------------','---------------------'
+         WRITE( LOGDEV,'(8x,A19,15x,A)' ) 'Stream Family Label','Stream Family Members'
+         WRITE( LOGDEV,'(8x,A19,15x,A)' ) '-------------------','---------------------'
          DO IFAM = 1,DESID_N_STREAM_FAMS
-            WRITE( LOGDEV,'(8x,A32,2x,A)' ), STREAMFAMILYNAME( IFAM ), 
+            WRITE( LOGDEV,'(8x,A32,2x,A)' ) STREAMFAMILYNAME( IFAM ), 
      &             STREAMFAMILYMEMBERS( IFAM,1 )
             IF ( STREAMFAMILYNUM( IFAM ) .GT. 1 ) THEN
                 DO ISRM = 2,STREAMFAMILYNUM( IFAM )
-                   WRITE( LOGDEV,'(42x,A)' ), STREAMFAMILYMEMBERS( IFAM,ISRM )
+                   WRITE( LOGDEV,'(42x,A)' ) STREAMFAMILYMEMBERS( IFAM,ISRM )
                 END DO
             END IF
          END DO
 
 ! Write Out All Available Species Families to the Log File
          CALL LOG_SUBHEADING( LOGDEV, 'Chemical Species and Emission Variable Families')
-         WRITE( LOGDEV,'(8x,A20,14x,A)' ),'Species Family Label','Species Family Members'
-         WRITE( LOGDEV,'(8x,A20,14x,A)' ),'--------------------','---------------------'
+         WRITE( LOGDEV,'(8x,A20,14x,A)' ) 'Species Family Label','Species Family Members'
+         WRITE( LOGDEV,'(8x,A20,14x,A)' ) '--------------------','---------------------'
          DO IFAM = 1,N_CHEM_FAMS
-            WRITE( LOGDEV,'(8x,A32,2x,A)' ), CHEMFAMILYNAME( IFAM ), 
+            WRITE( LOGDEV,'(8x,A32,2x,A)' ) CHEMFAMILYNAME( IFAM ), 
      &             CHEMFAMILYMEMBERS( IFAM,1 )
             IF ( CHEMFAMILYNUM( IFAM ) .GT. 1 ) THEN
                 DO ISRM = 2,CHEMFAMILYNUM( IFAM )
-                   WRITE( LOGDEV,'(42x,A)' ), CHEMFAMILYMEMBERS( IFAM,ISRM )
+                   WRITE( LOGDEV,'(42x,A)' ) CHEMFAMILYMEMBERS( IFAM,ISRM )
                 END DO
             END IF
          END DO
@@ -2147,7 +2147,7 @@ C-----------------------------------------------------------------------
                      IF ( KDX .NE. 0 ) RULE_SPEC( KDX ) = .TRUE.
                    END DO
                  ELSE
-                   WRITE( LOGDEV, '(/,5A,/,A,/,A,/,A,/,A)' ),
+                   WRITE( LOGDEV, '(/,5A,/,A,/,A,/,A,/,A)' )
      &               'Species ',TRIM(DESID_RULES_NML( IRULE )%SPEC),':',
      &               TRIM(CHEM_NAME(ICHEM)),' was used in the Emissions',
      &               ' Control Instructions Namelist but it is not a valid CMAQ ',
@@ -2239,7 +2239,7 @@ C-----------------------------------------------------------------------
      &           DESID_RULES_NML( IRULE )%OP .NE. 'm' .AND.
      &           DESID_RULES_NML( IRULE )%OP .NE. 'o'       ) THEN
                WRITE( LOGDEV, * )
-               WRITE( XMSG, '(/,A,A,A,I3,A,A,A)' ),
+               WRITE( XMSG, '(/,A,A,A,I3,A,A,A)' )
      &             'The Emissions Operator (',DESID_RULES_NML( IRULE )%OP,
      &             ') applied for Rule ',IRULE,' in the Emissions Control ',
      &             'Namelist does not match any of the allowed values (a, m, or o)',
@@ -2474,7 +2474,7 @@ C-----------------------------------------------------------------------
                    END IF
                    END DO
                  ELSE
-                   WRITE( LOGDEV, '(5(/,A))' ),
+                   WRITE( LOGDEV, '(5(/,A))' )
      &              'ATTENTION: The emissions control file is ',
      &              'attempting to modify an existing instruction, but ',
      &              'there are no compatible existing instructions. ',
@@ -2503,10 +2503,10 @@ C-----------------------------------------------------------------------
                ! First determine number of emission scale factors (NFAC) and
                ! number of unique regions (NREG) that are specified for this 
                ! instruction and stream combination
-               NFAC = 1
-               NREG = 1
-               REG_UNQ(:) = 1
-               DO IFAC = 2,N_SCALEFAC
+               NFAC = 0
+               NREG = 0
+               REG_UNQ(:) = 0
+               DO IFAC = 1,N_SCALEFAC
                  IF ( LOCAL_OP( ISTR,ISRM,IFAC ) .EQ. '' ) EXIT
                  NFAC = NFAC + 1 
                
@@ -2691,7 +2691,7 @@ C-----------------------------------------------------------------------
                         BASIS_FAC = BASIS_FAC / EMVAR_MW
                      ELSE
                         ! Unknown Basis has been encountered. Need to exit.
-                        WRITE( XMSG,'(A,A16,A,I3,A,A,A)' ),
+                        WRITE( XMSG,'(A,A16,A,I3,A,A,A)' )
      &                     'ERROR: Emission Variable ',TRIM(DESID_EMVAR(ISRM)%ARRY(IEMVAR) ),
      &                     ' on emission stream ',ISRM, ' has units which are not recognized ',
      &                     'as an emission rate. If you wish to use this variable for ',
@@ -2716,7 +2716,7 @@ C-----------------------------------------------------------------------
                         BASIS_FAC = BASIS_FAC
                      ELSE
                         ! Unknown Basis has been encountered. Need to exit.
-                        WRITE( XMSG,'(A,A16,A,I3,A,A,A)' ),
+                        WRITE( XMSG,'(A,A16,A,I3,A,A,A)' )
      &                     'ERROR: Emission Variable ',TRIM(DESID_EMVAR(ISRM)%ARRY(IEMVAR) ),
      &                     ' on emission stream ',ISRM, ' has units which are not recognized ',
      &                     'as an emission rate. If you wish to use this variable for ',
@@ -2767,7 +2767,7 @@ C-----------------------------------------------------------------------
              N = DESID_EMVAR( ISRM )%LEN
              N_UNUSED = COUNT( .NOT. DESID_EMVAR( ISRM )%USED( : )
      &                         .AND. DESID_EMVAR(ISRM)%ARRY( 1:N ) .NE. 'NOT_AVAILABLE'  )
-             WRITE( LOGDEV, '(5x,4A,I2,A)' ), TRIM( DESID_STREAM_LAB( ISRM )),' | ',
+             WRITE( LOGDEV, '(5x,4A,I2,A)' ) TRIM( DESID_STREAM_LAB( ISRM )),' | ',
      &              TRIM(DESID_STREAM_DESC( ISRM )),': ', N_UNUSED,' unused variables.'
              IF ( N_UNUSED .GT. 0 ) THEN
                  LERROR = .TRUE.
@@ -2775,12 +2775,12 @@ C-----------------------------------------------------------------------
                  DO IEMVAR = 1,DESID_EMVAR( ISRM )%LEN
                    IF ( .NOT.DESID_EMVAR( ISRM )%USED( IEMVAR )
      &                  .AND.DESID_EMVAR( ISRM )%ARRY( IEMVAR ) .NE. 'NOT_AVAILABLE' ) 
-     &               WRITE( LOGDEV, '(10x,A)'), DESID_EMVAR( ISRM )%ARRY( IEMVAR )
+     &               WRITE( LOGDEV, '(10x,A)') DESID_EMVAR( ISRM )%ARRY( IEMVAR )
                  END DO
              END IF
              WRITE( LOGDEV, '()' )
          END DO
-         IF ( LERROR ) WRITE( LOGDEV, '(5x,A,/,5x,A,/,5x,A)' ),
+         IF ( LERROR ) WRITE( LOGDEV, '(5x,A,/,5x,A,/,5x,A)' )
      &       'NOTE: Some Emissions Variables are unused by your current', 
      &       'emission control configuration. You may want to include these ',
      &       'emissions if they are relevant to your application.'
@@ -2827,21 +2827,21 @@ C-----------------------------------------------------------------------
 
          CALL LOG_MESSAGE( LOGDEV,'' )
          CALL LOG_SUBHEADING( LOGDEV, 'DESID Emission Scaling Report')
-         WRITE( LOGDEV,'(7x,A,/,13x,A)' ),'Note: these are populated using rules from the',
+         WRITE( LOGDEV,'(7x,A,/,13x,A)' ) 'Note: these are populated using rules from the',
      &                              'Emission Control File Supplied by the User.'
          DO ISRM = 1,DESID_N_SRM
            
            ! Print summary information about each Sector including
            ! the label and the available aerosol modes
-           WRITE( LOGDEV, '(/,5x,A,A)'   ),'>',REPEAT('-',80 )
-           WRITE( LOGDEV,'(5x,A,A,A,A,A2,I2.2,A1)' ),
+           WRITE( LOGDEV, '(/,5x,A,A)'   ) '>',REPEAT('-',80 )
+           WRITE( LOGDEV,'(5x,A,A,A,A,A2,I2.2,A1)' )
      &            'Stream Type: "',TRIM(DESID_STREAM_DESC( ISRM )),
      &            '" | Sector Label: ',TRIM(DESID_STREAM_LAB( ISRM ) ),' (',ISRM,')'
 
-           WRITE( LOGDEV, '(/8x,A)' ),'Table of Aerosol Size Distributions Available for Use Sector-Wide.'
-           WRITE( LOGDEV, '(8x,A)' ),'Note that Mode 1 is reserved for gas-phase species and emission variable.'
-           WRITE( LOGDEV, '(10x,A,2x,A,2x,A)' ), 'Number','Em. Var.  Mode','Reference Mode (see AERO_DATA.F)'
-           WRITE( LOGDEV, '(10x,A,2x,A,2x,A)' ), '------','--------------','--------------------------------'
+           WRITE( LOGDEV, '(/8x,A)' ) 'Table of Aerosol Size Distributions Available for Use Sector-Wide.'
+           WRITE( LOGDEV, '(8x,A)' ) 'Note that Mode 1 is reserved for gas-phase species and emission variable.'
+           WRITE( LOGDEV, '(10x,A,2x,A,2x,A)' ) 'Number','Em. Var.  Mode','Reference Mode (see AERO_DATA.F)'
+           WRITE( LOGDEV, '(10x,A,2x,A,2x,A)' ) '------','--------------','--------------------------------'
            DO ISD = 2,DESID_STREAM_AERO( ISRM )%LEN
               IEM = DESID_STREAM_AERO( ISRM )%REF( ISD )
               REFNAME = ''
@@ -2849,15 +2849,15 @@ C-----------------------------------------------------------------------
                   REFNAME = DESID_AERO_REF( IEM )%NAME
               END IF
 
-              WRITE( LOGDEV,'(8x,I3,5x,A18,2x,A18,2x,A)' ),ISD, 
+              WRITE( LOGDEV,'(8x,I3,5x,A18,2x,A18,2x,A)' ) ISD, 
      &               DESID_STREAM_AERO( ISRM )%NAME( ISD )( 1:16 ), TRIM( REFNAME )
            END DO
 
 
            ! Finally Print Every Instruction for this Stream
-           WRITE( LOGDEV, '(/,8x,A,5x,A,2x,A,9x,A,13x,A,2x,A,4x,A,2x,A)' ),
+           WRITE( LOGDEV, '(/,8x,A,5x,A,2x,A,9x,A,13x,A,2x,A,4x,A,2x,A)' )
      &            'CMAQ Species','Phase/Mode','Em. Var. ','Region','Op','ScaleFac','Basis','FinalFac'
-           WRITE( LOGDEV, '(8x,A,5x,A,2x,A,9x,A,13x,A,2x,A,4x,A,2x,A)' ),
+           WRITE( LOGDEV, '(8x,A,5x,A,2x,A,9x,A,13x,A,2x,A,4x,A,2x,A)' )
      &            '------------','----------','---------','------','--','--------','-----','--------'
 
            DO IDIFF = 1,N_SPC_DIFF
@@ -2868,7 +2868,7 @@ C-----------------------------------------------------------------------
                    IF ( LOCAL_SPEC( ISTR ) .EQ. DIFF_SPC( IDIFF ) .AND.
      &                  MAP_ISTRtoSD( ISTR,ISRM ) .EQ. ISD     ) THEN 
                      IF ( L_WDIFF ) THEN
-                        WRITE( LOGDEV, '(10x,A,1x,A,1x,A,1x,A,1x,A,2x,ES9.2,4x,A,2x,ES9.2)' ),
+                        WRITE( LOGDEV, '(10x,A,1x,A,1x,A,1x,A,1x,A,2x,ES9.2,4x,A,2x,ES9.2)' )
      &                         LOCAL_SPEC( ISTR ),
      &                         DESID_STREAM_AERO( ISRM )%NAME( ISD )(1:10),
      &                         LOCAL_EMVAR( ISTR, ISRM ),
@@ -2880,7 +2880,7 @@ C-----------------------------------------------------------------------
                         L_WDIFF = .FALSE.
                         L_WISD  = .FALSE.
                       ELSE IF ( L_WISD ) THEN
-                        WRITE( LOGDEV, '(27x,A,1x,A,1x,A,1x,A,2x,ES9.2,4x,A,2x,ES9.2)' ),
+                        WRITE( LOGDEV, '(27x,A,1x,A,1x,A,1x,A,2x,ES9.2,4x,A,2x,ES9.2)' )
      &                         DESID_STREAM_AERO( ISRM )%NAME( ISD )(1:10),
      &                         LOCAL_EMVAR( ISTR, ISRM ),
      &                         DESID_REG( DESID_FAC( ISTR,ISRM )%REG( 1 ) )%LABEL(1:18),
@@ -2889,7 +2889,7 @@ C-----------------------------------------------------------------------
      &                         DESID_FAC( ISTR,ISRM )%FAC( 1 )
                         L_WISD = .FALSE.
                       ELSE
-                        WRITE( LOGDEV, '(38x,A,1x,A,1x,A,2x,ES9.2,4x,A,2x,ES9.2)' ),
+                        WRITE( LOGDEV, '(38x,A,1x,A,1x,A,2x,ES9.2,4x,A,2x,ES9.2)' )
      &                         LOCAL_EMVAR( ISTR, ISRM ),
      &                         DESID_REG( DESID_FAC( ISTR,ISRM )%REG( 1 ) )%LABEL(1:18),
      &                         LOCAL_OP( ISTR,ISRM,1 ), 
@@ -2923,7 +2923,7 @@ C-----------------------------------------------------------------------
                              END IF
                            END IF
                          END DO
-                         WRITE( LOGDEV, '(55x,A,1x,A,2x,ES9.2,4x,A,2x,ES9.2)' ),
+                         WRITE( LOGDEV, '(55x,A,1x,A,2x,ES9.2,4x,A,2x,ES9.2)' )
      &                          DESID_REG( DESID_FAC( ISTR,ISRM )%REG( IFAC ) )%LABEL(1:18),
      &                          LOCAL_OP( ISTR,ISRM,IFAC ), DESID_FAC( ISTR, ISRM )%BULK( IFAC ), 
      &                          LOCAL_BASIS( ISTR,ISRM,IFAC ), FAC
@@ -3042,7 +3042,7 @@ C stkemis_init.
   
               ! Create Description of this Emission File for output to
               ! diagnostics
-              WRITE( DESID_STREAM_DESC( ISRM ), '(A,I3)' ),
+              WRITE( DESID_STREAM_DESC( ISRM ), '(A,I3)' )
      &           'Gridded Area Emissions File ', N
              
               ! Retrieve Short-Name Label for Each Gridded File
@@ -3081,7 +3081,7 @@ C stkemis_init.
               
               ! Create Description of this Emission File for output to
               ! diagnostics
-              WRITE( DESID_STREAM_DESC( ISRM ), '(A,I3)' ),
+              WRITE( DESID_STREAM_DESC( ISRM ), '(A,I3)' )
      &        'Point Emissions File ', IPSRM( ISRM )
              
               ! Retrieve Short-Name Label for Each Inline File
@@ -3119,7 +3119,7 @@ C stkemis_init.
   
               ! Create Description of this Emission File for output to
               ! diagnostics
-              WRITE( DESID_STREAM_DESC( ISRM ), '(A,I2)' ),
+              WRITE( DESID_STREAM_DESC( ISRM ), '(A,I2)' )
      &          'Gridded Tracer Emissions File ', N
   
               ! Retrieve Short-Name Label for Each Tracer File
@@ -3251,6 +3251,7 @@ C stkemis_init.
         CHARACTER( 200 ) :: PREFIX = 'CCTM_DESID'
         CHARACTER( 200 ) :: SUFFIX = '.nc'
         CHARACTER( 200 ) :: XMSG
+        CHARACTER( 16 )  :: PNAME = 'DESID_INIT_DIAG'
         INTEGER          :: VALUE
         LOGICAL          :: stream_vector( DESID_N_SRM )
         INTEGER          :: N_Diag_Nml, N_Buff 
@@ -3296,7 +3297,7 @@ C stkemis_init.
      &          Desid_Diag_Fmt_Nml( IDIAG ) .NE. 'COLSUM' .AND. 
      &          Desid_Diag_Fmt_Nml( IDIAG ) .NE. 'LAYER1' ) THEN
                WRITE( LOGDEV, * )
-               WRITE( XMSG, '(A,I3,A,A)' ),
+               WRITE( XMSG, '(A,I3,A,A)' )
      &             'The format for Emission Diagnostic group ',IDIAG,
      &             ' is not allowed. Please correct:',TRIM( Desid_Diag_Fmt_Nml(IDIAG))
                CALL M3EXIT( 'Map_Emiss_Diag', 0, 0, XMSG, XSTAT1 )     
@@ -3306,7 +3307,7 @@ C stkemis_init.
            NSTREAM = INDEX1( '', Desid_Max_Diag_Streams, Desid_Diag_Streams_Nml(IDIAG,:) ) - 1
            IF ( NSTREAM .LE. 0 ) THEN
                WRITE( LOGDEV, * )
-               WRITE( XMSG, '(A,I3,A)' ),
+               WRITE( XMSG, '(A,I3,A)' )
      &             'No Emission Streams have been selected for group ',IDIAG,
      &             ' of the emission diagnostic input. Please correct.'
                CALL M3EXIT( 'Map_Emiss_Diag', 0, 0, XMSG, XSTAT1 )     
@@ -3330,7 +3331,7 @@ C stkemis_init.
              ! Stop CMAQ if there was an error setting the emission streams
              IF ( LERROR ) THEN
                WRITE( LOGDEV, * )
-               WRITE( XMSG, '(A,A,A)' ),
+               WRITE( XMSG, '(A,A,A)' )
      &             'CMAQ will crash until an error specifying the ',
      &             'DESID diagnostics is fixed. Detailed information is ',
      &             'in the processor log files.'
@@ -3359,7 +3360,7 @@ C stkemis_init.
      &                       DESID_DIAG_LAYS( JDIAG ) = 1
    
                         DESID_DIAG_LAB( JDIAG ) = DESID_STREAM_LAB( ISRM )
-                        WRITE( CDIAG, '(I0)' ), IDIAG
+                        WRITE( CDIAG, '(I0)' ) IDIAG
                         DESID_DIAG_FILENAME( JDIAG ) = TRIM( PREFIX ) // TRIM(CDIAG) //
      &                        '_' // TRIM( DESID_DIAG_LAB( JDIAG ) ) // TRIM( SUFFIX )
                         DESID_DIAG_SUM( JDIAG ) = 0
@@ -3389,7 +3390,7 @@ C stkemis_init.
      &                DESID_DIAG_LAYS( JDIAG ) = 1
    
                  DESID_DIAG_LAB( JDIAG ) = Desid_Diag_Streams_Nml( IDIAG,I )
-                 WRITE( CDIAG, '(I0)' ), IDIAG
+                 WRITE( CDIAG, '(I0)' ) IDIAG
                  DESID_DIAG_FILENAME( JDIAG ) = TRIM( PREFIX ) // TRIM(CDIAG) //
      &                 '_' // TRIM( DESID_DIAG_LAB( JDIAG ) ) // TRIM( SUFFIX )
    
@@ -3446,14 +3447,14 @@ C stkemis_init.
 
         DO IDIAG = 1,DESID_N_DIAG
            WRITE( LOGDEV, * )
-           WRITE( LOGDEV,'(5x,A19,2x,A)' ),'Diagnostic File: ',TRIM(DESID_DIAG_LAB( IDIAG ))
-           WRITE( LOGDEV,'(10x,A)' ), 'Stream Members'
+           WRITE( LOGDEV,'(5x,A19,2x,A)' ) 'Diagnostic File: ',TRIM(DESID_DIAG_LAB( IDIAG ))
+           WRITE( LOGDEV,'(10x,A)' ) 'Stream Members'
            DO I = 1,DESID_N_SRM
-               IF ( DESID_DIAG_STREAM_MASK( I,IDIAG ) ) WRITE( LOGDEV,'(15x,A32)'),DESID_STREAM_LAB(I)
+               IF ( DESID_DIAG_STREAM_MASK( I,IDIAG ) ) WRITE( LOGDEV,'(15x,A32)') DESID_STREAM_LAB(I)
            END DO
-           WRITE( LOGDEV,'(10x,A)' ), 'Diagnostic Species'
+           WRITE( LOGDEV,'(10x,A)' ) 'Diagnostic Species'
            DO I = 1,DESID_DIAG_SPEC( IDIAG )%NSPEC
-               WRITE( LOGDEV,'(15x,A16)'),DESID_DIAG_SPEC( IDIAG )%SPEC( I )
+               WRITE( LOGDEV,'(15x,A16)') DESID_DIAG_SPEC( IDIAG )%SPEC( I )
            END DO
         END DO
         
@@ -3465,7 +3466,10 @@ C stkemis_init.
            END IF
            WRITE( DESID_DIAG_LOGICAL( IDIAG ),'( "DESID_",I3.3 )' ) IDIAG
 #ifndef mpas
-           VALUE = SETENVVAR( DESID_DIAG_LOGICAL( IDIAG ), DESID_DIAG_FILENAME( IDIAG ) )
+           IF ( .NOT. SETENVVAR( DESID_DIAG_LOGICAL( IDIAG ), DESID_DIAG_FILENAME( IDIAG ) ) ) THEN
+              WRITE( XMSG, '(A,I3)' ) 'Could not set environment variable for DESID diagnostic file #', IDIAG
+              CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+           END IF
 #endif
         END DO
    

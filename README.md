@@ -12,18 +12,19 @@ CMAQ combines current knowledge in atmospheric science and air quality modeling 
 
 The science updates and new features in the alpha version (v6.0a1) are documented in the [CMAQv6.0alpha Release Notes](DOCS/Release_Notes/README.md) and summarized in the **[Release FAQ](DOCS/Release_FAQ/CMAQv6.0-FAQ.md)**.
 
-While initially planned for fall 2026, the status and timing of any final release of CMAQv6.0 is to be determined. This CMAQv6.0 alpha release allows community members:
+The official release of CMAQv6.0 is targeted for fall 2026, pending the availability of necessary resources. This pre-release version has gone through preliminary testing on multiple spatial domains however aspects of the system remain uncharacterized. Users assume the risk of unforeseen or undocumented impacts of code changes that have been incorporated since the CMAQv5.5 public release.
 
-* a preview of science and feature updates planned for the CMAQv6.0 release.
-* the ability to take advantage of improvements for preliminary studies of their own interest.
-* help other interested community members by testing, troubleshooting, and debugging the research version before any potential future final release.
+This CMAQv6.0 alpha release allows community members:
+
+* a preview of science and feature updates developed for the CMAQv6.0 release.
+* an opportunity to help the community by testing, troubleshooting, and debugging this version.
 
 ## New features in CMAQ version 6.0 include:
-* Gas, Aqueous, & Aerosol Chemistry 
-  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 including particle nitrate (pNO3) as a heterogenous reaction 
-  * CRACMM3M, with inclusion of halogen chemistry to improve the representation of gas-phase and aerosol chemistry in marine environments.
-  * CRACMM3HAPS which includes additional gas chemistry for Hazardous Air Pollutants.
-  * Henry’s law rate constant updates 
+* Gas, Aqueous, & Aerosol Chemistry
+  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 which adds chlorine chemistry, heterogeneous sulfur chemistry, and particle nitrate (pNO3) photolysis as well as other updates
+  * CRACMM3M with detailed halogen chemistry to improve the representation of gas-phase and aerosol chemistry in marine environments.
+  * CRACMM3HAPS with additional gas and particle Hazardous Air Pollutants.
+  *	Henry’s law rate constant updates
   * Photolysis rate constant updates 
 * Transport Processes & Land Surface Exchange 
   * Changes to runtime minimum eddy diffusivity option (KZMIN) 

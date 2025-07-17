@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ================= CMAQv5.5.X Configuration Script ================= #
+# ================= CMAQv6.X Configuration Script ================= #
 # Requirements: I/O API & netCDF libraries                            #
 #               PGI, Intel, or Gnu Fortran compiler                   #
 #               MPICH for multiprocessor computing                    #
@@ -163,7 +163,7 @@
         setenv myCC gcc
         setenv myFSTD "-O3 -funroll-loops -finit-character=32 -Wtabs -Wsurprising -ftree-vectorize -ftree-loop-if-convert -finline-limit=512"
         setenv myDBG  "-Wall -O0 -g -fcheck=all -ffpe-trap=invalid,zero,overflow -fbacktrace"
-        setenv myFFLAGS "-ffixed-form -ffixed-line-length-132 -funroll-loops -finit-character=32 -std=legacy"
+        setenv myFFLAGS "-ffixed-form -ffixed-line-length-132 -funroll-loops -finit-character=32"
         setenv myFRFLAGS "-ffree-form -ffree-line-length-none -funroll-loops -finit-character=32"
         setenv myCFLAGS "-O2"
         setenv myLINK_FLAG # "-fopenmp" openMP not supported w/ CMAQ

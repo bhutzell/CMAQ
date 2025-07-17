@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/STENEX/src/se_snl/se_slice_module.f,v 1.2 2006/02/15 14:41:56 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C --------------------------------------------------------------------------
 C Purpose:
 C
@@ -92,10 +86,9 @@ C --------------------------------------------------------------------------
         subroutine se_slice1i (data, sourcepe, destpe, sdim, from, to)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
-
-        include "mpif.h"
 
         integer, intent(inout) :: data(:)
         integer, intent(in) :: sourcepe, destpe, sdim, from, to
@@ -169,10 +162,9 @@ C --------------------------------------------------------------------------
         subroutine se_slice1r (data, sourcepe, destpe, sdim, from, to)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
-
-        include "mpif.h"
 
         real, intent(inout) :: data(:)
         integer, intent(in) :: sourcepe, destpe, sdim, from, to
@@ -257,11 +249,10 @@ C --------------------------------------------------------------------------
         subroutine se_slice2i (data, sourcepe, destpe, sdim, from, to)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
-        include "mpif.h"
-        
         integer, intent(inout) :: data(:,:)
         integer, intent(in) :: sourcepe, destpe, sdim, from, to
 
@@ -388,11 +379,10 @@ C --------------------------------------------------------------------------
         subroutine se_slice2r (data, sourcepe, destpe, sdim, from, to)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
-        include "mpif.h"
-        
         real, intent(inout) :: data(:,:)
         integer, intent(in) :: sourcepe, destpe, sdim, from, to
 
@@ -520,14 +510,13 @@ C --------------------------------------------------------------------------
         subroutine se_slice3i (data, sourcepe, destpe, sdim, from, to)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
         integer, intent(inout) :: data(:,:,:)
         integer, intent(in) :: sourcepe, destpe, sdim, from, to
 
-        include "mpif.h"
-        
         integer :: error
         integer :: i, j, k, li, lj, lk, ui, uj, uk
         integer :: status(MPI_STATUS_SIZE)
@@ -662,14 +651,13 @@ C --------------------------------------------------------------------------
         subroutine se_slice3r (data, sourcepe, destpe, sdim, from, to)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
         real, intent(inout) :: data(:,:,:)
         integer, intent(in) :: sourcepe, destpe, sdim, from, to
 
-        include "mpif.h"
-        
         integer :: error
         integer :: i, j, k, li, lj, lk, ui, uj, uk
         integer :: status(MPI_STATUS_SIZE)
@@ -807,11 +795,10 @@ C --------------------------------------------------------------------------
         subroutine se_slice4i (data, sourcepe, destpe, sdim, from, to)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
-        include "mpif.h"
-        
         integer, intent(inout) :: data(:,:,:,:)
         integer, intent(in) :: sourcepe, destpe, sdim, from, to
 
@@ -963,11 +950,10 @@ C --------------------------------------------------------------------------
         subroutine se_slice4r (data, sourcepe, destpe, sdim, from, to)
 
         use se_pe_info_ext
+        use mpi
 
         implicit none
 
-        include "mpif.h"
-        
         real, intent(inout) :: data(:,:,:,:)
         integer, intent(in) :: sourcepe, destpe, sdim, from, to
 

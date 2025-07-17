@@ -245,7 +245,7 @@ ATOTIJK         ,ug m-3    ,ATOTI[0] + ATOTJ[0] + ATOTK[0]
 AUNSPEC1IJ      ,ug m-3    ,ATOTIJ[0] - (ASO4IJ[0] + ANO3IJ[0]         \
                                          +ANH4IJ[0] + ACLIJ[0]         \
                                          +ANAIJ[0] + AECIJ[0]          \
-                                         +AOCIJ[0] + ASOILJ[0])       
+                                         +AOCIJ[0] + ASOILJ[0] + ABRJ[0])       
 !! Non-Carbon Organic Mass
 ANCOMIJ         ,ug m-3    ,AOMIJ[0] - AOCIJ[0]
 
@@ -272,11 +272,12 @@ PM1_TOT         ,ug m-3    ,ATOTI[0]*FPM1_AIT[3]+ATOTJ[0]*FPM1_ACC[3]+ATOTK[0]*F
 !PM1_MG         ,ug m-3    ,                     AMGJ[1] *FPM1_ACC[3] +AMGK[0] *FPM1_COR[3]
 !PM1_K          ,ug m-3    ,                     AKJ[1]  *FPM1_ACC[3] +AKK[0]  *FPM1_COR[3]
 !PM1_CA         ,ug m-3    ,                     ACAJ[1] *FPM1_ACC[3] +ACAK[0] *FPM1_COR[3]
+!PM1_BR         ,ug m-3    ,                     ABRJ[1] *FPM1_ACC[3] +ABRK[0] *FPM1_COR[3]
 !PM1_NH4        ,ug m-3    ,ANH4I[1] *FPM1_AIT[3]+ANH4J[1]*FPM1_ACC[3] +ANH4K[1]*FPM1_COR[3]
 !PM1_NO3        ,ug m-3    ,ANO3I[1] *FPM1_AIT[3]+ANO3J[1]*FPM1_ACC[3] +ANO3K[1]*FPM1_COR[3] 
 !PM1_SOIL       ,ug m-3    ,ASOILJ[0]*FPM1_ACC[3]+(ASOIL[1]+ACORS[1])*FPM1_COR[3]
 !PM1_UNSPEC1    ,ug m-3    ,PM1_TOT[0] - (PM1_CL[0] + PM1_EC[0]+ PM1_NA[0]  + PM1_NH4[0] +  \
-!                                         PM1_NO3[0]+ PM1_OC[0]+ PM1_SOIL[0]+ PM1_SO4[0] ) 
+!                                         PM1_NO3[0]+ PM1_OC[0]+ PM1_SOIL[0]+ PM1_SO4[0] + PM1_BR[0]) 
 !PM1_UNSPCRS    ,ug m-3    ,ATOTK[0] *FPM1_COR[3] - (ASO4K[1]*FPM1_COR[3] \
 !                                                  +ACLK[1]*FPM1_COR[3]  \
 !                                                  +ANAK[0]*FPM1_COR[3]  \
@@ -306,7 +307,7 @@ PM25_SOIL       ,ug m-3    ,ASOILJ[0]*FPM25_ACC[3]+ASOIL[1]*FPM25_COR[3]
 PM25_SO4        ,ug m-3    ,ASO4I[1]*FPM25_AIT[3]+ASO4J[1]*FPM25_ACC[3]+ASO4K[1]*FPM25_COR[3]
 PM25_TOT        ,ug m-3    ,ATOTI[0]*FPM25_AIT[3]+ATOTJ[0]*FPM25_ACC[3]+ATOTK[0]*FPM25_COR[3]
 PM25_UNSPEC1    ,ug m-3    ,PM25_TOT[0]-(PM25_CL[0]+PM25_EC[0]+PM25_NA[0]+PM25_NH4[0] \
-                           +PM25_NO3[0]+PM25_OC[0]+PM25_SOIL[0]+PM25_SO4[0])
+                           +PM25_NO3[0]+PM25_OC[0]+PM25_SOIL[0]+PM25_SO4[0]+PM25_BR[0])
 PM25_UNSPCRS    ,ug m-3    ,ATOTK[0]*FPM25_COR[3] - (ASO4K[1]*FPM25_COR[3] \
                                                   +ACLK[1]*FPM25_COR[3]  \
                                                   +ANAK[0]*FPM25_COR[3]  \

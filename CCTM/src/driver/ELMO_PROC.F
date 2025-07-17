@@ -270,6 +270,8 @@
       LOGICAL, INTENT( IN ) :: WRITE_STEP
       LOGICAL, INTENT( IN ) :: INIT_STEP
       REAL                  :: DIVFAC
+      REAL                  :: DIVFAC1_PH ! special case for averaging particle pH at write step
+      REAL                  :: DIVFAC2_PH ! for averaging pH within the write step
 
       CHARACTER(250) :: XMSG
       INTEGER        :: XSTAT1
@@ -300,7 +302,7 @@
      &                     OUT_UNIT=ELMO_TABLE( J )%IUNIT,IERR=IERR )
            IF ( IERR .EQ. 1 ) THEN
               ! Invalid Variable Type
-              WRITE ( XMSG, '(A,I3,A)'),'A user-requested variable for ',
+              WRITE ( XMSG, '(A,I3,A)') 'A user-requested variable for ',
      &                'ELMO cannot be found. Please check that it is ',
      &                'defined correctly. It is number ',J,' on the used ',
      &                'variable list.'
@@ -326,6 +328,7 @@
                OL = L1 - ELMO_FILE( IFL )%LAY_BOT + 1
                
                DO IVAR = 1,ELMO_FILE( IFL )%N_VARS
+                   J   = ELMO_FILE( IFL )%TABID( IVAR )
                    U   = ELMO_FILE( IFL )%USEDID( IVAR )
                    IV  = ELMO_TABLE( J )%VAR_TYPE
                    IF ( IV .EQ. ET_DDEP .OR.
@@ -363,17 +366,19 @@
              OL = L1 - ELMO_FILE( IFL )%LAY_BOT + 1
              DIVFAC = 1.0
              IF ( WRITE_STEP ) DIVFAC = 0.5 / FLOAT( ELMO_NSTEP - 1 )
+             DIVFAC1_PH = 1.0
+             IF ( WRITE_STEP ) DIVFAC1_PH = 1.0 / FLOAT( ELMO_NSTEP )
+             DIVFAC2_PH = 1.0
+             IF ( ELMO_NSTEP .GT. 1 ) DIVFAC2_PH = 1.0 / FLOAT( ELMO_NSTEP - 1 )
+
 
              DO  IVAR = 1,ELMO_FILE( IFL )%N_VARS
                 J   = ELMO_FILE( IFL )%TABID( IVAR )
                 U   = ELMO_FILE( IFL )%USEDID( IVAR )
                 IV  = ELMO_TABLE( J )%VAR_TYPE
                 IDG = ELMO_TABLE( J )%ID
-              
-                IF ( (IV .EQ. ET_DRVD .OR. IV .EQ. ET_ISAM_DRVD 
-     &                                .OR. IV .EQ. ET_DDM_DRVD ) .AND.
-     &               IDG .EQ. ID_PMF_PH .AND.
-     &               ELMO_USED( U ) .LT. -100. ) THEN
+             
+                IF ( IDG .EQ. ID_PMF_PH ) THEN
                    ! Special Averaging for Particle pH
                    ! Add whatever the current average is right now.
                    ! Certainly this is problematic, particularly
@@ -381,17 +386,38 @@
                    ! 0. It's best to either use the instantaneous
                    ! value or recalculate the average fine particle acidity
                    ! offline.
-                   IF ( INIT_STEP ) THEN
-                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
-                   ELSE IF ( WRITE_STEP ) THEN
-                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC * 
-     &                          ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) 
-     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) - ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) )
-                   ELSE 
-                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =
-     &                          ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) 
-     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
+                   ! Averaging for particle pH is done as a simple average
+                   ! rather than a trapezoidal average as is done for other
+                   ! averaged variables.
+
+                   ! special case for pH when there is a physically unrealistic value
+                   IF ( ELMO_USED( U ) .LT. -100 ) THEN
+                      IF ( INIT_STEP ) THEN
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
+                      ELSE IF ( WRITE_STEP ) THEN
+                         ! elmo_out = (elmo_out + avg(elmo_out)) / elmo_nstep
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC1_PH *
+     &                      ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
+     &                      + DIVFAC2_PH * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) )
+                      ELSE
+                         ! elmo_out = elmo_out + avg(elmo_out)
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =
+     &                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
+     &                      + DIVFAC2_PH * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
+                      END IF
+                   ! if the pH is reasonable then accumulate and take simple average at the write step
+                   ELSE
+                      IF ( INIT_STEP ) THEN
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U )
+                      ELSE IF ( WRITE_STEP ) THEN
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC1_PH *
+     &                        ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) + ELMO_USED( U ) )
+                      ELSE
+                         ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =
+     &                        ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) + ELMO_USED( U )
+                      END IF
                    END IF
+
               
                 ELSE IF ( IV .EQ. ET_DDEP .OR.
      &                    IV .EQ. ET_ISAM_DDEP .OR.
@@ -420,7 +446,14 @@
                 ELSE
                    ! For all other variables, apply trapezoidal rule for averaging.
                    IF ( INIT_STEP ) THEN
-                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U ) 
+                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U )
+                   ELSE IF ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) .LE. ELMO_BLANK_XPT999
+     &                      .OR. ELMO_USED( U ) .LE. ELMO_BLANK_XPT999 ) THEN
+                      ! If ELMO_OUT or ELMO_USED are ELMO_BLANK then overwrite ELMO_OUT with
+                      ! with ELMO_BLANK = AMISS3 = -9.0E36.
+                      ! This prevents the case where large negative values can accumulate
+                      ! and overflow to -infinity.
+                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_BLANK
                    ELSE IF ( WRITE_STEP ) THEN
                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC *
      &                     ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) + 2.0 * ELMO_USED( U ) - ELMO_USED( U ) )
@@ -543,7 +576,7 @@
                 CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, J=IX1, IERR=IERR )
                 IF ( IERR .EQ. 1 ) THEN
                    ! Invalid Variable Type
-                   WRITE ( XMSG, '(2A,I3,4A)'),'There was an error processing ', 
+                   WRITE ( XMSG, '(2A,I3,4A)') 'There was an error processing ', 
      &                     'component number ',IVAR,' of the composite ',
      &                     TRIM(ELMO_TABLE( J )%NAME),'. Please check ',
      &                     'its definition.'

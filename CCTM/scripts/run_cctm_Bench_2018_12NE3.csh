@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ===================== CCTMv5.4.X Run Script ========================= 
+# ===================== CCTMv6.X Run Script ========================= 
 # Usage: run.cctm >&! cctm_Bench_2018_12SE1.log &                                
 #
 # To report problems or request help with this script/program:     
@@ -33,9 +33,9 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v55              #> Code Version
+ set VRSN      = v6a1              #> Code Version
  set PROC      = mpi               #> serial or mpi
- setenv MECH     cb6r5_ae7_aq      #> Mechanism ID
+ setenv MECH     cracmm3           #> Mechanism ID
  set APPL      = Bench_2018_12NE3  #> Application Name (e.g. Gridname)
 
 #> Check that mechanism is cb6 or cracmm
@@ -159,9 +159,9 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 #> Science Options
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
-setenv CTM_WB_DUST N         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
-setenv CTM_BROWN_VEG Y       #> use NPV input files to limit dust emissions [ default: N ]
-setenv CTM_LNO_ONLINE N      #> turn on lightning NOx [ default: N ]
+setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
+setenv CTM_BROWN_VEG Y       #> when using CTM_WB_DUST, use non-photosynthetic (brown) vegetation input files to limit dust emissions [ default: N ]
+setenv CTM_LNO_ONLINE Y      #> turn on lightning NOx emissions[ default: N ]
                              #> alternatively LNOx emissions can also be read in as external emissions inputs,
                              #> in this case, please setenv this variable to N to avoid double counting
 setenv KZMIN Y               #> use Min Kz option in edyintb [ default: Y ], 
@@ -171,7 +171,7 @@ setenv CLM_VERSION N         #> WRF CLM LSM
 setenv NOAH_VERSION N        #> WRF NOAH LSM
 setenv CTM_ABFLUX Y          #> ammonia bi-directional flux for in-line deposition 
                              #>    velocities [ default: N ]
-setenv CTM_BIDI_FERT_NH3 T   #> subtract fertilizer NH3 from emissions because it will be handled
+setenv CTM_BIDI_FERT_NH3 Y   #> subtract fertilizer NH3 from emissions because it will be handled
                              #>    by the BiDi calculation [ default: Y ]
 setenv CTM_HGBIDI N          #> mercury bi-directional flux for in-line deposition 
                              #>    velocities [ default: N ]
@@ -347,7 +347,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Ozone column data
   set OMIfile   = omi_cmaq_2005through2024_27x27.dat
 
-  # If using BROWN_VEG option, then set the path to the NPV input files
+  # If using BROWN_VEG option, then set the path to the non-photosynthetic vegetation (NPV) input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
        setenv PV_AVG_FILE ${INPDIR}/surface/pv_avg.dat
        setenv NPV_AVG_FILE ${INPDIR}/surface/npv_avg.dat
@@ -510,7 +510,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   if( $USE_SAGE_N == 'Y' ) then
      setenv SAGE_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
      if( $USE_SAGE_N_EF == 'Y') then
-        setenv SAGE_EF /work/MOD3APP/ezv/2020_NEI/BEIS4/12US1/BEIS4_SAGE_beld6_norm_emis_12NE3.ncf
+        setenv SAGE_EF ${INPDIR}/surface/BEIS4_SAGE_beld6_norm_emis_12NE3.ncf
      endif
   endif
 
