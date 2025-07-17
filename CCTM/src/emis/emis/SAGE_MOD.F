@@ -565,7 +565,7 @@ C Function arguments:
 
 C-----------------------------------------------------------------------
          delang       = sign(1.0,LAT)*PI180 * min(max(23.45 * COS( ANGODY * PI180* ( DOY - D_OFF )),-89.0),89.0)
-         hourang      = min(max(-tan( delang ) * tan( PI180 * LAT ),-0.99),0.99)
+         hourang      = sign(1.0,LAT)*min(max(-tan( delang ) * tan( PI180 * LAT ),-0.99),0.99)
          DAY_LENGTH   = 2.0/15.0 * acos(hourang)/PI180
          return
 
@@ -587,7 +587,6 @@ C Function arguments:
 C Local variables:
          Real     DOY       ! Day of the year (max 365)
          Real     DOY_YEST  ! DOY for yesterday
-         Real     YEAR
 ! Day length function
          Real            :: ddldt                ! d(day length)/dt (h/day)
          Real            :: Fdl                  ! Day length function
@@ -601,8 +600,8 @@ C Local variables:
 
 
 C-----------------------------------------------------------------------
-         YEAR     = DATE / 1000
-         DOY      = FLOAT( DATE ) - YEAR * 1000
+
+         DOY      = FLOAT( MOD( DATE, 1000 ) )
          if(DOY .eq. 1.0 ) Then
             DOY_YEST = 365.0
          else 
@@ -626,7 +625,7 @@ C-----------------------------------------------------------------------
             FMIN  = 0.05
          End If
          if(Ts .Gt. 283.15) FERT_ADJ = max(FERT_ADJ, FMIN)
-         
+
          RETURN
          
          END FUNCTION FERT_ADJ
