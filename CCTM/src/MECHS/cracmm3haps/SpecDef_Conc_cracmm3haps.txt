@@ -252,8 +252,6 @@ ANH4K           ,ug m-3    ,ANH4K[1]
 ASO4IJ          ,ug m-3    ,ASO4I[1]+ASO4J[1]
 ASO4K           ,ug m-3    ,ASO4K[1]
 AHMSJ           ,ug m-3    ,AHMSJ[1]
-AFEK            ,ug m-3    ,0.02695*ASOIL[1]+0.0467*ACORS[1]
-AMNK            ,ug m-3    ,0.00075*ASOIL[1]+0.0011*ACORS[1]
 
 !! Organic Particle Species
 ! Why is there an APOCI and APOCJ in the output? It doesn't match below
