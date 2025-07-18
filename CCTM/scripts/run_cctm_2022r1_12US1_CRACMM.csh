@@ -391,7 +391,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv GR_EM_SYM_DATE_001 F # To change default behaviour please see Users Guide for EMIS_SYM_DATE
 
   set EMISfile  = emis_mole_rwc_${YYYYMMDD}_12US1_cmaq_cracmmv2_P229_2022hc_CRACMM2.ncf
-  setenv GR_EMIS_002 ${EMISpath}/rwc/${EMISfile}
+  setenv GR_EMIS_002 $INPDIR/emis/cracmmv2_20241031/premerged/rwc/${EMISfile}
   setenv GR_EMIS_LAB_002 GR_RES_FIRES
   setenv GR_EM_SYM_DATE_002 F # To change default behaviour please see Users Guide for EMIS_SYM_DATE
 
@@ -486,16 +486,16 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
          setenv MEGAN_SOILINP    $OUTDIR/CCTM_MSOILOUT_${RUNID}_${YESTERDAY}.nc
                              #> Biogenic NO soil input file; ignore if INITIAL_RUN = Y
                              #>                            ; ignore if IGNORE_SOILINP = Y
-         setenv MEGAN_CTS /work/MOD3DATA/2016_12US1/surface/megan3.2/CT3_CONUS.ncf
-         setenv MEGAN_EFS /work/MOD3DATA/2016_12US1/surface/megan3.2/EFMAPS_CONUS.ncf
-         setenv MEGAN_LDF /work/MOD3DATA/2016_12US1/surface/megan3.2/LDF_CONUS.ncf
+         setenv MEGAN_CTS $INPDIR/surface/megan3.2/CT3_CONUS.ncf
+         setenv MEGAN_EFS $INPDIR/surface/megan3.2/EFMAPS_CONUS.ncf
+         setenv MEGAN_LDF $INPDIR/surface/megan3.2/LDF_CONUS.ncf
          if ($BDSNP_MEGAN == 'Y') then
             setenv BDSNPINP    $OUTDIR/CCTM_BDSNPOUT_${RUNID}_${YESTERDAY}.nc
-            setenv BDSNP_FFILE /work/MOD3DATA/2016_12US1/surface/megan3.2/FERT_CONUS.ncf
-            setenv BDSNP_NFILE /work/MOD3DATA/2016_12US1/surface/megan3.2/NDEP_CONUS.ncf
-            setenv BDSNP_LFILE /work/MOD3DATA/2016_12US1/surface/megan3.2/LANDTYPE_CONUS.ncf
-            setenv BDSNP_AFILE /work/MOD3DATA/2016_12US1/surface/megan3.2/ARID_CONUS.ncf
-            setenv BDSNP_NAFILE /work/MOD3DATA/2016_12US1/surface/megan3.2/NONARID_CONUS.ncf
+            setenv BDSNP_FFILE $INPDIR/surface/megan3.2/FERT_CONUS.ncf
+            setenv BDSNP_NFILE $INPDIR/surface/megan3.2/NDEP_CONUS.ncf
+            setenv BDSNP_LFILE $INPDIR/surface/megan3.2/LANDTYPE_CONUS.ncf
+            setenv BDSNP_AFILE $INPDIR/surface/megan3.2/ARID_CONUS.ncf
+            setenv BDSNP_NAFILE $INPDIR/surface/megan3.2/NONARID_CONUS.ncf
          endif
   endif
 
@@ -683,15 +683,15 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      #> remove previous log files
      foreach file ( ${log_test} )
         #echo "Deleting log file: $file"
-        /bin/rm -f $file  
+        rm -f $file  
      end
  
      #> remove previous output files
      foreach file ( ${out_test} )
         #echo "Deleting output file: $file"
-        /bin/rm -f $file  
+        rm -f $file  
      end
-     /bin/rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
+     rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
 
   else
      #> error if previous log files exist

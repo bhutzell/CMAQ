@@ -656,15 +656,15 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      #> remove previous log files
      foreach file ( ${log_test} )
         #echo "Deleting log file: $file"
-        /bin/rm -f $file  
+        rm -f $file  
      end
 
      #> remove previous output files
      foreach file ( ${out_test} )
         #echo "Deleting output file: $file"
-        /bin/rm -f $file  
+        rm -f $file  
      end
-     /bin/rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
+     rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
 
   else
      #> error if previous log files exist
