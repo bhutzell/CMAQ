@@ -12,26 +12,6 @@ CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version buil
 **Significance and Impact**:   
 CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enable a wider range of applications of CRACMM.
 
-### Heterogeneous chemistry of sulfur species
-[Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Science update  
-**Release Version/Date**: CMAQv6.0  
-
-**Description**: 
-In certain areas with high PM pollution in the winter (e.g., Fairbanks, AK, the North China Plain, etc.), chemical transport models can significantly underpredict particulate sulfur concentrations. Recent studies have suggested that heterogeneous sulfur chemistry in/on aqueous aerosols may contribute significant amounts of sulfur PM. Here we add the oxidation of SO2 to sulfate and the production/loss of hydroxymethanesulfonate (HMS) in aqueous aerosol to CRACMM3.
-
-**Significance and Impact**:  
-CMAQ underpredicts particulate sulfur in and around Fairbanks, Alaska, an area affected by severe PM pollution episodes during the winter. During cold, dark Fairbanks winters, CMAQ's existing secondary sulfate production pathways are not very active; however, adding heterogeneous production of sulfate and HMS in aerosol water significantly reduces the model underprediction. With this update, HMS and sulfate predictions compare well with intensive measurements during the ALPACA winter air quality study (Simpson et al., 2024). The impacts of the additional chemistry vary with location and season. Excluding locations with high coincident SO2 and HCHO, monthly average PM sulfur concentrations do not exhibit very large changes over CONUS. Larger effects are noted on the 1.33 km resolution Fairbanks domain and over Asia during the winter. This update should have mixed results on evaluation over CONUS.
-
-**References**:  
-Farrell, S. L., Pye, H. O. T., Gilliam, R., Pouliot, G., Huff, D., Sarwar, G., Vizuete, W., Briggs, N., Duan, F., Ma, T., Zhang, S., and Fahey, K.: Predicted impacts of heterogeneous chemical pathways on particulate sulfur over Fairbanks (Alaska), the Northern Hemisphere, and the Contiguous United States, Atmos. Chem. Phys., 25, 3287-3312, 2025.
-
-Simpson, W. R., Mao, J., Fochesatto, G. J., Law, K. S., DeCarlo,P. F., Schmale, J., Pratt, K. A., Arnold, S. R., Stutz, J., Dibb, J. E., et al.: Overview of the alaskan layered pollution and chemical analysis(ALPACA) field experiment, ACS ES&T Air 2024, 1, 200?222, 2024.
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1337](https://github.com/USEPA/CMAQ/commit/f0e2d42087e93ff5f37e79d987f5d23e46acac4e) | [PR#1337](https://github.com/USEPA/CMAQ_Dev/pull/1337)  |
-
 ### Halogen chemistry in CRACMM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update  
