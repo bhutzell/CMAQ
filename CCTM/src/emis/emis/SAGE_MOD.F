@@ -560,7 +560,7 @@ C Function arguments:
          Real            :: hourang              ! noon hour solar angle
          Real            :: delang               ! solar declanation angle
          Real            :: daylen               ! day length (h)
-         Real, Parameter :: D_OFF  = 172.0       ! Summer Solstice       
+         Real, Parameter :: D_OFF  = 172.0       ! Summer Solstice in northern hemisphere
          Real, Parameter :: ANGODY = 360.0/365.0 !* PIO180 
 
 C-----------------------------------------------------------------------
@@ -615,12 +615,12 @@ C-----------------------------------------------------------------------
             ddldt    = ( DAY_LENGTH(DOY, LAT)  - DAY_LENGTH(DOY_YEST, LAT) ) /
      &              abs( DAY_LENGTH(81.0, LAT) - DAY_LENGTH(80.0, LAT) )
          endif
-         SDDL     = min(0.9,(115-LAT)/100)
+         SDDL     = min(0.9,(115-abs(LAT))/100)
          Fdl      = exp(-(ddldt-1.0)**2/(2.0 * SDDL**2)) 
          FTs      = exp(-0.5*((TS-TMin)/SDT)**2)
          FERT_ADJ = Fdl*FTs
          If( abs(LAT) > 23.4 ) Then
-            FMIN  = 1.17/LAT
+            FMIN  = 1.17/abs(LAT)
          Else 
             FMIN  = 0.05
          End If
