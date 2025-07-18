@@ -120,6 +120,7 @@ C Local Variables:
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
          END SUBROUTINE CKSUMMER
+#ifndef m3box
 #ifndef mpas
          SUBROUTINE HADV ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
             REAL, POINTER             :: CGRID( :,:,:,: )
@@ -148,6 +149,9 @@ C Local Variables:
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
          END SUBROUTINE HDIFF
 #endif
+!close m3box
+#endif
+#ifndef m3box
          SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP )
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
@@ -158,6 +162,8 @@ C Local Variables:
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
          END SUBROUTINE STAGE_VDIFF
+!close m3box
+#endif
          SUBROUTINE PHOT ( CGRID, JDATE, JTIME, TSTEP )
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
@@ -226,6 +232,7 @@ C-----------------------------------------------------------------------
       IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
       CALL LOG_MESSAGE( LOGDEV, XMSG )
 
+#ifndef m3box
       WRITE( XMSG, '(2x,A,I6.6)' ) 'Time-Step Length (HHMMSS): ',TSTEP(2) 
       IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
       CALL LOG_MESSAGE( LOGDEV, XMSG )
@@ -237,6 +244,8 @@ C-----------------------------------------------------------------------
          CALL VDIFF ( CGRID, JDATE, JTIME, TSTEP )
       END IF
       IF ( CKSUM ) CALL CKSUMMER ( 'VDIFF', CGRID, JDATE, JTIME )
+!close m3box
+#endif
 #ifndef mpas
       IF ( BUDGET_DIAG .OR. LIPR ) CALL PA_UPDATE_PROC ( IPR_VDIF, CGRID, JDATE, JTIME, TSTEP, .FALSE. )
 #endif
@@ -247,6 +256,7 @@ C-----------------------------------------------------------------------
       STIME = JTIME
       CALL NEXTIME ( SDATE, STIME, TSTEP( 2 ) )
 
+#ifndef m3box
       IF ( .NOT. COLUMN_MODEL ) THEN
          ! Calculate Horizontal Transport
          ! couple CGRID for advection and horizontal diffusion
@@ -286,7 +296,8 @@ C-----------------------------------------------------------------------
 #endif
 
       END IF ! Not Column Model
-      
+!close m3box
+#endif      
       ! Calculate Photolysis Rates
       CALL PHOT ( CGRID, JDATE, JTIME, TSTEP )
       IF ( CKSUM ) CALL CKSUMMER ( 'PHOT', CGRID, JDATE, JTIME )

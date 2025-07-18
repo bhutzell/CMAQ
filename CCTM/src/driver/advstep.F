@@ -193,9 +193,13 @@ C-----------------------------------------------------------------------
 
          CALL LOG_HEADING( LOGDEV, 'INITIALIZE ADVECTION STEPPING' )
 
+#ifndef m3box
          IF ( SIGST .GT. VGLVS_GD( 2 ) .OR.
      &        SIGST .LT. VGLVS_GD( NLAYS + 1 ) ) THEN
             WRITE(XMSG, '(A, 1PE12.3)') 'SIGMA_SYNC_TOP incorrect', SIGST
+            CALL M3MESG(XMSG)
+            WRITE(XMSG, '(2(A, 1PE12.3))') 'SIGMA_SYNC_TOP must be > ', 
+     &      VGLVS_GD( 2 ),' or < ',VGLVS_GD( NLAYS + 1 )
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
          END IF
 
@@ -214,7 +218,10 @@ C-----------------------------------------------------------------------
                END IF
             END DO
          END IF
-
+#else
+         L = NLAYS
+!close m3box
+#endif
          ADVLAYR = L
          WRITE( LOGDEV,92005 ) ADVLAYR
 
