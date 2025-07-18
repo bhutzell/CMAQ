@@ -1,5 +1,18 @@
 # Integrated Source Apportionment Method (ISAM)
 
+##  Add cracmm3m to mechanisms supported by ISAM
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Science Update      
+**Release Version**: CMAQv6.0  
+
+**Description**: Code changes allow  CCTM-ISAM simulations to use the cracmm3m chemical mechanism.
+
+**Significance and Impact**: The update adds information to the ISAM module so CCTM-ISAM simulations can use the cracmm3m chemical mechanism.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1313](https://github.com/USEPA/CMAQ/commit/ff9a728b28c0776e04e2e1463567e9f286e95dd7) | [PR#1313](https://github.com/USEPA/CMAQ_Dev/pull/1313)  |
+
 ### Improve stability in ISAM apportionment output
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**:  Improve stability  
@@ -19,7 +32,7 @@ The changes to the source apportionment routines in the aerosol and cloud module
 |[Merge for PR#1305](https://github.com/USEPA/CMAQ/commit/32cd44f4046eb704504a012cdae32de04f04e1d8) | [PR#1305](https://github.com/USEPA/CMAQ_Dev/pull/1305)  |
 
 ### Erroneous mass attribution  
-[Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
+[Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency 
 **Type of update**:  Bug Fix   
 **Release Version/Date**:  CMAQv6.0
 
@@ -36,13 +49,31 @@ Corrects erroneous mass attributed to sources geographically far away very soon 
 |[Merge for PR#1134](https://github.com/USEPA/CMAQ/commit/63afe25a706aed7ad3273d4718b2eedd2f242cea) | [PR#1134](https://github.com/USEPA/CMAQ_Dev/pull/1134)  |
 
 
+### ISAM Control file
+[Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**:  Improve log file 
+**Release Version/Date**:  CMAQv6.0
+
+**Description**:   
+Users were running into character limits for text parser of the isam control file. Additionally, issues with the isam control file are not clearly communicated by in the model log files.  To address this a simple ISAM tag summary is now written to the log files to provide additional clues if necessary.
+
+**Significance and Impact**:   
+No impact on any output files for both ISAM and the base model. Some minor changes to the log files.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1326](https://github.com/USEPA/CMAQ_Dev/commit/f735176e9a02a7dd82ca71031e76f74809ebaebc) | [PR#1326](https://github.com/USEPA/CMAQ_Dev/pull/1326)  |
+
 ## Avoid floating point exceptions in aerosol source apportionment algorithm
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**:  v6.0 
+**Release Version/Date**:  CMAQv6.0 
 
 **Description**:  
 ISAM encounters several floating-point exceptions when run in debug mode across all mechanisms. These are resolved by adding a minimum value to the denominator in each case.
+
+**Significance and Impact**:   
+This change will resolve unstable growth of small numerical noise in ISAM runs, which can sometimes appear as source-apportioned mass far away from the source it is attributed to.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
@@ -52,7 +83,7 @@ ISAM encounters several floating-point exceptions when run in debug mode across 
 ## Adds pcVOC and NOy species to ISAM species lists
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**:  v5.5+
+**Release Version/Date**:  CMAQv5.5+
 
 **Description**:  
 The species pcVOC, CRON, and OPAN were missing from the VOC, NOY and NOY species lists in ISAM. This can cause discrepancies when propagating source apportionment through the VOC and NOY systems. For example, with pcVOC missing, an unexplainable magnitude of mass is reclassified into the 'OTHER' category. It is also impossible for ELMO to calculate ISAM_NOY from CB6 mechanisms because ELMO's definition of NOY (in the chemical control file) does not match the list of species available.
@@ -83,21 +114,7 @@ The SOA predictions for the non-contiguous regions show dramatically large maxim
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-
-| | [PR#1317](https://github.com/USEPA/CMAQ_Dev/pull/1317)  |
-
-##  Add cracmm3m to mechanisms supported by ISAM
-[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency      
-**Type of update**: Science Update    
-**Release Version**: CMAQv6.0  
-
-**Description**: Code changes allow  CCTM-ISAM simulations to use the cracmm3m chemical mechanism.
-
-**Significance and Impact**: The update adds information to the ISAM module so CCTM-ISAM simulations can use the cracmm3m chemical mechanism.
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-| | [PR#1313](https://github.com/USEPA/CMAQ_Dev/pull/1313)  |
+|[Merge for PR#1317](https://github.com/USEPA/CMAQ/commit/7cef46fcef095f760b8d39b61d85e6e21b42b609) | [PR#1317](https://github.com/USEPA/CMAQ_Dev/pull/1317)  |
 
 
 ##  Source Apportionment of SOA

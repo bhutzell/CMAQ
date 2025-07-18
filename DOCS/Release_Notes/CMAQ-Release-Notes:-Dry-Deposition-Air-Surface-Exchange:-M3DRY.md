@@ -1,11 +1,10 @@
 # M3DRY
-
 ### Runtime Deposition Options
 [Jon Pleim](mailto:pleim.jon@pa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
-**Release Version/Date**:  V6.0 
+**Release Version/Date**:  V6.0   
 
-**Description**:  
+**Description**:   
 Allows the user to specify M3Dry (default) or STAGE dry deposition options from the run script. 
 
 **Significance and Impact**:   
@@ -19,7 +18,7 @@ Updated relative reactivity for carbon species following Raoult’s law changing
 ### Updates of minimum Kz for M3Dry
 [Jon Pleim](mailto:pleim.jon@pa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
-**Release Version/Date**:  V6.0 
+**Release Version/Date**:  V6.0   
 
 **Description**:   
 Changes the minimum Kz from 1.0 m2/s to 0.01 m2/s when the Kzmin flag is set to False.  This minimum Kz is the same as used in WRF.  Also, when Kzmin flag is set to True, changes the height above ground where Kzmin is set according to fraction of urban LU from 500 m to the PBLHT.

@@ -3,7 +3,7 @@
 ### Improve DESID Error Checking for Negative Emissions  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix   
-**Release Version/Date**:  CMAQv6.0 
+**Release Version/Date**:  CMAQv6.0  
 
 **Description**:  
 CMAQ users including Bonyoung Koo (Bay Area Air Quality Management District) and Calvin Howes (South Coast Air Quality Management District) have reported issues where an aerosol mass emission rate goes below zero but is within the tolerance set in DESID (-1.0e-7). When extrapolated to particle surface area or number emission though, this value can exceed the static threshold. Their suggestion to relax tolerances for particle number and surface area emissions is appropriate and useful.
@@ -26,13 +26,13 @@ There should be no impact on results, but users are now given more information t
 ### DESID Area-Normalized Conversion Factor  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix    
-**Release Version/Date**:  v6.0 
+**Release Version/Date**: CMAQv6.0  
 
 **Description**:    
 The DESID conversion factor assigned to translate area-based emissions is erroneously inverted. This update takes the reciprocal of that value.
 
 **Significance and Impact**:    
-This will dramatically affect predictions for any species that includes emissions normalized to a specific area that is not in units of meters. 
+This will have almost no effect for most simulations and users since area-normalized emission rates are rarely used. However, for cases that utilize area-weight emissions, this fix will dramatically affect predictions for any species that includes emissions normalized to a specific area that is not in units of meters. 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
@@ -41,7 +41,7 @@ This will dramatically affect predictions for any species that includes emission
 ### Streamline Emissions Unit Conversions in DESID
 [Ben Murphy](mailto:murphy.ben@epa.gov)], U.S. Environmental Protection Agency    
 **Type of update**: Code Improvement   
-**Release Version/Date**:  v6.0 
+**Release Version/Date**:  CMAQv6.0  
 
 **Description**:   
 This update streamlines and centralizes the unit conversions in DESID so that all aerosol and gas units are the same when passing from online emission modules to DESID and the unit conversion subroutine uses one approach for converting all scalars from total emission rate to volume-normalized emission rate. Erroneous comments in the dust module that inaccurately describe units for key variables are also resolved.
@@ -60,7 +60,7 @@ No impact on results.
 ### Streamlining DESID code  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Code Maintenance   
-**Release Version/Date**:  v6.0 
+**Release Version/Date**:  CMAQv6.0  
 
 **Description**:    
 DESID variables for online emission streams indices (e.g. IBIOSRM, IMGSRM, etc.) are largely unnecessary and can be removed in almost all cases. This simplification makes it easier to introduce new online emission modules to DESID. There are fewer places in the code to modify.
