@@ -21,15 +21,13 @@ This CMAQv6.0 alpha release allows community members:
 
 ## New features in CMAQ version 6.0 include:
 * **CRACMM3: new state-of-the-science chemical mechanisms**
-  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 adds chlorine chemistry, heterogeneous sulfur chemistry, and particle nitrate (pNO3) photolysis. In addition, it updates reactions for several systems including radical cycling and photolytic loss for semivolatile organic compounds. *CRACMM3 is now CMAQ’s default chemical mechanism.* 
-  * CRACMM3M offers detailed halogen chemistry to improve the representation of gas-phase and aerosol chemistry in marine environments.
-CRACMM3HAPS provides additional gas and particle Hazardous Air Pollutants.
+  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 adds chlorine chemistry, heterogeneous sulfur chemistry, and particle nitrate (pNO3) photolysis and improves conservation of carbon across reactions. In addition, it updates reactions for several systems including semivolatile organic compounds. 
+ * These updates and other features improve predictions of hazardous air pollutants, PM2.5, and ozone and more explicitly tie precursor sources to resulting pollutant concentrations downwind which should lead to improved sensitivity and source attribution.
 
 * **Major advancements in windblow dust estimates**
   * Dramatic improvement of windblown dust emissions for NLCD40 land-use specification address high bias in dust estimates from earlier CMAQ versions.
   * New satellite-based global vegetation dataset accounts for the effect of previously underestimated brown vegetation and further improves dust estimates for many regions in the US and Northern Hemisphere.
   * These improvements apply to both the U.S. and hemispheric scale simulations.
-  * The CMAQ Team now recommends activating wind-blown dust predictions for ALL applications!
 
 * **Improvements to source apportionment tools, CMAQ-ISAM and CMAQ-DDM3D** 
   * Tagged source apportionment modeling via CMAQ-ISAM is now compatible with the most up-to-date chemistry CRACMM2, CRACMM3, CRACMM3M, and CRACMM3HAPS.
@@ -97,3 +95,4 @@ Test case input and output data for the CMAQv5.5 release are available from the 
 The United States Environmental Protection Agency (EPA) GitHub project code is provided on an "as is" basis and the user assumes responsibility for its use. EPA has relinquished control of the information and no longer has responsibility to protect the integrity, confidentiality, or availability of the information. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by EPA. The EPA seal and logo shall not be used in any manner to imply endorsement of any commercial product or activity by EPA or the United States Government.
 
 * [Open source license](license.md)
+

@@ -1,5 +1,5 @@
 # Diagnostic Options
-## Explicit and Lumped air quality Model Output module (ELMO)
+## ELMO
 ### ELMO version 2  
 **Primary Contact**: [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Secondary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency     

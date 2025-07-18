@@ -638,10 +638,6 @@ CMPST =
                 'ug m-3', 'FINE', 
                 'PMF_OC + PMF_EC',
 		
-'PMF_HMS'     , 'Fine-Mode Hydroxymethanesulfonate',
-                'ug m-3', 'FINE', 
-                'AHMS',	
-
 !-- Particle Composites Projected to Aerosol Mass Spectrometer --!
 'PMAMS_SO4'   , 'Sulfate Collected by the AMS',
                 'ug m-3', 'PMAMS', 
