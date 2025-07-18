@@ -14,7 +14,7 @@ https://forum.cmascenter.org/t/cmaqv5-5-emission-error-with-negative-emissions/5
 
 DESID has been updated to allow number emissions down to -1 x 10<sup>-11</sup> s<sup>-1</sup> and surface area emissions down to -0.1 m<sup>2</sup> s<sup>-1</sup>.
 
-This update also improves error reporting by giving the user the domain-wide gridcell location of the negative value detected in reference to the global grid, not the local sub-domain. If only one processor is used, the local and global units are assumed to be the same.  
+This update also improves error reporting by giving the user the gridcell location of the negative value detected in reference to the global grid, not the local sub-domain. If only one processor is used, the local and global units are assumed to be the same.  
 
 **Significance and Impact**:   
 There should be no impact on results, but users are now given more information to diagnose the cause of negative emission rates calculated in DESID.
