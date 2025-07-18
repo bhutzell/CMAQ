@@ -284,7 +284,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             CALL M3MESG( MSG )
           ENDIF
 
-          ENV_DFLT = 'BCDFIMP'
+          ENV_DFLT = '#BCDFHIJKLMNPRTY'
           ENV_DESC = 'String containing the QA flag values to indicate bad data'        
           CALL ENVSTR( QA_FLAG_VALUES, ENV_DESC, ENV_DFLT, QA_FLAG_STRING, STATUS)
 

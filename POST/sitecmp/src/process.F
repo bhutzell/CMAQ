@@ -880,14 +880,14 @@ C****************************************************************************
         if(TABLE_TYPE .eq. 'CASTNET' .or. TABLE_TYPE .eq. 'SEARCH') then
           Call getField(record, delimiter, VAR%OBS_FIELD(n)+1, flag)
           Call rmQuots( flag )
-          if( INDEX('#IJKLMNBCDFP', flag(1:1)) .gt. 0 ) field = ' '
+          if( INDEX('#BCDFHIJKLMNPRTY', flag(1:1)) .gt. 0 ) field = ' '
           endif
 
         ! check for a code flag field following data field
         if(TABLE_TYPE .eq. 'MET') then
           Call getField(record, delimiter, VAR%OBS_FIELD(n)+1, flag)
           Call rmQuots( flag )
-          if( LEN_TRIM(flag).eq.1 .and. INDEX('BCDFIMP',flag(1:1)).gt.0 ) field = ' '
+          if( LEN_TRIM(flag).eq.1 .and. INDEX('#BCDFHIJKLMNPRTY',flag(1:1)).gt.0 ) field = ' '
           endif
 
         !  read fieldValue and check if missing
