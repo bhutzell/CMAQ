@@ -331,7 +331,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   # If using BROWN_VEG option, then set the path to the non-photosynthetic vegetation (npv) input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
        setenv PV_AVG_FILE ${INPDIR}/surface/pv_avg.dat
-       setenv NPV_AVG_FILE ${INPDIR}/surace/npv_avg.dat
+       setenv NPV_AVG_FILE ${INPDIR}/surface/npv_avg.dat
    endif
 
   #> Optics file

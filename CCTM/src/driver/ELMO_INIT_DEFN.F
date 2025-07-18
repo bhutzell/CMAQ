@@ -1183,7 +1183,7 @@
                  VDESC3D( IVAR ) = ELMO_TABLE( J )%DESC
                END DO
                
-               FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
+               FDESC3D( 1 ) = 'ELMO output file'
                DO L = 2, MXDESC3
                   FDESC3D( L ) = ' '
                END DO
