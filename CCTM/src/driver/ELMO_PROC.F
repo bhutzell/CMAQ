@@ -326,6 +326,7 @@
                OL = L1 - ELMO_FILE( IFL )%LAY_BOT + 1
                
                DO IVAR = 1,ELMO_FILE( IFL )%N_VARS
+                   J   = ELMO_FILE( IFL )%TABID( IVAR )
                    U   = ELMO_FILE( IFL )%USEDID( IVAR )
                    IV  = ELMO_TABLE( J )%VAR_TYPE
                    IF ( IV .EQ. ET_DDEP .OR.
