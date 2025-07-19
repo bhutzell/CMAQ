@@ -16,7 +16,7 @@ The official release of CMAQv6.0 is targeted for fall 2026, pending the availabi
 This CMAQv6.0 alpha release allows early adopters:
 
 * a preview of science and feature updates developed for the CMAQv6.0 release.
-* an opportunity to help the the broader user community by testing, troubleshooting, and debugging this version.
+* an opportunity to help the the broader CMAS community by testing, troubleshooting, and debugging this version.
 
 
 ## New features in CMAQ version 6.0 include:
@@ -74,9 +74,9 @@ Source code and scripts are organized as follows:
 The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DESID have been updated for CMAQv6.0 alpha.  All other User's Guide content in this repository was last updated for the CMAQv5.5 release. Additional documentation updates will be included in the CMAQv6.0 release. Information on the updates in CMAQv6.0 alpha is included in the **[CMAQ Release Notes](DOCS/Release_Notes/README.md).**
 
 
-## CMAQ Test Cases 
-Test case input and output data for the CMAQv5.5 release are available from the CMAS Data Warehouse. Step-by-step benchmark tutorials using the test case data are provided in the GitHub repo. These Test Case datasets may be adapted to work with the CMAQv6.0 alpha versions.
-* [CMAQ Test Case Data](DOCS/Test_Case_Data.md)
+## CMAQ Test Case  
+A full set of inputs for 2022 are provided for the 12US1 domain, including emissions compatible with both the CRACMM2 and CRACMM3 chemical mechanisms. Input files can be used for running CMAQv5.5 (with CRACMM2) or CMAQv6.0 alpha (with CRACMM2 or CRACMM3). 
+* [CMAQ Data](DOCS/CMAQ_Data.md)
 
 
 ## Other Online Resources 
