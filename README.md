@@ -16,7 +16,7 @@ The official release of CMAQv6.0 is targeted for fall 2026, pending the availabi
 This CMAQv6.0 alpha release allows early adopters:
 
 * a preview of science and feature updates developed for the CMAQv6.0 release.
-* an opportunity to help the the broader CMAS community by testing, troubleshooting, and debugging this version.
+* an opportunity to help the the broader user community by testing, troubleshooting, and debugging this version.
 
 
 ## New features in CMAQ version 6.0 include:
