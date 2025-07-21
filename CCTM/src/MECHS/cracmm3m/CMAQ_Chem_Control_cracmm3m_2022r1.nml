@@ -724,10 +724,6 @@ CMPST =
                 'ug m-3', 'PM1', 
                 'ABR',
 
-'PM1_HMS'     , 'PM1 Hydroxymethane Sulfonate',
-                'ug m-3', 'PM1', 
-                'AHMS',
-
 'PM1_RCSOIL'  ,'PM1 Reconstructed Soil <1 um (Malm et al., 1994; Eqn 5)',
                 'ug m-3', 'PM1', 
                 'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
@@ -812,10 +808,6 @@ CMPST =
 'PM25_BR'     , 'PM2.5 Bromine',
                 'ug m-3', 'PM25', 
                 'ABR',
-
-'PM25_HMS'    , 'PM2.5 Hydroxymethane Sulfonate',
-                'ug m-3', 'PM25', 
-                'AHMS',
 
 'PM25_RCSOIL' ,'PM2.5 Reconstructed Soil <2.5 um (Malm et al., 1994; Eqn 5)',
                 'ug m-3', 'PM25', 
