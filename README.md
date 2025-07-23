@@ -46,7 +46,6 @@ This CMAQv6.0 alpha release allows early adopters:
 
 * **Improved methods for land-surface impacts on deposition, emissions, and dilution** 
   *	The resistance to dry deposition of volatile carbon-containing compounds has been increased consistent with their vapor-pressures. This increases VOC and CO concentrations across model applications.
-  * The new Soil-Atmosphere Gaseous Emissions (SAGE) module improves soil NO and HONO emissions with a simple, meteorologically dependent approach.
   * Boundary-layer mixing dynamics in stable conditions have been made consistent with upstream meteorological models.
   * Enhanced options for online coupling of CMAQ chemistry to meteorological models. First public release of a unified coupler to support WRF-CMAQ and MPAS-CMAQ in a harmonized framework.
  
