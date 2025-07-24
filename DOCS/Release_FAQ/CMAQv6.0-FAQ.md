@@ -6,6 +6,7 @@
 * [What do I need to do to update from v5.5 to v6.0alpha?](#update_v55_v60b)
   * [What differences should I expect in the required model input files?](#diff_v55_v60b_input_files)
   * [What differences should I expect in my model output files?](#diff_v55_v60b_output_files)
+* [What differences should I expect in my model results with v6.0 alpha compared to v5.5?](#diff_v55_v60_model_results)
 * [Are there new benchmark data and documentation updates?](#data_and_docs)
 * [How to cite CMAQ](#how_to_cite)
 * [Additional FAQ](#additional_faq)
@@ -306,7 +307,13 @@ The shp2cmaq.py script was fixed to work properly as both a module and a standal
 * CMAQv6.0alpha updates to ELMOv2 replace ELMOv1.0 diagnostic output files. The CCTM defaults now produce the CCTM_ELMO1 which supersedes older CCTM_ELMO files while adding additional gas and particle phase diagnostic aggregates not available in ELMOv1.0. ELMOv2.1 also produces a CCTM_ELMO2_DEP file which includes gas and particle phase dry and wet deposition hourly aggregates.
   
 * CMAQv6.0alpha updates two of the three photolysis diagnostic files (CCTM_PHOTDIAG1 and CCTM_PHOTDIAG3). The CCTM_PHOTDIAG1 file remains largely unchanged, with the only changes being in the diagnostic variables: AOD_W550_ANGST (Aerosol Optical Depth at 550 nm based on an Angstrom Interpolation) and AAOD_W550_ANGST (Aerosol Absorption Optical Depth at 550 nm based on an Angstrom Interpolation). The updates now enable calculation of AOD_550 values when the sun is below the horizon. The CCTM_PHOTDIAG3 file changed in three different ways. (1) The variable representing total extinction, the sum of absorption and scattering at various wavelengths from gas, aerosols and clouds, is no longer reported; this variable is now replaced by the cloud extinction; the total extinction can be computed manually as the sum of gas, aerosol and cloud extinction. (2) The photolysis diagnostic variable names "EXT_AERO_W" are changed to "AERO_EXT_W", making the naming convention consistent with how the gas is reported. (3)  The photolysis diagnostics for AOD_550 and aerosol asymmetry and extinction are now available at all simulation hours, independent of the position of the sun.  [Release Note #1](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Photolysis.md#remove-uninitialized-variable-and-correct-a-diagnostic-in-cctms-inline-module-for-photolysis-frequencies),  [Release Note #2](../Release_Notes/CMAQ-Release-Notes:-Photolysis.md#remove-uninitialized-variable-and-correct-a-diagnostic-in-cctms-inline-module-for-photolysis-frequencies)
-  
+
+<a id=diff_v55_v60_model_results></a>
+## What differences should I expect in my model results with v6.0 alpha compared to v5.5?
+The following summary is based on our testing of CMAQv5.5 and CMAQv6.0 alpha using annual 2022 simulations performed over the northern hemisphere (108 km horizontal grid spacing, 44 vertical layers) and the CONUS (both 12 km and 36km horizontal grid resolution was tested, 35 vertical layers). The 108 km simulations were used to generate lateral boundary conditions for the 12 km and 36 km simulations, with science options (except bidi-directional ammonia exchange) matching across both domains. 
+
+All CMAQv6.0 alpha simulations (108 km, 36 km, 12 km) used the CRACMM3 chemical mechanism that includes a detailed representation of ocean chemistry. The CMAQv5.5 108 km simulations used the cb6r5m_ae7_aq chemical mechanism while the 12 km and 36km simulations used CRACMM2 chemical mechanism.
+
 <a id=data_and_docs></a>
 ## Are there new benchmark data and documentation updates?
 
