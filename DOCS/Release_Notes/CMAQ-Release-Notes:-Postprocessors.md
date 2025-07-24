@@ -2,7 +2,7 @@
 
 ## [sitecmp](../../POST/sitecmp/README.md) 
 ### Update handling of CASTNET QA Flags for ozone, increase number of species allowed in expressions 
-[Christian Hogrefe](mailto:hogrefe.christian@epa.gov)], U.S. Environmental Protection Agency    
+[Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Improved functionality   
 **Release Version/Date**: CMAQv6.0
 
@@ -23,7 +23,7 @@ In a test case for summer 2022, updating the CASTNET ozone QA flags recognized b
 
 ## [sitecmp_dailyo3](../../POST/sitecmp_dailyo3/README.md) 
 ### Update handling of CASTNET QA Flags for ozone 
-[Christian Hogrefe](mailto:hogrefe.christian@epa.gov)], U.S. Environmental Protection Agency    
+[Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Improved functionality   
 **Release Version/Date**: CMAQv6.0
 
