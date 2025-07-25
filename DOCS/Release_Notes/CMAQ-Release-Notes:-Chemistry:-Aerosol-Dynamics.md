@@ -1,7 +1,8 @@
 # Aerosol Dynamics
 
 ### Generalized Dynamic and Equilibrium Partitioning of Inorganic Aerosols
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency  
+Please direct questions to [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency   
 **Type of update**: Science Update  
 **Release Version/Date**:  CMAQv6.0 
 
@@ -18,7 +19,7 @@ The base code is unstable at very short time steps because the equilibrium assum
 |[Merge for PR#1340](https://github.com/USEPA/CMAQ/commit/447d8f3a585b6e7f1839fbd26aaecc2c2e9ac524) | [PR#1340](https://github.com/USEPA/CMAQ_Dev/pull/1340)  | 
 
 ### SOA Mapping: Revise Logfile Output
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Logfile Messaging  
 **Release Version/Date**:  CMAQv6.0 
 
@@ -36,7 +37,7 @@ No impact on results.
   
 
 ### Remove option for Aerosol Initial Condition surface area and update settings for Boundary Condition Surface Area
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Run script updates  
 **Release Version/Date**:  CMAQv6.0 
 
@@ -71,7 +72,7 @@ The majority of the difference between these simulations comes from coarse mode 
 
 
 ### Improve Aerosol Boundary Condition Processing
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5   
 
@@ -91,7 +92,7 @@ There is no impact on simulations run with Hemispheric CMAQ boundary conditions,
   
 
 ### Two-Moment Option for Particle Coagulation
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix/Science Update  
 **Release Version/Date**: CMAQv5.4  
 
@@ -109,7 +110,7 @@ Whitby, McMurry, Shankar, and Binkowski. Modal Aerosol Dynamics Modeling, Report
 |[Merge for PR#879](https://github.com/USEPA/CMAQ/commit/ae76f45de41c78bdd76afd65187b3f900f606c8a) | [PR#879](https://github.com/USEPA/CMAQ_Dev/pull/879)  |  
 
 ### Sulfuric Acid Conservation in VOLINORG
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.4  
 
@@ -124,7 +125,7 @@ Differences in sulfuric acid concentrations at the surface up to a factor of 100
 **Internal PRs** [PR#636](https://github.com/USEPA/CMAQ_Dev/pull/636) 
 
 ### Update Aerosol Size Distribution Check for ICs and BCs
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix/Science Update   
 **Release Version/Date**: CMAQv5.4  
 
@@ -149,7 +150,7 @@ Impact on surface concentrations and domain-wide budget were assessed for a July
 |[Merge for PR#874](https://github.com/USEPA/CMAQ/commit/c6bb6fe9d84fc4d6cd277c761715a83031ac5611) | [PR#874](https://github.com/USEPA/CMAQ_Dev/pull/874)  |  
 
 ### Reclassify all SOA species as 'dry' aerosol
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Science Update  
 **Release Version/Date**: CMAQv5.4  
 
@@ -166,7 +167,7 @@ Modest decreases to organic aerosol concentrations throughout the US domain for 
 |[Merge for PR#890](https://github.com/USEPA/CMAQ/commit/d5bdbad4e83e945533b851ab74dfef6b59b366a7) | [PR#890](https://github.com/USEPA/CMAQ_Dev/pull/890)  |
 
 ### Simplify Aerosol Chemical Namelist
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)   
 **Type of update**: Interface Update  
 **Release Version/Date**: CMAQv5.4  
 
