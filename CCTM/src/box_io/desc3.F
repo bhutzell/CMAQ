@@ -30,8 +30,11 @@ C...........   ARGUMENTS and their descriptions:
         CHARACTER(LEN=*), INTENT( IN ) ::  FNAME   !  logical name of file to be described.
 C...........   Local:
         INTEGER :: IVAR
+        LOGICAL :: FOUND
+        
 
            DESC3 = .TRUE.      
+           FOUND = .FALSE.
 
            NLAYS3D = 1
            TSTEP3D = 010000
@@ -91,7 +94,7 @@ C...........   Local:
 
           NVARS3D  = 11
 
-!         RETURN
+          FOUND = .TRUE.
       
       ENDIF
 
@@ -122,12 +125,12 @@ C...........   Local:
                 
                 NVARS3D = 6
 
+                FOUND = .TRUE.
       END IF
 
       IF ( FNAME .EQ. MET_CRO_3D .OR. FNAME .EQ. INIT_CONC_1 ) THEN
 
           DESC3         = .TRUE.
-          FDESC3D( 1 ) = "WRF ARW V4.5"
 
 
           VGTYP3D = VGSGPN3 ! VGTYP3D
@@ -145,6 +148,7 @@ C...........   Local:
           UNITS3D (  3 )   = 'KG/M**3         '  
  
           IF ( FNAME .EQ. MET_CRO_3D ) THEN
+            FDESC3D( 1 ) = "WRF ARW V4.5"
             VNAME3D (  4 )   = 'PRES            '         
             UNITS3D (  4 )   = 'Pa              '
             VNAME3D (  5 )   = 'JACOBM          '         
@@ -157,7 +161,7 @@ C...........   Local:
           END IF
 
 
-!         RETURN
+          FOUND = .TRUE.
       
       ENDIF
 
@@ -179,7 +183,7 @@ C...........   Local:
 
           NVARS3D  =  5
 
-!         RETURN
+          FOUND = .TRUE.
       
       ENDIF
 
@@ -196,7 +200,13 @@ C...........   Local:
           UNITS3D (  4 )   = ''
 
           NVARS3D  =  4
-!         RETURN
+          FOUND = .TRUE.
+      END IF
+
+      IF ( .NOT. FOUND ) THEN
+           VNAME3D = ''
+           UNITS3D = ''
+           NVARS3D = 0
       END IF
 
       WRITE( 6,'(a)')TRIM( FNAME )

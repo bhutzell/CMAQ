@@ -31,6 +31,7 @@
 
         USE RUNTIME_VARS
         USE UTILIO_DEFN
+        USE DRIVER_INPUTS, ONLY: SET_BOX_INPUTS
 #ifdef parallel
         USE MPI
 #endif
@@ -75,6 +76,9 @@ C processes (NPROCS)
 #endif
         ! Initialize all runscript environmental variables
         CALL INIT_ENV_VARS( 0, 0 )
+
+        ! retrieve box met and geo data
+        CALL SET_BOX_INPUTS()
 
         MODEL_TSTEP = LOCAL_TSTEP
 

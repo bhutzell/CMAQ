@@ -24,8 +24,9 @@ C........... Local variables:
         INTEGER, PARAMETER :: MAX_IO_STRLEN = 10000
         INTEGER            :: FSTATUS  ! io status or io unit number for FNAME
         INTEGER            :: NFILE
+        INTEGER            :: NVAR
 
-        CHARACTER( MAX_IO_STRLEN ) :: ACTUALL_NAME
+        CHARACTER( MAX_IO_STRLEN ) :: ACTUAL_NAME
 
         INTERFACE
            SUBROUTINE ENVSTR( VAR_NAME, VAR_DESC, VAR_DEFAULT, VAR_VALUE, STATUS )
@@ -42,8 +43,12 @@ C........... Local variables:
         END INTERFACE
 
         DO NFILE = 1,N_FILES
-           CALL NAMEVAL( LGCL_NAME( NFILE ),ACTUALL_NAME )
-           INQUIRE(FILE = ACTUALL_NAME, NUMBER=FSTATUS)
+           CALL NAMEVAL( LGCL_NAME( NFILE ),ACTUAL_NAME )
+           INQUIRE(FILE = ACTUAL_NAME, NUMBER=FSTATUS)
+           NVAR = INDEX(ACTUAL_NAME,' -v') - 1
+           IF( NVAR .GT. 0 )THEN
+              ACTUAL_NAME = ACTUAL_NAME(1:NVAR)
+           END IF
            IF ( FSTATUS .GT. 0 )THEN
               FLUSH( FSTATUS )
               CLOSE( FSTATUS )

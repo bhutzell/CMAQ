@@ -377,7 +377,7 @@ C...calc local hour angle
      &    * COS( ZPT )
       ZR = ACOS( CSZ )
       ZENITH = ZR / PI180
-      print*,'IDATE, IMTH, IN = ',IDATE,IMTH,IMTH-1
+!     print*,'IDATE, IMTH, IN = ',IDATE,IMTH,IMTH-1
      
       RETURN
       END SUBROUTINE CALCZEN 

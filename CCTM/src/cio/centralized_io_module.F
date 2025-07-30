@@ -2978,7 +2978,6 @@
 
       END SUBROUTINE DESID_READ_NAMELIST  
 
-#ifndef m3box
 ! -------------------------------------------------------------------------
         subroutine soilinp_setup
 
@@ -3456,6 +3455,7 @@
           end if
 
         end subroutine soilinp_setup
+#ifndef m3box
 !close m3box
 #endif
 ! -------------------------------------------------------------------------
@@ -7683,6 +7683,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   RETURN
             ENDIF
       
+            IF ( INDEX(TRIM(VNAME),'TSEASFC') .GT. 0 ) THEN
+                  BUFFER  = CELL_TEMP
+                  RETURN
+            ENDIF
+      
             IF ( INDEX(TRIM(VNAME),'TEMP2') .GT. 0 ) THEN
                   BUFFER  = CELL_TEMP
                   RETURN
@@ -7692,7 +7697,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   BUFFER  = 6.0
                   RETURN
             ENDIF
-      
+ 
+            IF ( INDEX(TRIM(VNAME),'RCA') .GT. 0 ) THEN
+               BUFFER  = -1.0
+                RETURN
+            ENDIF
+
+            IF ( INDEX(TRIM(VNAME),'SNOCOV') .GT. 0 ) THEN
+               BUFFER  = 0.0
+               RETURN
+            ENDIF
+                
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_3D variables
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

@@ -60,9 +60,13 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       ! Fetch CMAQ Header
       CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD, CMAQ_TOC, NCMAQ_TOC )
 
-#ifdef mpas
+#if defined(mpas) || defined(m3box)
       write ( cmype, '(I3.3)' ) mype
+#ifdef m3box
+      iologeq = 'CTM_LOG_' // cmype // trim( appl_name )
+#else
       iologeq = 'CTM_LOG_' // cmype
+#endif
 
       i = 99
       found = .false.
@@ -80,7 +84,11 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       open ( unit    =  logdev,
      &       iostat  =  iost,
      &       file    =  iologeq,
+#ifdef mpas
      &       status  =  'new',
+#else
+     &       status  =  'unknown',
+#endif
      &       access  =  'sequential')
 
 #else
@@ -137,10 +145,13 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       END DO
 #ifndef mpas
 #ifndef twoway
+#ifndef m3box
       CALL LOG_HEADING( LOGDEV, 'Initialize I/O-API' )
       DO IHEAD = 1,NIOAPI_HEAD
           WRITE( LOGDEV, '(A)' ) IOAPI_HEADER( IHEAD )
       END DO
+!close m3box
+#endif
 #endif
 #endif
 

@@ -870,6 +870,7 @@ C Initialize Modules
             S = AVG_CONC_MAP( V )
             AGRID( :,:,:,V ) = DIVFAC * ( AGRID( :,:,:,V )
      &           - CGRID( :,:,ACONC_BLEV:ACONC_ELEV,S ) )
+
 #ifdef sens
             DO NP = 1, NPMAX
                SAGRID( :,:,:,NP,V ) = DIVFAC * ( SAGRID( :,:,:,NP,V )

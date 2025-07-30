@@ -22,8 +22,9 @@ C...........   ARGUMENTS and their descriptions:
 C........... Local variables:
         INTEGER, PARAMETER :: MAX_IO_STRLEN = 10000
         INTEGER            :: FSTATUS  ! io status or io unit number for FNAME
+        INTEGER            :: NVAR
 
-        CHARACTER( MAX_IO_STRLEN ) :: ACTUALL_NAME
+        CHARACTER( MAX_IO_STRLEN ) :: ACTUAL_NAME
 
         INTERFACE
            SUBROUTINE ENVSTR( VAR_NAME, VAR_DESC, VAR_DEFAULT, VAR_VALUE, STATUS )
@@ -40,9 +41,14 @@ C........... Local variables:
         END INTERFACE
 
 
-        CALL NAMEVAL( FNAME,ACTUALL_NAME )
+        CALL NAMEVAL( FNAME,ACTUAL_NAME )
 
-        INQUIRE(FILE = ACTUALL_NAME, NUMBER=FSTATUS)
+        NVAR = INDEX(ACTUAL_NAME,' -v') - 1
+        IF( NVAR .GT. 0 )THEN
+           ACTUAL_NAME = ACTUAL_NAME(1:NVAR)
+        END IF
+
+        INQUIRE(FILE = ACTUAL_NAME, NUMBER=FSTATUS)
         IF ( FSTATUS .GT. 0 )CLOSE( FSTATUS )
 
 C   begin body of subroutine  OPEN3

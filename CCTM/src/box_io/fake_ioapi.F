@@ -341,8 +341,8 @@ C                 stored in format YYYYDDD:HHMMSS.
 C***********************************************************************
       IMPLICIT NONE
 C...........   ARGUMENTS and their descriptions:
-        INTEGER         ADATE, ATIME
-        INTEGER         ZDATE, ZTIME
+        INTEGER, INTENT( IN ) :: ADATE, ATIME
+        INTEGER, INTENT( IN ) :: ZDATE, ZTIME
 C...........   Local Variables
         INTEGER         AYEAR,  ZYEAR, DAYS, HOURS, MINS, SECS
         INTEGER         TOTAL
@@ -615,32 +615,25 @@ C   begin body of subroutine CRLF
         RETURN
 
         END FUNCTION CRLF
-         REAL FUNCTION ENVREAL( LNAME, DESC, DEFAULT, STAT )
-         CHARACTER*(*), INTENT(IN   ) :: LNAME
-         CHARACTER*(*), INTENT(IN   ) :: DESC
-         REAL         , INTENT(IN   ) :: DEFAULT
-         INTEGER      , INTENT(  OUT) :: STAT
 
-C          forces routine to use the default value
-           STAT    = -2
-           ENVREAL = -2
-           RETURN
+         REAL FUNCTION ENVREAL( LNAME, DESC, DEFAULT, STAT )
+
+            USE GET_ENV_VARS, ONLY: GET_ENV_REAL
+
+            IMPLICIT NONE
+
+            CHARACTER*(*), INTENT(IN   ) :: LNAME
+            CHARACTER*(*), INTENT(IN   ) :: DESC
+            REAL         , INTENT(IN   ) :: DEFAULT
+            INTEGER      , INTENT(  OUT) :: STAT
+
+C             forces routine to use the default value
+            ENVREAL = GET_ENV_REAL( LNAME, DESC, DEFAULT, STAT )
+C           STAT    = -2
+C           ENVREAL = -2
+            RETURN
 
          END FUNCTION ENVREAL
-
-        LOGICAL FUNCTION ENVYN_OLD( LNAME, DESC, DEFAULT, STATUS )
-	 IMPLICIT NONE
-	 
-	 CHARACTER*(*), INTENT(IN   ) :: LNAME
-         CHARACTER*(*), INTENT(IN   ) :: DESC
-         LOGICAL      , INTENT(IN   ) :: DEFAULT
-         INTEGER      , INTENT(  OUT) :: STATUS
-
-	 STATUS = 0
-	 
-	 ENVYN_OLD  = .FALSE.
-	 
-        END FUNCTION ENVYN_OLD
 	
          LOGICAL FUNCTION ENVYN( LNAME, DESC, DEFAULT, STATUS )
            IMPLICIT NONE
@@ -701,21 +694,6 @@ C          forces routine to use the default value
 
          END FUNCTION ENVYN
 	
-        LOGICAL FUNCTION WRITE3( FNAME, VNAME, JDATE, JTIME, BUFFER )
-
-        IMPLICIT NONE
-! does nothing
-C...........   ARGUMENTS and their descriptions:
-
-        CHARACTER*(*), INTENT(IN   ) :: FNAME      !  logical file name
-        CHARACTER*(*), INTENT(IN   ) :: VNAME      !  logical file name
-        INTEGER      , INTENT(IN   ) :: JDATE      !  date, formatted YYYYDDD
-        INTEGER      , INTENT(IN   ) :: JTIME      !  time, formatted HHMMSS
-        REAL         , INTENT(IN   ) :: BUFFER(*)  !  output buffer array
-
-        WRITE3 = .TRUE.
-        RETURN
-        END FUNCTION WRITE3
 
       integer function getefile( FNAME, LOGA, LOGB, PNAME)
 
