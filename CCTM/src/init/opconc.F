@@ -99,8 +99,6 @@ C  environment variable description
       INTEGER      STRT, FINI         ! loop counters
       INTEGER      INDX
 
-      LOGICAL, EXTERNAL :: FLUSH3
-
 C-----------------------------------------------------------------------
 
 #ifndef mpas

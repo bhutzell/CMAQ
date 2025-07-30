@@ -1146,11 +1146,12 @@ C------  Updating MOL, then WSTAR, MOLI, HOL
             END DO
          END DO
    
-         Met_Data%MOLI  = 1.0 / Met_Data%MOL 
-         Met_Data%HOL   = Met_Data%PBL / Met_Data%MOL
+         Met_Data%MOLI  = 1.0 / MAX( ABS( Met_Data%MOL ),1.0E-30 ) * SIGN( Met_Data%MOL,1.0 )
+         Met_Data%HOL   = Met_Data%PBL / MAX( ABS( Met_Data%MOL ),1.0E-30 ) * SIGN( Met_Data%MOL,1.0 )
 C------
 
          Met_Data%CONVCT = .FALSE.
+#ifndef m3box
          DO R = 1, NROWS
             DO C = 1, NCOLS
                DO L = 1, NLAYS
@@ -1179,6 +1180,8 @@ C------
      &          Met_Data%HOL .Lt. -0.02 .And. Met_Data%LPBL .Gt. 3 )
             Met_Data%CONVCT = .True.
          End Where
+!close m3box
+#endif
 
 !        Calculate the cosine of the zenith angle 
          CALL CZANGLE(JDATE, JTIME, NCOLS, NROWS )

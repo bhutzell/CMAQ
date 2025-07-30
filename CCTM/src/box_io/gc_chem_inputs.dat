@@ -1,0 +1,57 @@
+
+&TIME_CONTROLS
+        BXM_STDATE   = 1985182 ! 2006001 ! 1985182     
+        BXM_STTIME   = 000000      
+        BXM_RUNLEN   = 240000     
+        BXM_TSTEP    = 000300    
+        BXM_MSTEP    = 000300   
+/
+
+&DATA_CONTROLS
+        ASCII    = .TRUE.       
+        IOAPI    = .FALSE.    
+        M3PHOT   = .TRUE.      
+        PHZATAB  = .FALSE.       
+        PHNONE   = .FALSE.     
+/
+
+&AIR_CONTROLS
+        BXM_TEMP     = 300.0      ! Temperature (deg K)                    <
+        BXM_PRES     = 101325.0    ! Pressure (Pa) 1 atm                    <
+        BXM_QV       = 0.01244     ! Water vapor mixing ratio (Kg/Kg air)   <
+        BXM_AIR      = 1000000.0   ! Air mixing (ppmV)
+        BXM_N2       = 771000.0    ! molecular nitrogen gas (ppmV)
+        BXM_O2       = 209000.0    ! molecular oxygen gas (ppmV)
+        BXM_H2       = 0.0         ! molecular hydrogen gas (ppmV)
+        BXM_CH4      = 2           ! methane (ppmV) 
+        BXM_DENS     = 1.225       ! Air density (Kg/m^3)                   <
+/
+
+
+&PHOT_CONTROLS
+        BXM_LAT      = 0.0        ! Latitude (deg)                         <
+        BXM_LON      = 0           ! Longitude (deg)                        <
+        BXM_HT       = 0.000       ! Height for J values (Km)               <
+        BXM_WBAR     = 0.0         ! Cloud liq. H2O content (gm/m^3)        <
+        BXM_CLDT     = 3.0         ! Cloud tops (Km)                        <
+        BXM_CLDB     = 2.0         ! Cloud bottoms (Km)                     <
+        BXM_CFRAC    = 0.0         ! Cloud fraction                         <
+/
+
+&FILE_CONTROLS
+        UNIX_OS      = .TRUE.
+        INDIR        = './'
+        INFILE       = 'INFILE'
+        JTABDIR      = './'
+        JTABLE       = 'JTABLE'
+        OUTDIR       = './'
+        OUTFILE      = 'OUTFILE'
+        BXM_SAS      = 'NO'
+        BXM_MACTAB   = 'YES'
+/
+
+&SURFACE_CONTROLS
+        BXM_OPEN = 0.0
+	BXM_SURF = 0.0
+	BXM_SEAICE = 0.0
+/

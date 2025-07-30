@@ -240,8 +240,6 @@ C for INTERPX
       integer :: io_mode
 #endif
 
-      LOGICAL, EXTERNAL :: FLUSH3
-
 #ifdef verbose_hrno
       integer mxptype, ncfno0
       real    mxrntot, mxfac1, avgfac2, mxfac3, mxfac4

@@ -377,11 +377,19 @@
             ELMO_FILE( IFL )%FILENAME = TRIM( OUTDIR ) // '/' // 
      &                                  TRIM( ELMO_FILE( IFL )%FILENAME )
         END IF
+#ifdef m3box
+!shut off ELMO for boxmodel untit version of IOAPI setenvvar is developed
+      N_ELMO_FILES = 0
+!close m3box
+#endif
 #ifndef mpas
+#ifndef m3box
         IF ( .NOT. SETENVVAR( ELMO_FILE( IFL )%FLOGICAL, ELMO_FILE( IFL )%FILENAME ) ) THEN
             WRITE( XMSG, '(A,I3)' ) 'ERROR: Could not set environment variable for ELMO file # ', IFL
             CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
         END IF
+!close m3box
+#endif
 #endif
 
         ! Output Time Step

@@ -45,12 +45,12 @@
 !        LOGICAL         CHECK3  !  is JDATE:JTIME available for FNAME?
 !        LOGICAL         CLOSE3  !  close FNAME
 !        LOGICAL         DESC3   !  Puts M3 file descriptions into FDESC3.EXT
-        LOGICAL         FILCHK3 ! check file type and dimensions
+!        LOGICAL         FILCHK3 ! check file type and dimensions
 !        INTEGER         INIT3   !  Initializes M3 API and returns unit for log
 !        LOGICAL         SHUT3   !  Shuts down API
 !        LOGICAL         OPEN3   !  opens an M3 file
 !        LOGICAL         READ3   !  read M3 file for variable,layer,timestep
-        LOGICAL         WRITE3  !  write timestep to M3 file
+!       LOGICAL         WRITE3  !  write timestep to M3 file
 !        LOGICAL         XTRACT3 !  extract window from timestep in a M3 file
         LOGICAL         INTERP3 !  do time interpolation from a M3 file
         LOGICAL         DDTVAR3 !  do time derivative from M3 file
@@ -72,7 +72,7 @@
 !     &                  SHUT3  , OPEN3  , READ3  , WRITE3 , XTRACT3,
 !     &                  INTERP3, DDTVAR3, INQATT3, RDATT3 , WRATT3 ,
 !     &                  RDATTC , WRATTC,  SYNC3,   INTERPX ! , PINTERPB
-        EXTERNAL        FILCHK3, WRITE3 ,
+        EXTERNAL         OPEN3
      &                  INTERP3, DDTVAR3, INQATT3, RDATT3 , WRATT3 ,
      &                  RDATTC , WRATTC,  SYNC3 
 

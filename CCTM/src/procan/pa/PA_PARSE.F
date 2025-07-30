@@ -544,6 +544,8 @@ C Function: Concatenate a series of strings, eliminating trailing
 C           blanks, but leaving a space between each string 
 C.......................................................................
 
+         USE UTILIO_DEFN           ! IOAPI parameters and functions declarations
+
          IMPLICIT NONE
          
 C Arguments:

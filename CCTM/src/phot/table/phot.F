@@ -619,7 +619,7 @@ C...  in cloud - linearly interpolate between base and top value
       END IF
 
       
-      write(logdev,*)'phot completed: ',JDATE, JTIME
+!     write(logdev,*)'phot completed: ',JDATE, JTIME
 
       IF ( PHOTDIAG .AND. JTIME_CHK ) THEN
 

@@ -53,6 +53,7 @@ C   01 Feb 19 D.Wong: removed USE ALLOC_DATA_MODULE clause
 C   09 Sep 19 F. Sidi: Replaced L_CONC_WVEL & L_ACONC_WVEL (depreciated) with W_VEL
 C-----------------------------------------------------------------------
 
+         USE UTILIO_DEFN           ! IOAPI parameters and functions declarations
          USE GRID_CONF
          USE RUNTIME_VARS, ONLY: LOGDEV, LVEXT, N_CONC_VARS, W_VEL
          USE UTILIO_DEFN
@@ -100,7 +101,6 @@ C  environment variable description
          REAL, ALLOCATABLE  :: VERTEXTLAT(:), VERTEXTLON(:)
          REAL, ALLOCATABLE :: VERTEXTJR(:), VERTEXTIR(:)
 
-         LOGICAL, EXTERNAL :: FLUSH3
          CHARACTER( 16 ) :: DOVERTNAME = 'DOVERTEXT'
          CHARACTER( 16 ) :: VERTEXTLATNAME = 'VERTEXTLAT'
          CHARACTER( 16 ) :: VERTEXTLONNAME = 'VERTEXTLON'
@@ -829,6 +829,7 @@ C-----------------------------------------------------------------------
 !     &               1      ,    0.d0,    0.d0,    0.d0,    0.d0,    0.d0,
 !     &               NVERTEXT, VERTEXTLON, VERTEXTLAT, VERTEXTIR, VERTEXTJR )
 #ifndef mpas
+#ifndef m3box
          IF ( GDTYP3D .EQ. LAMGRD3 ) THEN
              PRJSET = SETLAM( REAL(P_ALP_GD), REAL(P_BET_GD), REAL(P_GAM_GD),
      &                         REAL(XCENT_GD), REAL(YCENT_GD))
@@ -873,6 +874,8 @@ C-----------------------------------------------------------------------
              XMSG = 'Unsupported coordinate system type'
              CALL M3EXIT(PNAME, 0, 0, XMSG, XSTAT2)
          END IF
+!close m3box
+#endif
 #endif
 
          END SUBROUTINE LONLAT2XY

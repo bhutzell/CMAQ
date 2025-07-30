@@ -87,6 +87,10 @@
 
 ! Try to open existing file for update
       OK = OPEN3( A_CONC_1, FSRDWR3, PNAME )
+#ifdef m3box
+      OK = .FALSE.
+! close m3box
+#endif
       CALL SUBST_GLOBAL_LOGICAL( OK, 'AND' )
       IF ( .NOT. OK ) THEN
 #ifndef twoway

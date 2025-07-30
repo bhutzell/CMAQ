@@ -79,8 +79,6 @@ C Local variables:
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL OK
 
-      LOGICAL, EXTERNAL :: FLUSH3
-
 C-----------------------------------------------------------------------
 
 #ifndef mpas

@@ -11,9 +11,17 @@
           MODULE PROCEDURE XTRACT3_0D,
      &                     XTRACT3_1D,
      &                     XTRACT3_2D,
+     &                     XTRACT3_2DI,
      &                     XTRACT3_3D,
      &                     XTRACT3_4D
        END INTERFACE
+       INTERFACE WRITE3
+          MODULE PROCEDURE WRITE3R2D,
+     &                     WRITE3I,
+     &                     WRITE3R3D,
+     &                     WRITE3R4D
+       END INTERFACE
+
 
        INTERFACE
          SUBROUTINE FETCH_CHR ( FILDEV, INBUF , LPOS , EOL , CHR )
@@ -58,6 +66,7 @@
                 INTEGER      , INTENT(  OUT) :: STAT
                 END FUNCTION ENVYN
             END INTERFACE
+
 
 !      INTERFACE
 !        LOGICAL FUNCTION  CLOSE3( FNAME )
@@ -258,21 +267,21 @@
          INTEGER,          INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
          REAL,             INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
         END FUNCTION INTERPX
-        LOGICAL FUNCTION XTRACT3( FNAME, VNAME,
-     &                            LAY0, LAY1, ROW0, ROW1, COL0, COL1,
-     &                            JDATE, JTIME, BUFFER )
-         CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-         CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
-         INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: ROW1            !  upper row   bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: COL0            !  lower col   bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: COL1            !  upper col   bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
-         INTEGER,          INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
-         REAL,             INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
-        END FUNCTION XTRACT3
+!        LOGICAL FUNCTION XTRACT3( FNAME, VNAME,
+!     &                            LAY0, LAY1, ROW0, ROW1, COL0, COL1,
+!     &                            JDATE, JTIME, BUFFER )
+!         CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
+!         CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+!         INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
+!         INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
+!         INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
+!         INTEGER,          INTENT(IN   ) :: ROW1            !  upper row   bound for XTRACT3
+!         INTEGER,          INTENT(IN   ) :: COL0            !  lower col   bound for XTRACT3
+!         INTEGER,          INTENT(IN   ) :: COL1            !  upper col   bound for XTRACT3
+!         INTEGER,          INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
+!         INTEGER,          INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
+!         REAL,             INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
+!        END FUNCTION XTRACT3
         LOGICAL   FUNCTION  CHECK3 ( FNAME , VNAME , JDATE , JTIME )
          CHARACTER(LEN=*), INTENT( IN ) :: FNAME   !  logical name of file to be "opened"
          CHARACTER(LEN=*), INTENT( IN ) :: VNAME   !  Variable to check
@@ -310,7 +319,71 @@
 
        PUBLIC XTRACT3
 
+      TYPE OUTPUT_FILE
+         CHARACTER(LEN=NAMLEN3) :: FILENAME = ''
+         INTEGER                :: NVARS    = 0
+         INTEGER                :: IO_UNIT  = -1
+         INTEGER                :: NDIM     = -1
+         INTEGER                :: JDATE    = -999999
+         INTEGER                :: JTIME    = 0
+         INTEGER                :: NSTEPS   = 0
+         INTEGER                :: FILLED   = 0
+         LOGICAL                :: FLUSHED  = .TRUE.
+         LOGICAL                :: HEADER   = .TRUE.
+         CHARACTER(LEN=16), ALLOCATABLE :: VARNAMES(:)
+         CHARACTER(LEN=16), ALLOCATABLE :: UNITS(:)
+         REAL,              ALLOCATABLE :: VALUES(:)
+      END TYPE OUTPUT_FILE
+
+      INTEGER :: N_OUTPUT_FILES = 0
+      TYPE( OUTPUT_FILE )  :: OUTPUT_FILES( MXFILE3 )
+
       CONTAINS
+
+        LOGICAL FUNCTION SETUP_OUTPUT_FILE( FILENAME,NVARS,UNITS,VARNAMES,NDIM,IO_UNIT,JDATE,JTIME,NFILE )
+
+          IMPLICIT NONE
+
+          CHARACTER(LEN=*), INTENT( IN ) :: FILENAME
+          INTEGER,          INTENT( IN ) :: NVARS
+          CHARACTER(LEN=*), INTENT( IN ) :: VARNAMES(:)
+          CHARACTER(LEN=*), INTENT( IN ) :: UNITS(:)
+          INTEGER,          INTENT( IN ) :: IO_UNIT
+          INTEGER,          INTENT( IN ) :: NDIM
+          INTEGER,          INTENT( IN ) :: JDATE
+          INTEGER,          INTENT( IN ) :: JTIME
+          INTEGER,          INTENT( IN ) :: NFILE
+
+          INTEGER :: ALSTAT, NVAR
+
+          SETUP_OUTPUT_FILE = .TRUE.
+
+          OUTPUT_FILES(NFILE)%FILENAME = TRIM(FILENAME)
+          OUTPUT_FILES(NFILE)%NVARS = NVARS
+          OUTPUT_FILES(NFILE)%NDIM  = NDIM
+          OUTPUT_FILES(NFILE)%JDATE = JDATE
+          OUTPUT_FILES(NFILE)%JTIME = JTIME
+          OUTPUT_FILES(NFILE)%IO_UNIT = IO_UNIT
+
+          ALLOCATE( OUTPUT_FILES(NFILE)%VARNAMES( NVARS ),
+     &              OUTPUT_FILES(NFILE)%UNITS( NVARS ),
+     &              OUTPUT_FILES(NFILE)%VALUES( NVARS ),
+     &              STAT =  ALSTAT)
+          IF( ALSTAT .NE. 0 )THEN
+            WRITE(6,'(A)')"ALLOCATION ERROR in M3UTILIO FUNCTION: SETUP_OUTPUT_FILE"
+            SETUP_OUTPUT_FILE = .FALSE.
+            RETURN
+          ELSE
+            WRITE(6,'(A)')"SETUP_OUTPUT_FILE: Set file," // TRIM(OUTPUT_FILES(NFILE)%FILENAME)
+          END IF
+
+          DO NVAR = 1,NVARS
+             OUTPUT_FILES(NFILE)%VARNAMES( NVAR ) = VARNAMES( NVAR )
+             OUTPUT_FILES(NFILE)%UNITS( NVAR )    = UNITS( NVAR )
+             OUTPUT_FILES(NFILE)%VALUES( NVAR )   = AMISS3
+          END DO
+          
+        END FUNCTION SETUP_OUTPUT_FILE
       INTEGER FUNCTION LBLANK( STRING )
 
 C***********************************************************************
@@ -1184,6 +1257,36 @@ C...........   PARAMETERS:
 
           end subroutine quicksort
 ! ------------------------------------------------------------------------------
+          real function yr2day (year)
+
+! compute the reciprocal of number of days in a given year
+! TO DO: add optional argument for climatological 365-day calendar
+            integer, intent(in) :: year
+
+            if (leap_year(year)) then
+               yr2day = 1.0/366.0
+            else
+               yr2day = 1.0/365.0
+            end if
+
+          end function yr2day
+! ------------------------------------------------------------------------------
+          LOGICAL FUNCTION FILCHK3( FNAME,
+     &                              FTYPE, NCOLS, NROWS, NLAYS, NTHIK )
+     
+            IMPLICIT NONE
+
+            CHARACTER(LEN=*), INTENT( IN ) :: FNAME !  logical file name
+            INTEGER,          INTENT( IN ) :: FTYPE !  user's queried file type
+            INTEGER,          INTENT( IN ) :: NCOLS !  user's queried col-dimension
+            INTEGER,          INTENT( IN ) :: NROWS !  user's queried row-dimension
+            INTEGER,          INTENT( IN ) :: NLAYS !  user's queried lay-dimension
+            INTEGER,          INTENT( IN ) :: NTHIK !  user's queried bdy-dimension
+
+            FILCHK3 = .TRUE.
+
+          END FUNCTION FILCHK3
+
           SUBROUTINE M3MSG2 ( MSG )
             IMPLICIT NONE
              CHARACTER*(*), INTENT ( IN ) :: MSG
@@ -1218,6 +1321,68 @@ C   begin body of function  TRIMLEN
           TRIMLEN = LEN_TRIM( STRING )
           RETURN
          END FUNCTION TRIMLEN
+        integer function setenvvar ( env_name, env_value )
+
+        !------------------------------------------------------------------------------!
+        ! description:                                                                 !
+        !                                                                              !
+        ! wrapper function around c function setenvvarc to set a shell             !
+        ! environmental variable from within program                                   !
+        !                                                                              !
+        ! inputs: env_name  : shell environmental variable                             !
+        !         env_value : value that is env_name is set to                         !
+        !                                                                              !
+        ! example:                                                                     !
+        !          you want to setenv foo bar                                          !
+        !          iout = mio_setenvvar ( "foo", "bar" )                                !
+        !                                                                              !
+        ! external functions called:                                                   !
+        !          c function mio_setenvvarc                                           !
+        !                                                                              !
+        ! revision history:                                                            !
+        !     2024: prototype adapted from d.wong/CJC setenvvar f.sidi usepa           !
+        !                                                                              !
+        !------------------------------------------------------------------------------!
+            implicit none
+
+            ! function arguments
+            character(*), intent(in) :: env_name    ! logical env. name to be set
+            character(*), intent(in) :: env_value   ! value that env_name is set to
+
+
+            ! scratch variables
+            integer :: env_name_len                     ! length of env_name string
+            integer :: env_value_len                    ! length of env_value string
+            character(len=len(env_value)) :: test_value ! used to get set variable
+            ! exteranal functions
+
+            integer, external :: setenvvarc
+
+            ! find length of strings
+
+            env_name_len  = len_trim ( env_name  )
+            env_value_len = len_trim ( env_value )
+
+            ! check to make sure no blank string is passed & call c function
+            ! mio_setenvvarc
+            if ( ( env_name_len .eq. 0 ) .or. (env_value_len .eq. 0 ) ) then
+              setenvvar = -1
+              return
+            else
+              setenvvar = setenvvarc ( env_name, env_name_len,
+     &                                        env_value, env_value_len )
+            endif
+            if( setenvvar .le. 0 )then
+              print*,'Error: setenvvar fails to set ',trim(env_name)
+              stop
+            else
+              call nameval(env_name,test_value)
+              print*,'Success: setenvvar sets ',trim(env_name),' = ',
+     &        trim(test_value)
+            end if
+
+        end function setenvvar
+
         LOGICAL FUNCTION XTRACT3_2D( FNAME, VNAME,
      &                            LAY0, LAY1, ROW0, ROW1, COL0, COL1,
      &                            JDATE, JTIME, BUFFER )
@@ -1477,6 +1642,265 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RETURN
 
       END FUNCTION XTRACT3_2D
+        LOGICAL FUNCTION XTRACT3_2DI( FNAME, VNAME,
+     &                            LAY0, LAY1, ROW0, ROW1, COL0, COL1,
+     &                            JDATE, JTIME, BUFFER )
+
+C***********************************************************************
+C
+C  FUNCTION:  Mimics IO/API function DESC3 by putting selected
+C             file description data in commons.
+C
+C  RETURN VALUE:  TRUE iff successful
+C
+C  PRECONDITIONS REQUIRED: None
+C
+C  SUBROUTINES AND FUNCTIONS CALLED: None
+C
+C  REVISION  HISTORY: Prototype created by Golam Sarwar - March, 2004
+C  REVISION  HISTORY: This file was Created from XTRACT3
+C  REVISION  HISTORY: XTRACT3 was created Prototype created by Jerry Gipson IN JULY 1997	
+C
+C***********************************************************************
+      USE DRIVER_INPUTS
+      USE SCENE_DATA
+
+      IMPLICIT NONE
+
+C...........   INCLUDES:
+
+C...........   ARGUMENTS and their descriptions:
+
+        CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
+        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+        INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
+        INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
+        INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
+        INTEGER,          INTENT(IN   ) :: ROW1            !  upper row   bound for XTRACT3
+        INTEGER,          INTENT(IN   ) :: COL0            !  lower col   bound for XTRACT3
+        INTEGER,          INTENT(IN   ) :: COL1            !  upper col   bound for XTRACT3
+        INTEGER,          INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
+        INTEGER,          INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
+        INTEGER,          INTENT(  OUT) :: BUFFER( :,: )   !  interpolation-output buffer array
+
+        INTEGER  L, M
+
+        CHARACTER(LEN=LEN(VNAME)) :: VARIABLE
+C.............................................................................
+C   begin body of subroutine  OPEN3
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  MET_CRO_2D variables
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+   
+            L = LEN_TRIM(VNAME)
+            M = LEN(VNAME)
+
+            VARIABLE( 1:L )   = VNAME( 1:L )
+            VARIABLE( L+1:M ) = ' '
+              
+       
+            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER  = CELL_PRES
+                  XTRACT3_2DI = .TRUE.
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+         
+            IF ( INDEX(TRIM(VNAME),'WBAR') .GT. 0 ) THEN
+               BUFFER  = BXM_WBAR
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+                                
+            IF ( INDEX(TRIM(VNAME),'SEAICE') .GT. 0 ) THEN
+                 BUFFER  = BXM_SEAICE
+                 XTRACT3_2DI = .TRUE.
+                 RETURN
+            ENDIF
+
+            IF ( INDEX(TRIM(VNAME),'CLDT') .GT. 0 ) THEN
+               BUFFER  = BXM_CLDT
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'CLDB') .GT. 0 ) THEN
+               BUFFER  = BXM_CLDB
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'CFRAC') .GT. 0 ) THEN
+               BUFFER  = BXM_CFRAC
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+
+            IF ( INDEX(TRIM(VNAME),'SLTYP') .GT. 0 ) THEN
+               BUFFER  = 5.0 ! set soil type to loam
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'TEMPG') .GT. 0 ) THEN
+                  BUFFER  = CELL_TEMP
+                  XTRACT3_2DI = .TRUE.
+                  RETURN
+            ENDIF
+   
+   
+            IF ( INDEX(TRIM(VNAME),'RCA') .GT. 0 ) THEN
+               BUFFER  = -1.0
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+   
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  MET_CRO_3D variables
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+   
+            IF ( INDEX(TRIM(VNAME),'TA') .GT. 0 ) THEN
+                  BUFFER  = CELL_TEMP
+                  XTRACT3_2DI = .TRUE.
+                  RETURN
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER  = CELL_PRES
+                  XTRACT3_2DI = .TRUE.
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'QV') .GT. 0 ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER  = QV
+                  XTRACT3_2DI = .TRUE.
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'DENS') .GT. 0 ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER  = DENS
+                  XTRACT3_2DI = .TRUE.
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'DENSA_J') .GT. 0 ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER  = DENS_J
+                  XTRACT3_2DI = .TRUE.
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'ZH') .GT. 0 ) THEN
+               IF ( LDEFAULT ) THEN
+                  BUFFER  = 50.0
+                  XTRACT3_2DI = .TRUE.
+                  RETURN
+               ELSE
+               ENDIF
+            ENDIF
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  OCEAN_1 variables
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
+               BUFFER  = BXM_OPEN
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
+               BUFFER  = BXM_SURF
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+
+
+            IF ( INDEX(TRIM(VNAME),'CHLO') .GT. 0 ) THEN
+               BUFFER  = 0.0 
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+
+
+
+            IF ( INDEX(TRIM(VNAME),'DMS') .GT. 0 ) THEN
+               BUFFER  = 0.0
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  GRID_CRO_2D variables
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            IF ( INDEX(TRIM(VNAME),'LAT') .GT. 0 ) THEN
+               BUFFER  = BXM_LAT
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'LON') .GT. 0 ) THEN
+               BUFFER  = BXM_LON
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+                                 
+            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
+               BUFFER  = BXM_OPEN
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
+               BUFFER  = BXM_SURF
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'MSFX2') .GT. 0 ) THEN
+               BUFFER  = 1.0
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'HT') .GT. 0 ) THEN
+               BUFFER  = BXM_HT
+               XTRACT3_2DI = .TRUE.
+               RETURN
+            ENDIF
+   
+            IF ( INDEX(TRIM(VNAME),'LUFRAC_') .GT. 0 ) THEN
+              IF ( INDEX(TRIM(VNAME),'LUFRAC_04') .GT. 0 ) THEN
+                 BUFFER = 1.0
+              ELSE
+                 BUFFER = 0.0
+              END IF
+              XTRACT3_2DI = .TRUE.
+              RETURN
+            ENDIF
+
+            BUFFER  = 1.0E-30
+            PRINT*,"XTRACT3_2DI: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
+            PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
+            XTRACT3_2DI = .TRUE.
+      
+      RETURN
+
+      END FUNCTION XTRACT3_2DI
         LOGICAL FUNCTION XTRACT3_3D( FNAME, VNAME,
      &                            LAY0, LAY1, ROW0, ROW1, COL0, COL1,
      &                            JDATE, JTIME, BUFFER )
@@ -1782,7 +2206,31 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_2D variables
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
    
-            IF ( INDEX(TRIM( VARIABLE ),'PRES') .GT. 0  ) THEN
+            IF ( INDEX(VNAME,'PRSFC') ) THEN
+                  BUFFER = BXM_PRES
+                  XTRACT3_1D = .TRUE.
+                  RETURN
+            ENDIF
+
+            IF ( INDEX(TRIM(VNAME),'TEMPG') .GT. 0 ) THEN
+                  BUFFER  = CELL_TEMP
+                  XTRACT3_1D = .TRUE.
+                  RETURN
+            ENDIF
+
+            IF ( INDEX(TRIM(VNAME),'TSEASFC') .GT. 0 ) THEN
+                  BUFFER  = CELL_TEMP
+                  XTRACT3_1D = .TRUE.
+                  RETURN
+            ENDIF
+
+            IF ( INDEX(TRIM(VNAME),'TEMP2') .GT. 0 ) THEN
+                  BUFFER  = CELL_TEMP
+                  XTRACT3_1D = .TRUE.
+                  RETURN
+            ENDIF
+
+           IF ( INDEX(TRIM( VARIABLE ),'PRES') .GT. 0  ) THEN
                BUFFER  = CELL_PRES
                XTRACT3_1D = .TRUE.
                RETURN
@@ -2459,6 +2907,548 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RETURN
 
       END FUNCTION XTRACT3_4D
+
+        LOGICAL FUNCTION WRITE3R( FNAME, VNAME, JDATE, JTIME, BUFFER )
+
+!          USE M3UTILIO, ONLY: OUTPUT_FILE,N_OUTPUT_FILES,OUTPUT_FILES,SETUP_OUTPUT_FILE
+
+           IMPLICIT NONE
+
+C...........   ARGUMENTS and their descriptions:
+           CHARACTER*(*), INTENT(IN   ) :: FNAME      !  logical file name
+           CHARACTER*(*), INTENT(IN   ) :: VNAME      !  logical file name
+           INTEGER      , INTENT(IN   ) :: JDATE      !  date, formatted YYYYDDD
+           INTEGER      , INTENT(IN   ) :: JTIME      !  time, formatted HHMMSS
+           REAL         , INTENT(IN   ) :: BUFFER(*)  !  output buffer array
+
+           INTEGER :: FILE_ID
+           INTEGER :: VAR_ID
+           INTEGER :: NVAR
+           INTEGER :: IO_UNIT
+           INTEGER :: IOS
+           INTEGER :: LDATE, LTIME
+  
+           LOGICAL :: WRITE_ALL
+           LOGICAL :: NEW_MOMENT = .TRUE.
+
+!          WRITE3 = .TRUE.
+!          RETURN
+
+           FILE_ID = 0
+           DO NVAR = 1,N_OUTPUT_FILES
+!              write(6,'(6(A,1X))')'WRITE3: FNAME,OUTPUT_FILES(NVAR)%FILENAME = ',
+!     &        TRIM(FNAME),TRIM(OUTPUT_FILES(NVAR)%FILENAME)
+              IF ( INDEX(TRIM(OUTPUT_FILES(NVAR)%FILENAME),TRIM(FNAME)) .GT. 0 ) THEN
+                FILE_ID = NVAR
+                EXIT
+              END IF
+           END DO
+           IF( FILE_ID .LT. 1 )THEN
+             WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' is not opened.'
+             WRITE3R = .FALSE.
+             RETURN
+           END IF
+
+           LDATE = OUTPUT_FILES(FILE_ID)%JDATE
+           LTIME = OUTPUT_FILES(FILE_ID)%JTIME
+           
+           IF ( LDATE .NE. JDATE .OR. LTIME .NE. JTIME 
+     &          .OR.  LDATE .NE. JDATE .AND. LTIME .NE. JTIME ) THEN
+              OUTPUT_FILES(FILE_ID)%JDATE  = JDATE
+              OUTPUT_FILES(FILE_ID)%JTIME  = JTIME
+              NEW_MOMENT = .TRUE.
+           ELSE
+              NEW_MOMENT = .FALSE.
+           END IF
+           IF ( OUTPUT_FILES(FILE_ID)%HEADER ) THEN
+              NEW_MOMENT = .TRUE.
+              OUTPUT_FILES(FILE_ID)%HEADER = .FALSE.
+           END IF
+           
+           IO_UNIT = OUTPUT_FILES(FILE_ID)%IO_UNIT
+
+           IF( TRIM(VNAME) .EQ. ALLVAR3 )THEN 
+               WRITE_ALL = .TRUE.
+               NVAR = OUTPUT_FILES(FILE_ID)%NVARS
+               OUTPUT_FILES(FILE_ID)%FILLED = NVAR
+               OUTPUT_FILES(FILE_ID)%VALUES(1:NVAR) = BUFFER(1:NVAR)
+           ELSE
+               VAR_ID = 0
+               DO NVAR = 1,OUTPUT_FILES(FILE_ID)%NVARS
+!                  IF ( INDEX(TRIM(OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)),TRIM(VNAME)) .GT. 0 ) THEN
+                  IF ( OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR) .EQ. VNAME ) THEN
+                    VAR_ID = NVAR
+                    EXIT
+                  END IF
+               END DO
+               IF( VAR_ID .LT. 1 )THEN
+                 WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' does not have variable, '
+     &           // TRIM( VNAME )
+                 WRITE3R = .FALSE.
+                 RETURN
+               END IF
+               OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+               IF( OUTPUT_FILES(FILE_ID)%FILLED .EQ. OUTPUT_FILES(FILE_ID)%NVARS )THEN
+                   WRITE_ALL = .TRUE.
+               ELSE
+                   WRITE_ALL = .FALSE.
+               END IF
+               OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = BUFFER(1)
+           END IF
+           IF ( NEW_MOMENT ) THEN
+             OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
+             OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+           ELSE
+             BACKSPACE(UNIT = IO_UNIT, ERR = 1000, IOSTAT = IOS)
+             OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
+           END IF
+           WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
+     &     (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
+           IF ( WRITE_ALL ) THEN
+!             OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+           END IF
+
+           WRITE3R = .TRUE.
+           RETURN
+
+1000       WRITE(6,'(A)')'WRITE3R ERROR: Failed to rewind ' // TRIM(FNAME) 
+     &     // ' one lines.'
+           WRITE3R = .FALSE.
+
+        END FUNCTION WRITE3R
+        LOGICAL FUNCTION WRITE3I( FNAME, VNAME, JDATE, JTIME, BUFFER )
+
+!          USE M3UTILIO, ONLY: OUTPUT_FILE,N_OUTPUT_FILES,OUTPUT_FILES,SETUP_OUTPUT_FILE
+
+           IMPLICIT NONE
+
+C...........   ARGUMENTS and their descriptions:
+           CHARACTER*(*), INTENT(IN   ) :: FNAME       !  logical file name
+           CHARACTER*(*), INTENT(IN   ) :: VNAME       !  logical file name
+           INTEGER      , INTENT(IN   ) :: JDATE       !  date, formatted YYYYDDD
+           INTEGER      , INTENT(IN   ) :: JTIME       !  time, formatted HHMMSS
+           INTEGER      , INTENT(IN   ) :: BUFFER(:,:) !  output buffer array
+
+           INTEGER :: FILE_ID
+           INTEGER :: VAR_ID
+           INTEGER :: NVAR
+           INTEGER :: IO_UNIT
+           INTEGER :: IOS
+           INTEGER :: LDATE, LTIME
+  
+           LOGICAL :: WRITE_ALL
+           LOGICAL :: NEW_MOMENT = .TRUE.
+
+!          WRITE3I = .TRUE.
+!          RETURN
+
+           FILE_ID = 0
+           DO NVAR = 1,N_OUTPUT_FILES
+!              write(6,'(6(A,1X))')'WRITE3: FNAME,OUTPUT_FILES(NVAR)%FILENAME = ',
+!     &        TRIM(FNAME),TRIM(OUTPUT_FILES(NVAR)%FILENAME)
+              IF ( INDEX(TRIM(OUTPUT_FILES(NVAR)%FILENAME),TRIM(FNAME)) .GT. 0 ) THEN
+                FILE_ID = NVAR
+                EXIT
+              END IF
+           END DO
+           IF( FILE_ID .LT. 1 )THEN
+             WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' is not opened.'
+             WRITE3I = .FALSE.
+             RETURN
+           END IF
+
+           LDATE = OUTPUT_FILES(FILE_ID)%JDATE
+           LTIME = OUTPUT_FILES(FILE_ID)%JTIME
+           
+           IF ( LDATE .NE. JDATE .OR. LTIME .NE. JTIME 
+     &          .OR.  LDATE .NE. JDATE .AND. LTIME .NE. JTIME ) THEN
+              OUTPUT_FILES(FILE_ID)%JDATE  = JDATE
+              OUTPUT_FILES(FILE_ID)%JTIME  = JTIME
+              NEW_MOMENT = .TRUE.
+           ELSE
+              NEW_MOMENT = .FALSE.
+           END IF
+           IF ( OUTPUT_FILES(FILE_ID)%HEADER ) THEN
+              NEW_MOMENT = .TRUE.
+              OUTPUT_FILES(FILE_ID)%HEADER = .FALSE.
+           END IF
+           
+           IO_UNIT = OUTPUT_FILES(FILE_ID)%IO_UNIT
+
+           IF( TRIM(VNAME) .EQ. ALLVAR3 )THEN 
+               WRITE_ALL = .TRUE.
+               NVAR = OUTPUT_FILES(FILE_ID)%NVARS
+               OUTPUT_FILES(FILE_ID)%FILLED = NVAR
+               OUTPUT_FILES(FILE_ID)%VALUES(1:NVAR) = BUFFER(1,1:NVAR)
+           ELSE
+               VAR_ID = 0
+               DO NVAR = 1,OUTPUT_FILES(FILE_ID)%NVARS
+!                  IF ( INDEX(TRIM(OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)),TRIM(VNAME)) .GT. 0 ) THEN
+                  IF ( OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR) .EQ. VNAME ) THEN
+                    VAR_ID = NVAR
+                    EXIT
+                  END IF
+               END DO
+               IF( VAR_ID .LT. 1 )THEN
+                 WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' does not have variable, '
+     &           // TRIM( VNAME )
+                 WRITE3I = .FALSE.
+                 RETURN
+               END IF
+               OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+               IF( OUTPUT_FILES(FILE_ID)%FILLED .EQ. OUTPUT_FILES(FILE_ID)%NVARS )THEN
+                   WRITE_ALL = .TRUE.
+               ELSE
+                   WRITE_ALL = .FALSE.
+               END IF
+               OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = BUFFER(1,1)
+           END IF
+           IF ( NEW_MOMENT ) THEN
+             OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
+             OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+           ELSE
+             BACKSPACE(UNIT = IO_UNIT, ERR = 1000, IOSTAT = IOS)
+             OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
+           END IF
+           WRITE(IO_UNIT,'(2(I7,","),4000(26X,I8,","))')JDATE,JTIME,
+     &     (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
+           IF ( WRITE_ALL ) THEN
+!             OUTPUT_FILES(FILE_ID)%VALUES = IMISS3
+           END IF
+
+           WRITE3I = .TRUE.
+           RETURN
+
+1000       WRITE(6,'(A)')'WRITE3I ERROR: Failed to rewind ' // TRIM(FNAME) 
+     &     // ' one lines.'
+           WRITE3I = .FALSE.
+
+        END FUNCTION WRITE3I
+        LOGICAL FUNCTION WRITE3R2D( FNAME, VNAME, JDATE, JTIME, BUFFER )
+
+!          USE M3UTILIO, ONLY: OUTPUT_FILE,N_OUTPUT_FILES,OUTPUT_FILES,SETUP_OUTPUT_FILE
+
+           IMPLICIT NONE
+
+C...........   ARGUMENTS and their descriptions:
+           CHARACTER*(*), INTENT(IN   ) :: FNAME       !  logical file name
+           CHARACTER*(*), INTENT(IN   ) :: VNAME       !  logical file name
+           INTEGER      , INTENT(IN   ) :: JDATE       !  date, formatted YYYYDDD
+           INTEGER      , INTENT(IN   ) :: JTIME       !  time, formatted HHMMSS
+           REAL         , INTENT(IN   ) :: BUFFER(:,:) !  output buffer array
+
+           INTEGER :: FILE_ID
+           INTEGER :: VAR_ID
+           INTEGER :: NVAR
+           INTEGER :: IO_UNIT
+           INTEGER :: IOS
+           INTEGER :: LDATE, LTIME
+           LOGICAL :: NEW_MOMENT = .TRUE.
+  
+           LOGICAL :: WRITE_ALL
+
+!          WRITE3 = .TRUE.
+!          RETURN
+
+           FILE_ID = 0
+           DO NVAR = 1,N_OUTPUT_FILES
+!              write(6,'(6(A,1X))')'WRITE3: FNAME,OUTPUT_FILES(NVAR)%FILENAME = ',
+!     &        TRIM(FNAME),TRIM(OUTPUT_FILES(NVAR)%FILENAME)
+              IF ( INDEX(TRIM(OUTPUT_FILES(NVAR)%FILENAME),TRIM(FNAME)) .GT. 0 ) THEN
+                FILE_ID = NVAR
+                EXIT
+              END IF
+           END DO
+           IF( FILE_ID .LT. 1 )THEN
+             WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' is not opened.'
+             WRITE3R2D = .FALSE.
+             RETURN
+           END IF
+
+           LDATE = OUTPUT_FILES(FILE_ID)%JDATE
+           LTIME = OUTPUT_FILES(FILE_ID)%JTIME
+           
+           IF ( LDATE .NE. JDATE .OR. LTIME .NE. JTIME 
+     &          .OR.  LDATE .NE. JDATE .AND. LTIME .NE. JTIME ) THEN
+              OUTPUT_FILES(FILE_ID)%JDATE  = JDATE
+              OUTPUT_FILES(FILE_ID)%JTIME  = JTIME
+              NEW_MOMENT = .TRUE.
+           ELSE
+              NEW_MOMENT = .FALSE.
+           END IF
+           IF ( OUTPUT_FILES(FILE_ID)%HEADER ) THEN
+              NEW_MOMENT = .TRUE.
+              OUTPUT_FILES(FILE_ID)%HEADER = .FALSE.
+           END IF
+
+                      
+           IO_UNIT = OUTPUT_FILES(FILE_ID)%IO_UNIT
+
+           IF( TRIM(VNAME) .EQ. ALLVAR3 )THEN 
+               WRITE_ALL = .TRUE.
+               NVAR = OUTPUT_FILES(FILE_ID)%NVARS
+               OUTPUT_FILES(FILE_ID)%FILLED = NVAR
+               OUTPUT_FILES(FILE_ID)%VALUES(1:NVAR) = BUFFER(1,1:NVAR)
+           ELSE
+               VAR_ID = 0
+               DO NVAR = 1,OUTPUT_FILES(FILE_ID)%NVARS
+!                  IF ( INDEX(TRIM(OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)),TRIM(VNAME)) .GT. 0 ) THEN
+                  IF ( OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR) .EQ. VNAME ) THEN
+                    VAR_ID = NVAR
+                    EXIT
+                  END IF
+               END DO
+               IF( VAR_ID .LT. 1 )THEN
+                 WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' does not have variable, '
+     &           // TRIM( VNAME )
+                 WRITE3R2D = .FALSE.
+                 RETURN
+               END IF
+               OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+               IF( OUTPUT_FILES(FILE_ID)%FILLED .EQ. OUTPUT_FILES(FILE_ID)%NVARS )THEN
+                   WRITE_ALL = .TRUE.
+               ELSE
+                   WRITE_ALL = .FALSE.
+               END IF
+               OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = BUFFER(1,1)
+           END IF
+           IF ( NEW_MOMENT ) THEN
+             OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
+             OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+           ELSE
+             BACKSPACE(UNIT = IO_UNIT, ERR = 1000, IOSTAT = IOS)
+             OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
+           END IF
+           WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
+     &     (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
+           IF ( WRITE_ALL ) THEN
+!             OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+           END IF
+
+           WRITE3R2D = .TRUE.
+           RETURN
+
+1000       WRITE(6,'(A)')'WRITE3R2D ERROR: Failed to rewind ' // TRIM(FNAME) 
+     &     // ' one lines.'
+           WRITE3R2D = .FALSE.
+        END FUNCTION WRITE3R2D
+        LOGICAL FUNCTION WRITE3R3D( FNAME, VNAME, JDATE, JTIME, BUFFER )
+
+!          USE M3UTILIO, ONLY: OUTPUT_FILE,N_OUTPUT_FILES,OUTPUT_FILES,SETUP_OUTPUT_FILE
+
+           IMPLICIT NONE
+
+C...........   ARGUMENTS and their descriptions:
+           CHARACTER*(*), INTENT(IN   ) :: FNAME         !  logical file name
+           CHARACTER*(*), INTENT(IN   ) :: VNAME         !  logical file name
+           INTEGER      , INTENT(IN   ) :: JDATE         !  date, formatted YYYYDDD
+           INTEGER      , INTENT(IN   ) :: JTIME         !  time, formatted HHMMSS
+           REAL         , INTENT(IN   ) :: BUFFER(:,:,:) !  output buffer array
+
+           INTEGER :: FILE_ID
+           INTEGER :: VAR_ID
+           INTEGER :: NVAR
+           INTEGER :: IO_UNIT
+           INTEGER :: IOS
+           INTEGER :: LDATE, LTIME
+  
+           LOGICAL :: WRITE_ALL
+           LOGICAL :: NEW_MOMENT = .TRUE.
+
+!          WRITE3 = .TRUE.
+!          RETURN
+
+           FILE_ID = 0
+           DO NVAR = 1,N_OUTPUT_FILES
+!              write(6,'(6(A,1X))')'WRITE3: FNAME,OUTPUT_FILES(NVAR)%FILENAME = ',
+!     &        TRIM(FNAME),TRIM(OUTPUT_FILES(NVAR)%FILENAME)
+              IF ( INDEX(TRIM(OUTPUT_FILES(NVAR)%FILENAME),TRIM(FNAME)) .GT. 0 ) THEN
+                FILE_ID = NVAR
+                EXIT
+              END IF
+           END DO
+           IF( FILE_ID .LT. 1 )THEN
+             WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' is not opened.'
+             WRITE3R3D = .FALSE.
+             RETURN
+           END IF
+
+           LDATE = OUTPUT_FILES(FILE_ID)%JDATE
+           LTIME = OUTPUT_FILES(FILE_ID)%JTIME
+           
+           IF ( LDATE .NE. JDATE .OR. LTIME .NE. JTIME 
+     &          .OR.  LDATE .NE. JDATE .AND. LTIME .NE. JTIME ) THEN
+              OUTPUT_FILES(FILE_ID)%JDATE  = JDATE
+              OUTPUT_FILES(FILE_ID)%JTIME  = JTIME
+              NEW_MOMENT = .TRUE.
+           ELSE
+              NEW_MOMENT = .FALSE.
+           END IF
+           IF ( OUTPUT_FILES(FILE_ID)%HEADER ) THEN
+              NEW_MOMENT = .TRUE.
+              OUTPUT_FILES(FILE_ID)%HEADER = .FALSE.
+           END IF
+           
+           IO_UNIT = OUTPUT_FILES(FILE_ID)%IO_UNIT
+
+           IF( TRIM(VNAME) .EQ. ALLVAR3 )THEN 
+               WRITE_ALL = .TRUE.
+               NVAR = OUTPUT_FILES(FILE_ID)%NVARS
+               OUTPUT_FILES(FILE_ID)%FILLED = NVAR
+               OUTPUT_FILES(FILE_ID)%VALUES(1:NVAR) = BUFFER(1,1,1:NVAR)
+           ELSE
+               VAR_ID = 0
+               DO NVAR = 1,OUTPUT_FILES(FILE_ID)%NVARS
+!                  IF ( INDEX(TRIM(OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)),TRIM(VNAME)) .GT. 0 ) THEN
+                  IF ( OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR) .EQ. VNAME ) THEN
+                    VAR_ID = NVAR
+                    EXIT
+                  END IF
+               END DO
+               IF( VAR_ID .LT. 1 )THEN
+                 WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' does not have variable, '
+     &           // TRIM( VNAME )
+                 WRITE3R3D = .FALSE.
+                 RETURN
+               END IF
+               OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+               IF( OUTPUT_FILES(FILE_ID)%FILLED .EQ. OUTPUT_FILES(FILE_ID)%NVARS )THEN
+                   WRITE_ALL = .TRUE.
+               ELSE
+                   WRITE_ALL = .FALSE.
+               END IF
+               OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = BUFFER(1,1,1)
+           END IF
+           IF ( NEW_MOMENT ) THEN
+             OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
+             OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+           ELSE
+             BACKSPACE(UNIT = IO_UNIT, ERR = 1000, IOSTAT = IOS)
+             OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
+           END IF
+           WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
+     &     (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
+           IF ( WRITE_ALL ) THEN
+!             OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+           END IF
+
+           WRITE3R3D = .TRUE.
+           RETURN
+
+1000       WRITE(6,'(A)')'WRITE3R3D ERROR: Failed to rewind ' // TRIM(FNAME) 
+     &     // ' one lines.'
+           WRITE3R3D = .FALSE.
+
+        END FUNCTION WRITE3R3D
+
+        LOGICAL FUNCTION WRITE3R4D( FNAME, VNAME, JDATE, JTIME, BUFFER )
+
+!          USE M3UTILIO, ONLY: OUTPUT_FILE,N_OUTPUT_FILES,OUTPUT_FILES,SETUP_OUTPUT_FILE
+
+           IMPLICIT NONE
+
+C...........   ARGUMENTS and their descriptions:
+           CHARACTER*(*), INTENT(IN   ) :: FNAME           !  logical file name
+           CHARACTER*(*), INTENT(IN   ) :: VNAME           !  logical file name
+           INTEGER      , INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
+           INTEGER      , INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
+           REAL         , INTENT(IN   ) :: BUFFER(:,:,:,:) !  output buffer array
+
+           INTEGER :: FILE_ID
+           INTEGER :: VAR_ID
+           INTEGER :: NVAR
+           INTEGER :: IO_UNIT
+           INTEGER :: IOS
+           INTEGER :: LDATE, LTIME
+  
+           LOGICAL :: WRITE_ALL
+           LOGICAL :: NEW_MOMENT = .TRUE.
+
+!          WRITE3 = .TRUE.
+!          RETURN
+
+           FILE_ID = 0
+           DO NVAR = 1,N_OUTPUT_FILES
+!              write(6,'(6(A,1X))')'WRITE3: FNAME,OUTPUT_FILES(NVAR)%FILENAME = ',
+!     &        TRIM(FNAME),TRIM(OUTPUT_FILES(NVAR)%FILENAME)
+              IF ( INDEX(TRIM(OUTPUT_FILES(NVAR)%FILENAME),TRIM(FNAME)) .GT. 0 ) THEN
+                FILE_ID = NVAR
+                EXIT
+              END IF
+           END DO
+           IF( FILE_ID .LT. 1 )THEN
+             WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' is not opened.'
+             WRITE3R4D = .FALSE.
+             RETURN
+           END IF
+
+           LDATE = OUTPUT_FILES(FILE_ID)%JDATE
+           LTIME = OUTPUT_FILES(FILE_ID)%JTIME
+           
+           IF ( LDATE .NE. JDATE .OR. LTIME .NE. JTIME 
+     &          .OR.  LDATE .NE. JDATE .AND. LTIME .NE. JTIME ) THEN
+              OUTPUT_FILES(FILE_ID)%JDATE  = JDATE
+              OUTPUT_FILES(FILE_ID)%JTIME  = JTIME
+              NEW_MOMENT = .TRUE.
+           ELSE
+              NEW_MOMENT = .FALSE.
+           END IF
+           IF ( OUTPUT_FILES(FILE_ID)%HEADER ) THEN
+              NEW_MOMENT = .TRUE.
+              OUTPUT_FILES(FILE_ID)%HEADER = .FALSE.
+           END IF
+           
+           IO_UNIT = OUTPUT_FILES(FILE_ID)%IO_UNIT
+
+           IF( TRIM(VNAME) .EQ. ALLVAR3 )THEN 
+               WRITE_ALL = .TRUE.
+               NVAR = OUTPUT_FILES(FILE_ID)%NVARS
+               OUTPUT_FILES(FILE_ID)%FILLED = NVAR
+               OUTPUT_FILES(FILE_ID)%VALUES(1:NVAR) = BUFFER(1,1,1,1:NVAR)
+           ELSE
+               VAR_ID = 0
+               DO NVAR = 1,OUTPUT_FILES(FILE_ID)%NVARS
+!                  IF ( INDEX(TRIM(OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)),TRIM(VNAME)) .GT. 0 ) THEN
+                  IF ( OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR) .EQ. VNAME ) THEN
+                    VAR_ID = NVAR
+                    EXIT
+                  END IF
+               END DO
+               IF( VAR_ID .LT. 1 )THEN
+                 WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' does not have variable, '
+     &           // TRIM( VNAME )
+                 WRITE3R4D = .FALSE.
+                 RETURN
+               END IF
+               OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+               IF( OUTPUT_FILES(FILE_ID)%FILLED .EQ. OUTPUT_FILES(FILE_ID)%NVARS )THEN
+                   WRITE_ALL = .TRUE.
+               ELSE
+                   WRITE_ALL = .FALSE.
+               END IF
+               OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = BUFFER(1,1,1,1)
+           END IF
+           IF ( NEW_MOMENT ) THEN
+             OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
+             OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+           ELSE
+             BACKSPACE(UNIT = IO_UNIT, ERR = 1000, IOSTAT = IOS)
+             OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
+           END IF
+           WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
+     &     (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
+           IF ( WRITE_ALL ) THEN
+!             OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+           END IF
+
+           WRITE3R4D = .TRUE.
+           RETURN
+
+1000       WRITE(6,'(A)')'WRITE3R4D ERROR: Failed to rewind ' // TRIM(FNAME) 
+     &     // ' one lines.'
+           WRITE3R4D = .FALSE.
+
+        END FUNCTION WRITE3R4D
 
        END MODULE M3UTILIO
   
