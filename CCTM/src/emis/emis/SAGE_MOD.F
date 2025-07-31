@@ -564,8 +564,8 @@ C Function arguments:
          Real, Parameter :: ANGODY = 360.0/365.0 !* PIO180 
 
 C-----------------------------------------------------------------------
-         delang       = sign(1.0,LAT)*PI180 * min(max(23.45 * COS( ANGODY * PI180* ( DOY - D_OFF )),-89.0),89.0)
-         hourang      = sign(1.0,LAT)*min(max(-tan( delang ) * tan( PI180 * LAT ),-0.99),0.99)
+         delang       = PI180 * min(max(23.45 * COS( ANGODY * PI180* ( DOY - D_OFF )),-89.0),89.0)
+         hourang      = min(max(-tan( delang ) * tan( PI180 * LAT ),-0.99),0.99)
          DAY_LENGTH   = 2.0/15.0 * acos(hourang)/PI180
          return
 
