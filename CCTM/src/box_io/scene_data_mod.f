@@ -74,4 +74,13 @@ c         PVDIM = 4  ====> Density ( kg / m**3)
 
          REAL      EMIS( MXEMSP, MXEMHRS )
 
+         INTEGER :: NUMB_INIT_CONC = 0
+         CHARACTER(LEN=16), ALLOCATABLE :: INIT_CONC_SPCS( : )
+         REAL,              ALLOCATABLE :: INIT_CONC_VALUES( : )
+
+         INTEGER :: NUMB_MET_DATA = 0
+         CHARACTER(LEN=16), ALLOCATABLE :: MET_DATA_SPCS( : )
+         REAL,              ALLOCATABLE :: MET_DATA_VALUES( : )
+
       END MODULE SCENE_DATA
+

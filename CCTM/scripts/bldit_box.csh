@@ -158,12 +158,7 @@ set make_options = "-j"                #> additional options for make command if
  endif
 
  # Gas chem solver
- setenv ChemSolver ebi                   #> [ default for most mechanisms: ebi ]
- if ( ! ( $?ISAM_CCTM ) ) then           # check whether best solver is best for mechanism
-    if ( ${Mechanism} == cb6r5m_ae7_aq || ${Mechanism} == cracmm3m ) then #> Gas-phase chemistry solver options ($CMAQ_MODEL/CCTM/src/gas)
-       setenv ChemSolver ros3                                             #> ros3 (or smvgear) are system independent
-    endif  
- endif
+ setenv ChemSolver ros3                   #> [ default for boxmodeling, ebi and smvgear other options]
                                          
  if ( $ChemSolver == ebi ) then             
     set ModGas    = gas/${ChemSolver}_${Mechanism}
@@ -206,7 +201,7 @@ set make_options = "-j"                #> additional options for make command if
  setenv F_FLAGS   "${myFFLAGS}"            #> F77 flags
  set F90_FLAGS  = "${myFRFLAGS}"           #> F90 flags
  set CPP_FLAGS  = "-Dm3box"                #> Fortran preprocessor flags
- set C_FLAGS    = "${myCFLAGS} -DFLDMN -I" #> C flags
+ set C_FLAGS    = "${myCFLAGS} -O0 -g -debug all -traceback -DFLDMN -I" #> C flags
  set LINK_FLAGS = "${myLINK_FLAG}"         # Link flags
 
 
@@ -473,22 +468,16 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo                                                              >> $Cfile
  echo "lib_base    $CMAQ_LIB;"                                     >> $Cfile
  echo                                                              >> $Cfile
- echo "lib_1       ioapi/lib;"                                     >> $Cfile
+ echo "lib_1                ;"                                     >> $Cfile
  echo                                                              >> $Cfile
- echo "lib_2       ioapi/include_files;"                           >> $Cfile
+ echo "lib_2                ;"                                     >> $Cfile
  echo                                                              >> $Cfile
- if ( $?ParOpt ) then
-    echo "lib_3       ${quote}mpi -I.$quote;"                      >> $Cfile
-    echo                                                           >> $Cfile
- endif
+ echo "lib_3                ;"                                     >> $Cfile
  echo                                                              >> $Cfile
- echo "lib_4       ioapi/lib;"                                     >> $Cfile
  echo                                                              >> $Cfile
- if ( $?build_mpas_cmaq ) then
-    set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $quote;"
- else
-    set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $STX1 $STX2$quote;"
- endif
+ echo "lib_4                ;"                                     >> $Cfile
+ echo                                                              >> $Cfile
+ set text = "$quote$CPP_FLAGS $SENS $STX1 $STX2$quote;"
  echo "cpp_flags   $text"                                          >> $Cfile
  echo                                                              >> $Cfile
  echo "f_compiler  $FC;"                                           >> $Cfile

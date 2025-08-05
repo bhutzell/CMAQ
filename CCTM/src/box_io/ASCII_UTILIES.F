@@ -3,7 +3,7 @@
         IMPLICIT NONE
       CONTAINS
 
-      SUBROUTINE ICDATA_ASCII ( ASCII_FNAM , CGRID )
+      SUBROUTINE ICDATA_ASCII ( ASCII_FNAM )
 
 C***********************************************************************
 C
@@ -26,9 +26,7 @@ C***********************************************************************
 C..INCLUDES:
       
 C..ARGUMENTS: 
-
       CHARACTER*(*), INTENT( INOUT ) :: ASCII_FNAM       ! ASCII file name 
-      REAL, POINTER                  :: CGRID (:, :, :, :)  ! Concentration array  
 
 C..PARAMETERS:                  ! Total number of species in cgrid array
       CHARACTER(16), PARAMETER :: PNAME  = 'ICDATA_ASCII'         ! Program Name
@@ -42,75 +40,47 @@ C..SCRATCH LOCAL VARIABLES:
       CHARACTER(100)   INBUF       ! Input buffer -- 1 line
       CHARACTER(16)    WORD        ! Word read on line
 
-      CHARACTER(16), ALLOCATABLE , SAVE ::  SPC ( : )  ! cgrid species names
+      CHARACTER(16), ALLOCATABLE :: SPC ( : )  ! cgrid species names
 
       INTEGER EOL          ! Last non-blank character on line
       INTEGER FILDEV       ! Unit number for ASCII file
       INTEGER IND          ! Species index
       INTEGER LINNUM       ! Current line number read in ASCII file
-!     INTEGER, SAVE :: LOGDEV       !  FORTRAN unit number for log file
       INTEGER LPOS         ! Read position on input line
       INTEGER N            ! Loop index
 
-      LOGICAL LFIRST       ! Flag for first time
-      LOGICAL, ALLOCATABLE, SAVE :: LFOUND ( : )  ! Flag for non-zero IC for a species
+      LOGICAL, ALLOCATABLE       :: LFOUND ( : )  ! Flag for non-zero IC for a species
 
       REAL NUMBER          ! Number found
+      LOGICAL :: LFIRST = .TRUE.               ! Flag for first time
 
 C***********************************************************************
 
 c..open the ascii file and initialize
-!     LOGDEV = INIT3() 
-
-      FILDEV = JUNIT()
-      OPEN ( UNIT = FILDEV, FILE = ASCII_FNAM , ERR = 1000 )
+!     FILDEV = JUNIT()
+      OPEN ( NEWUNIT = FILDEV, FILE = ASCII_FNAM , FORM ='FORMATTED', STATUS='OLD',
+     &       ERR = 1000 )
 
       LINNUM = 0
       LFIRST = .TRUE.
 
-      N_SPC = N_GC_SPC + 1 + N_AE_SPC + N_NR_SPC + N_TR_SPC 
-  
+      N_SPC = N_CGRID_SPC
       ALLOCATE( SPC( N_SPC ) )
       ALLOCATE( LFOUND( N_SPC ) )
+ 
+      SPC = CGRID_NAME
+      LFOUND = .FALSE.
 
-      CGRID = 0.0
-
-      DO N = 1 , N_GC_SPC
-         SPC ( N ) = GC_SPC ( N )
-      ENDDO
-
-      SPC ( N_GC_SPC + 1 ) = 'AIR'
-
-      DO N = 1 , N_AE_SPC
-         IND = N_GC_SPC + 1 + N
-         SPC ( IND ) = AE_SPC ( N )
-      ENDDO
-
-      DO N = 1 , N_NR_SPC
-         IND = N_GC_SPC + 1 + N_AE_SPC + N
-         SPC ( IND ) = NR_SPC ( N )
-      ENDDO
-
-      DO N = 1 , N_TR_SPC
-         IND = N_GC_SPC + 1 + N_AE_SPC + N_NR_SPC + N
-         SPC ( IND ) = TR_SPC ( N )
-      ENDDO
-
-      DO N = 1 , N_SPC
-         LFOUND ( N ) = .FALSE.
-      ENDDO
-      
       DO
          READ( FILDEV , '(A)' , END = 120 ) INBUF
          LINNUM = LINNUM + 1
-!        print*,linnum,TRIM(INBUF)
       END DO
 120   REWIND(FILDEV)
+
       LINNUM = 0
 c..read one line of ascii file
    20 READ( FILDEV , '(A)' , END = 100 ) INBUF
       LINNUM = LINNUM + 1
-!     print*,linnum,TRIM(INBUF)
 
 c..skip comment lines and blank lines
       IF ( INBUF (1:1) .EQ. '!' ) THEN 
@@ -138,9 +108,9 @@ c..If the name matches a species, get the IC
          CALL FETCH_REAL ( FILDEV, INBUF , LPOS, EOL, LINNUM, CHR, NUMBER )
          IF ( NUMBER .GT. 0.0 ) THEN
 
-            CGRID ( 1 , 1 , 1 , IND ) = NUMBER
+            INIT_CONC_VALUES ( IND ) = NUMBER
 
-            print*,LINNUM,ind,SPC(ind),NUMBER,CGRID ( 1 , 1 , 1 , IND )
+            print*,LINNUM,ind,SPC(ind),NUMBER,INIT_CONC_VALUES ( IND )
             LFOUND ( IND ) = .TRUE.
          ELSE
             WRITE ( LOGDEV , 93000) WORD , LINNUM
@@ -157,7 +127,7 @@ c..Report the ICs set
       LFIRST = .TRUE.
 
       DO  N = 1 , N_SPC
-         IF ( .NOT. LFOUND ( N ) .OR. CGRID ( 1, 1, 1, N) .LE. 0.0 ) THEN
+         IF ( .NOT. LFOUND ( N ) .OR. INIT_CONC_VALUES( N ) .LE. 0.0 ) THEN
             IF ( LFIRST ) WRITE ( LOGDEV , 92100 ) 
             WRITE ( LOGDEV , 92020 ) N, SPC ( N )
             LFIRST = .FALSE.
@@ -167,9 +137,9 @@ c..Report the ICs set
       LFIRST = .TRUE.
 
       DO  N = 1 , N_SPC
-        IF ( LFOUND ( N ) .AND. CGRID ( 1 , 1 , 1 , N) .GT. 0.0 ) THEN
+        IF ( LFOUND ( N ) .AND. INIT_CONC_VALUES( N ) .GT. 0.0 ) THEN
             IF ( LFIRST ) WRITE ( LOGDEV , 92200 ) 
-            WRITE ( LOGDEV , 92020 )N,  SPC ( N ) , CGRID ( 1 , 1 , 1 , N)
+            WRITE ( LOGDEV , 92020 )N,  SPC ( N ) ,  INIT_CONC_VALUES ( N)
             LFIRST = .FALSE.
          ENDIF
       ENDDO
@@ -179,6 +149,9 @@ c..Report the ICs set
          CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT3 )
       ENDIF
  
+      DEALLOCATE ( SPC,LFOUND )
+      CLOSE( FILDEV )
+
       RETURN
 
 
@@ -254,8 +227,9 @@ C***********************************************************************
 c..open the ascii file and initialize
       LOGDEV = 6
 
-      FILDEV = 112
-      OPEN ( UNIT = FILDEV, FILE = ASCII_FNAM , ERR = 1000 )
+!     FILDEV = 112
+      OPEN ( NEWUNIT = FILDEV, FILE = ASCII_FNAM , FORM ='FORMATTED', STATUS='OLD',
+     &       ERR = 1000 )
 
       LINNUM = 0
 

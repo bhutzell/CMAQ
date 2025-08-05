@@ -445,6 +445,10 @@ C Initialize ddm3d calculations
         CALL MAP_AERO()
         CALL MAP_OA()
 
+#ifdef m3box
+         CALL LOAD_BOX_ICS()
+!close m3box
+#endif
 
 C Initialize Global Arrays for Storing Chemical, Regional, Process,
 C and Emission Stream Families

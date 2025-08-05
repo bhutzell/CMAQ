@@ -17,12 +17,13 @@ C***********************************************************************
 C...........   INCLUDES:
       INCLUDE SUBST_FILES_ID  ! I/O definitions and declarations 
 C...........   ARGUMENTS and their descriptions:
-            CHARACTER(LEN=*), INTENT(IN   ) :: FNAME   !  logical name of file to be closed
+            CHARACTER*(*), INTENT(IN   ) :: FNAME   !  logical name of file to be closed
 
 C........... Local variables:
         INTEGER, PARAMETER :: MAX_IO_STRLEN = 10000
         INTEGER            :: FSTATUS  ! io status or io unit number for FNAME
         INTEGER            :: NVAR
+        LOGICAL            :: ESTATUS
 
         CHARACTER( MAX_IO_STRLEN ) :: ACTUAL_NAME
 
@@ -40,18 +41,35 @@ C........... Local variables:
            END SUBROUTINE NAMEVAL
         END INTERFACE
 
+C First check if logical filename is open
+        INQUIRE(FILE = FNAME, OPENED=ESTATUS, NUMBER=FSTATUS)
+        IF ( ESTATUS )THEN
+!          PRINT*,"CLOSE3;" // TRIM( FNAME ) // " is open."
+           CLOSE( FSTATUS, ERR = 500 )
+           CLOSE3 = .TRUE.
+           RETURN
+        ELSE
+           WRITE(6,'(A)')"CLOSE3: file, " // TRIM( FNAME ) // ", not opened."
+        END IF
 
-        CALL NAMEVAL( FNAME,ACTUAL_NAME )
-
+C Try actual filename if using logical filename fails
+500     CALL NAMEVAL( FNAME,ACTUAL_NAME )
         NVAR = INDEX(ACTUAL_NAME,' -v') - 1
         IF( NVAR .GT. 0 )THEN
            ACTUAL_NAME = ACTUAL_NAME(1:NVAR)
         END IF
 
-        INQUIRE(FILE = ACTUAL_NAME, NUMBER=FSTATUS)
-        IF ( FSTATUS .GT. 0 )CLOSE( FSTATUS )
-
-C   begin body of subroutine  OPEN3
+        INQUIRE(FILE = ACTUAL_NAME, OPENED=ESTATUS, NUMBER=FSTATUS)
+        IF ( ESTATUS )THEN
+!          PRINT*,"CLOSE3;" // TRIM( ACTUAL_NAME ) // " is open."
+           CLOSE( FSTATUS, ERR = 1000 )
+        ELSE
+           WRITE(6,'(A)')"CLOSE3: file, " // TRIM( ACTUAL_NAME ) // ", not opened."
+        END IF
         CLOSE3 = .TRUE.      
+        RETURN
+
+1000    WRITE(6,'(A)')"CLOSE3: Failed to close file, " // TRIM( FNAME )
+        CLOSE3 = .FALSE.
         RETURN
       END FUNCTION  CLOSE3

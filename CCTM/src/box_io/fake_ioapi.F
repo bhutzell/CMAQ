@@ -759,7 +759,7 @@ C           ENVREAL = -2
            CHARACTER*(*), INTENT( OUT ) :: VAR_VALUE
            INTEGER,       INTENT( OUT ) :: STATUS 
 !local
-           CHARACTER( 120 )    :: MSG         ! Message text
+           CHARACTER( 1000 )    :: MSG         ! Message text
            INTEGER, PARAMETER  :: LOGDEV = 6
 
            CALL GET_ENVIRONMENT_VARIABLE( NAME=VAR_NAME, VALUE= VAR_VALUE, STATUS=STATUS, TRIM_NAME=.TRUE.)

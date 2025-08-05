@@ -401,7 +401,7 @@ C for input and output files
            OUTFILE      = 'OUTFILE'
            BXM_SAS      = 'NO'
            BXM_MACTAB   = 'NO'
-           INFILE       = 'INFILE'
+           INFILE       = 'BOX_IC_FILE'
            EMIS_FILE    = 'EMIS_DATA'
 
            FILE_LINE    = ''

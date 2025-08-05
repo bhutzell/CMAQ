@@ -18,8 +18,9 @@ C
 C
 C***********************************************************************
 
-!     USE UTILIO_DEFN
-
+      USE SCENE_DATA
+      USE M3UTILIO, ONLY: OUTPUT_FILE,N_OUTPUT_FILES,OUTPUT_FILES,SETUP_OUTPUT_FILE,
+     &                    NAMEVAL,MAX_IO_STRLEN
 
       IMPLICIT NONE
 C...........   INCLUDES:
@@ -27,7 +28,7 @@ C...........   INCLUDES:
          INCLUDE 'FDESC3.EXT'        !  I/O API file headers
          INCLUDE SUBST_FILES_ID  ! I/O definitions and declarations 
 C...........   ARGUMENTS and their descriptions:
-        CHARACTER(LEN=*), INTENT( IN ) ::  FNAME   !  logical name of file to be described.
+        CHARACTER*(*), INTENT( IN ) ::  FNAME   !  logical name of file to be described.
 C...........   Local:
         INTEGER :: IVAR
         LOGICAL :: FOUND
@@ -157,9 +158,12 @@ C...........   Local:
             UNITS3D (  6 )   = 'm               '
             NVARS3D          = 6
           ELSE
-            NVARS3D  =  3
+            NVARS3D  =  3 + NUMB_INIT_CONC
+            IF ( NVARS3D .GT. 3 ) THEN
+                VNAME3D( 4:3+NUMB_INIT_CONC ) = INIT_CONC_SPCS( 1:NUMB_INIT_CONC )
+                UNITS3D( 4:3+NUMB_INIT_CONC ) = ''
+            END IF
           END IF
-
 
           FOUND = .TRUE.
       
@@ -215,7 +219,7 @@ C...........   Local:
            WRITE(6,'(I3,1X,2(A16,1X))')IVAR,TRIM(VNAME3D(IVAR)),TRIM(UNITS3D(IVAR))
          END DO
       ELSE
-         WRITE(6,'(A)')'NO File Varaibles Defined.'
+         WRITE(6,'(A)')'NO File Varaibles Defined for ' // TRIM(FNAME)
       END IF
 
       RETURN

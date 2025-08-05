@@ -31,12 +31,12 @@ C...........   INCLUDES:
 
 C...........   ARGUMENTS and their descriptions:
 
-        CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
-        INTEGER         , INTENT(IN   ) :: LAY1            !  upper layer bound for READ3
-        INTEGER         , INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
-        INTEGER         , INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
-        REAL            , INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
+        CHARACTER*(*), INTENT(IN   ) :: FNAME           !  logical file name
+        CHARACTER*(*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+        INTEGER,       INTENT(IN   ) :: LAY1            !  upper layer bound for READ3
+        INTEGER,       INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
+        INTEGER,       INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
+        REAL,          INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
 
         INTEGER  L
         INTEGER  LAYB, LAYT

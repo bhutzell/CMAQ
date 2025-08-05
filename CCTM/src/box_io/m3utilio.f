@@ -15,6 +15,14 @@
      &                     XTRACT3_3D,
      &                     XTRACT3_4D
        END INTERFACE
+       INTERFACE INTERPX
+          MODULE PROCEDURE XTRACT3_0D,
+     &                     XTRACT3_1D,
+     &                     XTRACT3_2D,
+     &                     XTRACT3_2DI,
+     &                     XTRACT3_3D,
+     &                     XTRACT3_4D
+       END INTERFACE
        INTERFACE WRITE3
           MODULE PROCEDURE WRITE3R2D,
      &                     WRITE3I,
@@ -22,6 +30,11 @@
      &                     WRITE3R4D
        END INTERFACE
 
+
+!      INTERFACE INDEX1
+!        MODULE PROCEDURE INDEX1_CHAR,
+!    &                    INDEXINT1
+!      END INTERFACE
 
        INTERFACE
          SUBROUTINE FETCH_CHR ( FILDEV, INBUF , LPOS , EOL , CHR )
@@ -251,37 +264,22 @@
        private :: quicksort
 
        INTERFACE
-        LOGICAL FUNCTION INTERPX ( FNAME, VNAME, CALLER,
-     &                    COL0, COL1, ROW0, ROW1, LAY0, LAY1,
-     &                    JDATE, JTIME, BUFFER )
-         CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-         CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
-         CHARACTER(LEN=*), INTENT(IN   ) :: CALLER          !  name of caller
-         INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: ROW1            !  upper row   bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: COL0            !  lower col   bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: COL1            !  upper col   bound for XTRACT3
-         INTEGER,          INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
-         INTEGER,          INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
-         REAL,             INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
-        END FUNCTION INTERPX
-!        LOGICAL FUNCTION XTRACT3( FNAME, VNAME,
-!     &                            LAY0, LAY1, ROW0, ROW1, COL0, COL1,
-!     &                            JDATE, JTIME, BUFFER )
-!         CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-!         CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
-!         INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
-!         INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
-!         INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
-!         INTEGER,          INTENT(IN   ) :: ROW1            !  upper row   bound for XTRACT3
-!         INTEGER,          INTENT(IN   ) :: COL0            !  lower col   bound for XTRACT3
-!         INTEGER,          INTENT(IN   ) :: COL1            !  upper col   bound for XTRACT3
-!         INTEGER,          INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
-!         INTEGER,          INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
-!         REAL,             INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
-!        END FUNCTION XTRACT3
+!       LOGICAL FUNCTION INTERPX ( FNAME, VNAME, CALLER,
+!    &                    COL0, COL1, ROW0, ROW1, LAY0, LAY1,
+!    &                    JDATE, JTIME, BUFFER )
+!        CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
+!        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+!        CHARACTER(LEN=*), INTENT(IN   ) :: CALLER          !  name of caller
+!        INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
+!        INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
+!        INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
+!        INTEGER,          INTENT(IN   ) :: ROW1            !  upper row   bound for XTRACT3
+!        INTEGER,          INTENT(IN   ) :: COL0            !  lower col   bound for XTRACT3
+!        INTEGER,          INTENT(IN   ) :: COL1            !  upper col   bound for XTRACT3
+!        INTEGER,          INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
+!        INTEGER,          INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
+!        REAL,             INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
+!       END FUNCTION INTERPX
         LOGICAL   FUNCTION  CHECK3 ( FNAME , VNAME , JDATE , JTIME )
          CHARACTER(LEN=*), INTENT( IN ) :: FNAME   !  logical name of file to be "opened"
          CHARACTER(LEN=*), INTENT( IN ) :: VNAME   !  Variable to check
@@ -289,25 +287,25 @@
          INTEGER,          INTENT( IN ) :: JTIME       !  Model time
         END FUNCTION CHECK3
         LOGICAL   FUNCTION  OPEN3 ( FNAME , FSTATUS , PNAME)
-         CHARACTER(LEN=*), INTENT( IN ) :: FNAME   !  logical name of file to be "opened"
-         CHARACTER(LEN=*), INTENT( IN ) :: PNAME   !  Calling program name
-         INTEGER,          INTENT( IN ) :: FSTATUS       !  Not used
+         CHARACTER*(*), INTENT( IN ) :: FNAME   !  logical name of file to be "opened"
+         CHARACTER*(*), INTENT( IN ) :: PNAME   !  Calling program name
+         INTEGER,       INTENT( IN ) :: FSTATUS       !  Not used
         END FUNCTION OPEN3     
         LOGICAL FUNCTION  DESC3 ( FNAME )
-         CHARACTER(LEN=*), INTENT( IN ) ::  FNAME   !  logical name of file to be described.
+         CHARACTER*(*), INTENT( IN ) ::  FNAME   !  logical name of file to be described.
         END FUNCTION DESC3
         LOGICAL FUNCTION  SHUT3 ( )
         END FUNCTION SHUT3
         LOGICAL FUNCTION  CLOSE3 ( FNAME )
-         CHARACTER(LEN=*), INTENT( IN ) ::  FNAME   !  logical name of file to be described.
+         CHARACTER*(*), INTENT( IN ) ::  FNAME   !  logical name of file to be described.
         END FUNCTION CLOSE3
         LOGICAL FUNCTION READ3 ( FNAME, VNAME, LAY1, JDATE, JTIME, BUFFER )
-         CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-         CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
-         INTEGER         , INTENT(IN   ) :: LAY1            !  upper layer bound for READ3
-         INTEGER         , INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
-         INTEGER         , INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
-         REAL            , INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
+         CHARACTER*(*), INTENT(IN   ) :: FNAME           !  logical file name
+         CHARACTER*(*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+         INTEGER      , INTENT(IN   ) :: LAY1            !  upper layer bound for READ3
+         INTEGER      , INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
+         INTEGER      , INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
+         REAL         , INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
         END FUNCTION READ3 
        END INTERFACE
 
@@ -1014,7 +1012,7 @@ C...........   PARAMETERS:
 ! perform same function as in index1 but for integer
 
             integer, intent(in) :: name
-            integer, intent(in) :: list(*)
+            integer, intent(in) :: list(:)
             integer, intent(in) :: n
 
             integer :: i
@@ -1036,6 +1034,36 @@ C...........   PARAMETERS:
             end if
 
           end function indexint1
+! ------------------------------------------------------------------------------
+          integer function index1_char (name, n, list)
+
+! acts as the original IOAPI routine index1 to determine a character
+! string, name in the character string item list
+
+            character (*), intent(in) :: name
+            character (*), intent(in) :: list(:)
+            integer, intent(in)       :: n
+
+            integer :: i
+            logical :: found
+
+            i = 0
+            found = .false.
+            do while ((.not. found) .and. (i < n))
+               i = i + 1
+               if (name == list(i)) then
+                  found = .true.
+               end if
+            end do
+
+            if (.not. found) then
+               index1_char = 0
+            else
+               index1_char = i
+            end if
+
+          end function index1_char
+
 ! ----------------------------------------------------------
           integer function julian (year, month, day)
 
@@ -1389,18 +1417,14 @@ C   begin body of function  TRIMLEN
 
 C***********************************************************************
 C
-C  FUNCTION:  Mimics IO/API function DESC3 by putting selected
+C  FUNCTION:  Mimics IO/API function XTRACT3 by putting selected
 C             file description data in commons.
 C
-C  RETURN VALUE:  TRUE iff successful
+C  RETURN VALUE:  TRUE if successful
 C
 C  PRECONDITIONS REQUIRED: None
 C
-C  SUBROUTINES AND FUNCTIONS CALLED: None
-C
-C  REVISION  HISTORY: Prototype created by Golam Sarwar - March, 2004
-C  REVISION  HISTORY: This file was Created from XTRACT3
-C  REVISION  HISTORY: XTRACT3 was created Prototype created by Jerry Gipson IN JULY 1997	
+C  SUBROUTINES AND FUNCTIONS CALLED: BOX_IC_VALUE
 C
 C***********************************************************************
       USE DRIVER_INPUTS
@@ -1412,8 +1436,8 @@ C...........   INCLUDES:
 
 C...........   ARGUMENTS and their descriptions:
 
-        CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+        CHARACTER*(*),    INTENT(IN   ) :: FNAME           !  logical file name
+        CHARACTER*(*),    INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
         INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
@@ -1427,8 +1451,19 @@ C...........   ARGUMENTS and their descriptions:
         INTEGER  L, M
 
         CHARACTER(LEN=LEN(VNAME)) :: VARIABLE
-C.............................................................................
-C   begin body of subroutine  OPEN3
+
+        REAL CONC
+
+c search box initial conditions
+            DO L = 1,NUMB_INIT_CONC
+               CONC = BOX_IC_VALUE( VNAME )
+               IF ( CONC .GT. 0.0 ) THEN
+!                 print*,'XTRACT3_2D: ',TRIM( VNAME ),' = ',CONC
+                  BUFFER = CONC
+                  XTRACT3_2D = .TRUE.
+                  RETURN
+               END IF
+            END DO
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_2D variables
@@ -1671,8 +1706,8 @@ C...........   INCLUDES:
 
 C...........   ARGUMENTS and their descriptions:
 
-        CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+        CHARACTER*(*),    INTENT(IN   ) :: FNAME           !  logical file name
+        CHARACTER*(*),    INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
         INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
@@ -1686,8 +1721,6 @@ C...........   ARGUMENTS and their descriptions:
         INTEGER  L, M
 
         CHARACTER(LEN=LEN(VNAME)) :: VARIABLE
-C.............................................................................
-C   begin body of subroutine  OPEN3
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_2D variables
@@ -1914,11 +1947,7 @@ C  RETURN VALUE:  TRUE if successful
 C
 C  PRECONDITIONS REQUIRED: None
 C
-C  SUBROUTINES AND FUNCTIONS CALLED: None
-C
-C  REVISION  HISTORY: Prototype created by Golam Sarwar - March, 2004
-C  REVISION  HISTORY: This file was Created from XTRACT3
-C  REVISION  HISTORY: XTRACT3 was created Prototype created by Jerry Gipson IN JULY 1997	
+C  SUBROUTINES AND FUNCTIONS CALLED: BOX_IC_VALUE
 C
 C***********************************************************************
       USE DRIVER_INPUTS
@@ -1930,8 +1959,8 @@ C...........   INCLUDES:
 
 C...........   ARGUMENTS and their descriptions:
 
-        CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+        CHARACTER*(*),    INTENT(IN   ) :: FNAME           !  logical file name
+        CHARACTER*(*),    INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
         INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
@@ -1943,9 +1972,18 @@ C...........   ARGUMENTS and their descriptions:
         REAL,             INTENT(  OUT) :: BUFFER( :,:,: )   !  interpolation-output buffer array
 
         INTEGER  L
-C.............................................................................
-C   begin body of subroutine  OPEN3
+        REAL     CONC
 
+c search box initial conditions
+            DO L = 1,NUMB_INIT_CONC
+               CONC = BOX_IC_VALUE( VNAME )
+               IF ( CONC .GT. 0.0 ) THEN
+!                 print*,'XTRACT3_3D: ',TRIM( VNAME ),' = ',CONC
+                  BUFFER = CONC
+                  XTRACT3_3D = .TRUE.
+                  RETURN
+               END IF
+            END DO
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_3D variables
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2163,11 +2201,7 @@ C  RETURN VALUE:  TRUE if successful
 C
 C  PRECONDITIONS REQUIRED: None
 C
-C  SUBROUTINES AND FUNCTIONS CALLED: None
-C
-C  REVISION  HISTORY: Prototype created by Golam Sarwar - March, 2004
-C  REVISION  HISTORY: This file was Created from XTRACT3
-C  REVISION  HISTORY: XTRACT3 was created Prototype created by Jerry Gipson IN JULY 1997	
+C  SUBROUTINES AND FUNCTIONS CALLED: BOX_IC_VALUE
 C
 C***********************************************************************
       USE DRIVER_INPUTS
@@ -2179,8 +2213,8 @@ C...........   INCLUDES:
 
 C...........   ARGUMENTS and their descriptions:
 
-        CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+        CHARACTER*(*),    INTENT(IN   ) :: FNAME           !  logical file name
+        CHARACTER*(*),    INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
         INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
@@ -2192,7 +2226,7 @@ C...........   ARGUMENTS and their descriptions:
         REAL,             INTENT(  OUT) :: BUFFER( : )   !  interpolation-output buffer array
 
         INTEGER  L, M
-
+        REAL     CONC
         CHARACTER(LEN=LEN(VNAME)) :: VARIABLE
 
             L = LEN_TRIM(VNAME)
@@ -2201,6 +2235,16 @@ C...........   ARGUMENTS and their descriptions:
             VARIABLE( 1:L )   = VNAME( 1:L )
             VARIABLE( L+1:M ) = ' '
 
+c search box initial conditions
+            DO L = 1,NUMB_INIT_CONC
+               CONC = BOX_IC_VALUE( VNAME )
+               IF ( CONC .GT. 0.0 ) THEN
+!                 print*,'XTRACT3_1D: ',TRIM( VNAME ),' = ',CONC
+                  BUFFER = CONC
+                  XTRACT3_1D = .TRUE.
+                  RETURN
+               END IF
+            END DO
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_2D variables
@@ -2423,11 +2467,7 @@ C  RETURN VALUE:  TRUE if successful
 C
 C  PRECONDITIONS REQUIRED: None
 C
-C  SUBROUTINES AND FUNCTIONS CALLED: None
-C
-C  REVISION  HISTORY: Prototype created by Golam Sarwar - March, 2004
-C  REVISION  HISTORY: This file was Created from XTRACT3
-C  REVISION  HISTORY: XTRACT3 was created Prototype created by Jerry Gipson IN JULY 1997	
+C  SUBROUTINES AND FUNCTIONS CALLED: BOX_IC_VALUE
 C
 C***********************************************************************
       USE DRIVER_INPUTS
@@ -2439,8 +2479,8 @@ C...........   INCLUDES:
 
 C...........   ARGUMENTS and their descriptions:
 
-        CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+        CHARACTER*(*),    INTENT(IN   ) :: FNAME           !  logical file name
+        CHARACTER*(*),    INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
         INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
@@ -2452,8 +2492,18 @@ C...........   ARGUMENTS and their descriptions:
         REAL,             INTENT(  OUT) :: BUFFER          !  interpolation-output buffer 
 
         INTEGER  L
-C.............................................................................
-C   begin body of subroutine  OPEN3
+        REAL     CONC
+
+c search box initial conditions
+            DO L = 1,NUMB_INIT_CONC
+               CONC = BOX_IC_VALUE( VNAME )
+               IF ( CONC .GT. 0.0 ) THEN
+!                 print*,'XTRACT3_0D: ',TRIM( VNAME ),' = ',CONC
+                  BUFFER = CONC
+                  XTRACT3_0D = .TRUE.
+                  RETURN
+               END IF
+            END DO
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_3D variables
@@ -2671,11 +2721,7 @@ C  RETURN VALUE:  TRUE if successful
 C
 C  PRECONDITIONS REQUIRED: None
 C
-C  SUBROUTINES AND FUNCTIONS CALLED: None
-C
-C  REVISION  HISTORY: Prototype created by Golam Sarwar - March, 2004
-C  REVISION  HISTORY: This file was Created from XTRACT3
-C  REVISION  HISTORY: XTRACT3 was created Prototype created by Jerry Gipson IN JULY 1997	
+C  SUBROUTINES AND FUNCTIONS CALLED: BOX_IC_VALUE
 C
 C***********************************************************************
       USE DRIVER_INPUTS
@@ -2687,8 +2733,8 @@ C...........   INCLUDES:
 
 C...........   ARGUMENTS and their descriptions:
 
-        CHARACTER(LEN=*), INTENT(IN   ) :: FNAME             !  logical file name
-        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME             !  variable name, or 'ALL'
+        CHARACTER*(*),    INTENT(IN   ) :: FNAME           !  logical file name
+        CHARACTER*(*),    INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
         INTEGER,          INTENT(IN   ) :: LAY0              !  lower layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: LAY1              !  upper layer bound for XTRACT3
         INTEGER,          INTENT(IN   ) :: ROW0              !  lower row   bound for XTRACT3
@@ -2700,8 +2746,18 @@ C...........   ARGUMENTS and their descriptions:
         REAL,             INTENT(  OUT) :: BUFFER( :,:,:,: ) !  interpolation-output buffer 
 
         INTEGER  L
-C.............................................................................
-C   begin body of subroutine  OPEN3
+        REAL     CONC
+
+c search box initial conditions
+            DO L = 1,NUMB_INIT_CONC
+               CONC = BOX_IC_VALUE( VNAME )
+               IF ( CONC .GT. 0.0 ) THEN
+!                 print*,'XTRACT3_4D: ',TRIM( VNAME ),' = ',CONC
+                  BUFFER = CONC
+                  XTRACT3_4D = .TRUE.
+                  RETURN
+               END IF
+            END DO
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_2D variables
@@ -3449,6 +3505,25 @@ C...........   ARGUMENTS and their descriptions:
            WRITE3R4D = .FALSE.
 
         END FUNCTION WRITE3R4D
+      
+        REAL FUNCTION BOX_IC_VALUE( SPECIES )
+
+           USE SCENE_DATA
+
+           IMPLICIT NONE
+! arguments:
+           CHARACTER*(*), INTENT( IN ) :: SPECIES
+!local:
+           INTEGER :: NSPECIES 
+    
+           NSPECIES = INDEX1_CHAR( SPECIES,NUMB_INIT_CONC,INIT_CONC_SPCS )
+           IF( NSPECIES .GE. 0 )THEN
+              BOX_IC_VALUE = INIT_CONC_VALUES( NSPECIES )
+           ELSE
+              BOX_IC_VALUE = -1.0E-30
+           END IF
+           
+        END FUNCTION BOX_IC_VALUE
 
        END MODULE M3UTILIO
   
