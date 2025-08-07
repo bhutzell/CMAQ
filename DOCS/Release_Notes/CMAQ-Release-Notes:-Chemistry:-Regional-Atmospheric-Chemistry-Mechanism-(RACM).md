@@ -31,19 +31,19 @@ The second update:
 
 Model sensitivity runs were completed using the existing and updated models (by correcting kinetics information) for 10 days in summer. Ratios of predicted 10-day mean HCHO photolysis rate coefficients with the existing and updated models are shown in Figure 1. For HCHO photolysis, the updated model increases photolysis rate coefficients for the molecular channel [Figure 1(a)] while reducing the photolysis rate coefficients for the radical channel [Figure 1(b)]. 
 
-![image](https://user-images.githubusercontent.com/17162838/172213812-1d5034fe-05fe-4f52-a31c-7dbab8b9b2b0.png)
+![image](./images/chemistry/cmaqv6.0_ratio_mean_photolysis_rate_coefficient_for_HCHO_photolysis_figure1.png)
 
 Figure 1: (a) Ratio of mean photolysis rate coefficient for the molecular channel of HCHO photolysis (values with updated model / values with existing model) (b) ratio of mean photolysis rate coefficients for the radical channel of HCHO photolysis (values with updated model / values with existing model) 
 
 Predicted 10-day mean ozone concentrations with the existing model are shown in Figure 2(a) and differences in predicted mean ozone concentrations with the updated and existing models are shown in Figure 2(b). It has mixed impacts on predicted ozone. The update increases ozone over some areas while reducing it over other areas. 
 
-![image](https://user-images.githubusercontent.com/17162838/172213855-b2f40c1e-8d7b-42a4-9057-2a3d2bb520a4.png)
+![image](./images/chemistry/cmaqv6.0_predicted_10-day_mean_ozone_concentrations_and_differences.png)
 
 Figure 2: (a) Predicted 10-day mean ozone concentrations with the existing model (b) differences in predicted mean ozone concentrations with the updated and existing models (predictions  with updated model – predictions with existing model) 
 
 Impacts on other model species are also small. For example, differences in predicted mean sulfate concentrations with the updated and existing models are shown in Figure 3(a) and differences in predicted mean aerosol nitrate concentrations with updated and existing models are shown in Figure 3(b). Impacts on sulfate and aerosol nitrate concentrations are small.
 
-![image](https://user-images.githubusercontent.com/17162838/172213898-f0203dc9-e869-41e1-a43a-895634bbc7b2.png)
+![image](./images/chemistry/cmaqv6.0_differences_in_mean_sulfate_concentrations_updated_vs_existing_model.png)
 
 Figure 3: (a) Differences in predicted mean sulfate concentrations with the updated and existing models (predictions with updated model – predictions with existing model) (b) differences in predicted mean aerosol nitrate concentrations with the updated and existing models (predictions with updated model – predictions with existing model)
 
