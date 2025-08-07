@@ -43,11 +43,11 @@ Ramboll, the developer of the Carbon Bond chemical mechanism, recently updated t
 
 Model simulations were completed with the CB6r3 and CB6r5 over the continental United States for a winter (January) and a summer (July) month in 2016. The update increases monthly mean ozone in both month (Figure 1); however, it also decreases ozone over some areas by small margin. Overall, the impacts of the update on model predictions are small. The impacts are slightly larger in summer than those in winter. It affects Model Bias both at AQS and CASTNET sites (Figure 2) by small margins.
 
-![image](https://user-images.githubusercontent.com/17162838/172222534-0323ac35-1cc7-490a-a43a-827062182504.png)
+![image](./images/chemistry/cmaqv6.0_impact_of_cb6r5_on_monthly_mean_ozone_figure_1.png)
 
 Figure 1: Impact of CB6r5 on monthly mean ozone
 
-![image](https://user-images.githubusercontent.com/17162838/172222590-a19d6f4e-bba6-46e7-b9e4-4eff003c3f7f.png)
+![image](./images/chemistry/cmaqv6.0_impact_of_cb6r5_monthly_mean_model_bias_figure_2.png)
 
 Figure 2: Impact of CB6r5 on monthly mean Model Bias at AQS and CASTNET sites
 
@@ -111,21 +111,21 @@ First change:
 
 Model sensitivity runs were completed using cb6r3_ae7_aq chemical mechanism with the existing and updated simple first order ozone loss for the continental US domain for a period of 9-days in summer (June 22-30, 2016). The revised simple first order ozone loss increases the average ozone over seawater and coastal areas by up to 1.5 ppbv. Impact is higher over seawater than over coastal area. Impact over the interior portion of the domain is negligible. 
 
-![image](https://user-images.githubusercontent.com/2692799/167717635-e1aa5591-64ca-4a59-8de0-d7a8294f5051.png)  
+![image](./images/chemistry/cmaqv6.0_impact_of_updated_simple_halogen_chemistry_O3_figure_1.png)  
 **Figure 1: Impact of the updated simple halogen chemistry on O3**
 
 Second change:
 
 Model sensitivity runs were completed using the existing and updated checks for OPEN and SURF values for a 10-day period in summer. Model with updated checks for OPEN and SURF values has only small impacts on predicted results. The mean difference in O3 concentrations during the 10-day period are shown in Figure 2. Note that the ocean file used in this test does not contain any tiny positive values along state borders; hence the problem reported by a CMAQ user does not show up in the model results.
 
-![image](https://user-images.githubusercontent.com/2692799/167717666-bf85d529-f378-4d20-83e8-02680a05c4c4.png)  
+![image](./images/chemistry/cmaqv6.0_impact_of_threshold_value_0.001_OPEN_SURF_values_on_O3_figure_2.png)
 **Figure 2: Impact of using a threshold value of 0.001 for OPEN and SURF values on O3**
 
 Third change:
 
 Two different model simulations were completed using the existing and updated implementation of the condensed halogen chemistry for 10 days in summer (June 21 -  June 30, 2016). It employed 12-km horizontal grid resolution with 35 vertical layers. The difference in O3 concentrations (updated – existing implementation) is shown in Figure 3. Model with the updated implementation does not have any impact on O3 over open ocean. However, it increases O3 over coastal areas when OPEN+SURF  < 1.0. 
 
-![image](https://user-images.githubusercontent.com/2692799/167717690-4e217cf9-5432-4f2d-8ed4-50a269f156e5.png)  
+![image](./images/chemistry/cmaqv6.0_impact_of_updated_halogen+chemistry_O3_figure_3.png)
 **Figure 3: Impact of the updated implementation of halogen chemistry on O3**
 
 **References**:  
@@ -169,11 +169,11 @@ Model sensitivity simulations were completed using cb6r5_ae7_aq chemical mechani
 Impact of the DMS chemistry on model performance was calculated using data from all networks (Figure 3). It can affect Normalized Mean Bias for sulfate at CASTNET, CSN and IMPROVE networks. However, the impacts are generally small when all sites are considered for calculating Normalized Mean Bias. Impacts on Normalized Mean Bias can be higher in coastal areas. It’s impact on ozone is small (< ±0.3 ppb) and impact on model performance is negligible.
 
 
-![image](https://user-images.githubusercontent.com/2692799/167717457-8bb2e2dc-e246-49d5-adaf-93a9283eca35.png)**Figure 1: (a) mean SO2 without DMS chemistry in January (b) impact of DMS chemistry on SO2 in January (c) mean SO2 without DMS chemistry in July (d) impact of DMS chemistry on SO2 in July**
+![image](./images/chemistry/cmaqv6.0_impact_of_dms_chemistry_SO2_figure_1.png)**Figure 1: (a) mean SO2 without DMS chemistry in January (b) impact of DMS chemistry on SO2 in January (c) mean SO2 without DMS chemistry in July (d) impact of DMS chemistry on SO2 in July**
 
-![image](https://user-images.githubusercontent.com/2692799/167717484-b1c40b51-be9d-4fec-bb8d-d5e7c0ae1a3d.png)**Figure 2: (a) mean sulfate without DMS chemistry in January (b) impact of DMS chemistry on sulfate in January (c) mean sulfate without DMS chemistry in July (d) impact of DMS chemistry on sulfate in July**
+![image](./images/chemistry/cmaqv6.0_impact_of_dms_chemistry_sulfate_figure_2.png)**Figure 2: (a) mean sulfate without DMS chemistry in January (b) impact of DMS chemistry on sulfate in January (c) mean sulfate without DMS chemistry in July (d) impact of DMS chemistry on sulfate in July**
 
-![image](https://user-images.githubusercontent.com/2692799/167717507-36c144ad-1eef-4d26-a69c-7589d8dffa0d.png)**Figure 3: Normalized Mean Bias of sulfate without and with DMS chemistry (a) IMPROVE sites in January (b) CSN sites in January (c) CASTNET sites in January (d) IMPROVE sites in July (e) CSN sites in July (f) CASTNET sites in July**  
+![image](./images/chemistry/cmaqv6.0_impact_of_dms_chemistry_normalized_mean_bias_figure_3.png)**Figure 3: Normalized Mean Bias of sulfate without and with DMS chemistry (a) IMPROVE sites in January (b) CSN sites in January (c) CASTNET sites in January (d) IMPROVE sites in July (e) CSN sites in July (f) CASTNET sites in July**  
 
 Existing ocean files will not work with the DMS chemistry; new ocean files with DMS concentrations in seawater are needed and can be generated using a new python based tool.
 
