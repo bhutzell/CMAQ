@@ -53,8 +53,8 @@ Second part changes NH3 deposition when running without ammonia bi-directional e
 <table>
 <thead>
 <tr>
-<th><img width="100%" src="https://github.com/user-attachments/assets/55c33725-ff52-4d28-9093-7c26f545f02d"></th>
-<th><img width="100%" src="https://github.com/user-attachments/assets/ad68c147-30af-40ee-87f0-6f9420dce0c5"></th>
+<th><img width="100%" src="./images/dry-deposition/cmaqv6.0_seasonal_mean_difference_ozone_mixing_ratio.png"></th>
+<th><img width="100%" src="./images/dry-deposition/cmaqv6.0_seasonal_mean_difference_PM2.5_concentration.png"></th>
 </tr>
 </table>
 
