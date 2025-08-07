@@ -114,7 +114,7 @@ This is a bug fix updating the treatment of aerosol-to-aqueous surrogates (AE2AQ
 **Significance and Impact**:  
 These updates correct the in-cloud treatment and post-cloud redistribution of inert aerosol species. PM2.5 impacts are minor. 
 
-![Fahey_AE2AQ_BugFix](https://github.com/user-attachments/assets/4a16562f-faa3-4c0c-a59b-817d30cda615)
+![Fahey_AE2AQ_BugFix](./images/chemistry/cmaqv6.0_bug_fix_for_AE2AQ_surrogates.png)
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
