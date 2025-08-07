@@ -58,12 +58,12 @@ This pull request adds photolysis of aerosol nitrate (ANO3) to CRACMM3 following
 **Significance and Impact**:   
 Model ozone (O3) concentrations without the photolysis of aerosol nitrate are shown in Figure 1a. Higher values are predicted over the southern portion than the northern portion. Model O3 enhancements with the photolysis of aerosol nitrate are shown Figure 1b. Enhancements occur only over small areas and are much smaller than those obtained with the hemispheric CMAQ model (Sarwar et al., 2024). The majority of the enhancements in the hemispheric model occurs over the ocean and are transported over land. The impacts on O3 are small since the continental US domain contains only a small oceanic area. 
 
-![Sarwar_Photo_I](https://github.com/user-attachments/assets/f9ff0ac9-b498-45c9-a1dd-53aaf34116bc)
+![Photolysis_of_aerosol_nitrate_CRACMM3_Image_1](./images/chemistry/cmaqv6.0_release_notes_Photolysis_of_aerosol_nitrate_CRACMM3_12US1_figure_1.png)
 Figure 1: (a) Model O3 without the aerosol nitrate photolysis (b) Impact of the aerosol nitrate photolysis on O3 compared to those without the aerosol nitrate photolysis 
 
 Model aerosol nitrate concentrations without the photolysis of aerosol nitrate are shown in Figure 2a. Higher values are predicted only over the Mid-west. Changes in model aerosol nitrate concentrations with the photolysis of aerosol nitrate are shown Figure 2b. Aerosol nitrate concentrations decrease over some oceanic areas. However, the impacts over land areas are small.
 
-![Sarwar_Photo_II](https://github.com/user-attachments/assets/b772f084-370f-46f2-b04d-715e16cf0fbb)
+![Photolysis_of_aerosol_nitrate_CRACMM3_Image_2](./images/chemistry/cmaqv6.0_release_notes_Photolysis_of_aerosol_nitrate_CRACMM3_12US1_figure_2.png)
 
 Figure 2: (a) Model aerosol nitrate concentrations without the aerosol nitrate photolysis (b) Impact of the aerosol nitrate photolysis on aerosol nitrate concentrations compared to those without the aerosol nitrate photolysis 
 
@@ -266,22 +266,22 @@ This updates adds photolysis of aerosol nitrate (ANO3) to the CRACMM3 marine mec
 **Significance and Impact**:   
 Model ozone (O3) concentrations without the photolysis of aerosol nitrate are shown in Figure 1a. Higher values are predicted over land than over seawater. Model O3 enhancements with the photolysis of aerosol nitrate are shown in Figure 1b. Consistent with the results shown in Sarwar et al. (2024) for CB6, aerosol nitrate photolysis enhances O3 over seawater and land by large margins. Larger enhancements occur over the western U.S. than over the eastern U.S.
 
-![Sarwar_CRACMM_I](https://github.com/user-attachments/assets/fa1aac70-5816-41d7-a6eb-0b6d0431577c)
+![Sarwar_CRACMM_I](./images/chemistry/cmaqv6.0_release_notes_Photolysis_of_aerosol_nitrate_CRACMM3_NHEMI_figure_1.png)
 Figure 1: (a) CMAQ predicted O3 with CRACMM2M (without aerosol nitrate photolysis) in May (b) Impact of aerosol nitrate photolysis on O3 compared to without aerosol nitrate photolysis
 
 Monthly Mean Bias was calculated by using model predicted daily maximum 8 hour average (MDA8) O3 and observed data from the AQS monitoring network over the western and eastern U.S (Figure 2(a-b)). Over the western U.S., the model without aerosol nitrate photolysis underpredicts observed data in most months while model with aerosol nitrate photolysis eliminates the negative bias. Over the eastern U.S., the model without aerosol nitrate photolysis has mixed model performance with negative bias in January-May and positive bias in June-December. The model with aerosol nitrate photolysis eliminates the negative bias in January-May, but slightly deteriorates bias in June-December.
 
-![Sarwar_CRACMM3M_II](https://github.com/user-attachments/assets/85f7f03b-d05a-4812-9d7f-f876e44d1990)
+![Sarwar_CRACMM3M_II](./images/chemistry/cmaqv6a_monthly_mean_bias_dma8_O3_east_west_us_figure_2.png)
 Figure 2: (a) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the western U.S. (b) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. 
 
 Model PM2.5 concentrations without the photolysis of aerosol nitrate are shown in Figure 3a. Higher values are predicted over land than over seawater. Changes in model PM2.5 concentrations with the photolysis of aerosol nitrate are shown in Figure 3b. It only affects model PM2.5 concentrations by small margins. Reductions occur due to the loss of aerosol nitrate by photolysis while enhancements occur from the changes in secondary aerosols due to the changes in oxidant levels. 
 
-![Sarwar_CRACMM3M_III](https://github.com/user-attachments/assets/c33e60ea-ece7-4754-b8d6-d65243d271f3)
+![Sarwar_CRACMM3M_III](./images/chemistry/cmaqv6.0a_mean_pm2.5_cracmm2m_may_figure_3.png)
 Figure 3: (a) CMAQ predicted mean PM2.5 wth CRACMM2M (without the aerosol nitrate photolysis) in May (b) Impact of the aerosol nitrate photolysis on PM2.5 compared to those without the aerosol nitrate photolysis in May
 
 Monthly Mean Bias was calculated by using predicted daily mean PM2.5 and observed data from the AQS monitoring network over the western and eastern U.S (Figure 4(a-b)). Bias without and with the aerosol nitrate photolysis in each month is similar over western and eastern U.S. Thus, the aerosol nitrate photolysis has low impacts on model performance for PM2.5.
 
-![Sarwar_CRACMM3M_IV](https://github.com/user-attachments/assets/3ca7e37d-6e1c-4d4c-b254-0c9e0b77abbd)
+![Sarwar_CRACMM3M_IV](./images/chemistry/cmaqv6.0a_mean_bias_daily_mean_pm2.5_west_east_us_figure_4.png)
 Figure 4: (a) Monthly Mean Bias of daily mean PM2.5  without and with aerosol nitrate photolysis at AQS sites over the western U.S. (b) Monthly Mean Bias of daily mean PM2.5  without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. 
 
 **References**:   
@@ -557,7 +557,7 @@ When a new version of a chemical mechanism is developed, the CMAQ team generally
 **Type of update**: Science Update   
 **Release Version/Date**: CMAQv5.5   
 
-<img src="https://github.com/user-attachments/assets/e0eeceb1-da06-4e94-a456-e83e50455b15" width="400">
+![CRACMM_LOGO](./images/chemistry/cmaqv6.0a_cracmm_image.png)
 
 **Description**:  
 CRACMM2 includes several updates to CRACMM1. Many updates are intended to improve the representation of secondary formaldehyde (HCHO) in CRACMM. These include the incorporation of the AMORE v1.2 isoprene condensation into the primary CRACMM mechanism, updates to HCHO yields from monoterpenes, and the addition of styrene as a new explicit species. Some other opportunistic updates (mostly unrelated to formaldehyde) are changes to monoterpene nitrates that affect SOA formation and NOx recycling, the inclusion of emitted methane (ECH4), heterogeneous uptake of HO2 and NO3 radicals, and changes in how emissions of certain aromatic species are mapped to CRACMM species. CRACMM1 bug fixes noted below have also been incorporated into CRACMM2.  
