@@ -54,7 +54,7 @@ These updates are implemented in solvers for all mechanisms and have been tested
 Model with updated convergence criteria has only small impacts on model results. The largest difference in hourly predicted ozone concentrations during the 10-day period with cb6r3_ae7_aq and racm2_ae6_aq are shown in Figure 1. Model results with other mechanisms are also similar and are not shown. 
 
 
-![image](https://user-images.githubusercontent.com/17162838/172241106-c248b1c4-4ed6-47dc-b412-c75ac0ad2fac.png)
+![image](./images/chemistry/cmaqv6.0_impact_of_updated_convergence_criteria_in_EBI_solver_on_predicted_ozone.png)
 
 Figure 1: Impact of updated convergence criteria in EBI solver on predicted ozone
 
