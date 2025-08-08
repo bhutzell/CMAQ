@@ -21,7 +21,7 @@
 **Description**:   
 These changes address an issue in the aerosol/gas partitioning calculations for the ISAM model and expand on the previous changes outlined below. In some instances, mass was still erroneously allocated to the wrong tags. This was most obvious when a signal would occassionally show up far away from an isolated source. For example, below is a map of contribution of NO2 from a power plant in IL. Very early in the simulation, a substantial signature appears of the coast of CA.
 
-![image](https://github.com/user-attachments/assets/4d7571ad-5279-48d4-b928-6c69aaae6b2b)
+![image]()
 
 **Significance and Impact**:   
 
@@ -39,7 +39,7 @@ The changes to the source apportionment routines in the aerosol and cloud module
 **Description**:   
 This bug fix resolves the erroneous growth of tagged mass far away from the location of emission sources. As pictured below, NO2 emitted from various states across the U.S. leads to NO2 from each source present in southern and central California. The reason for the error involves how tagged aerosol mass concentrations were floored in CMAQ v5.4. As implemented, the approach added artificial mass to condensing or evaporating species. This mass propagated through the system and led to enhancements in both particle- and gas-phase species.
 
-![combined_01052016](https://github.com/user-attachments/assets/3b6b9c5a-766e-4981-b087-1f00759b9d15)
+![combined_01052016](./images/instrumented-models/cmaqv6.0_isam_tagged_aerosol_mass_concentrations_bugfix.png)
 
 **Significance and Impact**:   
 Corrects erroneous mass attributed to sources geographically far away very soon after emissions that can not be explained by transport. This issues was brought to attention on the CMAS user forum. As depicted above, the concentration of these artificial enhancements can approach the true values of the tagged concentrations near and downwind real sources. It is difficult to completely know where these errors would have congregated in various domains, but they are likely more problematic in places with enhanced photoactivity, like SOUTHERN California.
@@ -96,21 +96,21 @@ Tested two cases on the 12K CONUS domain for one week in July:
 (2) SpecList - added pcvoc and NOY compounds (CRON and OPAN) to ISAM species list.
 
 **CO Concentrations from EGUs**  
-![Murphy_ISAM_I](https://github.com/user-attachments/assets/567b99b0-8174-4130-90f3-2db459308c3a)
+![Murphy_ISAM_I](./images/instrumented-models/cmaqv6.0_isam_CO_Concentrations_from_EGUs.png)
 
 **NOx species from the same EGUs** changes by about a factor of 4 lower than the absolute EGU contribution.  
-![Fig1_speclist_NOx_EGU](https://github.com/user-attachments/assets/213051d9-b8bb-42b1-900c-aeeb5efa9fe2)
+![Fig1_speclist_NOx_EGU](./images/instrumented-models/cmaqv6.0_isam_NOx_Concentrations_from_EGUs.png)
 
 **Fine PM and SOA from EGUs** show increases of about 1 ug m-3 due to the pcVOC addition, and this is the principal driver of change in total fine PM.  
-![Fig1_speclist_PMF_EGU](https://github.com/user-attachments/assets/1fad9296-c28b-4fcb-90af-eca2ad9b9b00)
-![Fig1_speclist_SOA_EGU](https://github.com/user-attachments/assets/b7981275-4be4-47df-b8ab-4cf44365a4a8)
+![Fig1_speclist_PMF_EGU](./images/instrumented-models/cmaqv6.0_isam_FinePM_Concentrations_from_EGUs.png)
+![Fig1_speclist_SOA_EGU](./images/instrumented-models/cmaqv6.0_isam_SOA_Concentrations_from_EGUs.png)
 
 For gridded area sources in non-contiguous states, NOy is increased marginally due to addition of CRON and OPAN to the species list. The effect on ozone is quite small.   
-![Fig1_speclist_NOY_Gridded_NonCont](https://github.com/user-attachments/assets/79e6655c-9dec-4c74-a97f-646206634489)
+![Fig1_speclist_NOY_Gridded_NonCont](./images/instrumented-models/cmaqv6.0_isam_NOy_Concentrations_from_gridded_area_sources.png)
 
 The SOA predictions for the non-contiguous regions show dramatically large maximum differences compared to absolute time-averaged concentrations. This reflects the dominant role of pcSOA to the total. The  differences for fine PM are mostly, if not equal to, the changes in total SOA.  
-![Fig1_speclist_PMF_Gridded_NonCont](https://github.com/user-attachments/assets/d0816e82-f10a-4952-9a7d-712fe4474cd7)
-![Fig1_speclist_SOA_Gridded_NonCont](https://github.com/user-attachments/assets/d6b9881a-d0bd-4cdf-9e08-260473a16edf)
+![Fig1_speclist_PMF_Gridded_NonCont](./images/instrumented-models/cmaqv6.0_isam_FinePM_Concentrations_from_non_contiguous_gridded_sources.png)
+![Fig1_speclist_SOA_Gridded_NonCont](./images/instrumented-models/cmaqv6.0_isam_SOA_Concentrations_from_non_contiguous_gridded_sources.png)
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
@@ -133,8 +133,8 @@ Dynamic equilibrium is a challenging concept in the context of source apportionm
 With SOA source apportionment now supported, all components of the particulate and gas phases are represented by CMAQ-ISAM and the apportionment of bulk PM metrics may be quantified.  
 
 In the example below, CMAQ-ISAM is used to investigate how SOA formed from biogenic VOCs is impacted by anthropogenic sources. Between 2005 and 2018, US NOX and SO2 emissions reductions yielded substantial reductions in this "biogenic SOA". 
-<img src="https://github.com/user-attachments/assets/6c2e2110-4b3f-4c74-b72a-cb5d659dfe4a">
-<img src="https://github.com/user-attachments/assets/0dc5e0fe-9281-4002-af43-e544d3acd3f5">
+![image](./images/instrumented-models/cmaqv6.0_isam_soa_from_biogenic_vocs_2005_and_2018.png)
+![image](./images/instrumented-models/cmaqv6.0_isam_biogenic_soa_from_anthropogenic_and_biogenic_sources.png)
 
 
 |Merge Commit | Internal record|
