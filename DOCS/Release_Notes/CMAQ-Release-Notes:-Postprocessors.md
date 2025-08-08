@@ -124,8 +124,7 @@ The previous tz.csv file was compared to two other time zone databases: tz_world
 A new tz.csv file was created from the Natural Earth 10m time zone shapefile (v4.1.0)[2]. The new tz.csv file is 2.5 MB, compared to the 4 MB original. The new file is smaller because it does not attempt to hug coastal boundaries, but instead allows for time zones that extend into the water to do so.  
 
 **Significance and Impact**: This will not affect model concentrations, but it will impact h2day calculations because small areas have updated time zones. This tends to matter most along the edges of time zones.  The original, new, and difference in "TZ hours behind UTC" are shown below.  
-
-<img width="523" alt="image" src="https://github.com/user-attachments/assets/cf3ab1fb-fa09-48c9-ba7e-c21a18434121">
+![image](./images/cmaqv6.0_hr2day_tzcsv_update.png)
 
 **References**:  
 [1] http://efele.net/maps/tz/world/  
