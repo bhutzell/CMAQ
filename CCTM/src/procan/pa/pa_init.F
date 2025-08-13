@@ -70,12 +70,12 @@ C  23 Jul 10 D.Wong:  move first OPEN3 try inside IF ( MYPE .EQ. 0 ) clause
 C  16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 C  11 May 11 D.Wong: incorporated twoway model implementation
 C  16 Sep 16 J.Young: update for inline procan
+C  01 Aug 25 D.Wong: brought in parallel I/O implementation
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE PAGRD_DEFN            ! PA horiz domain specs
       USE UTILIO_DEFN
-      USE CGRID_SPCS, ONLY : N_CGRID_SPC
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE, SE_DATA_COPY_MODULE)
@@ -162,7 +162,7 @@ C..open each one
             CALL ENVSTR( OUTFNAME, ENV_DESC, ENV_DFLT, RET_VAL, STATUS)
             IF ( STATUS .NE. 0 ) CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
 
-            IF ( MYPE .EQ. 0 ) THEN
+            IF ( IO_PE_INCLUSIVE ) THEN
 
 C..try to open existing file for update
                IF ( .NOT. OPEN3( OUTFNAME, FSRDWR3, PNAME ) ) THEN
@@ -185,9 +185,22 @@ C..try to open existing file for update
 
                END IF
 
+               IF ( .NOT. FLUSH3 ( OUTFNAME ) ) THEN
+                  XMSG = 'Could not sync to disk ' // TRIM( OUTFNAME )
+                  CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
+               END IF
+
             END IF
 
             CALL SUBST_BARRIER
+
+            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
+               IF ( .NOT. OPEN3( OUTFNAME, FSREAD3, PNAME ) ) THEN
+                  XMSG = 'Could not open ' // TRIM( OUTFNAME )
+     &                 // ' file for read'
+                  CALL M3MESG( XMSG )
+               END IF
+            END IF
 
          END DO   ! NUMFLS
 
@@ -196,13 +209,7 @@ C  Initialize arrays
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          DELC = 0.0
-         IF ( .NOT. ALLOCATED( CSAV ) ) THEN
-           ALLOCATE ( CSAV( NCOLS,NROWS,NLAYS,N_CGRID_SPC ),
-     &                STAT = STATUS )
-           CALL CHECKMEM( STATUS, 'CSAV', PNAME )
-           CSAV = CGRID
-         END IF
- 
+
       END IF   ! LIPR
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -235,7 +242,7 @@ C..open each one
             XMSG = 'IRR output file ' // TRIM( OUTFNAME ) // ' not assigned'
             IF ( STATUS .NE. 0 ) CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
 
-            IF ( MYPE .EQ. 0 ) THEN
+            IF ( IO_PE_INCLUSIVE ) THEN
 
 C..try to open existing file for update
                IF ( .NOT. OPEN3( OUTFNAME, FSRDWR3, PNAME ) ) THEN
@@ -258,9 +265,21 @@ C..try to open existing file for update
 
                END IF
 
+               IF ( .NOT. FLUSH3 ( OUTFNAME ) ) THEN
+                  XMSG = 'Could not sync to disk ' // TRIM( OUTFNAME )
+                  CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
+               END IF
             END IF
 
             CALL SUBST_BARRIER
+
+            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
+               IF ( .NOT. OPEN3( OUTFNAME, FSREAD3, PNAME ) ) THEN
+                  XMSG = 'Could not open ' // TRIM( OUTFNAME )
+     &                 // ' file for read'
+                  CALL M3MESG( XMSG )
+               END IF
+            END IF
 
          END DO   ! NFL
 
