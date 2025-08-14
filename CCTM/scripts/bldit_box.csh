@@ -93,11 +93,11 @@ set make_options = "-j"                #> additional options for make command if
  setenv Mechanism cracmm3              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
 #> Working directory and Version IDs
  if ( $?ISAM_CCTM ) then
-     set VRSN  = v60_ISAM_${Mechanism}             #> model configuration ID for CMAQ_ISAM
+     set VRSN  = v60B_ISAM_${Mechanism}             #> model configuration ID for CMAQ_ISAM
  else if ( $?DDM3D_CCTM ) then
-     set VRSN = v60_DDM3D_${Mechanism}            #> model configuration ID for CMAQ_DDM
+     set VRSN = v60B_DDM3D_${Mechanism}            #> model configuration ID for CMAQ_DDM
  else
-     set VRSN = v60_serial_${Mechanism}                   #> model configuration ID for CMAQ
+     set VRSN = v60B_serial_${Mechanism}                   #> model configuration ID for CMAQ
  endif
  
  set EXEC  = CCTM_${VRSN}.exe          #> executable name
@@ -162,7 +162,7 @@ set make_options = "-j"                #> additional options for make command if
  if ( ! ( $?ISAM_CCTM ) ) then           # check whether best solver is best for mechanism
     if ( ${Mechanism} == cb6r5m_ae7_aq || ${Mechanism} == cracmm3m ) then #> Gas-phase chemistry solver options ($CMAQ_MODEL/CCTM/src/gas)
        setenv ChemSolver ros3                                             #> ros3 (or smvgear) are system independent
-    endif  
+    endif
  endif
                                          
  if ( $ChemSolver == ebi ) then             
@@ -187,9 +187,24 @@ set make_options = "-j"                #> additional options for make command if
 #>    Most of these settings are done in config.cmaq
 #============================================================================================
 
- setenv FC ${myFC}                     #> path of Fortan compiler; set in config.cmaq
+  switch ( $compiler ) #> path of Fortan and C compilers; instead of values set in config.cmaq 
+   case  "intel":
+      set FC = "ifort"
+      set CC = "icx"
+      breaksw
+   case "gcc":
+      set FC = "gfortran"
+      set CC = "gcc"
+      breaksw
+   case "pgi":
+      set FC = "pgf90"
+      set CC = "pgcc"
+      breaksw
+   default:
+      breaksw
+  endsw
+
  set    FP = $FC                       #> path of Fortan preprocessor; set in config.cmaq
- set    CC = ${myCC}                   #> path of C compiler; set in config.cmaq
  setenv BLDER ${CMAQ_HOME}/UTIL/bldmake/bldmake_${compilerString}.exe   #> name of model builder executable
 
 #> Libraries/include files
@@ -206,9 +221,22 @@ set make_options = "-j"                #> additional options for make command if
  setenv F_FLAGS   "${myFFLAGS}"            #> F77 flags
  set F90_FLAGS  = "${myFRFLAGS}"           #> F90 flags
  set CPP_FLAGS  = "-Dm3box"                #> Fortran preprocessor flags
- set C_FLAGS    = "${myCFLAGS} -O0 -g -debug all -traceback -DFLDMN -I" #> C flags
- set LINK_FLAGS = "${myLINK_FLAG}"         # Link flags
+ switch ( $compiler )  #> C flags
+   case  "intel":
+      set C_FLAGS = "-O0 -g -debug all -traceback -DFLDMN -I "
+      breaksw
+   case "gcc":
+      set C_FLAGS = "-O0 -g -fcheck=all -fbacktrace -DFLDMN -I "
+      breaksw
+   case "pgi":
+      set C_FLAGS = "-O0 -g -Mbounds -Mchkptr -traceback -DFLDMN -I "
+      breaksw
+   default:
+      set C_FLAGS = "-O0 -g -DFLDMN -I "
+      breaksw
+  endsw
 
+  set LINK_FLAGS = "${myLINK_FLAG}"         # Link flags
 
 #============================================================================================
 #> Implement User Input
@@ -501,16 +529,12 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo                                                              >> $Cfile
  echo "link_flags  $quote$LINK_FLAGS$quote;"                       >> $Cfile
  echo                                                              >> $Cfile
- echo "ioapi       $quote$LIB2$quote;     "                        >> $Cfile
+ echo "            "                                          >> $Cfile
  echo                                                              >> $Cfile
- echo "netcdf      $quote$netcdf_lib$quote;"                       >> $Cfile
+ echo "      "                                               >> $Cfile
  echo                                                              >> $Cfile
- echo "netcdff     $quote$netcdff_lib$quote;"                      >> $Cfile
+ echo "     "                                               >> $Cfile
  echo                                                              >> $Cfile
- if ( $?ParOpt ) then
-    echo "mpich       $quote$LIB3$quote;"                          >> $Cfile
-    echo                                                           >> $Cfile
- endif
  echo "include SUBST_PE_COMM    $ICL_PAR/PE_COMM.EXT;"             >> $Cfile
  echo "include SUBST_FILES_ID   $ICL_FILES/FILES_CTM.EXT;"         >> $Cfile
  echo "include SUBST_EMISPRM    $ICL_EMCTL/EMISPRM.EXT;"           >> $Cfile
@@ -788,21 +812,34 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     ln -s Makefile.$compilerString Makefile
  endif
 
-#create make.it script that compiles create_omi without having to source config_cmaq.csh
+#create make.it script that compiles without having to source config_cmaq.csh
 
  set make_it = "make.it"
  echo "#! /bin/csh -f" >! ${make_it}
  echo " "              >> ${make_it}
  echo "source ../../../../config_cmaq.csh "${compiler}" "${compilerVrsn}  >> ${make_it}
+ echo "#setenv debug true"                                         >> ${make_it}
  echo 'if ( $#argv == 1 )then'                                     >> ${make_it}
  echo '   if ( $1  == "clean" )make clean'                         >> ${make_it}
- echo "#setenv debug true"                                         >> ${make_it}
  echo "endif"                                                      >> ${make_it}
- echo "make"                                                       >> ${make_it}
+ echo "if( $?debug )then"                                          >> ${make_it}
+ echo "  make"                                                     >> ${make_it}
+ echo "else"                                                       >> ${make_it}
+ echo "  make -j"                                                  >> ${make_it}
+ echo "endif"                                                      >> ${make_it}
  echo "unsetenv compiler"                                          >> ${make_it}
  echo "unsetenv compilerVrsn"                                      >> ${make_it}
  echo 'exit()'         >> ${make_it}
  chmod +x ${make_it}
+
+if ( $#argv == 1 )then
+   if ( $1  == "clean" )make clean
+endif
+if( $?debug )then
+   make
+else
+   make -j
+endif
 
 #> Alert user of error in BLDMAKE if it ocurred
  if ( $status != 0 ) then
@@ -818,6 +855,8 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  endif
  mv ${CFG}.bld $Bld/${CFG}
 
+set echo
+
 #> gcc compiler chokes on trailing comments in namelists
  if ( ${compiler} == gcc ) then
     echo "   >>> removing trailing comments from namelists <<<"
@@ -826,45 +865,4 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     end
  endif
 
-#> If Building WRF-CMAQ, download WRF, download auxillary files and build
-#> model
- if ( $?build_wrf_cmaq ) then
-
-#> Check if the user has git installed on their system
-  git --version >& /dev/null
-  
-  if ($? == 0) then
-   set git_check
-  endif
- 
-  if ($?git_check) then
-
-    cd $CMAQ_HOME/CCTM/scripts
-  
-    # Downlad WRF repository from GitHub and put CMAQv5.5 into it
-    set WRF_BLD = BLD_WRF${WRF_VRSN}_CCTM_${VRSN}_${compilerString}
-    setenv wrf_path ${CMAQ_HOME}/CCTM/scripts/${WRF_BLD}
-    setenv WRF_CMAQ 1
-
-    if ( ! -d $WRF_BLD ) then 
-      git clone --branch ${WRF_VRSN} https://github.com/wrf-model/WRF.git ./$WRF_BLD >& /dev/null
-      cd $wrf_path
-      mv $Bld ./cmaq
-  
-      # Configure WRF
-        ./configure <<EOF
-        ${WRF_ARCH}
-        1
-EOF
-    endif
-
-     # Compile WRF-CMAQ
-     ./compile em_real |& tee -a wrf-cmaq_buildlog.log
-
-     cd ${CMAQ_HOME}/CCTM/scripts
-
-   endif
-
- endif 
-
-exit
+exit()
