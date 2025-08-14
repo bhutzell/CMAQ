@@ -159,6 +159,11 @@ set make_options = "-j"                #> additional options for make command if
 
  # Gas chem solver
  setenv ChemSolver ros3                   #> [ default for boxmodeling, ebi and smvgear other options]
+ if ( ! ( $?ISAM_CCTM ) ) then           # check whether best solver is best for mechanism
+    if ( ${Mechanism} == cb6r5m_ae7_aq || ${Mechanism} == cracmm3m ) then #> Gas-phase chemistry solver options ($CMAQ_MODEL/CCTM/src/gas)
+       setenv ChemSolver ros3                                             #> ros3 (or smvgear) are system independent
+    endif  
+ endif
                                          
  if ( $ChemSolver == ebi ) then             
     set ModGas    = gas/${ChemSolver}_${Mechanism}
