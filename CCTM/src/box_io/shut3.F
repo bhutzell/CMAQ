@@ -14,6 +14,9 @@ C
 C
 C***********************************************************************
 
+      USE M3UTILIO, ONLY: OUTPUT_FILE,N_OUTPUT_FILES,OUTPUT_FILES,SETUP_OUTPUT_FILE,
+     &                    NAMEVAL
+
       IMPLICIT NONE
 
 C...........   INCLUDES:
@@ -28,20 +31,6 @@ C........... Local variables:
 
         CHARACTER( MAX_IO_STRLEN ) :: ACTUAL_NAME
 
-        INTERFACE
-           SUBROUTINE ENVSTR( VAR_NAME, VAR_DESC, VAR_DEFAULT, VAR_VALUE, STATUS )
-             CHARACTER*(*), INTENT(  IN ) :: VAR_NAME
-             CHARACTER*(*), INTENT(  IN ) :: VAR_DESC
-             CHARACTER*(*), INTENT(  IN ) :: VAR_DEFAULT
-             CHARACTER*(*), INTENT( OUT ) :: VAR_VALUE
-             INTEGER,       INTENT( OUT ) :: STATUS
-           END SUBROUTINE ENVSTR
-           SUBROUTINE NAMEVAL( VAR_NAME, VAR_VALUE )
-             CHARACTER*(*), INTENT(  IN ) :: VAR_NAME
-             CHARACTER*(*), INTENT( OUT ) :: VAR_VALUE
-           END SUBROUTINE NAMEVAL
-        END INTERFACE
-
         DO NFILE = 1,N_FILES
            CALL NAMEVAL( LGCL_NAME( NFILE ),ACTUAL_NAME )
            INQUIRE(FILE = ACTUAL_NAME, NUMBER=FSTATUS)
@@ -54,9 +43,14 @@ C........... Local variables:
               CLOSE( FSTATUS )
            END IF
         END DO
-C.............................................................................
-C   begin body of subroutine  OPEN3
 
+        DO NFILE = 1,N_OUTPUT_FILES
+           FSTATUS = OUTPUT_FILES(NFILE)%IO_UNIT
+           IF( FSTATUS .GT. 0 )THEN
+               FLUSH( FSTATUS )
+               CLOSE( FSTATUS )
+           END IF
+        END DO
 
         SHUT3 = .TRUE.      
 

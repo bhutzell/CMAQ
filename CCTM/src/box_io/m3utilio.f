@@ -496,9 +496,12 @@ C   begin body of function  DT2STR
         J = JDATE
         T = JTIME
         CALL NEXTIME( J, T, 0 )
+        TIMBUF = ''
         TIMBUF = HHMMSS( T )
+        DATBUF = ''
         DATBUF = MMDDYY( J )
-        DT2STR = TIMBUF // DATBUF
+        
+        DT2STR = TRIM( TIMBUF ) // TRIM( DATBUF )
 
         RETURN
 
@@ -1349,7 +1352,7 @@ C   begin body of function  TRIMLEN
           TRIMLEN = LEN_TRIM( STRING )
           RETURN
          END FUNCTION TRIMLEN
-        integer function setenvvar ( env_name, env_value )
+        logical function setenvvar ( env_name, env_value )
 
         !------------------------------------------------------------------------------!
         ! description:                                                                 !
@@ -1394,16 +1397,13 @@ C   begin body of function  TRIMLEN
             ! check to make sure no blank string is passed & call c function
             ! mio_setenvvarc
             if ( ( env_name_len .eq. 0 ) .or. (env_value_len .eq. 0 ) ) then
-              setenvvar = -1
+              setenvvar = .false.
               return
             else
-              setenvvar = setenvvarc ( env_name, env_name_len,
-     &                                        env_value, env_value_len )
+              setenvvar = 
+     &        ( setenvvarc ( env_name, env_name_len,env_value, env_value_len ) .gt. 0 )
             endif
-            if( setenvvar .le. 0 )then
-              print*,'Error: setenvvar fails to set ',trim(env_name)
-              stop
-            else
+            if( setenvvar )then
               call nameval(env_name,test_value)
               print*,'Success: setenvvar sets ',trim(env_name),' = ',
      &        trim(test_value)
@@ -1453,18 +1453,29 @@ C...........   ARGUMENTS and their descriptions:
         CHARACTER(LEN=LEN(VNAME)) :: VARIABLE
 
         REAL CONC
+        LOGICAL, SAVE :: FIRST_CALL = .TRUE.
+        INTEGER, SAVE :: FIRST_DATE = -1
+        INTEGER, SAVE :: FIRST_TIME = -1
 
+c.....set date and time of first call
+        IF( FIRST_CALL )THEN
+          FIRST_DATE = JDATE
+          FIRST_TIME = JTIME
+          FIRST_CALL = .FALSE.
+        END IF
+
+        IF( FIRST_DATE .EQ. JDATE .AND. FIRST_TIME .EQ. JTIME )THEN
 c search box initial conditions
             DO L = 1,NUMB_INIT_CONC
                CONC = BOX_IC_VALUE( VNAME )
                IF ( CONC .GT. 0.0 ) THEN
-!                 print*,'XTRACT3_2D: ',TRIM( VNAME ),' = ',CONC
+                 print*,'XTRACT3_2D: ',TRIM( VNAME ),' = ',CONC
                   BUFFER = CONC
                   XTRACT3_2D = .TRUE.
                   RETURN
                END IF
             END DO
-
+         END IF
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_2D variables
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1721,6 +1732,17 @@ C...........   ARGUMENTS and their descriptions:
         INTEGER  L, M
 
         CHARACTER(LEN=LEN(VNAME)) :: VARIABLE
+        LOGICAL, SAVE :: FIRST_CALL = .TRUE.
+        INTEGER, SAVE :: FIRST_DATE = -1
+        INTEGER, SAVE :: FIRST_TIME = -1
+
+c.....set date and time of first call
+        IF( FIRST_CALL )THEN
+          FIRST_DATE = JDATE
+          FIRST_TIME = JTIME
+          FIRST_CALL = .FALSE.
+        END IF
+
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_2D variables
@@ -1974,16 +1996,29 @@ C...........   ARGUMENTS and their descriptions:
         INTEGER  L
         REAL     CONC
 
+        LOGICAL, SAVE :: FIRST_CALL = .TRUE.
+        INTEGER, SAVE :: FIRST_DATE = -1
+        INTEGER, SAVE :: FIRST_TIME = -1
+
+c.....set date and time of first call
+        IF( FIRST_CALL )THEN
+          FIRST_DATE = JDATE
+          FIRST_TIME = JTIME
+          FIRST_CALL = .FALSE.
+        END IF
+
+        IF( FIRST_DATE .EQ. JDATE .AND. FIRST_TIME .EQ. JTIME )THEN
 c search box initial conditions
             DO L = 1,NUMB_INIT_CONC
                CONC = BOX_IC_VALUE( VNAME )
                IF ( CONC .GT. 0.0 ) THEN
-!                 print*,'XTRACT3_3D: ',TRIM( VNAME ),' = ',CONC
+                 print*,'XTRACT3_3D: ',TRIM( VNAME ),' = ',CONC
                   BUFFER = CONC
                   XTRACT3_3D = .TRUE.
                   RETURN
                END IF
             END DO
+          END IF
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_3D variables
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2228,6 +2263,16 @@ C...........   ARGUMENTS and their descriptions:
         INTEGER  L, M
         REAL     CONC
         CHARACTER(LEN=LEN(VNAME)) :: VARIABLE
+        LOGICAL, SAVE :: FIRST_CALL = .TRUE.
+        INTEGER, SAVE :: FIRST_DATE = -1
+        INTEGER, SAVE :: FIRST_TIME = -1
+
+c.....set date and time of first call
+        IF( FIRST_CALL )THEN
+          FIRST_DATE = JDATE
+          FIRST_TIME = JTIME
+          FIRST_CALL = .FALSE.
+        END IF
 
             L = LEN_TRIM(VNAME)
             M = LEN(VNAME)
@@ -2235,222 +2280,31 @@ C...........   ARGUMENTS and their descriptions:
             VARIABLE( 1:L )   = VNAME( 1:L )
             VARIABLE( L+1:M ) = ' '
 
+        IF( FIRST_DATE .EQ. JDATE .AND. FIRST_TIME .EQ. JTIME )THEN
 c search box initial conditions
             DO L = 1,NUMB_INIT_CONC
                CONC = BOX_IC_VALUE( VNAME )
                IF ( CONC .GT. 0.0 ) THEN
-!                 print*,'XTRACT3_1D: ',TRIM( VNAME ),' = ',CONC
+!                 write(6,'(2(I7,1X),3(A),ES12.4)')JDATE,JTIME,'XTRACT3_1D: ',TRIM( VNAME ),' = ',CONC
                   BUFFER = CONC
                   XTRACT3_1D = .TRUE.
                   RETURN
                END IF
             END DO
+         END IF
 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_2D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            IF ( INDEX(VNAME,'PRSFC') ) THEN
-                  BUFFER = BXM_PRES
-                  XTRACT3_1D = .TRUE.
-                  RETURN
-            ENDIF
+         IF( XTRACT_METGEODATA( VNAME,CONC ) )THEN
+             BUFFER = CONC
+             XTRACT3_1D = .TRUE.
+             RETURN
+         ENDIF
 
-            IF ( INDEX(TRIM(VNAME),'TEMPG') .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_1D = .TRUE.
-                  RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'TSEASFC') .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_1D = .TRUE.
-                  RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'TEMP2') .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_1D = .TRUE.
-                  RETURN
-            ENDIF
-
-           IF ( INDEX(TRIM( VARIABLE ),'PRES') .GT. 0  ) THEN
-               BUFFER  = CELL_PRES
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-         
-            IF ( INDEX(TRIM( VARIABLE ),'WBAR' ) .GT. 0 ) THEN
-               BUFFER  = BXM_WBAR
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-                                
-            IF ( INDEX(TRIM( VARIABLE ),'SEAICE' ) .GT. 0 ) THEN
-                 BUFFER  = BXM_SEAICE
-                 XTRACT3_1D = .TRUE.
-                 RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM( VARIABLE ),'CLDT' ) .GT. 0 ) THEN
-               BUFFER  = BXM_CLDT
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'CLDB' ) .GT. 0 ) THEN
-               BUFFER  = BXM_CLDB
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'CFRAC' ) .GT. 0 ) THEN
-               BUFFER  = BXM_CFRAC
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM( VARIABLE ),'SLTYP' ) .GT. 0 ) THEN
-               BUFFER  = 5.0 ! set soil type to loam
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-   
-   
-            IF ( INDEX(TRIM(VNAME),'RCA') .GT. 0 ) THEN
-               BUFFER  = -1.0
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-   
-   
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            IF ( INDEX(TRIM( VARIABLE ),'TA' ) .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_1D = .TRUE.
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'PRES' ) .GT. 0 ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_1D = .TRUE.
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'QV' ) .GT. 0 ) THEN
-                  BUFFER  = QV
-                  XTRACT3_1D = .TRUE.
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'DENS' ) .GT. 0 ) THEN
-                  BUFFER  = DENS
-                  XTRACT3_1D = .TRUE.
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'DENSA_J' ) .GT. 0 ) THEN
-                  BUFFER  = DENS_J
-                  XTRACT3_1D = .TRUE.
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'ZH') .GT. 0  ) THEN
-                  BUFFER  = 50.0
-                  XTRACT3_1D = .TRUE.
-                  RETURN
-            ENDIF
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  OCEAN_1 variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-            IF ( INDEX(TRIM( VARIABLE ),'OPEN') .GT. 0  ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'SURF') .GT. 0  ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-
-
-            IF ( INDEX(TRIM( VARIABLE ),'CHLO') .GT. 0  ) THEN
-               BUFFER  = 0.0 
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-
-
-
-            IF ( INDEX(TRIM( VARIABLE ),'DMS') .GT. 0  ) THEN
-               BUFFER  = 0.0
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  GRID_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            IF ( INDEX(TRIM( VARIABLE ),'LAT') .GT. 0  ) THEN
-               BUFFER  = BXM_LAT
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'LON') .GT. 0  ) THEN
-               BUFFER  = BXM_LON
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-                                 
-            IF ( INDEX(TRIM( VARIABLE ),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'MSFX2') .GT. 0 ) THEN
-               BUFFER  = 1.0
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM( VARIABLE ),'HT') .GT. 0 ) THEN
-               BUFFER  = BXM_HT
-               XTRACT3_1D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VARIABLE),'LUFRAC_') .GT. 0 ) THEN
-              IF ( INDEX(TRIM(VARIABLE),'LUFRAC_04') .GT. 0 ) THEN
-                 BUFFER = 1.0
-              ELSE
-                 BUFFER = 0.0
-              END IF
-              XTRACT3_1D = .TRUE.
-              RETURN
-            END IF
-
-            BUFFER  = 1.0E-30
-            PRINT*,"XTRACT3_1D: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VARIABLE)
-            PRINT*,"Setting ", TRIM(VARIABLE),' to 1.0E-30'
-            XTRACT3_1D = .TRUE.
-         
+         BUFFER  = 1.0E-30
+         PRINT*,"XTRACT3_1D: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VARIABLE)
+         PRINT*,"Setting ", TRIM(VARIABLE),' to 1.0E-30'
+         XTRACT3_1D = .TRUE.
       
-      RETURN
+         RETURN
 
       END FUNCTION XTRACT3_1D
 
@@ -2493,7 +2347,18 @@ C...........   ARGUMENTS and their descriptions:
 
         INTEGER  L
         REAL     CONC
+        LOGICAL, SAVE :: FIRST_CALL = .TRUE.
+        INTEGER, SAVE :: FIRST_DATE = -1
+        INTEGER, SAVE :: FIRST_TIME = -1
 
+c.....set date and time of first call
+        IF( FIRST_CALL )THEN
+          FIRST_DATE = JDATE
+          FIRST_TIME = JTIME
+          FIRST_CALL = .FALSE.
+        END IF
+
+        IF( FIRST_DATE .EQ. JDATE .AND. FIRST_TIME .EQ. JTIME )THEN
 c search box initial conditions
             DO L = 1,NUMB_INIT_CONC
                CONC = BOX_IC_VALUE( VNAME )
@@ -2504,7 +2369,7 @@ c search box initial conditions
                   RETURN
                END IF
             END DO
-
+         END IF 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_3D variables
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2747,7 +2612,18 @@ C...........   ARGUMENTS and their descriptions:
 
         INTEGER  L
         REAL     CONC
+        LOGICAL, SAVE :: FIRST_CALL = .TRUE.
+        INTEGER, SAVE :: FIRST_DATE = -1
+        INTEGER, SAVE :: FIRST_TIME = -1
 
+c.....set date and time of first call
+        IF( FIRST_CALL )THEN
+          FIRST_DATE = JDATE
+          FIRST_TIME = JTIME
+          FIRST_CALL = .FALSE.
+        END IF
+
+        IF( FIRST_DATE .EQ. JDATE .AND. FIRST_TIME .EQ. JTIME )THEN        
 c search box initial conditions
             DO L = 1,NUMB_INIT_CONC
                CONC = BOX_IC_VALUE( VNAME )
@@ -2758,6 +2634,7 @@ c search box initial conditions
                   RETURN
                END IF
             END DO
+         END IF
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  MET_CRO_2D variables
@@ -3517,11 +3394,14 @@ C...........   ARGUMENTS and their descriptions:
            INTEGER :: NSPECIES 
     
            NSPECIES = INDEX1_CHAR( SPECIES,NUMB_INIT_CONC,INIT_CONC_SPCS )
-           IF( NSPECIES .GE. 0 )THEN
+           IF( NSPECIES .GT. 0 )THEN
               BOX_IC_VALUE = INIT_CONC_VALUES( NSPECIES )
+!              write(6,'(A,ES12.4)')'BOX_IC_VALUE: ' // TRIM(SPECIES ) // ' = ',BOX_IC_VALUE
            ELSE
               BOX_IC_VALUE = -1.0E-30
            END IF
+
+           RETURN
            
         END FUNCTION BOX_IC_VALUE
 

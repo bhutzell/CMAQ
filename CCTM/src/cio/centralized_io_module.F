@@ -7535,72 +7535,57 @@ C  REVISION  HISTORY: This file was Created from INTERP3
 C  REVISION  HISTORY: INTERP3 was created Prototype created by Jerry Gipson IN JULY 1997	
 C
 C***********************************************************************
-      USE DRIVER_INPUTS
+      USE DRIVER_INPUTS, ONLY: XTRACT_METGEODATA
       USE SCENE_DATA
 
       IMPLICIT NONE
 
 C...........   INCLUDES:
-       INCLUDE SUBST_FILES_ID  ! I/O definitions and declarations 
-
 
 C...........   ARGUMENTS and their descriptions:
-        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+        CHARACTER*(*), INTENT(IN   )    :: VNAME           !  variable name, or 'ALL'
         INTEGER, INTENT(IN   )          :: JDATE           !  date, formatted YYYYDDD
         INTEGER, INTENT(IN   )          :: JTIME           !  time, formatted HHMMSS
         REAL, INTENT(  OUT)             :: BUFFER( :,:,: ) !  interpolation-output buffer array
-        CHARACTER(LEN=*), INTENT(IN   ), OPTIONAL :: FNAME !  logical file name
+        CHARACTER*(*), INTENT(IN   ), OPTIONAL :: FNAME    !  logical file name
+
         INTEGER  L
+        REAL     CONC
 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            IF ( TRIM(VNAME) .EQ. 'TA' ) THEN
-                  BUFFER = CELL_TEMP
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(VNAME,'PRES') .GT. 0 ) THEN
-                  BUFFER = CELL_PRES
-                  RETURN
-            ENDIF
-   
-            IF ( TRIM(VNAME) .EQ. 'QV' ) THEN
-                  BUFFER = QV
-                  RETURN
-            ENDIF
-   
-            IF ( TRIM(VNAME) .EQ. 'DENS' ) THEN
-                  BUFFER = DENS
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'JACOBF') .EQ. 0 ) THEN
-                  BUFFER = JACOBF
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'JACOBM') .EQ. 0 ) THEN
-                  BUFFER = JACOBM
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENSA_J') .EQ. 0 ) THEN
-                  BUFFER = DENS_J
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(VNAME,'ZH') .GT. 0 ) THEN
-                  BUFFER = 50.0
-                  RETURN
-            ENDIF
+        LOGICAL, SAVE :: FIRST_CALL = .TRUE.
+        INTEGER, SAVE :: FIRST_DATE = -1
+        INTEGER, SAVE :: FIRST_TIME = -1
 
-            IF ( INDEX(VNAME,'ZF') .GT. 0 ) THEN
-                  BUFFER = 100.0
+c.....set date and time of first call
+        IF( FIRST_CALL )THEN
+          FIRST_DATE = JDATE
+          FIRST_TIME = JTIME
+          FIRST_CALL = .FALSE.
+        END IF
+
+        IF( FIRST_DATE .EQ. JDATE .AND. FIRST_TIME .EQ. JTIME )THEN
+c search box initial conditions
+            DO L = 1,NUMB_INIT_CONC
+               CONC = BOX_IC_VALUE( VNAME )
+               IF ( CONC .GT. 0.0 ) THEN
+!                 write(6,'(2(I7,1X),3(A),ES12.4)')JDATE,JTIME,'INTERP_3D: ',TRIM( VNAME ),' = ',CONC
+                  BUFFER = CONC
                   RETURN
-            ENDIF
+               END IF
+            END DO
+         END IF
+
+         IF( PRESENT( FNAME ) )THEN
+             PRINT*,'CIO_INTERP3D: FNAME,VNAME = ',TRIM(FNAME),', ',TRIM(VNAME),INDEX(VNAME,'ZF'),INDEX(VNAME,'ZH')
+         END IF
+
+         IF( XTRACT_METGEODATA( VNAME,CONC ) )THEN
+            BUFFER = CONC
+            RETURN
+         END IF
+
       
-      
+            BUFFER = 1.0E-30
             IF( PRESENT( FNAME ) )THEN
               PRINT*,"Interpolate_Var_3DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
             ELSE
@@ -7612,225 +7597,63 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
         END SUBROUTINE R_INTERPOLATE_VAR_3DGRID
         SUBROUTINE r_interpolate_var_2dgrid( VNAME, JDATE, JTIME, BUFFER, FNAME )
 
+          USE DRIVER_INPUTS, ONLY: XTRACT_METGEODATA
+          USE SCENE_DATA
 
-C***********************************************************************
-C
-C  FUNCTION:  Mimics IO/API function DESC3 by putting selected
-C             file description data in commons.
-C
-C  RETURN VALUE:  TRUE iff successful
-C
-C  PRECONDITIONS REQUIRED: None
-C
-C  SUBROUTINES AND FUNCTIONS CALLED: None
-C
-C  REVISION  HISTORY: Prototype created by Golam Sarwar - March, 2004
-C  REVISION  HISTORY: This file was Created from INTERP3
-C  REVISION  HISTORY: INTERP3 was created Prototype created by Jerry Gipson IN JULY 1997	
-C
-C***********************************************************************
-      USE DRIVER_INPUTS
-      USE SCENE_DATA
-
-      IMPLICIT NONE
-
-C...........   INCLUDES:
+          IMPLICIT NONE
 
 C...........   ARGUMENTS and their descriptions:
-        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
+        CHARACTER*(*), INTENT(IN   )    :: VNAME           !  variable name, or 'ALL'
         INTEGER, INTENT(IN   )          :: JDATE           !  date, formatted YYYYDDD
         INTEGER, INTENT(IN   )          :: JTIME           !  time, formatted HHMMSS
         REAL, INTENT(  OUT)             :: BUFFER( :,: )     !  interpolation-output buffer array
-        CHARACTER(LEN=*), INTENT(IN   ), OPTIONAL :: FNAME           !  logical file name
+        CHARACTER*(*), INTENT(IN   ), OPTIONAL :: FNAME    !  logical file name
         INTEGER  L
+        REAL     CONC
+        LOGICAL, SAVE :: FIRST_CALL = .TRUE.
+        INTEGER, SAVE :: FIRST_DATE = -1
+        INTEGER, SAVE :: FIRST_TIME = -1
 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_2D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            IF ( INDEX(VNAME,'PRSFC') ) THEN
-                  BUFFER = BXM_PRES
-                  RETURN
-            ENDIF
-         
-            IF ( VNAME .EQ. 'WBAR' ) THEN
-               BUFFER = BXM_WBAR
-               RETURN
-            ENDIF
-                                
-            IF ( VNAME .EQ. 'SEAICE' ) THEN
-                 BUFFER = BXM_SEAICE
-                 RETURN
-            ENDIF
+c.....set date and time of first call
+        IF( FIRST_CALL )THEN
+          FIRST_DATE = JDATE
+          FIRST_TIME = JTIME
+          FIRST_CALL = .FALSE.
+        END IF
 
-            IF ( VNAME .EQ. 'CLDT' ) THEN
-               BUFFER = BXM_CLDT
-               RETURN
-            ENDIF
-   
-            IF ( VNAME .EQ. 'CLDB' ) THEN
-               BUFFER = BXM_CLDB
-               RETURN
-            ENDIF
-   
-            IF ( VNAME .EQ. 'CFRAC' ) THEN
-               BUFFER = BXM_CFRAC
-               RETURN
-            ENDIF
+        IF( FIRST_DATE .EQ. JDATE .AND. FIRST_TIME .EQ. JTIME )THEN
+c search box initial conditions
+            DO L = 1,NUMB_INIT_CONC
+               CONC = BOX_IC_VALUE( VNAME )
+               IF ( CONC .GT. 0.0 ) THEN
+!                 write(6,'(2(I7,1X),3(A),ES12.4)')JDATE,JTIME,'INTERP_2D: ',TRIM( VNAME ),' = ',CONC
+                  BUFFER = CONC
+                  RETURN
+               END IF
+            END DO
+        END IF
 
-            IF ( INDEX(TRIM(VNAME),'TEMPG') .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  RETURN
-            ENDIF
-      
-            IF ( INDEX(TRIM(VNAME),'TSEASFC') .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  RETURN
-            ENDIF
-      
-            IF ( INDEX(TRIM(VNAME),'TEMP2') .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  RETURN
-            ENDIF
-      
-            IF ( INDEX(TRIM(VNAME),'MOLI') .GT. 0 ) THEN
-                  BUFFER  = 6.0
-                  RETURN
-            ENDIF
- 
-            IF ( INDEX(TRIM(VNAME),'RCA') .GT. 0 ) THEN
-               BUFFER  = -1.0
-                RETURN
-            ENDIF
+        IF( XTRACT_METGEODATA( VNAME,CONC ) )THEN
+            BUFFER = CONC
+            RETURN
+        END IF
 
-            IF ( INDEX(TRIM(VNAME),'SNOCOV') .GT. 0 ) THEN
-               BUFFER  = 0.0
-               RETURN
-            ENDIF
-                
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            IF ( VNAME .EQ. 'TA' ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER = CELL_TEMP
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( VNAME .EQ. 'PRES' ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER = CELL_PRES
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( VNAME .EQ. 'QV' ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER = QV
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( VNAME .EQ. 'DENS' ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER = DENS
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( VNAME .EQ. 'DENSA_J' ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER = DENS_J
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(VNAME,'ZH') ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER = 50.0
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-   
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  OCEAN_1 variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            IF ( VNAME .EQ. 'OPEN' ) THEN
-               BUFFER = BXM_OPEN
-               RETURN
-            ENDIF
-   
-            IF ( VNAME .EQ. 'SURF' ) THEN
-               BUFFER = BXM_SURF
-               RETURN
-            ENDIF
-   
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  GRID_CRO_2D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            IF ( VNAME .EQ. 'LAT' ) THEN
-               BUFFER = BXM_LAT
-               RETURN
-            ENDIF
-   
-            IF ( VNAME .EQ. 'LON' ) THEN
-               BUFFER = BXM_LON
-               RETURN
-            ENDIF
-                                 
-            IF ( VNAME .EQ. 'OPEN' ) THEN
-               BUFFER = BXM_OPEN
-               RETURN
-            ENDIF
-   
-            IF ( VNAME .EQ. 'SURF' ) THEN
-               BUFFER = BXM_SURF
-               RETURN
-            ENDIF
-   
-            IF ( VNAME .EQ. 'MSFX2' ) THEN
-               BUFFER = 1.0
-               RETURN
-            ENDIF
-   
-            IF ( VNAME .EQ. 'HT' ) THEN
-               BUFFER = BXM_HT
-               RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'LFRAC_') .GT. 0 ) THEN
-              IF ( VNAME .EQ. 'LUFRAC_04' ) THEN
-                 BUFFER = 1.0
-              ELSE
-                 BUFFER = 0.0
-              END IF
-              RETURN
-            ENDIF
-
-            BUFFER = 1.0E-30
-            IF( PRESENT( FNAME ) )THEN
-              PRINT*,"Interpolate_Var_2DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
-            ELSE
-              PRINT*,"Interpolate_Var_2DGRID: Unknown Variable, ",TRIM(VNAME)
-            END IF
-            PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
+        BUFFER = 1.0E-30
+        IF( PRESENT( FNAME ) )THEN
+           PRINT*,"Interpolate_Var_2DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
+        ELSE
+           PRINT*,"Interpolate_Var_2DGRID: Unknown Variable, ",TRIM(VNAME)
+        END IF
+        PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
             
-      RETURN
+        RETURN
 
       END SUBROUTINE R_INTERPOLATE_VAR_2DGRID
 ! -------------------------------------------------------------------------
         subroutine r_interpolate_var_point (fname, vname, date, time, data)
 ! Function: Return zero emissions for Point Source Group Real 1-D Data
 
-          USE DRIVER_INPUTS
+          USE DRIVER_INPUTS, ONLY: XTRACT_METGEODATA
           USE SCENE_DATA
 
           Implicit None

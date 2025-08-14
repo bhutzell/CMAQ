@@ -1,5 +1,37 @@
       MODULE DRIVER_INPUTS
 
+       USE SCENE_DATA, ONLY:
+     &        BXM_TEMP,     ! = 300.0, Temperature (deg K)                    <
+     &        BXM_PRES,     ! = 101325.0, Pressure (Pa) 1 atm                    <
+     &        BXM_QV,       ! = 0.01244, Water vapor mixing ratio (Kg/Kg air)   <
+     &        BXM_QC,       ! = 0.000, Cloud Water mixing ratio (Kg/Kg air)   <
+     &        BXM_QR,       ! = 0.000, Rain Water mixing ratio (Kg/Kg air)   < 
+     &        BXM_SLTYP,    ! = 5.0, Soil Type (Loam based on WRF 3.8.1 PX categories)
+     &        BXM_RN,       ! = 0.0, Nonconvective Rainfall (cm)
+     &        BXM_MOLI,     ! = 6.0, inverse of Monin-Obukhov length(1/m)
+     &        BXM_AIR,      ! = 1000000.0, Air mixing (ppmV)
+     &        BXM_N2,       ! = 771000.0, molecular nitrogen gas (ppmV)
+     &        BXM_O2,       ! = 209000.0, molecular oxygen gas (ppmV)
+     &        BXM_H2,       ! = 0.0, molecular hydrogen gas (ppmV)
+     &        BXM_CH4,      ! = 2,  methane (ppmV) 
+     &        BXM_DENS,     ! = 1.225, Air density (Kg/m^3)                   <
+     &        BXM_LAT,      ! = 45.0  ! Latitude (deg)                         <
+     &        BXM_LON,      ! = 0     ! Longitude (deg)                        <
+     &        BXM_HT,       ! = 0.000 ! Height for J values (Km)               <
+     &        BXM_ZH,       ! = 50.0  ! mid-layer height above ground
+     &        BXM_ZF,       ! = 100.0 ! full-layer height above ground
+     &        BXM_WBAR,     ! = 0.0   ! Cloud liq. H2O content (gm/m^3)        <
+     &        BXM_CLDT,     ! = 3.0   ! Cloud tops (Km)                        <
+     &        BXM_CLDB,     ! = 2.0   ! Cloud bottoms (Km)                     <
+     &        BXM_CFRAC,    ! = 0.0   ! Cloud fraction                         <
+     &        BXM_OPEN,     ! = 0.0 ! fraction opoen ocean
+     &        BXM_SURF,     ! = 0.0 ! fraction surf zone
+     &        BXM_DMS,      ! = 0.0 ! Dimethyl Sulfide Water concetration (nM)
+     &        BXM_CHLO,     ! = 0.0 ! Water Chlorophyll Concentration (ng/m3)
+     &        BXM_SNOCOV,   ! = 0.0 ! snow cover
+     &        BXM_SEAICE,   ! = 0.0 ! fraction sea ice
+     &        BXM_LU        ! = 'LUFRAC_04' ! landuse category based NLCD40 scheme
+
        IMPLICIT NONE
 
 ! AQCHEM driver inputs
@@ -97,7 +129,7 @@ C for time controls ! default values
       INTEGER BXM_RUNLEN    ! = 120000   ! time duration (HHMMSS) for this run    <
       INTEGER BXM_TSTEP     ! = 001500   ! output time step interval (HHMMSS)     <
       INTEGER BXM_MSTEP     ! = 000100   ! model time step interval (HHMMSS)      <
-      INTEGER BXM_EMTYPE    ! = 0        ! Determines type of emission inputs
+      INTEGER BXM_EMTYP     ! = 0        ! Determines type of emission inputs
 
       REAL GEAR_ATOL        ! = 1.0E-12  ! absolute tolerance for SMV Gear solution
       REAL GEAR_RTOL        ! = 1.0E-06  ! relative tolerance for SMV Gear solution
@@ -112,34 +144,6 @@ C for data selection flags ! defaults
       LOGICAL PHZATAB  ! = FALSE   ! Flag for zenith angle phot table       <
       LOGICAL PHNONE   ! = FALSE   ! Flag for all darkness                  <
 
-C for air conditions ! default values
-
-      REAL BXM_TEMP     ! = 300.0, Temperature (deg K)                    <
-      REAL BXM_PRES     ! = 101325.0, Pressure (Pa) 1 atm                    <
-      REAL BXM_QV       ! = 0.01244, Water vapor mixing ratio (Kg/Kg air)   <
-      REAL BXM_AIR      ! = 1000000.0, Air mixing (ppmV)
-      REAL BXM_N2       ! = 771000.0, molecular nitrogen gas (ppmV)
-      REAL BXM_O2       ! = 209000.0, molecular oxygen gas (ppmV)
-      REAL BXM_H2       ! = 0.0, molecular hydrogen gas (ppmV)
-      REAL BXM_CH4      ! = 2,  methane (ppmV) 
-      REAL BXM_DENS     ! = 1.225, Air density (Kg/m^3)                   <
-  
-C for photolysis      !  default values       
-
-       REAL  BXM_LAT      ! = 45.0  ! Latitude (deg)                         <
-       REAL  BXM_LON      ! = 0     ! Longitude (deg)                        <
-       REAL  BXM_HT       ! = 0.000 ! Height for J values (Km)               <
-       REAL  BXM_WBAR     ! = 0.0   ! Cloud liq. H2O content (gm/m^3)        <
-       REAL  BXM_CLDT     ! = 3.0   ! Cloud tops (Km)                        <
-       REAL  BXM_CLDB     ! = 2.0   ! Cloud bottoms (Km)                     <
-       REAL  BXM_CFRAC    ! = 0.0   ! Cloud fraction                         <
-
-
-C land surface data
-       REAL  BXM_OPEN     ! = 0.0 ! fraction opoen ocean
-       REAL  BXM_SURF     ! = 0.0 ! fraction surf zone
-       REAL  BXM_SEAICE   ! = 0.0 ! fraction sea ice
- 
 C for input and output files
 
       LOGICAL  UNIX_OS   ! .TRUE. ! flag whether unix system
@@ -159,6 +163,13 @@ C for input and output files
       CHARACTER(LEN=656)  MACTAB_FILE ! full file name 
       CHARACTER(LEN=656)  EMIS_FILE   ! full name of emissions file
 
+      INTERFACE
+        LOGICAL FUNCTION XTRACT_METGEODATA( VNAME,VNAME_VALUE )
+           CHARACTER *(*), INTENT(  IN ) :: VNAME       ! VNAME name
+           REAL,           INTENT( OUT ) :: VNAME_VALUE ! 1.0e-30 if not found
+        END FUNCTION XTRACT_METGEODATA
+      END INTERFACE        
+        
       CONTAINS
 
       SUBROUTINE SET_BOX_INPUTS()
@@ -328,16 +339,20 @@ C for input and output files
      &                              RB_ATOL, RB_RTOL
 
           NAMELIST /DATA_CONTROLS/  ASCII, IOAPI, M3PHOT, PHZATAB, PHNONE,
-     &                              BXM_EMTYPE
+     &                              BXM_EMTYP
 
-          NAMELIST /AIR_CONTROLS/   BXM_TEMP, BXM_PRES, BXM_QV, BXM_AIR,
-     &                              BXM_N2,   BXM_O2,   BXM_H2, BXM_CH4,
-     &                              BXM_DENS
+          NAMELIST /AIR_CONTROLS/   BXM_TEMP, BXM_PRES, BXM_QV,   BXM_AIR,
+     &                              BXM_N2,   BXM_O2,   BXM_H2,   BXM_CH4,
+     &                              BXM_DENS, BXM_RN,   BXM_MOLI, BXM_ZH,
+     &                              BXM_ZF,   BXM_QC,   BXM_QR
 
-          NAMELIST /SURFACE_CONTROLS/ BXM_OPEN, BXM_SURF, BXM_SEAICE
+          NAMELIST /SURFACE_CONTROLS/ BXM_OPEN, BXM_SURF, BXM_SEAICE,
+     &                                BXM_CHLO, BXM_DMS,  BXM_LU,
+     &                                BXM_SLTYP, BXM_SNOCOV
 
           NAMELIST /PHOT_CONTROLS/  BXM_LAT,  BXM_LON,  BXM_HT, BXM_WBAR, 
-     &                              BXM_CLDT, BXM_CLDB, BXM_CFRAC    
+     &                              BXM_CLDT, BXM_CLDB, BXM_CFRAC, BXM_ZH,
+     &                              BXM_ZF
 
           NAMELIST /FILE_CONTROLS/  UNIX_OS, INDIR,   INFILE,     JTABDIR,
      &                              JTABLE,  BXM_SAS, BXM_MACTAB, OUTDIR,
@@ -368,29 +383,41 @@ C for input and output files
            M3PHOT   = .TRUE.      
            PHZATAB  = .FALSE.       
            PHNONE   = .FALSE.     
-           BXM_EMTYPE   = 0
+           BXM_EMTYP   = 0
 
-           BXM_TEMP     = 300.0      ! Temperature (deg K)                    <
-           BXM_PRES     = 101325.0    ! Pressure (Pa) 1 atm                    <
-           BXM_QV       = 0.01244     ! Water vapor mixing ratio (Kg/Kg air)   <
+           BXM_TEMP     = 300.0       ! Temperature (deg K)                    
+           BXM_PRES     = 101325.0    ! Pressure (Pa) 1 atm                    
+           BXM_SLTYP    = 5.0         ! Soil Type (Loam based on WRF 3.8.1 PX categories)
+           BXM_RN       = 0.0         ! Nonconvective Rainfall (cm)
+           BXM_MOLI     = 6.0         ! inverse of Monin-Obukhov length(1/m)
+           BXM_QV       = 0.01244     ! Water vapor mixing ratio (Kg/Kg air)   
+           BXM_QC       = 0.000       ! Cloud Water mixing ratio (Kg/Kg air)   <
+           BXM_QR       = 0.000       ! Rain Water mixing ratio (Kg/Kg air)   < 
+
            BXM_AIR      = 1000000.0   ! Air mixing (ppmV)
            BXM_N2       = 771000.0    ! molecular nitrogen gas (ppmV)
            BXM_O2       = 209000.0    ! molecular oxygen gas (ppmV)
            BXM_H2       = 0.0         ! molecular hydrogen gas (ppmV)
            BXM_CH4      = 2           ! methane (ppmV) 
-           BXM_DENS     = 1.225       ! Air density (Kg/m^3)                   <
+           BXM_DENS     = 1.225       ! Air density (Kg/m^3)                   
 
-           BXM_LAT      = 45.0        ! Latitude (deg)                         <
-           BXM_LON      = 0           ! Longitude (deg)                        <
-           BXM_HT       = 0.000       ! Height for J values (Km)               <
-           BXM_WBAR     = 0.0         ! Cloud liq. H2O content (gm/m^3)        <
-           BXM_CLDT     = 3.0         ! Cloud tops (Km)                        <
-           BXM_CLDB     = 2.0         ! Cloud bottoms (Km)                     <
-           BXM_CFRAC    = 0.0         ! Cloud fraction                         <
+           BXM_LAT      = 45.0        ! Latitude (deg)                         
+           BXM_LON      = 0           ! Longitude (deg)                        
+           BXM_HT       = 0.000       ! Surface Height for J values (m)               
+           BXM_ZH       = 50.000      ! Mid-layer Heigth Cell (m)
+           BXM_ZF       = 100.000     ! Full-layer Heigth Cell (m)
+           BXM_WBAR     = 0.0         ! Cloud liq. H2O content (gm/m^3)        
+           BXM_CLDT     = 3.0         ! Cloud tops (Km)                        
+           BXM_CLDB     = 2.0         ! Cloud bottoms (Km)                     
+           BXM_CFRAC    = 0.0         ! Cloud fraction                         
 
            BXM_OPEN   = 0.0
            BXM_SURF   = 0.0
-           BXM_SEAICE = 0.0
+           BXM_SNOCOV = 0.0
+           BXM_DMS    = 0.0 ! Dimethyl Sulfide Water concetration (nM)
+           BXM_CHLO   = 0.0 ! Water Chlorophyll Concentration (ng/m3)
+           BXM_SEAICE = 0.0 ! fraction sea ice
+           BXM_LU     = 'LUFRAC_04' ! landuse category based NLCD40 scheme
 
            UNIX_OS      = .TRUE.
            INDIR        = ''
@@ -456,6 +483,7 @@ C for input and output files
             Write(6,'(a)')'Using Below Default Values'
           End If
           WRITE(6, NML=SURFACE_CONTROLS)
+          print*,'DRIVER_INPUTS: BXM_LU = ',TRIM(BXM_LU)
 
           IF(UNIX_OS)THEN
              J = BSLASH

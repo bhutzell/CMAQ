@@ -5,11 +5,6 @@ C......................................................................
 C
 C  CONTAINS: Miscellaneous data for box model scenario
 C
-C  DEPENDENT UPON: HGRD3.EXT
-C                  VGRD3.EXT
-C                  CHEMPARMS.EXT
-C
-C  REVISION HISTORY: Prototype created by Jerry Gipson, July, 1997
 C......................................................................
 C
 
@@ -54,7 +49,7 @@ c            IPVDIM = 2  ====> Time (HHMMSS)
          REAL       DENS_J    ! Air density times J
          REAL       LAT       ! Latitude (deg)
          REAL       LON       ! Longitude (deg)
-         REAL       HT        ! Height (Km)
+         REAL       HT        ! Surface Height (m)
          REAL       WBAR      ! Average Cloud liquid water content (g/ m**3)
          REAL       CLDT      ! Cloud Tops (Km)
          REAL       CLDB      ! Cloud Bottoms (Km)
@@ -65,6 +60,49 @@ c            IPVDIM = 2  ====> Time (HHMMSS)
          REAL       CELL_H2       ! Input molecular hydrogen gas, ppmV
          REAL       CELL_CH4      ! Input methane, ppmV
          REAL       CELL_N2       ! Input molecular nitrogen gas, ppmV
+
+C values defined in box data namelist such gc_chem_inputs.dat
+C for air conditions ! default values
+
+         REAL BXM_TEMP     ! = 300.0, Temperature (deg K)                    <
+         REAL BXM_PRES     ! = 101325.0, Pressure (Pa) 1 atm                    <
+         REAL BXM_QV       ! = 0.01244, Water vapor mixing ratio (Kg/Kg air)   <
+         REAL BXM_QC       ! = 0.000, Cloud Water mixing ratio (Kg/Kg air)   <
+         REAL BXM_QR       ! = 0.000, Rain Water mixing ratio (Kg/Kg air)   <
+         REAL BXM_SLTYP    ! = 5.0, Soil Type (Loam based on WRF 3.8.1 PX categories)
+         REAL BXM_RN       ! = 0.0, Nonconvective Rainfall (cm)
+         REAL BXM_MOLI     ! = 6.0, inverse of Monin-Obukhov length(1/m)
+
+C Does not override values in RXNS_DATA_MODULE.F90
+         REAL BXM_AIR      ! = 1000000.0, Air mixing (ppmV)
+         REAL BXM_N2       ! = 771000.0, molecular nitrogen gas (ppmV)
+         REAL BXM_O2       ! = 209000.0, molecular oxygen gas (ppmV)
+         REAL BXM_H2       ! = 0.0, molecular hydrogen gas (ppmV)
+         REAL BXM_CH4      ! = 2,  methane (ppmV) 
+         REAL BXM_DENS     ! = 1.225, Air density (Kg/m^3)                   <
+  
+C for photolysis      !  default values       
+
+         REAL  BXM_LAT      ! = 45.0  ! Latitude (deg)                         <
+         REAL  BXM_LON      ! = 0     ! Longitude (deg)                        <
+         REAL  BXM_HT       ! = 0.000 ! Surface Height for J values (m)               <
+         REAL  BXM_ZH       ! = 50.0  ! mid-layer height above ground
+         REAL  BXM_ZF       ! = 100.0 ! full-layer height above ground
+         REAL  BXM_WBAR     ! = 0.0   ! Cloud liq. H2O content (gm/m^3)        <
+         REAL  BXM_CLDT     ! = 3.0   ! Cloud tops (Km)                        <
+         REAL  BXM_CLDB     ! = 2.0   ! Cloud bottoms (Km)                     <
+         REAL  BXM_CFRAC    ! = 0.0   ! Cloud fraction                         <
+
+
+C land surface data
+         REAL  BXM_OPEN     ! = 0.0 ! fraction open ocean
+         REAL  BXM_SURF     ! = 0.0 ! fraction surf zone
+         REAL  BXM_DMS      ! = 0.0 ! Water Dimethyl Sulfide Concentraton (nM)
+         REAL  BXM_CHLO     ! = 0.0 ! Water Chlorophyll Concentration (ng/m3), OCI Algorithm
+         REAL  BXM_SEAICE   ! = 0.0 ! fraction sea ice
+         REAL  BXM_SNOCOV   ! = 0.0 ! snow cover
+
+        CHARACTER(LEN=16) BXM_LU ! = 'LUFRAC_04' ! landuse category based NLCD40 scheme
 
          REAL      PHYDAT ( MXSTEPS , PVDIM )   !   Real Physical data
 c         PVDIM = 1  ====> Temperature (deg K)
