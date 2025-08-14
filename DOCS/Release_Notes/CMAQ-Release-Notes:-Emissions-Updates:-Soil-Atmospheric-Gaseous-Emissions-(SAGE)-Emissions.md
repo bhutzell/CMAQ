@@ -36,45 +36,45 @@ F<sub>fert</sub> is an empirical function that estimates when fertilizer is expe
 **Impact on results:**   
 Generally, this option increases estimated ambient HONO and NO in arid areas and decreases soil NO under high soil moisture conditions. This results in increased ozone in the Western U.S. and decreased ozone in the Eastern U.S. for HEMI and 12US1 simulations. Soil NO emissions are generally higher than the BEIS and MEGAN Yienger and Levy 1995 (YL) implementation and lower than the MEGAN implementation of BDSNP. 
 
-![image](https://github.com/user-attachments/assets/03fd6ae1-3390-469f-96bd-cc9c1d8b3903) 
+![image](./images/cmaqv6.0_SAGE_Figure1.png) 
 Figure 1: 2022 Hemispheric CAMS NO (left: 5.2 Tg annually) and SAGE NO (right: 5.4 Tg annually). 
 
-![image](https://github.com/user-attachments/assets/ae5720e1-3d46-4ddc-8880-478211ec2a90)
+![image](./images/cmaqv6.0_SAGE_Figure2.png)
 Figure 2: 2022 Hemispheric diurnal emissions profile (right) and emissions time series (right) 
 
-![image](https://github.com/user-attachments/assets/ba7304f1-5073-454d-9c47-f961d8bdf5b7)
+![image](./images/cmaqv6.0_SAGE_Figure3.png)
 Figure 3: 2018 Hemispheric CAMS NO (left: 5.0 Tg annually) and SAGE NO (right: 4.4 Tg annually). 
 
-![image](https://github.com/user-attachments/assets/5adf570d-c64c-4f6f-82d8-f728db7d235d)
+![image](./images/cmaqv6.0_SAGE_Figure4.png)
 Figure 4: 2018 Hemispheric diurnal emissions profile (right) and emissions time series (right) 
 
-![image](https://github.com/user-attachments/assets/5315ab08-8980-419a-91a9-20d0bda231ef)
+![image](./images/cmaqv6.0_SAGE_Figure5.png)
 Figure 5: 2018 CONUS BEIS NO (left: 0.4 Tg annually) and SAGE NO (right: 0.5 Tg annually). 
 
-![image](https://github.com/user-attachments/assets/ac7b7324-e38a-4af0-883a-a36eb2437e04)
+![image](./images/cmaqv6.0_SAGE_Figure6.png)
 Figure 6: 2018 CONUS diurnal emissions profile (right) and emissions time series (right) 
 
 SAGE NO emissions show a greater degree of variability than the gridded CAMS emissions but are generally close in magnitude for the domain. SAGE emissions peak in late May and Early June and are typically lower from July to August on the hemispheric scale. At the CONUS scale SAGE emissions are 23% higher than BEIS for 2018, exhibit a similar seasonality with higher emissions in fall and higher midday and lower nighttime NO emissions. 
 
-![image](https://github.com/user-attachments/assets/d0350e5a-6160-4ffe-86b2-72265a175bcc)
+![image](./images/cmaqv6.0_SAGE_Figure7.png)
 Figure 7, Annual boxplots of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SAGE (Red), and the Base case (Blue)
 
-![image](https://github.com/user-attachments/assets/14ec7b46-415d-40d4-9afd-b0cc44b5ae13)
+![image](./images/cmaqv6.0_SAGE_Figure8.png)
 Figure 8, Monthly boxplots of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SAGE (Red), and the Base case (Blue)
 
-![image](https://github.com/user-attachments/assets/37f34ca9-f712-4a36-b546-de12cd92b762)
+![image](./images/cmaqv6.0_SAGE_Figure9.png)
 Figure 9, Seasonal Kelly plot of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SAGE and the Base case (STAGE2)
 
-![image](https://github.com/user-attachments/assets/6815edfa-324f-47b1-8081-368d356c84a5)
+![image](./images/cmaqv6.0_SAGE_Figure10.png)
 Figure 10, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SAGE and the Base case (STAGE2)
 
-![image](https://github.com/user-attachments/assets/59020ee1-8261-443b-b9e6-a07a299cee0d)
+![image](./images/cmaqv6.0_SAGE_Figure11.png)
 Figure 11, Annual boxplots of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SAGE (SOIL_GAS_R11; Red), and the Base case (Blue)
 
-![image](https://github.com/user-attachments/assets/3d67c118-89f6-4708-990b-b0beb0f21fb4)
+![image](./images/cmaqv6.0_SAGE_Figure12.png)
 Figure 12, Monthly boxplots of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SAGE (SOIL_GAS_R11; Red), and the Base case (Blue)
 
-![image](https://github.com/user-attachments/assets/df110b14-0467-4024-809b-3f50606dd5cb)
+![image](./images/cmaqv6.0_SAGE_Figure13.png)
 Figure 13, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SAGE (SOIL_GAS_R11) and the Base case
 
 
