@@ -24,7 +24,8 @@
 ! 07-04-20 G Sarwar, added an iodine reaction - (IO45)
 ! 01/08/21 G Sarwar, removed the reaction of CH3BR ; there are no emissions (BR21)
 ! 12-20-20 G Sarwar, added a reaction for CB6r5 and updated many rate constants and some yields following Ramboll Report to TCEQ (07/30/2020)
-!
+! 07-24-25 G. Sarwar
+! Aerosol nitrate photolysis
 !---------------------------------
 CB6R5M_AE7_AQ
 
@@ -708,6 +709,11 @@ REACTIONS[CM] =
 <DMS5>  DMS + CLO          = 0.75*SO2 + 0.25*MSA
                                      + MEO2
                                      + CL             # 1.7E-15@-340;
+
+! Aerosol nitrate photolysis (implemented as heterogeneous reactions)
+<HET_ANO3I> ANO3I = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
+<HET_ANO3J> ANO3J = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
+
 END MECH
 
 CONSTANTS

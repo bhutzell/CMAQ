@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CB6R5M_AE7_AQ mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Nov 22, 2024
+C  REVISION HISTORY: Created by EBI solver program, Jul 25, 2025
 C
 C***********************************************************************
       USE HRDATA
@@ -507,6 +507,8 @@ C..NOTE: RXRAT commented out are not referenced by any routine
       RXRAT(    451 ) = RKI(   451 ) * YC(  DMS ) * YC(  NO3 )
       RXRAT(    452 ) = RKI(   452 ) * YC(  DMS ) * YC(  CL )
       RXRAT(    453 ) = RKI(   453 ) * YC(  DMS ) * YC(  CLO )
+      RXRAT(    454 ) = RKI(   454 ) * YC(  ANO3I )
+      RXRAT(    455 ) = RKI(   455 ) * YC(  ANO3J )
 
 
       RETURN

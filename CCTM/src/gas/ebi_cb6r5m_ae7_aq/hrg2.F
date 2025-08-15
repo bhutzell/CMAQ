@@ -28,7 +28,7 @@ C  PRECONDITIONS: For the CB6R5M_AE7_AQ mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Nov 22, 2024
+C  REVISION HISTORY: Created by EBI solver program, Jul 25, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -258,6 +258,8 @@ c..Remaining HONO production terms
      &    +                 RXRAT(   389 )      ! BRNO2+ABRJ=HONO+BR2
      &    +                 RXRAT(   445 )      ! INO2+ACLJ=HONO+ICL
      &    +                 RXRAT(   446 )      ! INO2+ABRJ=HONO+IBR
+     &    +    6.7000D-01 * RXRAT(   454 )      ! ANO3I=0.6700D+00*HONO+...
+     &    +    6.7000D-01 * RXRAT(   455 )      ! ANO3J=0.6700D+00*HONO+...
 
       P19 = YC0( HONO ) + P19 * DTC
 

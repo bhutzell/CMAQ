@@ -1276,6 +1276,10 @@
              RKI( NCELL,  452) =  CFACT * ARRHENUIS_T03( INV_TEMP,  3.4000D-13,   2.0810D+03 )
 !  Reaction Label DMS5            
              RKI( NCELL,  453) =  CFACT * ARRHENUIS_T03( INV_TEMP,  1.7000D-15,   3.4000D+02 )
+!  Reaction Label HET_ANO3I       
+             RKI( NCELL,  454) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
+!  Reaction Label HET_ANO3J       
+             RKI( NCELL,  455) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
 
         END DO  
 !  Multiply rate constants by [M], [O2], [N2], [H2O], [H2], or [CH4]
@@ -1727,5 +1731,7 @@
              INDEX_MI2          = IOLD2NEW( INDEX_MI2         , 1 )
              INDEX_MIB          = IOLD2NEW( INDEX_MIB         , 1 )
              INDEX_MIC          = IOLD2NEW( INDEX_MIC         , 1 )
+             INDEX_ANO3I        = IOLD2NEW( INDEX_ANO3I       , 1 )
+             INDEX_ANO3J        = IOLD2NEW( INDEX_ANO3J       , 1 )
           END SUBROUTINE RESET_SPECIES_POINTERS
        END MODULE RXNS_FUNCTION
