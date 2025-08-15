@@ -209,6 +209,12 @@ C  Initialize arrays
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          DELC = 0.0
+         IF ( .NOT. ALLOCATED( CSAV ) ) THEN
+           ALLOCATE ( CSAV( NCOLS,NROWS,NLAYS,N_CGRID_SPC ),
+     &                STAT = STATUS )
+           CALL CHECKMEM( STATUS, 'CSAV', PNAME )
+           CSAV = CGRID
+         END IF
 
       END IF   ! LIPR
 
