@@ -21,7 +21,7 @@
 **Description**:   
 These changes address an issue in the aerosol/gas partitioning calculations for the ISAM model and expand on the previous changes outlined below. In some instances, mass was still erroneously allocated to the wrong tags. This was most obvious when a signal would occassionally show up far away from an isolated source. For example, below is a map of contribution of NO2 from a power plant in IL. Very early in the simulation, a substantial signature appears of the coast of CA.
 
-![image](https://github.com/user-attachments/assets/4d7571ad-5279-48d4-b928-6c69aaae6b2b)
+![image](./images/instrumented-models/cmaqv6.0_ISAM_v6.0_Layer1_NO2.png)
 
 **Significance and Impact**:   
 
