@@ -468,6 +468,8 @@ Information is based on the mech.def file.
 | DMS3   | DMS + NO3 ----> SO2 + HNO3 + MEO2 + FORM  |   1.90E-13e<sup>   520.00/T</sup> |   1.0869E-12 |
 | DMS4   | DMS + CL ---->   0.8600\*SO2 + MEO2 +    0.4500\*FORM +    0.4500\*HCL +    0.1400\*MSA +    0.5500\*CLO  |   3.40E-13e<sup>  2081.00/T</sup> |   3.6537E-10 |
 | DMS5   | DMS + CLO ---->   0.7500\*SO2 +    0.2500\*MSA + MEO2 + CL  |   1.70E-15e<sup>   340.00/T</sup> |   5.3174E-15 |
+| HET_ANO3I   | ANO3I ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_ANO3 | Not Available<sup>2</sup> | 
+| HET_ANO3J   | ANO3J ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_ANO3 | Not Available<sup>2</sup> | 
 
 <sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     
 <sup>1</sup>Photolysis Reaction;depends on radiation and predicted concentrations     
