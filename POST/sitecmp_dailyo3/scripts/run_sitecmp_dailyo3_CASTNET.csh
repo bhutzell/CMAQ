@@ -93,7 +93,7 @@
 #> indicate whether or not to check QA flag
  setenv QA_FLAG_CHECK Y 
  setenv QA_FLAG_HEADER "OZONE_F" 
- setenv QA_FLAG_VALUES "BCDFIMP" 
+ setenv QA_FLAG_VALUES "#BCDFHIJKLMNPRTY" 
 
 #> set missing value string
  setenv MISSING '-999'
