@@ -2448,7 +2448,10 @@
            INTEGER         :: YEAR
            INTEGER         :: DAY       ! julian day
 #ifndef mpas
+#ifndef m3box
            LOGICAL         :: LEAP_YEAR ! is a leap year
+!close m3box
+#endif
 #endif
            LOGICAL         :: FIRST_CALL  = .TRUE.
 
@@ -2484,23 +2487,20 @@
             DAY  = MOD( JDATE, 1000 )
             YEAR = INT( 0.001 * REAL(JDATE) )
             
-#ifndef mpas
+#if defined(mpas) || defined(m3box)
+            IF( LEAP_YEAR(YEAR) )THEN
+#else
             LEAP_YEAR = ( ( MOD(YEAR,4) .EQ. 0 )
      &                      .AND. ( MOD(YEAR,100) .NE. 0 )
      &                           .OR. ( MOD(YEAR,400) .EQ. 0  ))
 
             IF( LEAP_YEAR )THEN
-               TIME = REAL( DAY ) / 366.0
-            ELSE
-               TIME = REAL( DAY ) / 365.0
-            ENDIF
-#else
-            IF( LEAP_YEAR(YEAR) )THEN
-               TIME = REAL( DAY ) / 366.0
-            ELSE
-               TIME = REAL( DAY ) / 365.0
-            ENDIF
+!close m3box
 #endif
+               TIME = REAL( DAY ) / 366.0
+            ELSE
+               TIME = REAL( DAY ) / 365.0
+            ENDIF
 
            
 ! find where time is located in profile data

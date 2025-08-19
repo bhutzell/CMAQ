@@ -216,7 +216,7 @@
                 xmsgs( 2 ) = 'of the last available year on the '
      &                    // 'OMI input file:' // dt2str( jtdate_temp, 0 ) // '<<---<<'
                 write(xmsgs( 3 ),'(A,F14.8)')'Exact date: ',tdate_temp
-                call m3parag ( 3, xmsgs )
+                write(logdev,'(3(A,/))')(Trim(xmsgs(ios)),ios=1,3)
              end if
            else if ( tdate .le. strdate ) then
 ! Submitted date is outside of ozone database range.
@@ -240,7 +240,7 @@
                 xmsgs( 2 ) = 'of the next available year on the OMI input file:'
      &                 // dt2str( jtdate_temp, 0 ) // '<<---<<'
                 xmsgs( 3 ) = ' '
-                call m3parag ( 3, xmsgs )
+                write(logdev,'(3(A,/))')(Trim(xmsgs(ios)),ios=1,3)
              end if
 
 ! Submitted date falls within the satellite data measurement gap beginning
@@ -264,8 +264,8 @@
                 xmsgs( 1 ) = 'Total column ozone will be estimated from the corresponding Julian Day'
                 xmsgs( 2 ) = 'of the closest available year on the OMI input file:'
      &                     // dt2str( jtdate_temp, 0 ) // '<<---<<'
-                xmsgs( 3 ) = ' '
-                call m3parag ( 3, xmsgs )
+               xmsgs( 3 ) = ' '
+               write(logdev,'(3(A,/))')(Trim(xmsgs(ios)),ios=1,3)
              end if
            else
              if( jdate_prev .ne. jdate )then ! write message to log
@@ -273,7 +273,7 @@
      &                    // dt2str( jdate, 0 )
                xmsgs( 2 ) = 'from data available on the OMI input file'
                xmsgs( 3 ) = ' '
-               call m3parag ( 3, xmsgs )
+               write(logdev,'(3(A,/))')(Trim(xmsgs(ios)),ios=1,3)
              end if  
            end if
 
