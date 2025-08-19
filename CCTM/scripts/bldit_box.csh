@@ -97,7 +97,8 @@ set make_options = "-j"                #> additional options for make command if
  else if ( $?DDM3D_CCTM ) then
      set VRSN = v60B_DDM3D_${Mechanism}            #> model configuration ID for CMAQ_DDM
  else
-     set VRSN = v60B_serial_${Mechanism}                   #> model configuration ID for CMAQ
+#    set VRSN = v60B_serial_${Mechanism}                   #> model configuration ID for CMAQ
+     set VRSN = v60B_PHOTINLINE_serial_${Mechanism}                   #> model configuration ID for CMAQ
  endif
  
  set EXEC  = CCTM_${VRSN}.exe          #> executable name
@@ -135,8 +136,8 @@ set make_options = "-j"                #> additional options for make command if
  set ModPlmrs  = plrise/smoke               #> in-line emissions plume rise
  set ModCgrds  = spcs/cgrid_spcs_nml        #> chemistry species configuration module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/spcs)
-#set ModPhot   = phot/inline                #> photolysis calculation module 
- set ModPhot   = phot/table                #> photolysis calculation module 
+ set ModPhot   = phot/inline                #> photolysis calculation module 
+#set ModPhot   = phot/table                #> photolysis calculation module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/phot)
 
  set ModMech   = MECHS/${Mechanism}
@@ -210,8 +211,8 @@ set make_options = "-j"                #> additional options for make command if
 #> Libraries/include files
 #set LIOAPI   = "${IOAPI_DIR}/lib ${ioapi_lib}"      #> I/O API library directory
 #set IOAPIMOD = "${IOAPI_DIR}/include"               #> I/O API module directory
- set NETCDF   = "${NETCDF_DIR}/lib ${netcdf_lib}"    #> netCDF C library directory
- set NETCDFF  = "${NETCDFF_DIR}/lib ${netcdff_lib}"  #> netCDF Fortran library directory
+ set NETCDF   = "${NETCDF_DIR}/lib"    #> netCDF C library directory
+ set NETCDFF  = "${NETCDFF_DIR}/lib"  #> netCDF Fortran library directory
  set PNETCDF  = "${PNETCDF_DIR}/lib ${pnetcdf_lib}"  #> Parallel netCDF library directory
 #set PIO_INC  = "${IOAPI_DIR}/src"
 
@@ -229,7 +230,7 @@ set make_options = "-j"                #> additional options for make command if
       set C_FLAGS = "-O0 -g -fcheck=all -fbacktrace -DFLDMN -I "
       breaksw
    case "pgi":
-      set C_FLAGS = "-O0 -g -Mbounds -Mchkptr -traceback -DFLDMN -I "
+      set C_FLAGS = "-O0 -g -Mbounds -traceback -DFLDMN -I "
       breaksw
    default:
       set C_FLAGS = "-O0 -g -DFLDMN -I "
@@ -330,7 +331,7 @@ set make_options = "-j"                #> additional options for make command if
     set PAR = ""
     set Popt = NOOP
     set seL = sef90_noop
-    set LIB2 = "${ioapi_lib} ${extra_lib}"
+    set LIB2 = "${extra_lib}"
     set Str1 =
     set Str2 =
  endif 
@@ -529,11 +530,11 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo                                                              >> $Cfile
  echo "link_flags  $quote$LINK_FLAGS$quote;"                       >> $Cfile
  echo                                                              >> $Cfile
- echo "            "                                          >> $Cfile
+ echo "ioapi       $quote $quote;     "                        >> $Cfile
  echo                                                              >> $Cfile
- echo "      "                                               >> $Cfile
+ echo "netcdf      $quote $quote;"                       >> $Cfile
  echo                                                              >> $Cfile
- echo "     "                                               >> $Cfile
+ echo "netcdff     $quote $quote;"                      >> $Cfile
  echo                                                              >> $Cfile
  echo "include SUBST_PE_COMM    $ICL_PAR/PE_COMM.EXT;"             >> $Cfile
  echo "include SUBST_FILES_ID   $ICL_FILES/FILES_CTM.EXT;"         >> $Cfile
