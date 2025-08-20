@@ -34,7 +34,7 @@ The global arithmetic mean NO emission factors of [Steinkamp](http://www.atmos-c
 F<sub>fert</sub> is an empirical function that estimates when fertilizer is expected to be applied to agricultural soils. This is both a function of the one-meter soil temperature and the change in daylength. Both functions assume a normal distribution of values around an optimal point. The daylength function peaks at the spring equinox and has a minimum at the fall equinox. The soil temperature function has a peak at 10<sup>o</sup> C, the minimum recommended germination temperature for corn ([Abendroth et al., 2017](https://doi.org/10.2134/cftm2017.02.0015)). The seasonality function attenuates towards the tropics where a floor value at 5% to represent the lack of seasonality in the tropics.
 
 **Impact on results:**   
-Generally, this option increases estimated ambient HONO and NO in arid areas and decreases soil NO under high soil moisture conditions. This results in increased ozone in the Western U.S. and decreased ozone in the Eastern U.S. for HEMI and 12US1 simulations. Soil NO emissions are generally higher than the BEIS and MEGAN Yienger and Levy 1995 (YL) implementation and lower than the MEGAN implementation of BDSNP. 
+Generally, this option increases estimated ambient HONO and NO in arid areas and decreases soil NO under high soil moisture conditions. This results in increased ozone in the Western and decreases in the Eastern U.S. for HEMI and 12US1 simulations. Soil NO emissions are generally higher than the BEIS and MEGAN Yienger and Levy 1995 (YL) implementation and lower than the MEGAN implementation of BDSNP. The figures shown below are based on simulations conducted prior to a bug fix to the seasonality of fertilizer emissions. This bug fix results in higher soil NOx emissions in January-June and lower soil NOx emissions in July-December in the northern hemisphere.  
 
 ![image](https://github.com/user-attachments/assets/03fd6ae1-3390-469f-96bd-cc9c1d8b3903) 
 Figure 1: 2022 Hemispheric CAMS NO (left: 5.2 Tg annually) and SAGE NO (right: 5.4 Tg annually). 
@@ -81,3 +81,4 @@ Figure 13, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2018 1
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1332](https://github.com/USEPA/CMAQ_Dev/pull/1332/commits/56687957431443800ffdb28ed51e1e53540b0ac1) | [PR#1332](https://github.com/USEPA/CMAQ_Dev/pull/1332)  | 
+| | [PR#1379](https://github.com/USEPA/CMAQ_Dev/pull/1379) | 

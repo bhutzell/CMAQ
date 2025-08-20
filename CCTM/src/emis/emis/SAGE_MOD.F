@@ -560,11 +560,11 @@ C Function arguments:
          Real            :: hourang              ! noon hour solar angle
          Real            :: delang               ! solar declanation angle
          Real            :: daylen               ! day length (h)
-         Real, Parameter :: D_OFF  = 172.0       ! Summer Solstice       
+         Real, Parameter :: D_OFF  = 172.0       ! Summer Solstice in northern hemisphere
          Real, Parameter :: ANGODY = 360.0/365.0 !* PIO180 
 
 C-----------------------------------------------------------------------
-         delang       = sign(1.0,LAT)*PI180 * min(max(23.45 * COS( ANGODY * PI180* ( DOY - D_OFF )),-89.0),89.0)
+         delang       = PI180 * min(max(23.45 * COS( ANGODY * PI180* ( DOY - D_OFF )),-89.0),89.0)
          hourang      = min(max(-tan( delang ) * tan( PI180 * LAT ),-0.99),0.99)
          DAY_LENGTH   = 2.0/15.0 * acos(hourang)/PI180
          return
@@ -587,7 +587,6 @@ C Function arguments:
 C Local variables:
          Real     DOY       ! Day of the year (max 365)
          Real     DOY_YEST  ! DOY for yesterday
-         Real     YEAR
 ! Day length function
          Real            :: ddldt                ! d(day length)/dt (h/day)
          Real            :: Fdl                  ! Day length function
@@ -601,26 +600,32 @@ C Local variables:
 
 
 C-----------------------------------------------------------------------
-         YEAR     = FLOAT( DATE ) / 1000.0 
-         DOY      = FLOAT( DATE ) - YEAR * 1000
+
+         DOY      = FLOAT( MOD( DATE, 1000 ) )
          if(DOY .eq. 1.0 ) Then
             DOY_YEST = 365.0
          else 
             DOY_YEST = DOY - 1.0
-         end if 
-         ddldt    = ( DAY_LENGTH(DOY, LAT)  - DAY_LENGTH(DOY_YEST, LAT) ) /
-     &           abs( DAY_LENGTH(81.0, LAT) - DAY_LENGTH(80.0, LAT) )
-         SDDL     = min(0.9,(115-LAT)/100)
+         end if
+         ! very near the equator the denominator for the calculation of ddldt
+         ! becomes zero, so avoid division by zero for that case
+         if( abs( DAY_LENGTH(81.0, LAT) - DAY_LENGTH(80.0, LAT) ) .lt. 1e-30 ) Then
+            ddldt = 0
+         else
+            ddldt    = ( DAY_LENGTH(DOY, LAT)  - DAY_LENGTH(DOY_YEST, LAT) ) /
+     &              abs( DAY_LENGTH(81.0, LAT) - DAY_LENGTH(80.0, LAT) )
+         endif
+         SDDL     = min(0.9,(115-abs(LAT))/100)
          Fdl      = exp(-(ddldt-1.0)**2/(2.0 * SDDL**2)) 
          FTs      = exp(-0.5*((TS-TMin)/SDT)**2)
          FERT_ADJ = Fdl*FTs
          If( abs(LAT) > 23.4 ) Then
-            FMIN  = 1.17/LAT
+            FMIN  = 1.17/abs(LAT)
          Else 
             FMIN  = 0.05
          End If
          if(Ts .Gt. 283.15) FERT_ADJ = max(FERT_ADJ, FMIN)
-         
+
          RETURN
          
          END FUNCTION FERT_ADJ
