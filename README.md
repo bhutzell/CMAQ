@@ -74,7 +74,7 @@ The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DES
 
 
 ## CMAQ Test Case  
-A full set of inputs for 2022 are provided for the 12US1 domain, including emissions compatible with both the CRACMM2 and CRACMM3 chemical mechanisms. Input files can be used for running CMAQv5.5 (with CRACMM2) or CMAQv6.0 alpha (with CRACMM2 or CRACMM3). 
+A full set of model-ready inputs for 2022 are provided for the 12US1 domain, including CRACMM emissions compatible with both the CRACMM2 and CRACMM3 chemical mechanisms. Input files can be used for running CMAQv5.5 (with CRACMM2) or CMAQv6.0 alpha (with CRACMM2 or CRACMM3). 
 * [CMAQ Data](DOCS/CMAQ_Data.md)
 
 
