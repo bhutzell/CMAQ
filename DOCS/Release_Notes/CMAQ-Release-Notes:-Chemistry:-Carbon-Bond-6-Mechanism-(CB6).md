@@ -1,3 +1,55 @@
+### Photolysis of aerosol nitrate in CB6R5
+
+**Primary Contact**: 
+Golam Sarwar, Sarwar.golam@epa.gov, U.S. Environmental Protection Agency
+ 
+ 
+
+**Type of update**: Science Update 
+
+**Release Version/Date**:  CMAQv6.0
+
+**Description**:  
+This pull request adds photolysis of aerosol nitrate to CB6R5 following the procedure described in Sarwar et al., 2024. A new Euler Backward Iterative (EBI) solver is developed.
+
+**Significance and Impact**:  
+
+Model ozone (O3) concentrations without the photolysis of aerosol nitrate in May are shown in Figure 1a. Higher values are predicted over the southern portion than the northern portion. Model O3 enhancements with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model without photolysis of aerosol nitrate) are shown Figure 1b and O3 enhancements with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model with photolysis of aerosol nitrate) are shown Figure 1c. Photolysis of aerosol nitrate enhances O3 by small margins over small areas when the aerosol nitrate photolysis is only active within the modeling domain (RUN_B – RUN_A). The impacts on O3 are small since the continental U.S. domain contains only a small oceanic area. In contrast, it enhances O3 by larger margins over the entire modeling domain when aerosol nitrate photolysis is active within and outside the modeling domain through the effect of boundary conditions (RUN_C – RUN_A). Thus, the majority of the enhancements occur due to the boundary conditions which contain larger enhancements from the hemispheric model with the aerosol nitrate photolysis.
+
+<img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/48894c39-4e92-4cc2-836a-a6d6f0435beb" />
+
+Figure 1: (a) Model O3 without the pNO3 photolysis in May 2022 (RUN_A) (b) Impact of pNO3 photolysis on model O3 with initial and boundary conditions generated from hemispheric CMAQ without pNO3 photolysis (RUN_B -  RUN_A) (c) Impact of pNO3 photolysis on model O3 with initial and boundary conditions generated from hemispheric CMAQ with pNO3 photolysis (RUN_C -  RUN_A) 
+
+Daily Mean Bias was calculated by using model predicted daily maximum 8-hour average (DMA8) O3 and observed data from the AQS monitoring network over the western and eastern U.S. [Figure 2(a-b)]. Over the western U.S., model without the aerosol nitrate photolysis (RUN_A) underpredicts observed data for almost all days while model with the aerosol nitrate photolysis (RUN_C) increases O3 and eliminates the negative bias for majority of the days. However, model under-predictions remain on some days. Over the eastern U.S., model without the aerosol nitrate photolysis (RUN_A) has mixed impacts on model performance producing negative bias for almost all days in January-May and October-December, and positive bias in June-September. Model with the aerosol nitrate photolysis (RUN_C) improves the negative bias in January-May and October-December but deteriorates the bias in June-September.
+
+<img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/f9addeee-cdbc-418c-8423-866a61e440ff" />
+
+Figure 2: (a) Times series of daily maximum 8-hr O3 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the western U.S. (b) Times series of daily maximum 8-hr O3 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the eastern U.S. Western U.S. consists of Northwest, Northern Rockies, West, and Southwest climate regions while eastern U.S. consists of South, Southeast, Ohio Valley, Upper Midwest, and Northeast climate regions.
+
+Model PM2.5 concentrations without the photolysis of aerosol nitrate (RUN_A) are shown in Figure 3a. Higher values are predicted over land than over seawater. Changes in model PM2.5 concentrations with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model without photolysis of aerosol nitrate) are shown Figure 2b while PM2.5 concentration changes with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model with photolysis of aerosol nitrate) are shown Figure 1c. Photolysis of aerosol nitrate affects PM2.5 concentrations only by small margins when the aerosol nitrate photolysis is only active within the modeling domain (RUN_B – RUN_A) and also when aerosol nitrate photolysis is active within and outside the modeling domain through the effect of boundary conditions (RUN_C – RUN_A). Reductions occur due to the loss aerosol nitrate by photolysis while the enhancements occur from the changes in secondary aerosols due to the changes in oxidant levels. 
+
+<img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/ee097124-0fd8-4b9f-bfa6-f5fe73e9e3d9" />
+
+Figure 3: (a) Model PM2.5 without the pNO3 photolysis in May 2022 (RUN_A) (b) Impact of pNO3 photolysis on model PM2.5 with boundary conditions generated from hemispheric CMAQ without pNO3 photolysis (RUN_B -  RUN_A) (c) Impact of pNO3 photolysis on model PM2.5 with boundary conditions generated from hemispheric CMAQ with pNO3 photolysis (RUN_C -  RUN_A) 
+
+Daily Mean Bias was calculated by using model predicted daily mean PM2.5 and observed data from the AQS monitoring network over the western and eastern U.S. [Figure 4(a-b)]. Bias without and with the aerosol nitrate photolysis in each month is similar over the western and eastern U.S. Thus, the aerosol nitrate photolysis has low impacts on model performance for PM2.5.
+
+<img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/6214d231-b9ca-496a-aae4-e86bb3a9258e" />
+
+Figure 4: (a) Times series of PM2.5 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the western U.S. (b) Times series of PM2.5 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the eastern U.S. Western U.S. consists of Northwest, Northern Rockies, West, and Southwest climate regions while eastern U.S. consists of South, Southeast, Ohio Valley, Upper Midwest, and Northeast climate regions.
+
+ **References**:   
+Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A., B., Lee, J., Carpenter, L. J.: Examining the Impact of the photolysis of aerosol nitrate over Northern Hemisphere, Science of the Total Environment, 917, 170406, 2024. 
+
+Sarwar, G., Sidi, F., Simon, H., Henderson, B., Willison, J., Gilliam, R., Hogrefe, C., Foley, K., Mathur, R., Appel, W., 2025: Representing particulate nitrate photolysis over seawater improves CMAQ ozone predictions over the contiguous United States, Science of the Total Env., 970, 178968.
+
+
+ **Internal PRs**: 
+[PR#1382](https://github.com/USEPA/CMAQ_Dev/pull/1382)  
+
+
+
+
 ### Correction to molecular weight of HGIIGAS in species tables
 
 [Kristen Foley](mailto:foley.kristen@epa.gov), U.S. Environmental Protection Agency  

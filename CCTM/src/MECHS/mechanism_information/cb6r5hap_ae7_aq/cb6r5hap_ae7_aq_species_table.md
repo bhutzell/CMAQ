@@ -215,6 +215,7 @@
 | SRFACC            | Accum. Mode Surface Area Conc                        | NA                   | NA                     |
 | SRFAIT            | Aitken Mode Surface Area Conc                        | NA                   | NA                     |
 | SRFCOR            | Coarse Mode Surface Area Conc                        | NA                   | NA                     |
+| ASEAST            | J-mode seasalt tracer Conc                           | 31.3                 | E                      |
 
 Note that for each aerosol mass species, a letter will be appended to the names below in order to designate the size, or mode, of the aerosol being represented: I = Aitken mode, J = Accumulation mode, K = Coarse mode.  
 
