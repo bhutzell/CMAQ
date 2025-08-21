@@ -70,7 +70,7 @@ Source code and scripts are organized as follows:
 * **UTIL:** Utilities for generating code and using CMAQ (e.g. chemical mechanism generation)
 
 ## CMAQv6.0 Alpha Documentation
-The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DESID have been updated for CMAQv6.0 alpha.  All other User's Guide content in this repository was last updated for the CMAQv5.5 release. Additional documentation updates will be included in the CMAQv6.0 release. Information on the updates in CMAQv6.0 alpha is included in the **[CMAQ Release Notes](DOCS/Release_Notes/README.md).**
+The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DESID have been updated for CMAQv6.0 alpha.  All other User's Guide content in this repository was last updated for the CMAQv5.5 release. Additional documentation updates will be included in the CMAQv6.0 release. Information on the updates in CMAQv6.0 alpha is summarized in the **[Release FAQ](DOCS/Release_FAQ/CMAQv6.0-FAQ.md)**.
 
 
 ## CMAQ Test Case  
