@@ -84,7 +84,7 @@ O3_ERROR5 , ppmV, O3[1]O3[1]
 |[Merge for PR#1091](https://github.com/USEPA/CMAQ/commit/b4ff5c9631caa1361593656c38b70715211e11f7) | [PR#1091](https://github.com/USEPA/CMAQ_Dev/pull/1091)  |  
 
 ### Corrected Deposition Species Definition (SpecDef_Dep) files for missing nitrogen species
-[Jesse Bash](mailto:Bash.Jesse@epa.gov), U.S. Environmental Protection Agency  
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
 **Description**: There are a couple of issues with the SpecDef_Dep files resulting in the underestimation of total nitrogen deposition. The following changes were made to be more consistent with new NADP wet deposition and field scale dry deposition measurements: 
@@ -113,7 +113,7 @@ O3_ERROR5 , ppmV, O3[1]O3[1]
 
 ## [hr2day](../../POST/hr2day/README.md)
 ### Updating tz.csv to Natural Earth  
-**Primary Contact**: [Barron Henderson](mailto:henderson.barron@epa.gov), U.S. Environmental Protection Agency  
+[Barron Henderson](mailto:henderson.barron@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Change in input file  
 **Release Version/Date**: CMAQv5.5  
 

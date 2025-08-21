@@ -1,6 +1,6 @@
 ### Photolysis of aerosol nitrate in CB6R5M
 
-**Primary Contact**: [Golam Sarwar](sarwar.golam.email@epa.gov), U.S. Environmental Protection Agency    
+[Golam Sarwar](sarwar.golam.email@epa.gov), U.S. Environmental Protection Agency    
 
 **Type of update**: Science update  
 

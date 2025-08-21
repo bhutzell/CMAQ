@@ -3,7 +3,7 @@
 ## [MCIP](https://github.com/USEPA/CMAQ/tree/main/PREP/mcip)
 
 ### Expanded Land Use Support and Projection Corrections 
-[Tanya Spero](mailto:spero.tanya@epa.gov), U.S. Environmental Protection Agency    
+**Tanya Spero**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Science Update
 **Release Version/Date**: CMAQv6.0
 
@@ -43,7 +43,7 @@ These updates generally expand functionality of MCIP for broader use cases. The 
 
 
 ### Updates to Calculation of XORIG/YORIG for Some Lambert Domains (MCIP, Two-Way WRF-CMAQ, and Combine)
-[Tanya Spero](mailto:spero.tanya@epa.gov), U.S. Environmental Protection Agency    
+**Tanya Spero**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5
 
@@ -59,7 +59,7 @@ The original algorithm was removed from _combine_, and it was replaced with logi
 
 
 ### Removed Superfluous Open/Close Couplet to Read WRF Files in MCIP
-[Tanya Spero](mailto:spero.tanya@epa.gov), U.S. Environmental Protection Agency     
+**Tanya Spero**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Efficiency  
 **Release Version/Date**: CMAQv5.5
 
@@ -72,7 +72,7 @@ The original algorithm was removed from _combine_, and it was replaced with logi
 |[Merge for PR#1097](https://github.com/USEPA/CMAQ/commit/7319ff625dd70a88eb43124a3989574fc0f8551f) | [PR#1097](https://github.com/USEPA/CMAQ_Dev/pull/1097)  |    
 
 ### Updated MCIP Metadata for WRF Physics Beyond WRFv4.1
-[Tanya Spero](mailto:spero.tanya@epa.gov), U.S. Environmental Protection Agency   
+**Tanya Spero**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Metadata Update   
 **Release Version/Date**: CMAQv5.5  
 
@@ -94,7 +94,7 @@ The original algorithm was removed from _combine_, and it was replaced with logi
 Also, See the CMAQv6.0 Release Note on **[Remove option for Aerosol Initial Condition surface area](./CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#remove-option-for-aerosol-initial-condition-surface-area-and-update-settings-for-boundary-condition-surface-area)**.
  
  ### ICON C Compiler fix
-**Primary Contact**: [Barron H. HEnderson](mailto:henderson.barronl@epa.gov), U.S. Environmental Protection Agency    
+ [Barron H. Henderson](mailto:henderson.barronl@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv6.0  
 

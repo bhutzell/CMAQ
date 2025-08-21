@@ -1,6 +1,6 @@
 ### Correction to molecular weight of HGIIGAS in species tables
 
-[Kristen Foley](mailto:foley.kristen@epa.gov), U.S. Environmental Protection Agency  
+**Kristen Foley**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)   
 **Type of update:** Documentation Update   
 **Release Version/Date:** CMAQv5.5  
 **Description:** The molecular weight for HGIIGAS was incorrectly listed as 200.6 in the species tables for cb6r3_ae7_aq, cb6r5_ae7_aq, cb6r5hap_ae7_aq, cb6r5m_ae7_aq. This documentation can be found under CCTM/src/MECHS/README.md.  The molecular weight used in GC namelist files for these mechanisms is 271.5. The documentation in the species tables has been updated to be consistent with the namelist files (based on Donohoue et al.m 2005).  

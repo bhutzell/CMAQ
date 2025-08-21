@@ -1,8 +1,7 @@
 # Diagnostic Options
 ## ELMO
 ### ELMO version 2  
-**Primary Contact**: [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
-**Secondary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency     
+ **Ben Murphy** and **Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
 **Type of update**: Module Major Revision  
 **Release Version/Date**:  CMAQ v6.0  
 
@@ -98,7 +97,7 @@ Additional minor changes were made to support ELMOv2 implementation:
 
 
 ### Redirect ELMO for indicator of ozone production regime  
-**Primary Contact**: [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Enhancement  
 **Release Version/Date**:  CMAQ version 6.0  
 
@@ -112,7 +111,7 @@ The update modifies how the ELMO obtains an indicator whether the ozone producti
 
 
 ### Redirect ELMO for indicator of ozone production regime  
-**Primary Contact**: [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Enhancement  
 **Release Version/Date**:  CMAQ version 6.0  
 
@@ -125,7 +124,7 @@ The update modifies how the ELMO obtains an indicator whether the ozone producti
 
 
 ### Fix bug in ELMO calculation of PMF_OC, PMF_NCOM   
-[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency  
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
 
@@ -140,7 +139,7 @@ This change affects only PMF_OC and PMF_NCOM in the ELMO/AELMO outputs. There is
 |[Merge for PR#1104](https://github.com/USEPA/CMAQ/commit/3857d63aa00c2fbdd8278ccedc2c4986acc24f0e) | [PR#1104](https://github.com/USEPA/CMAQ_Dev/pull/1104)  | 
 
 ### Correct calculation of PM1, PM2.5, and PM25to10 as well as speciated NA, K, CA, and MG in ELMO  
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
  
@@ -174,7 +173,7 @@ The mode parameter fix for the calculation of mass with a hard diameter cut-off 
 |[Merge for PR#1078](https://github.com/USEPA/CMAQ/commit/52a12a0ac08237a871998996873dd57486833891) | [PR#1078](https://github.com/USEPA/CMAQ_Dev/pull/1078)  | 
 
 ### Accurate output of gas-phase species in mass units
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
   
@@ -190,7 +189,7 @@ Gas-phase Benzo-a-pyrene was yielding garbage output from ELMO.
 
 
 ### Restore accurate timestepping when running with temporally finer MET inputs 
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
 
@@ -205,7 +204,7 @@ This model bug fix should be adopted as soon as possible for any user running WR
 |[Merge for PR#962](https://github.com/USEPA/CMAQ/commit/a6e2bf20b774467fed85fc82eacd93ff57ef3434) | [PR#962](https://github.com/USEPA/CMAQ_Dev/pull/962)  | 
 
 ### Introduction of the Explicit and Lumped air quality Model Output module (ELMO)
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: New Feature  
 **Release Version/Date**: CMAQv5.4  
 
@@ -239,7 +238,7 @@ There is no quantitative impact on results, but there will be a noticeable posit
 
 ## Budget Tool
 ### Changes in Henry's law computation and Budget Tool  
-[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency     
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)       
 **Type of update**: Computational Efficiency Improvements    
 **Release Version/Date**:  Version 6.0    
 
@@ -254,7 +253,7 @@ Collectively, these two updates reduce runtime by approximately 18% on our 12US1
 |[Merge for PR#1182](https://github.com/USEPA/CMAQ/commit/7f82804551f82e714dc91c85430beaef9b1bb282) | [PR#1182](https://github.com/USEPA/CMAQ_Dev/pull/1182)  |   
 
 ### Bugfix to the Budget Tool output file
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
 **Type of update**: Bug Fixes  
 **Release Version/Date**:  v6.0   
 

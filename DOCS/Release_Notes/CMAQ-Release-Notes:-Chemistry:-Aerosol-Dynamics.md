@@ -1,8 +1,7 @@
 # Aerosol Dynamics
 
 ### Generalized Dynamic and Equilibrium Partitioning of Inorganic Aerosols
-**Ben Murphy**, U.S. Environmental Protection Agency  
-**[Havala Pye](mailto:pye.havala@epa.gov)**, U.S. Environmental Protection Agency   
+**Ben Murphy** and [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency   
 **Type of update**: Science Update  
 **Release Version/Date**:  CMAQv6.0 
 

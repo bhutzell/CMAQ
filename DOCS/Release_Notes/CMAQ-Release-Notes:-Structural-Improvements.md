@@ -1,7 +1,7 @@
 # Structural Improvements
 
 ### Reorganize Aero Module  
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
 **Type of update**: Restructure  
 **Release Version/Date**:  CMAQv6.0   
 
@@ -18,7 +18,7 @@ No impact on results.
 |[Merge for PR#1291](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e) | [PR#1291](https://github.com/USEPA/CMAQ_Dev/pull/1291)  |   
 
 ### Enable parallel I/O for Lightning and ELMO files
-[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
 **Type of update**: Fix/added feature    
 **Release Version/Date**: CMAQv6.0  
 
@@ -38,7 +38,7 @@ Was not tested given no access to a parallel file system, however, not anticipat
 
 
 ### Improvements to compiling with GCC 
-[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Compilation    
 **Release Version/Date**: CMAQv6.0  
 
@@ -66,7 +66,7 @@ Generally, warnings should be addressed when possible. You never know when GCC m
 |[Merge for PR#1358](https://github.com/USEPA/CMAQ/commit/ce939e79d4cda7961a5813578ee7de784a00e0b9) | [PR#1358](https://github.com/USEPA/CMAQ_Dev/pull/1358)  |  
 
 ### Replace CONST.EXT include file with module and update constant values  
-[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Restructure     
 **Release Version/Date**: CMAQv6.0  
 
@@ -88,7 +88,7 @@ NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds
 
 
 ### Cap log_message at 1000 lines  
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
 **Type of update**: Bug Fix   
 **Release Version/Date**:  CMAQv6.0   
 
@@ -118,7 +118,7 @@ The update removes a CCTM compile error from the desid_module.F file when the bu
 
 
 ### Simplify RETRIEVE_OCEAN_DATA
-[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**:  Simplify code  
 **Release Version/Date**: CMAQv6.0  
 
@@ -153,7 +153,7 @@ The non-FORTRAN explanation boils down to the ability to pass 1-D arrays, 2-D ar
 | [Merge for PR#1154](https://github.com/USEPA/CMAQ/commit/c31983b72a3049d708138da3f57227875333eb39) |  [PR#1154](https://github.com/USEPA/CMAQ_Dev/pull/1154) |
 
 ### Emissions Diagnostics and Log Output
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
 **Type of update**: Diagnostic and Log Updates    
 **Release Version**:  CMAQv5.5   
  
@@ -175,7 +175,7 @@ These updates improve consistency among diagnostic output files and improve read
 |[Merge for PR#1077](https://github.com/USEPA/CMAQ/commit/1eef012a93faf0f7f9b523fede916fb5cd890fef) | [PR#1077](https://github.com/USEPA/CMAQ_Dev/pull/1077)  |  
 
 ## Add precision to timing metrics in logfiles 
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency   
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Improvement (Minor log formatting change)     
 **Release Version/Date**: CMAQv5.5      
 
@@ -190,7 +190,7 @@ At high computational efficiency, the default precision provided for the timing 
 |[Merge for PR#961](https://github.com/USEPA/CMAQ/commit/cf37d49e144b3aed1380c6a74f404063f5e047bf) | [PR#961](https://github.com/USEPA/CMAQ_Dev/pull/961)  | 
 
 ## Improvement of Logfile output and error reporting
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix and Log File Improvements    
 **Release Version**: CMAQv5.4    
 

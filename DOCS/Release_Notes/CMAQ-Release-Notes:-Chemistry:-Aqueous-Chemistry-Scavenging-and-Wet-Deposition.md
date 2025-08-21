@@ -22,7 +22,7 @@ Tan, Y., Perri, M.J., Seitzinger, S.P., Turpin, B.J.: Effects of precursor conce
 |[Merge for PR#1339](https://github.com/USEPA/CMAQ/commit/ccb92633ebe4cd73ef738e4f16899c4eb95e2f0d) | [PR#1339](https://github.com/USEPA/CMAQ_Dev/pull/1339)  |
 
 ### Streamline Mapping to Default Cloud Chemistry Solver
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
 **Type of update**: Infrastructure Improvement  
 **Release Version/Date**: CMAQv6.0    
 
@@ -55,7 +55,7 @@ The following limited updates were made to **aqchem**:
 |[Merge for PR#1130](https://github.com/USEPA/CMAQ/commit/8d607848cdfe7b1f1b139dbb968145f092fb9714) | [PR#1130](https://github.com/USEPA/CMAQ_Dev/pull/1130)  |
 
 ### Minor bug fixes to cloud processing
-**Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
 **Type of update**: Maintenance  
 **Release Version/Date**:  CMAQv6.0   
 
@@ -72,7 +72,7 @@ Two issues are addressed.
 |[Merge for PR#1263](https://github.com/USEPA/CMAQ/commit/2f07b7813e6a632f256041c3d901f39e1fd96d90) | [PR#1263](https://github.com/USEPA/CMAQ_Dev/pull/1263)  |
 
 ### Removal of acm_ae6_mp Cloud Module
-**Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Maintenance  
 **Release Version/Date**:  CMAQv6.0   
 
@@ -85,7 +85,7 @@ Two issues are addressed.
 |[Merge for PR#1236](https://github.com/USEPA/CMAQ/commit/72f92b2a7e26b4d9ef16f2f7fbaa976bf77fbac3) | [PR#1236](https://github.com/USEPA/CMAQ_Dev/pull/1236)  |
 
 ###  Cleanup of unit conversions and wetdep output mapping  
-[Ben Murphy](mailto:murphy.benjamin@epa.gov), U.S. Environmental Protection Agency      
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
 **Type of update**: Science Update    
 **Release Version/Date**: CMAQv5.5   
 

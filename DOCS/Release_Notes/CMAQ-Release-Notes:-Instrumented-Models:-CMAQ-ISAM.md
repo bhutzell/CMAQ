@@ -65,7 +65,7 @@ No impact on any output files for both ISAM and the base model. Some minor chang
 |[Merge for PR#1326](https://github.com/USEPA/CMAQ_Dev/commit/f735176e9a02a7dd82ca71031e76f74809ebaebc) | [PR#1326](https://github.com/USEPA/CMAQ_Dev/pull/1326)  |
 
 ## Avoid floating point exceptions in aerosol source apportionment algorithm
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)       
 **Type of update**: Bug Fix  
 **Release Version/Date**:  CMAQv6.0 
 
@@ -81,7 +81,7 @@ This change will resolve unstable growth of small numerical noise in ISAM runs, 
 
 
 ## Adds pcVOC and NOy species to ISAM species lists
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**:  CMAQv5.5+
 
@@ -118,7 +118,7 @@ The SOA predictions for the non-contiguous regions show dramatically large maxim
 
 
 ##  Source Apportionment of SOA
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency      
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Science Update    
 **Release Version**: CMAQv5.5  
 
