@@ -334,9 +334,10 @@ Sarwar, G., Sidi, F., Simon, H., Henderson, B.H., Willison, J., Gilliam, R., Hog
 <a id=data_and_docs></a>
 ## Are there new benchmark data and documentation updates?
 
+The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DESID have been updated for CMAQv6.0 alpha. All other User's Guide content in this repository was last updated for the CMAQv5.5 release. Additional documentation updates will be included in the CMAQv6.0 release.
 
-|**CMAQ Version**|**Data Type (Size)**|**Domain**|**Simulation Dates**|**Data Access**|**Tutorial**| 
-|:----:|:----:|:--------------:|:----:|:--------:|:----:|
+A full set of inputs for January 1 - December 31, 2022 are provided for the 12US1 domain, including CRACMM emissions that are compatible with both the CRACMM2 and CRACMM3. Input files can be used for running CMAQv5.5 (with CRACMM2) or CMAQv6.0 alpha (with CRACMM2 or CRACMM3).
+* [CMAQ Data](DOCS/CMAQ_Data.md)
 
 
 <a id=how_to_cite></a>
