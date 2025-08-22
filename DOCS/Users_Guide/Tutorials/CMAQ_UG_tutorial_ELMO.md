@@ -169,7 +169,7 @@ Example:
 After about line 650 add
 
 ```
-       REAL, ALLOCATABLE, SAVE :: ELMO_NEW_VAR(:,:,:) ! Greenhouse gas accumulated per timestep
+       REAL, ALLOCATABLE, SAVE :: ELMO_NEW_VAR(:,:,:) ! NEW_VAR accumulated per timestep
 ```
 
 
