@@ -40,11 +40,11 @@ GRIDMASK_STATES_12NE3.nc
 
 Note, all states are listed in the variable list in the header of the file, but the data only contains valid entries for the states in the 12NE3 domain. 
 
-The instructions require the user to edit the DESID emissions control namelist file and the DESID chemical control namelist file in the BLD directory. If you want to use emission scaling (independently from ISAM or DDM3D) you will also need to edit these files. (see step 10 below).
+The instructions require the user to edit the emissions control namelist file and the chemical control namelist file in the BLD directory. If you want to use emission scaling (independently from ISAM or DDM3D) you will also need to edit these files. (see step 10 below).
 
 ```
-CMAQ_Control_DESID.nml
-CMAQ_Control_DESID_${MECH}.nml
+CMAQ_Control.nml
+CMAQ_Control_${MECH}.nml
 ```
 
 
@@ -146,10 +146,10 @@ Change directories to the build directory
 cd BLD_CCTM_v55_ISAM_gcc_cb6r5_ae7_aq_m3dry
 ```
 
-edit the DESID emissions namelist file
+edit the emissions namelist file
 
 ```
-gedit CMAQ_Control_DESID.nml
+gedit CMAQ_Control.nml
 ```
 
 Uncomment the line that contains ISAM_REGIONS as the File Label
@@ -169,10 +169,10 @@ Uncomment the line that contains ISAM_REGIONS as the File Label
 
 ### Step 11: Example of emissions scaling (Reduce the PT_EGU emissions in NY by 25%) (Optional step, described here, but not used)
 
-edit the DESID chemical control namelist file, note please specify the mechanism or define the MECH environment variable.
+edit the chemical control namelist file, note please specify the mechanism or define the MECH environment variable.
 
 ```
-gedit CMAQ_Control_DESID_${MECH}.nml
+gedit CMAQ_Control_${MECH}.nml
 ```
 
 Add the following line at the bottom of the the namelist file (before the /)

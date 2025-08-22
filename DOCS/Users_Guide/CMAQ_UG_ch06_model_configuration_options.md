@@ -529,6 +529,18 @@ Note that if this flag is set to N to indicate zero windblown dust emissions, us
 
 Alternatively, users can also edit the emission control file by commenting out the coarse and fine species expected for the windblown dust module. The following species are emitted by the Dust module and may be referenced in the emission control file [Table 6-1](#Table6-1):
 
+As of CMAQ 6.0 there is a new option to consider the sheltering effect of brown vegetation on windblown dust emissions instead of just photosynthetically active vegetation. This approach is taken from Huang and Foroutan (2022, https://doi.org/10.1029/2021JD035243) and significantly reduces windblown dust emissions by modifying the vegetated fraction, height, and roughness values within the windblown dust module. Enabling this option requires setting the environmental variable CTM_BROWN_VEG to true in the run script and downloading the following files from Amazon Web Services: 
+
+     https://cmaq-12us1-cracmm2-modeling-platform-2022.s3.amazonaws.com/2022_12US1/surface/npv_avg.dat
+     https://cmaq-12us1-cracmm2-modeling-platform-2022.s3.amazonaws.com/2022_12US1/surface/pv_avg.dat
+
+The run script should point to the input files using the following environmental variables:
+
+     setenv PV_AVG_FILE /path/to/pv_avg.dat
+     setenv NPV_AVG_FILE /path/to/npv_avg.dat
+
+The provided .dat files can be used for any domain or time period, and the resolution of the data is 0.1° x 0.1°. The inputs are interpolated at the start of each model initialization for the day of the simulation. Extended continuous runs are not recommmended with this option, as the data are not updated during the simulation.
+
 <a id=Table6-1></a>
 **Table 6-1. Aerosol Species Predicted by the Windblown Dust Module** 
 

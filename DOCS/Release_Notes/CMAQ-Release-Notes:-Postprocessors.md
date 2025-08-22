@@ -123,7 +123,7 @@ O3_ERROR5 , ppmV, O3[1]O3[1]
 |[Merge for PR#1091](https://github.com/USEPA/CMAQ/commit/b4ff5c9631caa1361593656c38b70715211e11f7) | [PR#1091](https://github.com/USEPA/CMAQ_Dev/pull/1091)  |  
 
 ### Corrected Deposition Species Definition (SpecDef_Dep) files for missing nitrogen species
-[Jesse Bash](mailto:Bash.Jesse@epa.gov), U.S. Environmental Protection Agency  
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
 **Description**: There are a couple of issues with the SpecDef_Dep files resulting in the underestimation of total nitrogen deposition. The following changes were made to be more consistent with new NADP wet deposition and field scale dry deposition measurements: 
@@ -152,7 +152,7 @@ O3_ERROR5 , ppmV, O3[1]O3[1]
 
 ## [hr2day](../../POST/hr2day/README.md)
 ### Updating tz.csv to Natural Earth  
-**Primary Contact**: [Barron Henderson](mailto:henderson.barron@epa.gov), U.S. Environmental Protection Agency  
+[Barron Henderson](mailto:henderson.barron@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Change in input file  
 **Release Version/Date**: CMAQv5.5  
 
@@ -163,8 +163,7 @@ The previous tz.csv file was compared to two other time zone databases: tz_world
 A new tz.csv file was created from the Natural Earth 10m time zone shapefile (v4.1.0)[2]. The new tz.csv file is 2.5 MB, compared to the 4 MB original. The new file is smaller because it does not attempt to hug coastal boundaries, but instead allows for time zones that extend into the water to do so.  
 
 **Significance and Impact**: This will not affect model concentrations, but it will impact h2day calculations because small areas have updated time zones. This tends to matter most along the edges of time zones.  The original, new, and difference in "TZ hours behind UTC" are shown below.  
-
-<img width="523" alt="image" src="https://github.com/user-attachments/assets/cf3ab1fb-fa09-48c9-ba7e-c21a18434121">
+![image](./images/cmaqv6.0_hr2day_tzcsv_update.png)
 
 **References**:  
 [1] http://efele.net/maps/tz/world/  

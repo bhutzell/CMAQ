@@ -1,6 +1,58 @@
+### Photolysis of aerosol nitrate in CB6R5
+
+**Primary Contact**: 
+Golam Sarwar, Sarwar.golam@epa.gov, U.S. Environmental Protection Agency
+ 
+ 
+
+**Type of update**: Science Update 
+
+**Release Version/Date**:  CMAQv6.0
+
+**Description**:  
+This pull request adds photolysis of aerosol nitrate to CB6R5 following the procedure described in Sarwar et al., 2024. A new Euler Backward Iterative (EBI) solver is developed.
+
+**Significance and Impact**:  
+
+Model ozone (O3) concentrations without the photolysis of aerosol nitrate in May are shown in Figure 1a. Higher values are predicted over the southern portion than the northern portion. Model O3 enhancements with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model without photolysis of aerosol nitrate) are shown Figure 1b and O3 enhancements with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model with photolysis of aerosol nitrate) are shown Figure 1c. Photolysis of aerosol nitrate enhances O3 by small margins over small areas when the aerosol nitrate photolysis is only active within the modeling domain (RUN_B – RUN_A). The impacts on O3 are small since the continental U.S. domain contains only a small oceanic area. In contrast, it enhances O3 by larger margins over the entire modeling domain when aerosol nitrate photolysis is active within and outside the modeling domain through the effect of boundary conditions (RUN_C – RUN_A). Thus, the majority of the enhancements occur due to the boundary conditions which contain larger enhancements from the hemispheric model with the aerosol nitrate photolysis.
+
+<img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/48894c39-4e92-4cc2-836a-a6d6f0435beb" />
+
+Figure 1: (a) Model O3 without the pNO3 photolysis in May 2022 (RUN_A) (b) Impact of pNO3 photolysis on model O3 with initial and boundary conditions generated from hemispheric CMAQ without pNO3 photolysis (RUN_B -  RUN_A) (c) Impact of pNO3 photolysis on model O3 with initial and boundary conditions generated from hemispheric CMAQ with pNO3 photolysis (RUN_C -  RUN_A) 
+
+Daily Mean Bias was calculated by using model predicted daily maximum 8-hour average (DMA8) O3 and observed data from the AQS monitoring network over the western and eastern U.S. [Figure 2(a-b)]. Over the western U.S., model without the aerosol nitrate photolysis (RUN_A) underpredicts observed data for almost all days while model with the aerosol nitrate photolysis (RUN_C) increases O3 and eliminates the negative bias for majority of the days. However, model under-predictions remain on some days. Over the eastern U.S., model without the aerosol nitrate photolysis (RUN_A) has mixed impacts on model performance producing negative bias for almost all days in January-May and October-December, and positive bias in June-September. Model with the aerosol nitrate photolysis (RUN_C) improves the negative bias in January-May and October-December but deteriorates the bias in June-September.
+
+<img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/f9addeee-cdbc-418c-8423-866a61e440ff" />
+
+Figure 2: (a) Times series of daily maximum 8-hr O3 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the western U.S. (b) Times series of daily maximum 8-hr O3 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the eastern U.S. Western U.S. consists of Northwest, Northern Rockies, West, and Southwest climate regions while eastern U.S. consists of South, Southeast, Ohio Valley, Upper Midwest, and Northeast climate regions.
+
+Model PM2.5 concentrations without the photolysis of aerosol nitrate (RUN_A) are shown in Figure 3a. Higher values are predicted over land than over seawater. Changes in model PM2.5 concentrations with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model without photolysis of aerosol nitrate) are shown Figure 2b while PM2.5 concentration changes with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model with photolysis of aerosol nitrate) are shown Figure 1c. Photolysis of aerosol nitrate affects PM2.5 concentrations only by small margins when the aerosol nitrate photolysis is only active within the modeling domain (RUN_B – RUN_A) and also when aerosol nitrate photolysis is active within and outside the modeling domain through the effect of boundary conditions (RUN_C – RUN_A). Reductions occur due to the loss aerosol nitrate by photolysis while the enhancements occur from the changes in secondary aerosols due to the changes in oxidant levels. 
+
+<img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/ee097124-0fd8-4b9f-bfa6-f5fe73e9e3d9" />
+
+Figure 3: (a) Model PM2.5 without the pNO3 photolysis in May 2022 (RUN_A) (b) Impact of pNO3 photolysis on model PM2.5 with boundary conditions generated from hemispheric CMAQ without pNO3 photolysis (RUN_B -  RUN_A) (c) Impact of pNO3 photolysis on model PM2.5 with boundary conditions generated from hemispheric CMAQ with pNO3 photolysis (RUN_C -  RUN_A) 
+
+Daily Mean Bias was calculated by using model predicted daily mean PM2.5 and observed data from the AQS monitoring network over the western and eastern U.S. [Figure 4(a-b)]. Bias without and with the aerosol nitrate photolysis in each month is similar over the western and eastern U.S. Thus, the aerosol nitrate photolysis has low impacts on model performance for PM2.5.
+
+<img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/6214d231-b9ca-496a-aae4-e86bb3a9258e" />
+
+Figure 4: (a) Times series of PM2.5 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the western U.S. (b) Times series of PM2.5 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the eastern U.S. Western U.S. consists of Northwest, Northern Rockies, West, and Southwest climate regions while eastern U.S. consists of South, Southeast, Ohio Valley, Upper Midwest, and Northeast climate regions.
+
+ **References**:   
+Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A., B., Lee, J., Carpenter, L. J.: Examining the Impact of the photolysis of aerosol nitrate over Northern Hemisphere, Science of the Total Environment, 917, 170406, 2024. 
+
+Sarwar, G., Sidi, F., Simon, H., Henderson, B., Willison, J., Gilliam, R., Hogrefe, C., Foley, K., Mathur, R., Appel, W., 2025: Representing particulate nitrate photolysis over seawater improves CMAQ ozone predictions over the contiguous United States, Science of the Total Env., 970, 178968.
+
+
+ **Internal PRs**: 
+[PR#1382](https://github.com/USEPA/CMAQ_Dev/pull/1382)  
+
+
+
+
 ### Correction to molecular weight of HGIIGAS in species tables
 
-[Kristen Foley](mailto:foley.kristen@epa.gov), U.S. Environmental Protection Agency  
+**Kristen Foley**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)   
 **Type of update:** Documentation Update   
 **Release Version/Date:** CMAQv5.5  
 **Description:** The molecular weight for HGIIGAS was incorrectly listed as 200.6 in the species tables for cb6r3_ae7_aq, cb6r5_ae7_aq, cb6r5hap_ae7_aq, cb6r5m_ae7_aq. This documentation can be found under CCTM/src/MECHS/README.md.  The molecular weight used in GC namelist files for these mechanisms is 271.5. The documentation in the species tables has been updated to be consistent with the namelist files (based on Donohoue et al.m 2005).  
@@ -43,11 +95,11 @@ Ramboll, the developer of the Carbon Bond chemical mechanism, recently updated t
 
 Model simulations were completed with the CB6r3 and CB6r5 over the continental United States for a winter (January) and a summer (July) month in 2016. The update increases monthly mean ozone in both month (Figure 1); however, it also decreases ozone over some areas by small margin. Overall, the impacts of the update on model predictions are small. The impacts are slightly larger in summer than those in winter. It affects Model Bias both at AQS and CASTNET sites (Figure 2) by small margins.
 
-![image](https://user-images.githubusercontent.com/17162838/172222534-0323ac35-1cc7-490a-a43a-827062182504.png)
+![image](./images/chemistry/cmaqv6.0_impact_of_cb6r5_on_monthly_mean_ozone_figure_1.png)
 
 Figure 1: Impact of CB6r5 on monthly mean ozone
 
-![image](https://user-images.githubusercontent.com/17162838/172222590-a19d6f4e-bba6-46e7-b9e4-4eff003c3f7f.png)
+![image](./images/chemistry/cmaqv6.0_impact_of_cb6r5_monthly_mean_model_bias_figure_2.png)
 
 Figure 2: Impact of CB6r5 on monthly mean Model Bias at AQS and CASTNET sites
 
@@ -111,21 +163,21 @@ First change:
 
 Model sensitivity runs were completed using cb6r3_ae7_aq chemical mechanism with the existing and updated simple first order ozone loss for the continental US domain for a period of 9-days in summer (June 22-30, 2016). The revised simple first order ozone loss increases the average ozone over seawater and coastal areas by up to 1.5 ppbv. Impact is higher over seawater than over coastal area. Impact over the interior portion of the domain is negligible. 
 
-![image](https://user-images.githubusercontent.com/2692799/167717635-e1aa5591-64ca-4a59-8de0-d7a8294f5051.png)  
+![image](./images/chemistry/cmaqv6.0_impact_of_updated_simple_halogen_chemistry_O3_figure_1.png)  
 **Figure 1: Impact of the updated simple halogen chemistry on O3**
 
 Second change:
 
 Model sensitivity runs were completed using the existing and updated checks for OPEN and SURF values for a 10-day period in summer. Model with updated checks for OPEN and SURF values has only small impacts on predicted results. The mean difference in O3 concentrations during the 10-day period are shown in Figure 2. Note that the ocean file used in this test does not contain any tiny positive values along state borders; hence the problem reported by a CMAQ user does not show up in the model results.
 
-![image](https://user-images.githubusercontent.com/2692799/167717666-bf85d529-f378-4d20-83e8-02680a05c4c4.png)  
+![image](./images/chemistry/cmaqv6.0_impact_of_threshold_value_0.001_OPEN_SURF_values_on_O3_figure_2.png)
 **Figure 2: Impact of using a threshold value of 0.001 for OPEN and SURF values on O3**
 
 Third change:
 
 Two different model simulations were completed using the existing and updated implementation of the condensed halogen chemistry for 10 days in summer (June 21 -  June 30, 2016). It employed 12-km horizontal grid resolution with 35 vertical layers. The difference in O3 concentrations (updated – existing implementation) is shown in Figure 3. Model with the updated implementation does not have any impact on O3 over open ocean. However, it increases O3 over coastal areas when OPEN+SURF  < 1.0. 
 
-![image](https://user-images.githubusercontent.com/2692799/167717690-4e217cf9-5432-4f2d-8ed4-50a269f156e5.png)  
+![image](./images/chemistry/cmaqv6.0_impact_of_updated_halogen+chemistry_O3_figure_3.png)
 **Figure 3: Impact of the updated implementation of halogen chemistry on O3**
 
 **References**:  
@@ -169,11 +221,11 @@ Model sensitivity simulations were completed using cb6r5_ae7_aq chemical mechani
 Impact of the DMS chemistry on model performance was calculated using data from all networks (Figure 3). It can affect Normalized Mean Bias for sulfate at CASTNET, CSN and IMPROVE networks. However, the impacts are generally small when all sites are considered for calculating Normalized Mean Bias. Impacts on Normalized Mean Bias can be higher in coastal areas. It’s impact on ozone is small (< ±0.3 ppb) and impact on model performance is negligible.
 
 
-![image](https://user-images.githubusercontent.com/2692799/167717457-8bb2e2dc-e246-49d5-adaf-93a9283eca35.png)**Figure 1: (a) mean SO2 without DMS chemistry in January (b) impact of DMS chemistry on SO2 in January (c) mean SO2 without DMS chemistry in July (d) impact of DMS chemistry on SO2 in July**
+![image](./images/chemistry/cmaqv6.0_impact_of_dms_chemistry_SO2_figure_1.png)**Figure 1: (a) mean SO2 without DMS chemistry in January (b) impact of DMS chemistry on SO2 in January (c) mean SO2 without DMS chemistry in July (d) impact of DMS chemistry on SO2 in July**
 
-![image](https://user-images.githubusercontent.com/2692799/167717484-b1c40b51-be9d-4fec-bb8d-d5e7c0ae1a3d.png)**Figure 2: (a) mean sulfate without DMS chemistry in January (b) impact of DMS chemistry on sulfate in January (c) mean sulfate without DMS chemistry in July (d) impact of DMS chemistry on sulfate in July**
+![image](./images/chemistry/cmaqv6.0_impact_of_dms_chemistry_sulfate_figure_2.png)**Figure 2: (a) mean sulfate without DMS chemistry in January (b) impact of DMS chemistry on sulfate in January (c) mean sulfate without DMS chemistry in July (d) impact of DMS chemistry on sulfate in July**
 
-![image](https://user-images.githubusercontent.com/2692799/167717507-36c144ad-1eef-4d26-a69c-7589d8dffa0d.png)**Figure 3: Normalized Mean Bias of sulfate without and with DMS chemistry (a) IMPROVE sites in January (b) CSN sites in January (c) CASTNET sites in January (d) IMPROVE sites in July (e) CSN sites in July (f) CASTNET sites in July**  
+![image](./images/chemistry/cmaqv6.0_impact_of_dms_chemistry_normalized_mean_bias_figure_3.png)**Figure 3: Normalized Mean Bias of sulfate without and with DMS chemistry (a) IMPROVE sites in January (b) CSN sites in January (c) CASTNET sites in January (d) IMPROVE sites in July (e) CSN sites in July (f) CASTNET sites in July**  
 
 Existing ocean files will not work with the DMS chemistry; new ocean files with DMS concentrations in seawater are needed and can be generated using a new python based tool.
 
