@@ -99,7 +99,7 @@ Reactions of S/IVOC ROCOXY sequester more HO than in CRACMM2. HOx can still be r
 **Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Science Update     
 **Release Version/Date**:  CMAQv6.0  
-
+z
 **Description**:   
 Representative structures for first and second generation aromatic oxidation species are updated. 
 
@@ -535,7 +535,7 @@ This file provides information on CRACMM updates at the reaction level. This fil
 
 
 ### Consolidated list of chemical mechanisms
-[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
 **Type of update**: Maintenance   
 **Release Version/Date**: CMAQv6.0   
 

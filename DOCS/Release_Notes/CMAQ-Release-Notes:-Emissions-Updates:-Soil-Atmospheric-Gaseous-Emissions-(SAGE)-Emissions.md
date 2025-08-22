@@ -2,7 +2,7 @@
 
 ### Introducing new soil emissions module 
 
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Science Update  
 **Release Version/Date**: CMAQv6.0  
 **Description**:  

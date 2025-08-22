@@ -102,7 +102,7 @@ None, but allows to more efficiently use the CMAQ repository on Windows and Maci
 |[Merge for PR#899](https://github.com/USEPA/CMAQ/commit/fb1683a0497db9343fbc8158c5acdea888442124) | [PR#899](https://github.com/USEPA/CMAQ_Dev/pull/899)  | 
 
 ## Autochem
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)   
 **Type of update**: New Feature  
 **Release Version/Date**: CMAQ Version 5.4   
 

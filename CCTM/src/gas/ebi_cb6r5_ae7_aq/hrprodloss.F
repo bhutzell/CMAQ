@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Mar 14, 2025
+C  REVISION HISTORY: Created by EBI solver program, Aug  1, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 
@@ -1354,6 +1354,12 @@ C***********************************************************************
       PROD(  MSA          ) =    2.5000D-01 * RXRAT(   347 )      ! DMS+OH=0.2500D+00*MSA+...
      &                      +    1.4000D-01 * RXRAT(   349 )      ! DMS+CL=0.1400D+00*MSA+MEO2+...
       LOSS(  MSA          ) =   0.0D0
+
+      PROD(  ANO3I        ) =   0.0D0
+      LOSS(  ANO3I        ) =                 RXRAT(   350 )      ! ANO3I=0.6700D+00*HONO+...
+
+      PROD(  ANO3J        ) =   0.0D0
+      LOSS(  ANO3J        ) =                 RXRAT(   351 )      ! ANO3J=0.6700D+00*HONO+...
 
       PNEG( PAR ) =    2.5000D+00 * RXRAT(   128 )      ! KET=-0.2500D+01*PAR+...
      &            +    2.7000D+00 * RXRAT(   133 )      ! ROR=-0.2700D+01*PAR+...

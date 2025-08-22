@@ -1,6 +1,6 @@
 # STAGE
 ### STAGE Updates
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**:  Science Update, Bug Fix    
 **Release Version/Date**:  CMAQv6.0  
 
@@ -22,7 +22,7 @@ Tiled R<sub>a</sub> is now parameterized as R<sub>a</sub> = Pr<sub>o</sub>U/u<su
 
 
 ### Runtime Deposition Options and Add Support for DDM-3D
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**:  Science Update   
 **Release Version/Date**:  CMAQv6.0    
 
@@ -37,7 +37,7 @@ STAGE and M3DRY deposition modules are now both built in model executables and m
 |[Merge for PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321/commits/d387fd332650055d71fb4de373dc25d92ab86730) | [PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321)  |
 
 ### Diagnostic NH3 Emissions from Agriculture and Biogenic Sources
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Diagnostic Update     
 **Release Version/Date**:  CMAQv6.0  
 
@@ -54,7 +54,7 @@ This only adds diagnostic data and does not change results or impact run time.
 
 
 ### Update to Minimum Kz and Kz0ut in the STAGE deposition option
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**:  Science Update, Documentation  
 **Release Version/Date**:  CMAQv6.0  
 
@@ -72,7 +72,7 @@ The revised Kz0ut results in substantially more O3 titration and higher NOx and 
 |[Merge for PR#1278](https://github.com/USEPA/CMAQ/commit/23654ff0e2f4371354ec357bff96845b7e4eff9a) | [PR#1278](https://github.com/USEPA/CMAQ_Dev/pull/1278)  |
 
 ### Restored the impact of dry deposition factor on diagnostic deposition velocity outputs
-**Primary Contact**: [Jesse Bash(mailto:bash.jesse@epa.gov)], U.S. Environmental Protection Agency    
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix    
 **Release Version/Date**:  CMAQv6.0  
 
@@ -90,7 +90,7 @@ If the user selects a dry deposition factor for a surrogate deposition velocity 
 |[Merge for PR#1282](https://github.com/USEPA/CMAQ/commit/1c99863e38eee05a8e901a1204c402a98bdbf09d) | [PR#1282](https://github.com/USEPA/CMAQ_Dev/pull/1282)  |
 
 ### Model stop if STAGECTRL_NML environmental variable is missing
- [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+ **Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Bug Fix     
 **Release Version/Date**:  CMAQv6.0  
 
@@ -106,7 +106,7 @@ Model results are unchanged.
  
 
 ### STAGE gcc debug flag bug fix  
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix     
 **Release Version/Date**:  CMAQv6.0  
 
@@ -122,7 +122,7 @@ This bugfix allows the user to run the model compiled with gcc debug flags using
 
 
 ### Correction in an Underflow STAGE Emerson Aerosol Dry Deposition Option
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix   
 **Release Version/Date**: CMAQv5.5    
 
@@ -138,7 +138,7 @@ This allows for CMAQ simulations using the STAGE Emersion aerosol dry deposition
 
 
 ### STAGE Minor Bugfix
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5   
 
@@ -159,7 +159,7 @@ This pull request corrects a units typo in the  CMAQ_Control_STAGE.nml and the F
 
 
 ### Land Use and Deposition Species Mapping 
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency   
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix, New Feature     
 **Release Version/Date**: CMAQv5.4    
 
@@ -178,7 +178,7 @@ Overall, these result in a reduction in model run time, particularly when the MO
 |[Merge for PR#847](https://github.com/USEPA/CMAQ/commit/16f959108268dd2a55e2271a26d5d89a9ec54914) | [PR#847](https://github.com/USEPA/CMAQ_Dev/pull/847)  | 
 
 ### Updates to Gaseous and Aerosol Dry Deposition
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency   
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug fix, New feature    
 **Release Version/Date**: CMAQv5.4    
 

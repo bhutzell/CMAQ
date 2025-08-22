@@ -1,7 +1,7 @@
 # Online Met-Dependent Emission (MetEmis) Module
 
 ### Implement Online Met-Dependent Emission Module (MetEmis)  
-[Ben Murphy](murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Science Update   
 **Release Version/Date**:  CMAQv6.0 
 

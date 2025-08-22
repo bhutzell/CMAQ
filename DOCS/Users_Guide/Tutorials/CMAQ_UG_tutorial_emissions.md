@@ -1,7 +1,7 @@
 ## CMAQ Tutorial ##
 ### Prescribing Emissions Using DESID (Detailed Emissions Scaling, Isolation and Diagnostics) Module ###
 Purpose: This tutorial will guide users to utilizing the Control namelists to perform some basic manipulation
-of their emission streams. For additional questions, contact Ben Murphy (murphy.ben@epa.gov) or visit the CMAS Forum.
+of their emission streams. For additional questions, contact [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov),  or visit the CMAS Forum.
 
 ------------
 

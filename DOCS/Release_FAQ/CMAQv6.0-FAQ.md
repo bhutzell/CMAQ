@@ -121,6 +121,13 @@ A duplicate reaction of OP3 with OH that was present in CRACMM1 and CRACMM2 was 
   - **Streamline chemical mechanisms**   
 CMAQv6.0 no longer supports the following mechanisms: CB6R3_AE7_AQ, CRACMM1_AQ, CRACMM1AMORE_AQ, RACM2_AE6_AQ, and SAPRC07TIC_AE7i_AQKMT2. The update ensures consistency across remaining mechanisms and utilities. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#delete-obsolete-chemical-mechanisms)
 
+- **Updates to Carbon Bond 6 Mechanisms**  
+  -  **Photolysis of aerosol nitrate in CB6r5**  
+    The CB6R5, CB6r5M, and CB6r5hap mechanisms now include photolysis of aerosol nitrate, following [Sarwar et al. (2024)](https://doi.org/10.1016/j.scitotenv.2024.170406), with a new EBI solver. This update leads to increases in ozone in simulations of the northern hemisphere (using cb6r5m) which increases ozone in the continental U.S. domain through  the effect of boundary conditions. The increase in ozone tends to reduce bias in the spring in the western US (switching from a underestimation to a more moderate overestimation) and leads to an increase in positive bias in summer months across the country.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Carbon-Bond-6-Mechanism-(CB6).md#photolysis-of-aerosol-nitrate-in-cb6r5)
+
+  - **Updates to Henry's Law constants**    
+    Henry's Law constants for CB6r5 species were updated. This change better reflects the properties of representative compounds and has minimal impact on ozone and PM2.5 concentrations. This change is documented in the CRACMM [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updates-to-henrys-law-constants-for-cracmm3) since the update impacts all mechanisms. 
+  
 - **Bug fix to CarbonBond 6 Mechanism with Hazardous Air Pollutants (CB6r5HAP)**  
     - **Correct loss of reactive tracer styrene from ozone reaction**    
 Bug fix to cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the model species styrene, a hazardous air pollutant. No other model species are impacted. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Carbon-Bond-6-Mechanism-(CB6)-with-Hazardous-Air-Pollutants.md#correct-loss-of-reactive-tracer-styrene-from-ozone-reaction)
@@ -161,7 +168,7 @@ Bug fix to cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the mo
   This update improves the Inline Photolysis diagnostics by replacing total extinction coefficients with cloud extinction coefficients and adding calculations for aerosol properties when the sun is below the horizon. These changes correct a unit conversion error and provide more informative and comprehensive diagnostic data for evaluating light attenuation and aerosol optical properties. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Photolysis.md#updates-to-diagnostics-for-inline-photolysis)
 
 
-### Dry Deposition Air Surface Exchange  
+### Vertical Diffusion & Air Surface Exchange
 
 - **Improve behavior of the runtime minimum eddy diffusivity option called KZMIN in STAGE and M3DRY**   
 The KZMIN option, first introduced in CMAQv4.5, is a parameterization to allow the mixing in the planetary boundary layer (PBL) to respond to the land-use characteristics. If the runtime environmental variable KZMIN is set to 'True/Yes', the land-use based parameterized minimum eddy diffusivity will now be applied through the PBL, whereas previously it was limited to 500 meters above ground. If KZMIN is set to 'False/No', a constant minimum value of 0.01 m<sup>2</sup>/s is applied everywhere at all times. This change primarily impacts nighttime concentrations, specifically in grid cells where the PBL is lower than 500 meters. In those grid cells, primary emitted species concentrations will increase, whereas ozone mixing ratios will decrease due to increased NOx titration. [STAGE Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-Surface-Tiled-Aerosol-and-Gaseous-Exchange-(STAGE).md#update-to-minimum-kz-and-kz0ut-in-the-stage-deposition-option) | [M3DRY Release Note](../Release_Notes/CMAQ-Release-Notes:-Dry-Deposition-Air-Surface-Exchange:-M3DRY.md#updates-of-minimum-kz-for-m3dry)
@@ -211,7 +218,7 @@ To estimate the emissions of gaseous halogens in marine environments, the grid c
   Removes unnecessary variables for online emission streams, making it easier to add new modules. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Detailed-Emissions-Scaling-Isolation-and-Diagnostics-Module-(DESID).md#streamlining-desid-code)
 
 - **Implement Online Met-Dependent Emission Module (MetEmis)** ***[community contribution]***   
-CMAQv6.0 introduces the MetEmis module to dynamically calculate meteorology-induced hourly gridded on-road mobile emissions within CMAQ, using simulated meteorology without any computational burden to the CMAQ modeling system. The impact is to improve the spatiotemporal representation of mobile emissions based on the simulated meteorology inputs when compared to the static scenario. For detailed information see Baek et al., 2023. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Online-Met-Dependent-Emission-(MetEmis)-Module.md#implement-online-met-dependent-emission-module-metemis)
+CMAQv6.0 introduces the MetEmis module to dynamically calculate meteorology-induced hourly gridded on-road mobile emissions within CMAQ, using simulated meteorology without any computational burden to the CMAQ modeling system. The impact is to improve the spatiotemporal representation of mobile emissions based on the simulated meteorology inputs when compared to the static scenario. For detailed information see [Baek et al., 2023](https://doi.org/10.5194/gmd-16-4659-2023). [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Online-Met-Dependent-Emission-(MetEmis)-Module.md#implement-online-met-dependent-emission-module-metemis)
 
 
 ### Diagnostic Options
@@ -232,7 +239,7 @@ Revises model default from `Budget_Diag = .TRUE.` to `Budget_Diag = .FALSE.`. Th
   Refactors the Aerosol module for better code organization and clarity, including renaming and regrouping routines.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#reorganize-aero-module)
   
 - **Replace CONST.EXT include file with module and update constant values**   
-Replaces the CONST.EXT file with a Fortran module to define model fundamental physical, chemical, and mathematical constants (e.g., PI, MWAIR, etc.). Additionally, the values of several constants have been updated to be consistent with 2019 NIST and SI standards, and an approximation to the error function ERF has been removed.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#replace-constext-include-file-with-module-and-update-constant-values)
+Replaces the CONST.EXT file with a Fortran module to define model fundamental physical, chemical, and mathematical constants (e.g., PI, MWAIR, etc.). Additionally, the values of several constants have been updated to be consistent with [2019 NIST and SI standards](https://doi.org/10.6028/nist.sp.330-2019), and an approximation to the error function ERF has been removed.  [Release Note](../Release_Notes/CMAQ-Release-Notes:-Structural-Improvements.md#replace-constext-include-file-with-module-and-update-constant-values)
 
 - **Reduce model runtime by rewriting HLCONST module**   
 The HLCONST module computes Henry's Law constants used in CCTM, to use integer tokens instead of strings. Restructing the code in this module reduces model runtime by approximately 8%. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Diagnostic-Options.md#changes-in-henrys-law-computation-and-budget-tool)
@@ -325,18 +332,15 @@ The CMAQv6.0 alpha 108 km simulation used the CRACMM3M chemical mechanism that i
 * On the hemispheric scale, the PM2.5 concentration decreases can be on the order of tens of ug/m3 in seasonal means over source regions. The largest impacts on transpacific and transatlantic transport to North America occur during spring and summer.
 * The largest windblown dust emissions over CONUS occur during spring. The largest reductions in PM2.5 concentrations in the CONUS simulations were found to also occur during spring, with reductions of 0.5 – 0.75 ug/m3 in seasonal means over much of the U.S. and exceeding 1-5 ug/m3 over the Southwest. This suggests that the CONUS springtime PM2.5 reductions were driven by the decreases in both long-range transported and local windblown dust. During summertime, increases in OM of 0.1 – 0.7 ug/m3 from v5.5 to v6.0 alpha over the Southeastern U.S. and portions of Canada and the Western U.S. counteract some of the effects caused by decreases in long-range transported and local windblown dust. As a result, summertime changes in total PM2.5 over CONUS were found to be less than 0.25 ug/m3 for the Eastern U.S. and less than 0.75 ug/m3 in the Western U.S. except for small areas susceptible to windblown dust emissions.
 
-### References
-Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A., B., Lee, J., Carpenter, L. J.: Examining the Impact of the photolysis of aerosol nitrate over Northern Hemisphere, Science of the Total Environment, 917, 170406, 2024a.
-
-Sarwar, G., Sidi, F., Simon, H., Henderson, B.H., Willison, J., Gilliam, R., Hogrefe, C., Foley, K., Mathur, R., Appel, K.W.: Representing particulate nitrate photolysis over seawater improves CMAQ ozone predictions over the contiguous United States, Science of The Total Environment, 970, 178968, 2025
 
 
 <a id=data_and_docs></a>
 ## Are there new benchmark data and documentation updates?
 
+The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DESID have been updated for CMAQv6.0 alpha. All other User's Guide content in this repository was last updated for the CMAQv5.5 release. Additional documentation updates will be included in the CMAQv6.0 release.
 
-|**CMAQ Version**|**Data Type (Size)**|**Domain**|**Simulation Dates**|**Data Access**|**Tutorial**| 
-|:----:|:----:|:--------------:|:----:|:--------:|:----:|
+A full set of inputs for January 1 - December 31, 2022 are provided for the 12US1 domain, including CRACMM emissions that are compatible with both the CRACMM2 and CRACMM3. Input files can be used for running CMAQv5.5 (with CRACMM2) or CMAQv6.0 alpha (with CRACMM2 or CRACMM3).
+* [CMAQ Data](DOCS/CMAQ_Data.md)
 
 
 <a id=how_to_cite></a>
@@ -353,10 +357,6 @@ Technical support for CMAQ, including questions about model inputs, downloading,
 and pre- and post-processing utilities, should be directed to the [CMAS Center User Forum](https://forum.cmascenter.org/). 
  [**Please read and follow these steps**](https://forum.cmascenter.org/t/please-read-before-posting/1321) prior to submitting new questions to the User Forum.
 
-<a id=mainbody_references></a>
-## References
-Baek, B. H., Coats, C., Ma, S., Wang, C.-T., Li, Y., Xing, J., Tong, D., Kim, S., and Woo, J.-H.: Dynamic Meteorology-induced Emissions Coupler (MetEmis) development in the Community Multiscale Air Quality (CMAQ): CMAQ-MetEmis, Geosci. Model Dev., 16, 4659–4676, https://doi.org/10.5194/gmd-16-4659-2023, 2023.
 
-NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds. NIST Special Publication 330, 2019. doi: 10.6028/nist.sp.330-2019
 
 
