@@ -2,8 +2,48 @@
 
 ## [MCIP](https://github.com/USEPA/CMAQ/tree/main/PREP/mcip)
 
+### Expanded Land Use Support and Projection Corrections 
+**Tanya Spero**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
+**Type of update**: Science Update
+**Release Version/Date**: CMAQv6.0
+
+**Description**: 
+
+1. Updated MCIP to process WRF land use classifications that include the urban local climate zones (LCZs) that were implemented in WRFv4.3. The LCZs are 11 categories that are appended to USGS, MODIS, and MODIFIED IGBP MODIS NOAH classifications in WRF. (There is no option to use LCZs in WRF with NLCD.) The LCZs were added as categories 31-41 in WRFv4.3, and those categories were changed to 51-61 beginning with WRFv4.4.2.  
+_Changed files: PREP/mcip/src/getluse.f90, PREP/mcip/src/lucats_mod.f90, PREP/mcip/src/setup_wrfem.f90_
+3. MCIP was changed to distinguish MODIS from MODIFIED IGBP MODIS NOAH, where category 21 is either "lakes" or "unclassified".  
+_Changed file: PREP/mcip/src/getluse.f90_
+4. Corrected MCIP internal calculations of latitude and longitude for polar stereographic projections in dot-point (Arakawa-B) and face-point (Arakawa-C) grid spaces. (Latitude and longitude on cell centers are taken directly from WRF, and there were no errors in those data.)  
+_Changed files: PREP/mcip/src/rdwrfem.f90, PREP/mcip/src/setup_wrfem.f90, PREP/mcip/src/Makefile
+New file: PREP/mcip/src/xy2ll_ps.f90_
+6. Added option for tangent Lambert conformal to be processed by MCIP. Combined the three Lambert conformal subroutines into a single subroutine. Note: using a tangent Lambert conformal projection (i.e., with one true latitude) may cause a divide-by-zero condition for users who also require processing in the Spatial Allocator. This option was requested on the CMAS Forum several times.  
+_Changed files: PREP/mcip/src/ll2xy_lam.f90, PREP/mcip/src/Makefile
+Deleted files: PREP/mcip/src/ll2xy_lam_sec.f90, PREP/mcip/src/ll2xy_lam_tan.f90_
+7. Restored option to not output time-independent I/O API files in a single MCIP run. (This option is useful for long simulations because the GRID* files do not change.)   
+_Changed files: PREP/mcip/scripts/run_mcip.csh, PREP/mcip/src/gridout.f90, PREP/mcip/src/mcipparm_mod.f90, PREP/mcip/src/readnml.f90_
+8. Corrected errors in the inline documentation that accompanies one of the Mercator routines. The documentation previously stated that the routine was for polar stereographic projections.  
+_Changed file: PREP/mcip/src/xy2ll_merc.f90_
+9. Updated WRF option translation for the MCIP metadata for new physics through WRFv4.7.0.  
+_Changed file: PREP/mcip/src/wrfemopts.f90_
+10. Moved the writes of time-independent files into the time-independent section of the main program to avoid redundant writes.  
+_Changed file: PREP/mcip/src/mcip.f90_
+11. Added compiler options for Intel 24.2, which changed from "ifort" to "ifx".  
+_Changed file: PREP/mcip/src/Makefile_
+12. Updated the version stamp.  
+_Changed file: PREP/mcip/src/mcipparm_mod.f90_
+13. Updated documentation  
+_Changed files: PREP/mcip/docs/CHANGES, PREP/mcip/docs/FAQ, PREP/mcip/docs/ReleaseNotes_
+
+**Significance and Impact**:
+These updates generally expand functionality of MCIP for broader use cases. The corrections to the polar stereographic latitude and longitude are helpful for some post-processing applications.  No changes to CCTM results are expected from any of these changes. The polar stereographic latitude and longitude on dot points and face points are not used by the CCTM, so the corrections to those fields do not impact CCTM results. Changes to accommodate urban local climate zones in WRFv4.3 and beyond are not yet incorporated in the CCTM, so there should be no impact on CCTM results.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1349]() | [PR#1349](https://github.com/USEPA/CMAQ_Dev/pull/1349)  |   
+
+
 ### Updates to Calculation of XORIG/YORIG for Some Lambert Domains (MCIP, Two-Way WRF-CMAQ, and Combine)
-[Tanya Spero](mailto:spero.tanya@epa.gov), U.S. Environmental Protection Agency    
+**Tanya Spero**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5
 
@@ -19,7 +59,7 @@ The original algorithm was removed from _combine_, and it was replaced with logi
 
 
 ### Removed Superfluous Open/Close Couplet to Read WRF Files in MCIP
-[Tanya Spero](mailto:spero.tanya@epa.gov), U.S. Environmental Protection Agency     
+**Tanya Spero**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Efficiency  
 **Release Version/Date**: CMAQv5.5
 
@@ -32,7 +72,7 @@ The original algorithm was removed from _combine_, and it was replaced with logi
 |[Merge for PR#1097](https://github.com/USEPA/CMAQ/commit/7319ff625dd70a88eb43124a3989574fc0f8551f) | [PR#1097](https://github.com/USEPA/CMAQ_Dev/pull/1097)  |    
 
 ### Updated MCIP Metadata for WRF Physics Beyond WRFv4.1
-[Tanya Spero](mailto:spero.tanya@epa.gov), U.S. Environmental Protection Agency   
+**Tanya Spero**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Metadata Update   
 **Release Version/Date**: CMAQv5.5  
 
@@ -54,12 +94,16 @@ The original algorithm was removed from _combine_, and it was replaced with logi
 Also, See the CMAQv6.0 Release Note on **[Remove option for Aerosol Initial Condition surface area](./CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#remove-option-for-aerosol-initial-condition-surface-area-and-update-settings-for-boundary-condition-surface-area)**.
  
  ### ICON C Compiler fix
-**Primary Contact**: [Barron H. HEnderson](mailto:henderson.barronl@epa.gov), U.S. Environmental Protection Agency    
+ [Barron H. Henderson](mailto:henderson.barronl@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**: CMAQv6.0
-**Description**:  Updating build script to include c_compiler in configuration if cc was not aliased or on the users path. The update adds c_compiler set to CC. This approach has more fail safes and is used in many other bldit scripts (bcon, cctm, etc).  
-**Significance and Impact**: Makes it easier to get ICON compiled  
-**References**:   N/A
+**Release Version/Date**: CMAQv6.0  
+
+**Description**:   
+Updating build script to include c_compiler in configuration if cc was not aliased or on the users path. The update adds c_compiler set to CC. This approach has more fail safes and is used in many other bldit scripts (bcon, cctm, etc).
+
+**Significance and Impact**:  
+Makes it easier to get ICON compiled  
+
 **Internal PRs**: [PR#1161](https://github.com/USEPA/CMAQ_Dev/pull/1161)
  
 

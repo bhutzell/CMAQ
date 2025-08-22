@@ -140,7 +140,7 @@ set NCELLS = `echo "${NX} * ${NY} * ${NZ}" | bc -l`
    else if ( ${MECH} =~ *cracmm* ) then
        setenv CONC_SPCS "O3 NO ANO3I ANO3J NO2 HCHO ISO NH3 ANH4I ANH4J ASO4I ASO4J"
    endif
-   setenv CONC_BLEV_ELEV " 1 1" #> CONC file layer range; comment to write all layers to CONC
+   # setenv CONC_BLEV_ELEV " 1 1" #> CONC file layer range; comment to write all layers to CONC
 
    #> ACONC file species; comment or set to "ALL" to write all species to ACONC
    #setenv AVG_CONC_SPCS "O3 NO CO NO2 ASO4I ASO4J NH3" 
@@ -185,7 +185,7 @@ setenv CTM_PVO3 N            #> consider potential vorticity module for O3 trans
 setenv CTM_BIOGEMIS_BE Y     #> calculate in-line biogenic emissions with BEIS [ default: N ]
 setenv CTM_BIOGEMIS_MG N     #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N         #> turns on BDSNP soil NO emissions [ default: N ]
-setenv USE_SAGE_N Y          #> turns on EPA soil NO and HONO emissions [ default: N ]
+setenv USE_SAGE_N N          #> turns on EPA soil NO and HONO emissions [ default: N ]
 setenv USE_SAGE_N_EF N       #> Use BEIS input emission factor file for soil NO and HONO [ default: N ]
 
 setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affecting photolysis
@@ -726,15 +726,15 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      #> remove previous log files
      foreach file ( ${log_test} )
         #echo "Deleting log file: $file"
-        /bin/rm -f $file  
+        rm -f $file  
      end
  
      #> remove previous output files
      foreach file ( ${out_test} )
         #echo "Deleting output file: $file"
-        /bin/rm -f $file  
+        rm -f $file  
      end
-     /bin/rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
+     rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
 
   else
      #> error if previous log files exist

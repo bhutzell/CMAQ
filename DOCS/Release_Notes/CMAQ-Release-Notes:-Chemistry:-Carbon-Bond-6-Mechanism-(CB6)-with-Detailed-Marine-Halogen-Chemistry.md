@@ -1,6 +1,6 @@
 ### Photolysis of aerosol nitrate in CB6R5M
 
-**Primary Contact**: [Golam Sarwar](sarwar.golam.email@epa.gov), U.S. Environmental Protection Agency    
+[Golam Sarwar](sarwar.golam.email@epa.gov), U.S. Environmental Protection Agency    
 
 **Type of update**: Science update  
 
@@ -135,17 +135,17 @@ The first update:
 Model simulations were completed with the existing and updated CB6r3m over the Northern Hemisphere for the year of 2016 (annual simulation). The update increases seasonal mean ozone over seawater and land areas compared to the previous chemistry (Figure 1). The impacts are higher in cooler months than those in warmer months. It affects Model Bias both at AQS (Figure 2) and CASTNET sites (Figure 3).
 
 
-![image](https://user-images.githubusercontent.com/17162838/172228107-48e829aa-67bf-4662-9b8c-297a0ca3ad8b.png)
+![image](./images/chemistry/cmaqv6.0_impact_halogen_chemistry_update_on_seasonal_mean_ozone_figure_1.png)
 
 Figure 1: Impact of the halogen chemistry update on seasonal mean ozone.
 
 
-![image](https://user-images.githubusercontent.com/17162838/172228347-ab452cfe-b4dd-4598-898a-d9473997ca9e.png)
+![image](./images/chemistry/cmaqv6.0_comparison_of_daily_max_8hr_ozone_and_monthly_mean_bias_AQS_figure_2.png)
 
 Figure 2: A comparison of model predicted daily maximum 8-hr ozone with observed data (left) and monthly mean Model Bias (right) at AQS sites.
 
 
-![image](https://user-images.githubusercontent.com/17162838/172228394-cfc82f81-3bd4-40ef-bb15-43a8aab2545f.png)
+![image](./images/chemistry/cmaqv6.0_comparison_of_daily_max_8hr_ozone_and_monthly_mean_bias_CASTNET_figure_3.png)
 
 Figure 3: A comparison of model predicted daily maximum 8-hr ozone with observed data (left) and monthly mean Model Bias (right) at CASTNET sites.
 
@@ -154,11 +154,11 @@ The second update:
 
 Two separate annual simulations were performed for 2016. One simulation used CB6r3m_ae7_aq and the other simulation used CB6r5m_ae7_aq. The update changes mean ozone in each season (Figure 1). It increases ozone in some areas while decreasing ozone over other areas. The update affects Model Bias both at AQS and CASTNET sites (Figure 2) by small margins.
 
-![image](https://user-images.githubusercontent.com/17162838/172229418-c5350f8b-c5af-49d4-80d9-dc1e3c086159.png)
+![image](./images/chemistry/cmaqv6.0_impact_of_CB6r5m_on_seasonal_mean_ozone_figure_1.png)
 
 Figure 1: Impact of CB6r5m on seasonal mean ozone
 
-![image](https://user-images.githubusercontent.com/17162838/172229459-9bda879d-8203-449b-a0ac-3e6f9ee828d9.png)
+![image](./images/chemistry/cmaqv6.0_impact_of_CB6r5m_on_mean_model_bias_at_AQS_and_CASTNET_sites_figure_2.png)
 
 Figure 2: Impact of CB6r5m on mean Model Bias at AQS and CASTNET sites
 

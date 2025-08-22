@@ -1,14 +1,30 @@
 # CMAQ Data
-* [Test Case Data](#test_case_data)
+* [CMAQv6.0 Test Case Data](#v60_input_data)
+* [CMAQv5.5 Test Case Data](#v55_test_case_data)
 * [Input and Output Files](#cmaq_inputs_outputs)
 * [EQUATES Data](#equates_data)
 * [Measurement-Model "Fused" CMAQ Outputs](#cmaq_fused)
 
-<a id=test_case_data></a>
-## Test Case Data
+<a id=v60_input_data></a>
+## CMAQv6.0 inputs for 2022
+A full set of inputs for 2022 are provided for the 12US1 domain (299 column x  459 row x 35 layer, 12-km horizontal grid spacing) on Amazon Web Services (AWS) Open Data Registry, including emissions compatible with both the CRACMM2 and CRACMM3 chemical mechanisms (referred to as 2022r1 CRACMM2 emissions).  Input files can be used for running CMAQv5.5 (with CRACMM2) or CMAQv6.0 (with CRACMM2 or CRACMM3). Sample scripts and control files are provided that are specific to this emissions case.  2022r1 CRACMM2 emissions largely follow the [EPA's 2022 modeling platform inventory](https://www.epa.gov/air-emissions-modeling/2022v1-emissions-modeling-platform) methods used to generate the data available from this AWS S3 bucket except for CRACMM2 speciation ([Skipper et al., 2024](https://doi.org/10.5194/acp-24-12903-2024)). Mobile emissions have been further updated to follow [Murphy et al. 2023](https://doi.org/10.5194/acp-23-13469-2023). 
+
+In addition, and new to CRACMM2, CRACMM2 changes how emissions inventories of primary organic aerosol (POA) are allocated to model species of different volatility and functionality. In CRACMM2, POA emissions are assigned to CRACMM species in S2S-Tool+SMOKE and present in the CMAQ-ready files with CRACMM names. The POA inventory is aligned with species of saturation concentrations of 100 µg/m3 and below as described by Pye et al. in prep. DESID should not be used to apply POA volatility profiles to emissions as they have already been applied upstream.
+
+However, in the case of the residential wood combustion files included in this dataset, an additional adjustment (not available at the time of CRACMM2 nor when these emissions were created) is recommended at runtime in DESID.  See the “Scale Fire ROC Emissions to account for organic compound volatility” section in the CMAQv6.0 alpha CMAQ_Chem_Control_cracmm3_2022r1.nml and CMAQv5.5 CMAQ_Control_DESID_cracmm2_2022r1.nml namelist files for further details. These files are located under the scripts directory linked below.
+
+
+Note that this set of 12US1 inputs are classic netCDF files rather than netCDF-4/HDF5 compressed. 
+
+|**CMAQ Version**|**Data Type (Size)**|**Domain**|**Simulation Dates**|**Data Access**|**Link**|**Tutorial**| 
+|:----:|:----:|:--------------:|:----:|:--------:|:----:|:----:|
+|v6.0 CRACMM2/CRACMM3 | Input | 12US1 | Dec 2021- Dec 20222| [Metadata, DOI, and links to data on AWS](https://doi.org/10.15139/S3/BDLBTW) <br> | [AWS Link to Scripts](https://cmaq-12us1-cracmm2-modeling-platform-2022.s3.amazonaws.com/index.html#2022_12US1/scripts/)|
+
+<a id=v55_test_case_data></a>
+## CMAQv5.5 Test Case Data
 Benchmark/tutorial data for the CMAQv5.5 release are available from the CMAS Data Warehouse.  The input and output files are stored on Amazon Web Services (AWS) Open Data Registry.  CMAQv5.5 benchmark input is the same as CMAQv5.4, providing a July 1-2, 2018 case over the Northeast US.  CMAQv5.5 comes with new output data for running several different model configurations (links below).  Tutorials are provided for using the benchmark data to test running of the base CMAQ model with either the CB6r5 or CRACMMv2 mechanisms, WRF-CMAQ, CMAQ-ISAM, and CMAQ-DDM. The input datasets include a grid mask file for the United States (GRIDMASK_STATES_12SE1.nc). The grid mask file is used for running the ISAM test case, or to test out regional emissions scaling with [DESID](DOCS/Users_Guide/Tutorials/CMAQ_UG_tutorial_emissions.md).  The input datasets also include an ocean file with variables needed to use the cb6r5_ae7 and cb6r5m_ae7 mechanisms. See the [Ocean File tutorial](DOCS/Users_Guide/Tutorials/CMAQ_UG_tutorial_oceanfile.md) for more information on changes to the required ocean file input beginning in v5.4.  
 
-In addition, a full set of inputs for 2018 are provided for the 12US1 domain (299 column x  459 row x 35 layer, 12-km horizontal grid spacing) on AWS, including emissions compatible with both the CB6r5 and CRACMMv1.0 chemical mechanisms.  Note that the 12US1 inputs are  netCDF-4/HDF5 compressed files to substantially reduce file sizes. Through testing at the EPA, we’ve noticed that certain domains encounter model crashes from reading in large amounts of compressed netCDF data.  A work around for those cases is uncompressing the data manually via [nccopy 1](https://www.unidata.ucar.edu/software/netcdf/workshops/2011/utilities/Nccopy.html) or [m3cple](https://www.cmascenter.org/ioapi/documentation/all_versions/html/M3CPLE.html) (compiled with HDF5) before running the CMAQ simulation.
+In addition, a full set of inputs for 2018 are provided for the 12US1 domain (299 column x  459 row x 35 layer, 12-km horizontal grid spacing) on AWS, including emissions compatible with both the CB6r5 and CRACMMv1.0 chemical mechanisms.  Note that many of the 12US1 inputs are  netCDF-4/HDF5 compressed files to substantially reduce file sizes. Through testing at the EPA, we’ve noticed that certain domains encounter model crashes from reading in large amounts of compressed netCDF data.  A work around for those cases is uncompressing the data manually via [nccopy 1](https://www.unidata.ucar.edu/software/netcdf/workshops/2011/utilities/Nccopy.html) or [m3cple](https://www.cmascenter.org/ioapi/documentation/all_versions/html/M3CPLE.html) (compiled with HDF5) before running the CMAQ simulation.
 
 |**CMAQ Version**|**Data Type (Size)**|**Domain**|**Simulation Dates**|**Data Access**|**Link**|**Tutorial**| 
 |:----:|:----:|:--------------:|:----:|:--------:|:----:|:----:|

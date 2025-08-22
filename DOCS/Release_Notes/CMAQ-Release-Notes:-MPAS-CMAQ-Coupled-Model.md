@@ -10,7 +10,7 @@
 MPAS-CMAQ code is available in [a branch of the CMAQ repository](https://github.com/USEPA/CMAQ/tree/MPAS_CMAQ) and includes new directories mio and mpas_cmaq in CCTM/src. The mio directory includes a prototype of an I/O system that removes dependence on I/O API. The mpas_cmaq directory includes a coupling interface for use with MPAS. For the initial release a configuration has been designed for use with the CRACMM2 mechanism on a 120 km uniform global mesh. Not all CMAQ features are supported at this time. See the [user guide](https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/PDF/CMAQ_UG_09_2019.pdf) for more information about downloading the required [MPAS code](https://github.com/USEPA/MPAS), [CMAQ code](https://github.com/USEPA/CMAQ/tree/MPAS_CMAQ), and [available inputs](https://mpas-cmaq.s3.amazonaws.com/index.html). The user guide also includes a description of available features and instructions for building and running the MPAS-CMAQ model.
 
      
-![image](https://github.com/user-attachments/assets/fedc3e86-7af2-4759-9bdd-d687de9e1d5f)
+![image](./images/cmaqv6.0_mpas_global_map.png)
   
 
 **References**  

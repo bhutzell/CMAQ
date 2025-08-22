@@ -1,5 +1,5 @@
 ### Improved NaN traps for EPIC input files
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug fix  
 **Release Version/Date**: CMAQv5.5   
 **Description**: CCTM crashes when debug flags are turned on if NaNs are present in EPIC input files and the current NaN traps do no work when running CCTM with debug compilation flags. The FORTRAN 2003 IEEE arithmetic function ieee_is_nan was implemented to correctly trap NaN in these inputs when running in debug mode. It is unclear why EPIC output contains sporadic NaNs, these are not visible Verdi or R and may have to do with a periodic error in specifying BADVAL3.

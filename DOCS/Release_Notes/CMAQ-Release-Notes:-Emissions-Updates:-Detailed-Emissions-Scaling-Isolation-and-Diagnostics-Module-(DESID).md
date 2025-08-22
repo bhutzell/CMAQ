@@ -1,9 +1,9 @@
 # Detailed Emissions Scaling Isolation and Diagnostics Module (DESID)
 
 ### Improve DESID Error Checking for Negative Emissions  
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix   
-**Release Version/Date**:  CMAQv6.0 
+**Release Version/Date**:  CMAQv6.0  
 
 **Description**:  
 CMAQ users including Bonyoung Koo (Bay Area Air Quality Management District) and Calvin Howes (South Coast Air Quality Management District) have reported issues where an aerosol mass emission rate goes below zero but is within the tolerance set in DESID (-1.0e-7). When extrapolated to particle surface area or number emission though, this value can exceed the static threshold. Their suggestion to relax tolerances for particle number and surface area emissions is appropriate and useful.
@@ -24,24 +24,24 @@ There should be no impact on results, but users are now given more information t
 |[Merge for PR#1222](https://github.com/USEPA/CMAQ/commit/d17cbcb6a715aa63a32ade77ebcbd2784b040c1a) | [PR#1222](https://github.com/USEPA/CMAQ_Dev/pull/1222)  | 
 
 ### DESID Area-Normalized Conversion Factor  
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Bug Fix    
-**Release Version/Date**:  v6.0 
+**Release Version/Date**: CMAQv6.0  
 
 **Description**:    
 The DESID conversion factor assigned to translate area-based emissions is erroneously inverted. This update takes the reciprocal of that value.
 
 **Significance and Impact**:    
-This will dramatically affect predictions for any species that includes emissions normalized to a specific area that is not in units of meters. 
+This will have almost no effect for most simulations and users since area-normalized emission rates are rarely used. However, for cases that utilize area-weight emissions, this fix will dramatically affect predictions for any species that includes emissions normalized to a specific area that is not in units of meters. 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1160](https://github.com/USEPA/CMAQ/commit/8767b9671cef369aad28d9a484f4b86f961958fa) | [PR#1160](https://github.com/USEPA/CMAQ_Dev/pull/1160)  | 
 
 ### Streamline Emissions Unit Conversions in DESID
-[Ben Murphy](mailto:murphy.ben@epa.gov)], U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Code Improvement   
-**Release Version/Date**:  v6.0 
+**Release Version/Date**:  CMAQv6.0  
 
 **Description**:   
 This update streamlines and centralizes the unit conversions in DESID so that all aerosol and gas units are the same when passing from online emission modules to DESID and the unit conversion subroutine uses one approach for converting all scalars from total emission rate to volume-normalized emission rate. Erroneous comments in the dust module that inaccurately describe units for key variables are also resolved.
@@ -58,9 +58,9 @@ No impact on results.
 |[Merge for PR#1177](https://github.com/USEPA/CMAQ/commit/44fa7764e3632063d2459e383d650ccaea491d95) | [PR#1177](https://github.com/USEPA/CMAQ_Dev/pull/1177)  | 
 
 ### Streamlining DESID code  
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
 **Type of update**: Code Maintenance   
-**Release Version/Date**:  v6.0 
+**Release Version/Date**:  CMAQv6.0  
 
 **Description**:    
 DESID variables for online emission streams indices (e.g. IBIOSRM, IMGSRM, etc.) are largely unnecessary and can be removed in almost all cases. This simplification makes it easier to introduce new online emission modules to DESID. There are fewer places in the code to modify.
@@ -73,7 +73,7 @@ No impact on results.
 |[Merge for PR#1267](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e) | [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  | 
 
 ### Updates needed for MPAS-CMAQ implementation  
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Bug Fix  
 **Release Version/Date**: v5.5  
 
@@ -90,7 +90,7 @@ No impact on results.
 |[Merge for PR#1007](https://github.com/USEPA/CMAQ/commit/109ac7ef5b972dee37fd4e1f66ec865b277d77c2) | [PR#1007](https://github.com/USEPA/CMAQ_Dev/pull/1007)  |
 
 ### Reconcile Emission Molecular Weight Table with CRACMM Speciation  
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Mechanism Support  
 **Release Version/Date**: CMAQv5.5  
 
@@ -103,7 +103,7 @@ No impact on results.
 |[Merge for PR#1006](https://github.com/USEPA/CMAQ/commit/bea8e25dccc0c416e42924cda3890ab098470b58) | [PR#1006](https://github.com/USEPA/CMAQ_Dev/pull/1006)  |
 
 ### Chemical Family Support
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5   
 
@@ -127,7 +127,7 @@ Other improvements in this update include a check when families are defined to m
 
 
 ### Restructuring and Miscellaneous updates to the DESID Interface and Processing Features
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Interface Update  
 **Release Version/Date**: CMAQv5.4  
 
