@@ -48,7 +48,7 @@ A consequence of removing BELD as an option from windblown dust is that the DUST
 
 The following plot summarizes the impact of the remaining changes above: 
 
-![image](https://user-images.githubusercontent.com/47453034/192348532-00cc147a-df4f-47dc-a5d5-b57ff315a9ec.png)
+![image](./images/emissions/cmaqv6.0_updates_to_wbd_prc_diff_aod.png)
 
 Again, note, in the image above, the impacts of changing windblown dust input data from BELD to MCIP/WRF is not shown, but was not found to be a large contributor to the changes seen. As can be seen the largest change on modeled windblown dust is a result of the bug fix that was causing low erodibility values. 
 

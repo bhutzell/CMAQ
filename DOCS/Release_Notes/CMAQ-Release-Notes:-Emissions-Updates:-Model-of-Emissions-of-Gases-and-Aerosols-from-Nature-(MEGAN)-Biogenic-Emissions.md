@@ -4,7 +4,7 @@
 **Release Version/Date**: CMAQv5.5  
 **Description**: A bug in the pulsing subroutine of BDSNP was allowing for 24 additional time steps to be added to the dry hours total per day. On coarse grids with large time steps this bug was especially noticeable. For example, a 15 minute time step would would allow for accumulation of 30 dry hours per day.  
 
-![Willison_MEGAN](https://github.com/user-attachments/assets/b35d125b-ce61-4ae4-be5a-fe5db2300724)
+![Willison_MEGAN](./images/emissions/cmaqv6.0_BDSNP_dry_hours_calculation_figure_1.png)
 
 
 **Significance and Impact**: The effect of the bug fix on soil NO is small, with a resultant decrease of 0.3% in total 2018 soil NO emissions over the Northern Hemisphere at 108 km grid spacing.  

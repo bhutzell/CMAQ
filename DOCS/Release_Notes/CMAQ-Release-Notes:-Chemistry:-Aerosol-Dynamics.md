@@ -58,10 +58,10 @@ These variables are now explained in the User Guide Appendix A.
 These changes improve transparency and compatibility across CMAQ scenarios.
 
 Simulations were performed on 2018 CONUS domain for a summertime period. The map below shows the difference between concentrations for total aerosol with the BC_AERO_M2USE option set to F vs. T. 
-![image](https://github.com/user-attachments/assets/9f048187-ab68-4f64-9ba9-925cb6c6d218)
+![image](./images/chemistry/cmaqv6.0_BC_AERO_M2USE_Figure1.png)
 Deviation in total fine particle mass concentration in $\mu g \ m^{-3}$.
 
-![image](https://github.com/user-attachments/assets/80068a34-2643-49ac-bb0a-cce3e5859d41)
+![image](./images/chemistry/cmaqv6.0_BC_AERO_M2USE_Figure2.png)
 Deviation in total coarse particle mass concentration in $\mu g \ m^{-3}$.
 The majority of the difference between these simulations comes from coarse mode particles. The impact on the fine mode particle mass is negligible.
 

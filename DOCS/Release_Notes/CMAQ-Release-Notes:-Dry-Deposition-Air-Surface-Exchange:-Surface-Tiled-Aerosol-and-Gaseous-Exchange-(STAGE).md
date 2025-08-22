@@ -203,34 +203,34 @@ This update to STAGE has 5 primary parts:
 4.	Land use specific parameters for aerosol deposition processes have now been moved to CMAQ_Control_STAGE.nml and the aerodynamic leaf width parameter has been updated based on TRY Plant Trait Database observations, assuming an oval leaf following [Campbell and Norman 1998](https://link.springer.com/book/10.1007/978-1-4612-1626-1).
 5.	The CSU [Emerson et al. 2020](https://doi.org/10.1073/pnas.2014761117) and Pleim et al. 2022 aerosol deposition options are now included as a runtime option. The CSU model has been modified to smoothly scale from leaf off to leaf on conditions and vegetated to non-vegetated conditions for the CMAQ application. This includes the incorporation of a two layer aerosol deposition model and replacing the product of the empirical factor 3 and u* with the integration of LAI(z) u*(z) from 0 to the canopy top using the in-canopy attenuation coefficient of [Yi 2008](https://doi.org/10.1175/2007JAMC1667.1). This matches the empirical factor of 3 at an LAI of approximately 5.3. When LAI = 0 this returns the deposition velocity for non-vegetated surfaces. Despite these changes, CMAQ model results, with an aerosol standard deviation of 1, are similar to the figures presented in Emerson et al. 2020.
 
-![image](https://user-images.githubusercontent.com/12100276/165372400-d045f7bd-c0c8-4780-9ce9-7c542cc2e4bb.png)
+![image](./images/dry-deposition/cmaqv6.0_deposition_velocity_as_a_function_of_particle_diameter.png)
 Deposition velocity as a function of particle diameter for the CSU model, M3Dry [PR#842](https://github.com/USEPA/CMAQ_Dev/pull/842), STAGE v5.3, and the STAGE-CSU modal parameterization [PR#883](https://github.com/USEPA/CMAQ_Dev/pull/883).
 
-![image](https://user-images.githubusercontent.com/12100276/165372939-ccfa2c55-8a45-4604-9a62-31e0887baa5e.png)
+![image](./images/dry-deposition/cmaqv6.0_deposition_pathways_of_STAGE-CSU_implementation.png)
 Deposition pathways of the STAGE-CSU implementation.
 
 **Significance and Impact**:  
 1.	This pull request revises the formula for Rb_leaf which results in lower resistances to vegetation with LAI > 4.6 and higher resistance to deposition otherwise. This primarily impacts HNO3 and other species with low/no canopy resistance. Model differences are small and typically less than 1 ppb.
 2.	Changes 2 and 3 result in about a 15% increase in summertime NH3 concentrations over the CONUS domain with decreases in heavily agricultural areas. This results in a reduction in the model bias and error.
 
-![image](https://user-images.githubusercontent.com/12100276/165373141-bac10392-8101-43fd-b322-3ebd566ef8d7.png)
+![image](./images/dry-deposition/cmaqv6.0_2016_evaluation_against_AMoN_concentrations_obs_by_PR.png)
 July 2016 Evaluation against AMoN concentrations, AMoN observations (grey), the STAGE v5.4 update [PR#883](https://github.com/USEPA/CMAQ_Dev/pull/883) (red), and [PR#842](https://github.com/USEPA/CMAQ_Dev/pull/842) (blue)
 
 3.	The Pleim et al. 2022 aerosol deposition options results are similar to [PR#842](https://github.com/USEPA/CMAQ_Dev/pull/842) while the Emerson et al. 2020 option results in a smaller reduction than Pleim et al. 2022 in ambient aerosol concentrations while still capturing the observed minimum in the aerosol deposition velocity. The Pleim et al. 2022 option was evaluated against a CONUS July 2016 simulation of a current build of M3Dry and the modeled PM was within 5% of each other. The differences in PM appear to be related to gaseous aerosol precursors due to differences in the gaseous deposition and BVOC emissions, the STAGE case used BEIS4/BELD6.
 
-![image](https://user-images.githubusercontent.com/12100276/165373756-a34c24ab-4615-48ff-bc4d-fd82ef69ca64.png)
+![image](./images/dry-deposition/cmaqv6.0_monthly_mean_PM2.5_from_M3Dry_STAGE.png)
 Monthly mean PM2.5 from M3Dry [PR#842](https://github.com/USEPA/CMAQ_Dev/pull/842) (left) and STAGE using the Pleim et al. 2022/M3Dry scheme (right).
 
-![image](https://user-images.githubusercontent.com/12100276/165373889-1d5e8c98-f79a-4ba4-822b-1cd587e65aea.png)
+![image](./images/dry-deposition/cmaqv6.0_time_series_and_scatter_of_PM2.5_from_M3Dry_and_STAGE.png)
 Time series of PM2.5 from M3Dry [PR#842](https://github.com/USEPA/CMAQ_Dev/pull/842), black, and STAGE using the M3Dry aerosol deposition velocity, red, (left) and a scatter plot between the two parameterizations (right).
 
-![image](https://user-images.githubusercontent.com/12100276/165374017-1e3a77be-6bf6-4b08-a58a-89252f4672b3.png)
+![image](./images/dry-deposition/cmaqv6.0_monthly_mean_PM2.5_from_STAGE_using_the_Emerson_and_Pleim.png)
 Monthly mean PM2.5 from STAGE using the Emerson et al. 2020/CSU scheme (left) and STAGE using the Pleim et al. 2022/M3Dry scheme (right).
 
-![image](https://user-images.githubusercontent.com/12100276/165374076-5c95bb86-a795-4ec9-9ad1-333c9f703050.png)
+![image](./images/dry-deposition/cmaqv6.0_time_series_and_scatter_of_PM2.5_from_Emerson_and_Pleim.png)
 Time series of PM2.5 from STAGE using the CSU aerosol deposition velocity, black, and STAGE using the M3Dry aerosol deposition parameterization, red, (left) and a scatter plot between the two parameterizations (right).
 
-![image](https://user-images.githubusercontent.com/12100276/165374388-27999a12-981f-4b15-b7f0-557a6471b691.png)
+![image](./images/dry-deposition/cmaqv6.0_stacked_bar_plots.png)
 July 2016 stacked barplots. From left to right, AQS daily observations, STAGE with CSU aerosol deposition option, STAGE with M3Dry aerosol deposition option, STAGE with v5.3 aerosol deposition option
 
 **References**:   

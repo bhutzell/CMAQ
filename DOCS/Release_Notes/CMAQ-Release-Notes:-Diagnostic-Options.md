@@ -153,19 +153,19 @@ A second correction also fixes a bug in the calculation of the ELMO parameter PM
 This change is important for a complete representation of PM25 cations. Significant impacts on PM25_NA (~33%), PM25_CA (~16%), PM25_MG (~27%), and PM25_K (9%) in tests on the southeast US benchmark domain.  
 
 **PM<sub>2.5</sub> Sodium**
-![Murphy_PM_Sodium](https://github.com/user-attachments/assets/3281f30b-e914-4c5f-a8cc-da6ebb9b2282)
+![Murphy_PM_Sodium](./images/chemistry/cmaqv6.0_pm2.5_sodium.png)
 
 **PM<sub>2.5</sub> Calcium**
-![Murphy_PM_Calcium](https://github.com/user-attachments/assets/02609bbb-d56c-4c2e-bda3-93da53e32fe3)
+![Murphy_PM_Calcium](./images/chemistry/cmaqv6.0_pm2.5_calcium.png)
 
 **PM<sub>2.5</sub> Magnesium**
-![Murphy_PM_Magnesium](https://github.com/user-attachments/assets/a459a040-a2de-43b7-a981-41d8c314f2ea)
+![Murphy_PM_Magnesium](./images/chemistry/cmaqv6.0_pm2.5_magnesium.png)
 
 **PM<sub>2.5</sub> Potassium**
-![Murphy_PM_K](https://github.com/user-attachments/assets/8f546043-686d-46ee-be8b-c023e2729d4e)
+![Murphy_PM_K](./images/chemistry/cmaqv6.0_pm2.5_potassium.png)
 
 **PM<sub>2.5-10</sub> Sodium**
-![Murphy_PM_Sodium_II](https://github.com/user-attachments/assets/5881c212-1206-4a41-ba0f-999bcaafaa93)
+![Murphy_PM_Sodium_II](./images/chemistry/cmaqv6.0_pm2.5-10_sodium.png)
 
 The mode parameter fix for the calculation of mass with a hard diameter cut-off has important impacts on PM2.5 predictions across the model domain, and the specific impact depends on fraction of the total mass, or speciated mass, that is present in each of the Aitken, Accumulation and Coarse modes. The predictions for fine-mode particulate (PMF) are unaffected as the GET_AERO_INLET routine is not called for these cases. 
 
