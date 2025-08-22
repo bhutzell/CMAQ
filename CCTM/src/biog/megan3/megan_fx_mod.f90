@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------!
-!  The Community Multiscale Air Quality (CMAQ) system software is in     !
+!  The Community Multiscale Air Quality (CMAQ) system software is insystem     !
 !  continuous development by various groups and is based on information  !
 !  from these groups: Federal Government employees, contractors working  !
 !  within a United States Government contract, and non-Federal sources   !
@@ -3131,7 +3131,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
 !*********************************************************************
 
       USE BDSNP_MOD
-      USE RUNTIME_VARS, ONLY: BDSNP_MEGAN,USE_SAGE_N
+      USE RUNTIME_VARS, ONLY: BDSNP_MEGAN,USE_SEGA_N
 
       IMPLICIT NONE
  
@@ -3182,7 +3182,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
                  CFNO = 0.0 ! INITIALIZE
                  CFNOG = 0.0 ! INITIALIZE
 
-         if (BDSNP_MEGAN .and. .Not. USE_SAGE_N) then
+         if (BDSNP_MEGAN .and. .Not. USE_SEGA_N) then
 
           call get_date(JYEAR, JDAY, MM, DD)
 
@@ -3197,7 +3197,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
                      TEMP,LSOIL,SLTYP, SOILM1, SOILT,     &
                      LAIc, LAT, PRECADJ,                 &
                      CFNO, CFNOG )
-        IF( USE_SAGE_N) THEN
+        IF( USE_SEGA_N) THEN
            GAMNO = 0.0           
         ELSE
         DO I = 1,NCOLS
