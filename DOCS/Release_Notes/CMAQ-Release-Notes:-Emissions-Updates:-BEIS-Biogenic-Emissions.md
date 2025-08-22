@@ -1,5 +1,5 @@
 ### BEIS Updates
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Science Update and Bug Fix  
 **Release Version/Date**: CMAQv5.4  
 **Description**:  

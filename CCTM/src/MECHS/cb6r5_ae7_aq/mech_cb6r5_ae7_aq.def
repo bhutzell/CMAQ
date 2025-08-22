@@ -21,6 +21,8 @@
 ! 2-9-21 G Sarwar, added a reaction for CB6r5 and updated many rate constants and some yeilds following Ramboll Report to TCEQ (07/30/2020)
 ! 4-29-21 G Sarwar, added heterogeneous hydrolysis of ClNO3 on fine-mode aerosol (<HET_CLNO3_WAI>)
 ! 3-3-22 G Sarwar, DMS chemistry (DMS1-DMS4)
+! 07-24-25 G. Sarwar
+! Aerosol nitrate photolysis
 !---------------------------------
 CB6R5_AE7_AQ
 
@@ -569,6 +571,9 @@ REACTIONS[CM] =
                                      + 0.45*HCL
                                      + 0.14*MSA
                                      + 0.55*CLO       # 3.4E-13@-2081;
+! Aerosol nitrate photolysis (implemented as heterogeneous reactions)
+<HET_ANO3I> ANO3I = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
+<HET_ANO3J> ANO3J = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
 
 END MECH
 

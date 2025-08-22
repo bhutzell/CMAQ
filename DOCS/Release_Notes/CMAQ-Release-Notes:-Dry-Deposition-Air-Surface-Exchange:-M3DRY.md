@@ -1,6 +1,6 @@
 # M3DRY
 ### Runtime Deposition Options
-[Jon Pleim](mailto:pleim.jon@pa.gov), U.S. Environmental Protection Agency    
+**Jon Pleim**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Science Update  
 **Release Version/Date**:  V6.0   
 
@@ -35,7 +35,7 @@ When using the new UACM option in WRF-CMAQ Kzmin should be False.
 
 
 ### Revised dry dep flux for NH3
-[Jon Pleim](mailto:pleim.jon@epa.gov), U.S. Environmental Protection Agency  
+**Jon Pleim**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Science Update  
 **Release Version/Date**: CMAQv5.5    
 
@@ -65,7 +65,7 @@ Second part changes NH3 deposition when running without ammonia bi-directional e
 
 
 ### New Aerosol Deposition Model (aero_depv)  
-[Jon Pleim](mailto:pleim.jon@epa.gov), U.S. Environmental Protection Agency  
+**Jon Pleim**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Science Update  
 **Release Version/Date**: CMAQv5.4  
 
