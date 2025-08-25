@@ -1,4 +1,4 @@
-# SAGE
+# SEGA
 
 ### Introducing new soil emissions module 
 
@@ -7,7 +7,7 @@
 **Release Version/Date**: CMAQv6.0  
 **Description**:  
 
-The Soil – Atmosphere Gaseous Emissions (SAGE) module for CMAQ estimates soil NO and HONO emissions generally following that of the BDSNP ([Hudman et al. 2012](https://doi.org/10.5194/acp-12-7779-2012)) parameterization.  This is a simple soil NO and HONO research option and includes a revised temperature function similar to [Wang et al., 2021](https://doi.org/10.1088/1748-9326/ac16a3) for both regional and hemispheric CMAQ simulations. Detailed soil emission factors - using USDA Crop Data Layers - are being developed and supported. Emission factors are based on the mean reported values in [Steinkamp and Lawrence 2011](https://doi.org/10.5194/acp-11-6063-2011) with updates to biocrust NO and HONO emissions following [Weber et al. 2015](http://www.pnas.org/cgi/doi/10.1073/pnas.1515818112). Agricultural cropping system soil NO was adjusted to a global total of 2.8 Tg with total global soil NO emissions of 9.5 Tg, matching the observationally constrained estimates of [Weng et al. 2020](https://doi.org/10.6084/m9.figshare.12205379).  Soil moisture functions for soil NO and HONO follow [Rasool et al., 2019](https://doi.org/10.5194/gmd-12-849-2019). STAGE land use aggregated data is needed to calculate in-line emission factors when an input emission factor file is not available.        
+The Soil Emissions of Gases to the Atmosphere (SEGA) module for CMAQ estimates soil NO and HONO emissions generally following that of the BDSNP ([Hudman et al. 2012](https://doi.org/10.5194/acp-12-7779-2012)) parameterization.  This is a simple soil NO and HONO research option and includes a revised temperature function similar to [Wang et al., 2021](https://doi.org/10.1088/1748-9326/ac16a3) for both regional and hemispheric CMAQ simulations. Detailed soil emission factors - using USDA Crop Data Layers - are being developed and supported. Emission factors are based on the mean reported values in [Steinkamp and Lawrence 2011](https://doi.org/10.5194/acp-11-6063-2011) with updates to biocrust NO and HONO emissions following [Weber et al. 2015](http://www.pnas.org/cgi/doi/10.1073/pnas.1515818112). Agricultural cropping system soil NO was adjusted to a global total of 2.8 Tg with total global soil NO emissions of 9.5 Tg, matching the observationally constrained estimates of [Weng et al. 2020](https://doi.org/10.6084/m9.figshare.12205379).  Soil moisture functions for soil NO and HONO follow [Rasool et al., 2019](https://doi.org/10.5194/gmd-12-849-2019). STAGE land use aggregated data is needed to calculate in-line emission factors when an input emission factor file is not available.        
 
 The general BDSNP emission algorithm is as follows: 
 
@@ -16,7 +16,7 @@ The general BDSNP emission algorithm is as follows:
 Where F<sub>NO,HONO</sub> is the emission rate of NO or HONO, CRF is the canopy reduction factor, F<sub>T</sub> is the temperature function,  F<sub>&theta;</sub> is the soil moisture function, F<sub>pulsing</sub> is the pulsing enhancement due to soil moisture or freeze/thaw cycles, EF<sub>biog</sub> is the biogenic emission factor, F<sub>fert</sub> is an empirical function that estimates fertilizer timing on a global scale, and EF<sub>fert</sub> is the fertilizer emission factor.  All the factors except F<sub>pulsing</sub> have a range from 0 to 1. 
 
 #### Canopy Reduction Factor
-SAGE estimates the canopy reduction factor using an asymptotic function of stomatal resistance and leaf area index. This generally follows the findings of [Delaria et al., 2020](https://acp.copernicus.org/articles/20/14023/2020/) with a maximum value of 60% at Rst/LAI of 20 s m-1 and a maximum value near 0 for Rst/LAI greater than 500. This better reflects our understanding of NO<sub>x</sub> deposition which is driven by stomatally mediated deposition of NO<sub>2</sub>. In BEIS the CRF is only applied to agriculture and scaled from 50% to 0% based on the growing season.
+SEGA estimates the canopy reduction factor using an asymptotic function of stomatal resistance and leaf area index. This generally follows the findings of [Delaria et al., 2020](https://acp.copernicus.org/articles/20/14023/2020/) with a maximum value of 60% at Rst/LAI of 20 s m-1 and a maximum value near 0 for Rst/LAI greater than 500. This better reflects our understanding of NO<sub>x</sub> deposition which is driven by stomatally mediated deposition of NO<sub>2</sub>. In BEIS the CRF is only applied to agriculture and scaled from 50% to 0% based on the growing season.
 
 #### Soil temperature function
 Both [Yienger & levy 1995](https://doi.org/10.1029/95JD00370) and [Hudman et al. 2012](https://doi.org/10.5194/acp-12-7779-2012) have an emissions plateau at soil temperatures greater than 30<sup>o</sup> C. This was increased following the findings of Oikawa et al. 2015 by fitting the double Arrhenius function of [Stark 1996](https://doi.org/10.1007/BF02183035) to the high temperature emission values of [Oikawa et al. 2015](https://doi.org/10.1038/ncomms9753) and the laboratory experiments of [Stark 1996](https://doi.org/10.1007/BF02183035). This results in an emissions peak at approximately 40<sup>o</sup> C with a decrease in emissions above 40<sup>o</sup> C due enzyme denaturation following [Stark 1996](https://doi.org/10.1007/BF02183035). This results in approximately 25% higher emissions at 40<sup>o</sup> C and still falling in the observed 2 to 3 factor of emission increase for a 10<sup>o</sup> C increase in soil temperature (Q10, [Koponen et al., 2006](https://doi.org/10.1016/j.soilbio.2005.12.004), [Zhao et al., 2025](https://doi.org/10.1029/2024EF004756)).
@@ -36,46 +36,46 @@ F<sub>fert</sub> is an empirical function that estimates when fertilizer is expe
 **Impact on results:**   
 Generally, this option increases estimated ambient HONO and NO in arid areas and decreases soil NO under high soil moisture conditions. This results in increased ozone in the Western and decreases in the Eastern U.S. for HEMI and 12US1 simulations. Soil NO emissions are generally higher than the BEIS and MEGAN Yienger and Levy 1995 (YL) implementation and lower than the MEGAN implementation of BDSNP. The figures shown below are based on simulations conducted prior to a bug fix to the seasonality of fertilizer emissions. This bug fix results in higher soil NOx emissions in January-June and lower soil NOx emissions in July-December in the northern hemisphere.  
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure1.png) 
-Figure 1: 2022 Hemispheric CAMS NO (left: 5.2 Tg annually) and SAGE NO (right: 5.4 Tg annually). 
+![image](./images/emissions/cmaqv6.0_SEGA_Figure1.png) 
+Figure 1: 2022 Hemispheric CAMS NO (left: 5.2 Tg annually) and SEGA NO (right: 5.4 Tg annually). 
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure2.png)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure2.png)
 Figure 2: 2022 Hemispheric diurnal emissions profile (right) and emissions time series (right) 
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure3.png)
-Figure 3: 2018 Hemispheric CAMS NO (left: 5.0 Tg annually) and SAGE NO (right: 4.4 Tg annually). 
+![image](./images/emissions/cmaqv6.0_SEGA_Figure3.png)
+Figure 3: 2018 Hemispheric CAMS NO (left: 5.0 Tg annually) and SEGA NO (right: 4.4 Tg annually). 
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure4.png)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure4.png)
 Figure 4: 2018 Hemispheric diurnal emissions profile (right) and emissions time series (right) 
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure5.png)
-Figure 5: 2018 CONUS BEIS NO (left: 0.4 Tg annually) and SAGE NO (right: 0.5 Tg annually). 
+![image](./images/emissions/cmaqv6.0_SEGA_Figure5.png)
+Figure 5: 2018 CONUS BEIS NO (left: 0.4 Tg annually) and SEGA NO (right: 0.5 Tg annually). 
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure6.png)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure6.png)
 Figure 6: 2018 CONUS diurnal emissions profile (right) and emissions time series (right) 
 
-SAGE NO emissions show a greater degree of variability than the gridded CAMS emissions but are generally close in magnitude for the domain. SAGE emissions peak in late May and Early June and are typically lower from July to August on the hemispheric scale. At the CONUS scale SAGE emissions are 23% higher than BEIS for 2018, exhibit a similar seasonality with higher emissions in fall and higher midday and lower nighttime NO emissions. 
+SEGA NO emissions show a greater degree of variability than the gridded CAMS emissions but are generally close in magnitude for the domain. SEGA emissions peak in late May and Early June and are typically lower from July to August on the hemispheric scale. At the CONUS scale SEGA emissions are 23% higher than BEIS for 2018, exhibit a similar seasonality with higher emissions in fall and higher midday and lower nighttime NO emissions. 
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure7.png)
-Figure 7, Annual boxplots of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SAGE (Red), and the Base case (Blue)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure7.png)
+Figure 7, Annual boxplots of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SEGA (Red), and the Base case (Blue)
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure8.png)
-Figure 8, Monthly boxplots of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SAGE (Red), and the Base case (Blue)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure8.png)
+Figure 8, Monthly boxplots of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SEGA (Red), and the Base case (Blue)
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure9.png)
-Figure 9, Seasonal Kelly plot of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SAGE and the Base case (STAGE2)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure9.png)
+Figure 9, Seasonal Kelly plot of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SEGA and the Base case (STAGE2)
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure10.png)
-Figure 10, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SAGE and the Base case (STAGE2)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure10.png)
+Figure 10, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SEGA and the Base case (STAGE2)
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure11.png)
-Figure 11, Annual boxplots of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SAGE (SOIL_GAS_R11; Red), and the Base case (Blue)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure11.png)
+Figure 11, Annual boxplots of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SEGA (SOIL_GAS_R11; Red), and the Base case (Blue)
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure12.png)
-Figure 12, Monthly boxplots of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SAGE (SOIL_GAS_R11; Red), and the Base case (Blue)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure12.png)
+Figure 12, Monthly boxplots of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SEGA (SOIL_GAS_R11; Red), and the Base case (Blue)
 
-![image](./images/emissions/cmaqv6.0_SAGE_Figure13.png)
-Figure 13, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SAGE (SOIL_GAS_R11) and the Base case
+![image](./images/emissions/cmaqv6.0_SEGA_Figure13.png)
+Figure 13, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SEGA (SOIL_GAS_R11) and the Base case
 
 
 |Merge Commit | Internal record|
