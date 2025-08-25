@@ -8,7 +8,7 @@
 
 **Description**:   
 
-The code changes make two updates to the functionality of the `sitecmp` post-processing tool.
+The code changes make three updates to the functionality of the `sitecmp` post-processing tool.
 
 - Update the CASTNET ozone QA flags recognized by `sitecmp`. Starting in 2019, the AMET-ready CASTNET hourly files with meteorology and ozone observations use additional QA flags for ozone (H, J, and Y) that are currently not recognized by `sitecmp` when checking for QA flags. Since these flags indicate invalid observations, not screening for them can lead to sporadic errors in model evaluation by including invalid observations in the analysis.
 - Update the code to recognize new environment variables `QA_FLAG_CHECK` (default Y) and `QA_FLAG_VALUES` (default '#BCDFHIJKLMNPRTY') so that QA flag check behavior can now be controlled by setting run script options. This feature was already implemented in `sitecmp_dailyo3`.
