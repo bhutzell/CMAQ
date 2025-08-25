@@ -176,7 +176,7 @@ setenv CTM_PVO3 N            #> consider potential vorticity module for O3 trans
 setenv CTM_BIOGEMIS_BE Y     #> calculate in-line biogenic emissions with BEIS [ default: N ]
 setenv CTM_BIOGEMIS_MG N     #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N         #> turns on BDSNP soil NO emissions [ default: N ]
-setenv USE_SAGE_N Y          #> turns on EPA soil NO and HONO emissions [ default: N ]
+setenv USE_SAGE_N N          #> turns on EPA soil NO and HONO emissions [ default: N ]
 setenv USE_SAGE_N_EF N       #> Use BEIS input emission factor file for soil NO and HONO [ default: N ]
 
 setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affecting photolysis
@@ -189,7 +189,7 @@ setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affec
                              #>      (4-Tabular Mie; 5-Mie Calculation; 6-Case Approx to Mie Theory)
 
 #> Surface Tiled Aerosol and Gaseous Exchange Option
-setenv CTM_USE_STAGE N       #> Use the STAGE deposition option [ default: N ]
+setenv CTM_USE_STAGE Y       #> Use the STAGE deposition option [ default: N ]
 setenv CTM_MOSAIC N          #> Output landuse specific deposition velocities [ default: N ]
 setenv CTM_STAGE_P22 N       #> Pleim et al. 2022 Aerosol deposition model [default: N]
 setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [default: Y; active only if CTM_USE_STAGE = Y]
@@ -326,7 +326,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Ozone column data
 #  set OMIfile   = OMI_1979_to_2019.dat
-  set OMIfile   = OMI_1979_to_2022.dat
+   set OMIfile   = omi_cmaq_2005through2024_27x27.dat
 
   # If using BROWN_VEG option, then set the path to the non-photosynthetic vegetation (npv) input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
@@ -338,15 +338,15 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set OPTfile = PHOT_OPTICS.dat
 
   #> MCIP meteorology files 
-  setenv GRID_BDY_2D $METpath/GRIDBDY2D.12US1.35L.$YYMMDD.nc4
-  setenv GRID_CRO_2D $METpath/GRIDCRO2D.12US1.35L.$YYMMDD.nc4
-  setenv GRID_CRO_3D $METpath/GRIDCRO3D.12US1.35L.$YYMMDD.nc4
-  setenv GRID_DOT_2D $METpath/GRIDDOT2D.12US1.35L.$YYMMDD.nc4
-  setenv MET_CRO_2D  $METpath/METCRO2D.12US1.35L.$YYMMDD.nc4
-  setenv MET_CRO_3D  $METpath/METCRO3D.12US1.35L.$YYMMDD.nc4
-  setenv MET_DOT_3D  $METpath/METDOT3D.12US1.35L.$YYMMDD.nc4
-  setenv MET_BDY_3D  $METpath/METBDY3D.12US1.35L.$YYMMDD.nc4
-  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.12US1.35L.$YYMMDD.nc4
+  setenv GRID_BDY_2D $METpath/GRIDBDY2D.12US1.35L.$YYMMDD
+  setenv GRID_CRO_2D $METpath/GRIDCRO2D.12US1.35L.$YYMMDD
+  setenv GRID_CRO_3D $METpath/GRIDCRO3D.12US1.35L.$YYMMDD
+  setenv GRID_DOT_2D $METpath/GRIDDOT2D.12US1.35L.$YYMMDD
+  setenv MET_CRO_2D  $METpath/METCRO2D.12US1.35L.$YYMMDD
+  setenv MET_CRO_3D  $METpath/METCRO3D.12US1.35L.$YYMMDD
+  setenv MET_DOT_3D  $METpath/METDOT3D.12US1.35L.$YYMMDD
+  setenv MET_BDY_3D  $METpath/METBDY3D.12US1.35L.$YYMMDD
+  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.12US1.35L.$YYMMDD
 
   #> Control Files
   #>
@@ -391,7 +391,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv GR_EM_SYM_DATE_001 F # To change default behaviour please see Users Guide for EMIS_SYM_DATE
 
   set EMISfile  = emis_mole_rwc_${YYYYMMDD}_12US1_cmaq_cracmmv2_P229_2022hc_CRACMM2.ncf
-  setenv GR_EMIS_002 ${EMISpath}/rwc/${EMISfile}
+  setenv GR_EMIS_002 $INPDIR/emis/cracmmv2_20241031/premerged/rwc/${EMISfile}
   setenv GR_EMIS_LAB_002 GR_RES_FIRES
   setenv GR_EM_SYM_DATE_002 F # To change default behaviour please see Users Guide for EMIS_SYM_DATE
 
@@ -486,16 +486,16 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
          setenv MEGAN_SOILINP    $OUTDIR/CCTM_MSOILOUT_${RUNID}_${YESTERDAY}.nc
                              #> Biogenic NO soil input file; ignore if INITIAL_RUN = Y
                              #>                            ; ignore if IGNORE_SOILINP = Y
-         setenv MEGAN_CTS /work/MOD3DATA/2016_12US1/surface/megan3.2/CT3_CONUS.ncf
-         setenv MEGAN_EFS /work/MOD3DATA/2016_12US1/surface/megan3.2/EFMAPS_CONUS.ncf
-         setenv MEGAN_LDF /work/MOD3DATA/2016_12US1/surface/megan3.2/LDF_CONUS.ncf
+         setenv MEGAN_CTS $INPDIR/surface/megan3.2/CT3_CONUS.ncf
+         setenv MEGAN_EFS $INPDIR/surface/megan3.2/EFMAPS_CONUS.ncf
+         setenv MEGAN_LDF $INPDIR/surface/megan3.2/LDF_CONUS.ncf
          if ($BDSNP_MEGAN == 'Y') then
             setenv BDSNPINP    $OUTDIR/CCTM_BDSNPOUT_${RUNID}_${YESTERDAY}.nc
-            setenv BDSNP_FFILE /work/MOD3DATA/2016_12US1/surface/megan3.2/FERT_CONUS.ncf
-            setenv BDSNP_NFILE /work/MOD3DATA/2016_12US1/surface/megan3.2/NDEP_CONUS.ncf
-            setenv BDSNP_LFILE /work/MOD3DATA/2016_12US1/surface/megan3.2/LANDTYPE_CONUS.ncf
-            setenv BDSNP_AFILE /work/MOD3DATA/2016_12US1/surface/megan3.2/ARID_CONUS.ncf
-            setenv BDSNP_NAFILE /work/MOD3DATA/2016_12US1/surface/megan3.2/NONARID_CONUS.ncf
+            setenv BDSNP_FFILE $INPDIR/surface/megan3.2/FERT_CONUS.ncf
+            setenv BDSNP_NFILE $INPDIR/surface/megan3.2/NDEP_CONUS.ncf
+            setenv BDSNP_LFILE $INPDIR/surface/megan3.2/LANDTYPE_CONUS.ncf
+            setenv BDSNP_AFILE $INPDIR/surface/megan3.2/ARID_CONUS.ncf
+            setenv BDSNP_NAFILE $INPDIR/surface/megan3.2/NONARID_CONUS.ncf
          endif
   endif
 
@@ -504,9 +504,9 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Bidirectional ammonia configuration
   if ( $CTM_ABFLUX == 'Y' ) then
-     setenv E2C_SOIL ${EPICpath}/${YYYY}r1_EPIC0509_12US1_soil.nc4
-     setenv E2C_CHEM ${EPICpath}/${YYYY}r1_EPIC0509_12US1_time${YYYYMMDD}.nc4
-     setenv E2C_LU ${EPICpath}/beld4_12US1_2011.nc4
+     setenv E2C_SOIL ${EPICpath}/${YYYY}r1_EPIC0509_12US1_soil.nc
+     setenv E2C_CHEM ${EPICpath}/${YYYY}r1_EPIC0509_12US1_time${YYYYMMDD}.nc
+     setenv E2C_LU ${EPICpath}/beld4_12US1_2011.nc
   endif
 
 #> Inline Process Analysis 
@@ -683,15 +683,15 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      #> remove previous log files
      foreach file ( ${log_test} )
         #echo "Deleting log file: $file"
-        /bin/rm -f $file  
+        rm -f $file  
      end
  
      #> remove previous output files
      foreach file ( ${out_test} )
         #echo "Deleting output file: $file"
-        /bin/rm -f $file  
+        rm -f $file  
      end
-     /bin/rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
+     rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
 
   else
      #> error if previous log files exist

@@ -1,7 +1,7 @@
 ## CMAQ Tutorial ##
 ### Prescribing Emissions Using DESID (Detailed Emissions Scaling, Isolation and Diagnostics) Module ###
-Purpose: This tutorial will guide users to utilizing the DESID Control namelists to perform some basic manipulation
-of their emission streams. For additional questions, contact Ben Murphy (murphy.ben@epa.gov) or visit the CMAS Forum.
+Purpose: This tutorial will guide users to utilizing the Control namelists to perform some basic manipulation
+of their emission streams. For additional questions, contact [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov),  or visit the CMAS Forum.
 
 ------------
 
@@ -32,15 +32,15 @@ residential heating, etc.
 - [14. Use a family of regions to scale emissions in a new location](#fam_region)  
 - [15. Use a family of species to scale emissions for a custom group of pollutants](#fam_chem)
 - [16. Miscellaneous Notes](#misc_notes)
-- [Example DESID Control File](../../../CCTM/src/emis/emis/CMAQ_Control_DESID.nml)  
-- [Example DESID Scaling Rules File](../../../CCTM/src/MECHS/cracmm2/CMAQ_Control_DESID_cracmm2.nml)  
+- [Example Control File](../../../CCTM/src/emis/emis/CMAQ_Control.nml)  
+- [Example DESID Scaling Rules File](../../../CCTM/src/MECHS/cracmm2/CMAQ_Control_cracmm2.nml)  
 - [Example Emissions Section of CCTM RunScript File](../../../CCTM/scripts/run_cctm_Bench_2018_12NE3_CRACMM2.csh#L327)   
 
 
 
 <a id=zero_out></a>
 ### 1. Zero Out Emissions
-Emission streams can be zeroed using the options for individual streams in the CMAQ RunScript or creating rules in the DESID Chemical Mapping Control Namelist.
+Emission streams can be zeroed using the options for individual streams in the CMAQ RunScript or creating rules in the Chemical Mapping Control Namelist.
 
 ##### a. Using Options in the CMAQ RunScript
 For gridded or inline emissions, reduce the value of N_EMIS_GR or N_EMIS_PT, respectively and adjust the values of the file paths and stream labels accordingly, if necessary.
@@ -220,7 +220,7 @@ The user may apply a scale factor to a specific area of the domain by identifyin
 !  Label      |               |Surrogate| Species      |Mode  |Factor|      |
 'KENTUCKY'    , 'All'         ,'All'    ,'All'         ,'All' ,1.50 ,'UNIT','m',
 ```
-The label for "KENTUCKY" should be linked to a specific gridded variable mask (of real numbers) using the "Desid_RegionDef" section on the [DESID Control Namelist](../../../CCTM/src/emis/emis/CMAQ_Control_DESID.nml#L137).
+The label for "KENTUCKY" should be linked to a specific gridded variable mask (of real numbers) using the "Desid_RegionDef" section on the [Control Namelist](../../../CCTM/src/emis/emis/CMAQ_Control.nml#L137).
 ```
 &Desid_RegionDef
  RGN_NML  =   
@@ -260,7 +260,7 @@ Chemical families are defined by prescribing, via the [CMAQ Miscellaneous Contro
 ```  
 In this example, 2 chemical families, "NOX" and "POA", are defined with 2 members, "NO" and "NO2", and "POC" and "PNCOM". Note that CMAQv5.3 required the variable ChemFamilyNum to be specified and this value is internally calculated in CMAQv5.4. If the variable is provided, the model will crash. Also, it is required to ensure that no Chemical Family Name is identical to any emission species or CMAQ species. Currently, CMAQ will not detect a name conflict but results will be compromised. A future version of CMAQ will check for duplicative names, trigger an error, and stop the model.
 
-Stream families are defined analogously in the DESID Control File (CMAQ_Control_DESID.nml):  
+Stream families are defined analogously in the Control File (CMAQ_Control.nml):  
 ```
 &Desid_StreamFamVars
  Desid_N_Stream_Fams = 3
@@ -367,6 +367,6 @@ In the default emissions mapping configuration, sulfuric acid (SULF) mass is map
 
 <!-- END_OF_COMMENT -->
 [link_emtut_1]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/driver/CMAQ_Control.nml
-[link_emtut_2]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/MECHS/cracmm2/CMAQ_Control_DESID_cracmm2.nml
+[link_emtut_2]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/MECHS/cracmm2/CMAQ_Control_cracmm2.nml
 [link_emtut_3]: https://github.com/USEPA/CMAQ/blob/main/CCTM/scripts/run_cctm_cracmm_2019_12US1_CRACMM2_EPA2019.csh#L420
 [link_emtut_4]: https://github.com/USEPA/CMAQ/blob/main/PREP/shp2cmaq/README.md

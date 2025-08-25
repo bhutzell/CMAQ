@@ -11,6 +11,7 @@ To clone code with all of the CMAQv5.5 bug fixes issue the following command fro
 
 |      Tag        |   PR Number       |         PR Name          |   Merge Date     | Brief Description |
 | -------------- | ------------------ | ------------------------ | ---------------- | -----------------------|
+| [CMAQv5.5.0.3_11Jul2025](https://github.com/USEPA/CMAQ/releases/tag/CMAQv5.5.0.3_11Jul2025)|[#253](https://github.com/USEPA/CMAQ/pull/253)|Diagnostic NH3 emissions from Agriculture and Biogenic sources | 2025-07-11 | Adds new diagnostic emissions when using the STAGE deposition option and bidirectional NH3 exchange to support 2023 and later NEI development.|
 | |[#231](https://github.com/USEPA/CMAQ/pull/231)|CRACMM2 fixes for ISAM and post processing  | 2025-03-19 | Small changes in post-processed concentrations due to missing species. Resolves issue [#221](https://github.com/USEPA/CMAQ/issues/221). |
 | |[#226](https://github.com/USEPA/CMAQ/pull/226)|Fix bug preventing CMAQ from running using SAPRC mechanisms  | 2024-12-06 | The fix is to specify that CLNO2 does undergo dry deposition to avoid a model crash when using any of the SAPRC07 mechanisms.|
 | |[#222](https://github.com/USEPA/CMAQ/pull/222)|Corrected NLCD to BELD3 mapping for shrub/scrub and dwarf scrub| 2024-12-06 | Corrects an error in NLCD40 land use mapping for inline windblown dust calculations. Addresses issues [#220](https://github.com/USEPA/CMAQ/issues/220).|

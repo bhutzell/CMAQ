@@ -1,5 +1,5 @@
 ## Activate Dry Deposition Diagnostic Output for PMOTHR
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Science Update  
 **Release Version/Date**: CMAQv5.4  
 **Description**:  
@@ -12,7 +12,7 @@ The diagnostic output for dry deposition of PMOTHR species was activated in the 
 |[Merge for PR#808](https://github.com/USEPA/CMAQ/commit/20ffc395a7d2e6c4686621dc43ea6d65f00b3679) | [PR#808](https://github.com/USEPA/CMAQ_Dev/pull/808)  |
 
 ## Remove Remnants of Reading Dry Deposition Velocities from MCIP
-[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency  
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 
 **Type of Update**: Bug Fix
 **Release Version/Date**: CMAQv5.4

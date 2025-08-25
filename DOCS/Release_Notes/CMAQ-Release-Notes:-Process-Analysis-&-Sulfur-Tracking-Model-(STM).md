@@ -1,5 +1,22 @@
 # Process Analysis and Sulfur Tracking Model (STM)
 
+## Fix to Process Analysis Tool
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
+**Type of Update**: Bug Fix   
+**Release Version**: CMAQv6.0  
+
+**Description**: When the Budget Tool was integrated into the model:
+
+1. Emission rates were not correctly multiplied by DT before they were added to the variables accumulating this process across the output time step, and
+2. the CSAV array was not initialized before VDIF was called if the Budget Tool was turned off.
+
+**Significance and Impact**:
+With these fixes in place, process rates for emissions and VDIF are reasonable again.
+   
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1340](https://github.com/USEPA/CMAQ_Dev/commit/447d8f3a585b6e7f1839fbd26aaecc2c2e9ac524) | [PR#1340](https://github.com/USEPA/CMAQ_Dev/pull/1340)  |
+
 ## Fix to option for Sulfur Tracking Model
 [William T. Hutzell](mailto:Hutzell.Bill@epa.gov), U.S. Environmental Protection Agency  
 **Type of Update**: Bug Fix   
@@ -18,7 +35,7 @@
 |[Merge for PR#968](https://github.com/USEPA/CMAQ/commit/19592006add22a559e275e98e71193f697d7b064) | [PR#968](https://github.com/USEPA/CMAQ_Dev/pull/968)  |
 
 ## Use Budget Filename set in Runscript
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of Update**: Minor Feature Improvement  
 **Release Version**: CMAQv5.5  
  
@@ -31,7 +48,7 @@
 |[Merge for PR#967](https://github.com/USEPA/CMAQ/commit/b3968964c6f8adfbb5fda9f3677b3ee1586b53e2) | [PR#967](https://github.com/USEPA/CMAQ_Dev/pull/967)  |
 
 ## Introduction of Budget Reporting Tool
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of Update**: New Feature  
 **Release Version**: CMAQv5.4  
 
@@ -52,7 +69,7 @@ Output is produced for every output time step (generally hourly). Units for both
  
 
 ## Resolve omission of organic condensable vapors from aerosol process analysis
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
 **Release Version**: CMAQv5.4  
 
