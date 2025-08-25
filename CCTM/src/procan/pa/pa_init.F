@@ -128,6 +128,8 @@ C..Local Variables:
       INTEGER NUMFLS    ! Number of PA or IRR output files needed
       INTEGER STATUS    ! Status Code
 
+      LOGICAL, EXTERNAL :: FLUSH3
+
 C-----------------------------------------------------------------------
 
       LSTOP = .FALSE.         
