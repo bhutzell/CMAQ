@@ -134,6 +134,9 @@ This section describes each of the input files required by the various CMAQ prog
 |[E2C_CHEM](#e2c_chem) <a id=e2c_chem_t></a>| GRDDED3 | Daily |XY|EPIC|required for running CMAQ with bidirectional NH3|
 |**STAGE Deposition Option**||||||
 |[STAGECTRL_NML](#stagectrl_nml) <a id=stagectrl_t></a>|ASCII|n/a|n/a|CMAQ repo|required|
+|**Windblown Dust (Brown Vegetation) Inputs**||||||
+|[PV_AVG_FILE](#PV_AVG_FILE) <a id=PV_AVG_FILE_t></a>| ASCII | Monthly Climatology | XY | Available for download |required for CTM_BROWN_VEG option |
+|[NPV_AVG_FILE](#NPV_AVG_FILE) <a id=NPV_AVG_FILE_t></a>| ASCII | Monthly Climatology | XY | Available for download |required for CTM_BROWN_VEG option |
 |**Photolysis** | | | |||
 |[OMI](#omi) <a id=omi_t></a>| ASCII | Daily | n/a |CMAQ repo or create_omi|required|
 |[OPTICS_DATA](#omi) <a id=omi_t></a>| ASCII | n/a | n/a |CMAQ repo|required|
@@ -861,6 +864,29 @@ Wavelength, optical and surface albedo parameters for CMAQ in-line photolysis ca
 Used by: CCTM
 
 Wavelength and photolysis rate parameters for CMAQ in-line photolysis calculation. This file is distributed with the CMAQ code and is chemical mechanism specific. 
+
+<a id=PV_AVG_FILE></a>
+<a id=NPV_AVG_FILE></a>
+
+## 4.11 Windblown Dust (Brown Vegetation) Inputs
+
+<!-- BEGIN COMMENT -->
+[Return to Table 4-1](#PV_AVG_FILE_t)
+<!-- END COMMENT -->
+
+Used by: CCTM
+
+PV_AVG_FILE and NPV_AVG_FILE are ASCII files that contain monthly average photosynthetically active (PV) and non-photosynthetically active (NPV) coverages for the windblown dust module. The files were created using the method described by Huang and Foroutan (2022, https://doi.org/10.1029/2021JD035243). These files can be downloaded via Amazon Web Services and used for any domain. 
+
+     https://cmaq-12us1-cracmm2-modeling-platform-2022.s3.amazonaws.com/2022_12US1/surface/npv_avg.dat
+     https://cmaq-12us1-cracmm2-modeling-platform-2022.s3.amazonaws.com/2022_12US1/surface/pv_avg.dat
+
+These files are required when setting CTM_BROWN_VEG to Y in the run script, along with the environmental variables
+
+     setenv PV_AVG_FILE /path/to/pv_avg.dat
+     setenv NPV_AVG_FILE /path/to/npv_avg.dat
+
+The resolution of the .dat files is 0.1° x 0.1° and the data are interpolated at the start of each model initialization for the day of the simulation. Extended continuous runs are not recommmended with this option, as the data are not updated during the simulation.
 
 
 <!-- BEGIN COMMENT -->

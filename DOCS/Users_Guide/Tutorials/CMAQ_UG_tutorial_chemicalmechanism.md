@@ -13,7 +13,7 @@ Goal: Modify the gas- and aerosol-phase chemical mechanisms in CMAQ, create new 
 2. GC namelist
 3. AE namelist
 4. NR namelist
-5. CMAQ_Control_DESID_*.nml namelist
+5. CMAQ_Control*.nml namelist
 6. AERO_DATA.F
 7. SOA_DEFN.F
 8. hlconst.F
@@ -29,7 +29,7 @@ Goal: Modify the gas- and aerosol-phase chemical mechanisms in CMAQ, create new 
 
 <a id=modifychem></a>
 ## 1. Modifying the chemical mechanism inputs ##
-### 1.1 See the [git instructions](#github) below if you would like to propagate the chemical mechanism changes in your Github repository. If you are assigning a new name to your mechanism, create a new folder under /$CMAQ_REPO/CCTM/src/MECHS and copy and update the names of all chemical namelist files, the mech_*.def file, the CMAQ_Control_DESID_*.nml namelist, and the SpecDef_*.txt file, if desired.  
+### 1.1 See the [git instructions](#github) below if you would like to propagate the chemical mechanism changes in your Github repository. If you are assigning a new name to your mechanism, create a new folder under /$CMAQ_REPO/CCTM/src/MECHS and copy and update the names of all chemical namelist files, the mech_*.def file, the CMAQ_Control_*.nml namelist, and the SpecDef_*.txt file, if desired.  
 
 
 <a id=mech_def></a>
@@ -350,7 +350,7 @@ To view a summary of the changes you have made to your repo since your last comm
 #   (use "git checkout -- <file>..." to discard changes in working directory)
 #
 #       modified:   CCTM/src/MECHS/saprc07tic_ae7i_aq/AE_saprc07tic_ae7i_aq.nml
-#       modified:   CCTM/src/MECHS/saprc07tic_ae7i_aq/CMAQ_Control_DESID_saprc07tic_ae7i_aq.nml
+#       modified:   CCTM/src/MECHS/saprc07tic_ae7i_aq/CMAQ_Control_saprc07tic_ae7i_aq.nml
 #       modified:   CCTM/src/MECHS/saprc07tic_ae7i_aq/GC_saprc07tic_ae7i_aq.nml
 #       modified:   CCTM/src/MECHS/saprc07tic_ae7i_aq/RXNS_DATA_MODULE.F90
 #       modified:   CCTM/src/MECHS/saprc07tic_ae7i_aq/RXNS_FUNC_MODULE.F90

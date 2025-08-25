@@ -48,11 +48,11 @@ The following gridmask file is provided with the [5.5 benchmark inputs](https://
 GRIDMASK_STATES_12NE3.nc
 ```
 
-The instructions require the user to edit the DESID emissions control namelist file and the DESID chemical control namelist file in the BLD directory. If you want to use emission scaling (independently from ISAM or DDM3D) you will also need to edit these files.
+The instructions require the user to edit the emissions control namelist file and the chemical control namelist file in the BLD directory. If you want to use emission scaling (independently from ISAM or DDM3D) you will also need to edit these files.
 
 ```
-CMAQ_Control_DESID.nml
-CMAQ_Control_DESID_${MECH}.nml
+CMAQ_Control.nml
+CMAQ_Control_${MECH}.nml
 ```
 
 
@@ -133,13 +133,13 @@ Change directories to the build directory
 cd BLD_CCTM_v55_DDM3D_gcc_cb6r5_ae7_aq_m3dry
 ```
 
-edit the Control_DESID namelist file
+edit the Control namelist file
 
 ```
-gedit CMAQ_Control_DESID.nml
+gedit CMAQ_Control.nml
 ```
 
-Add the Regions to the &Desid_RegionDef section of the control DESID namelist.
+Add the Regions to the &Desid_RegionDef section of the control namelist.
 
 ```
 &Desid_RegionDef
@@ -153,12 +153,12 @@ Add the Regions to the &Desid_RegionDef section of the control DESID namelist.
 
 ### Step 10: Example of emissions scaling (Reduce the PT_EGU emissions in PA by 25%) (Optional step)
 
-edit the DESID chemical control namelist file, note please specify the mechanism or define the MECH environment variable.
+edit the chemical control namelist file, note please specify the mechanism or define the MECH environment variable.
 
 
 ```
-#gedit CMAQ_Control_DESID_${MECH}.nml
-gedit CMAQ_Control_DESID_cb6r5_ae7_aq.nml
+#gedit CMAQ_Control_${MECH}.nml
+gedit CMAQ_Control_cb6r5_ae7_aq.nml
 ```
 
 Add the following line at the bottom of the the namelist file (before the /)

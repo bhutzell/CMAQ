@@ -1,7 +1,7 @@
 # SAPRC Chemical Mechanism
 
 ### Fix bug preventing CMAQ from running using SAPRC mechanisms
-[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Bug Fix   
 **Release Version/Date**:  CMAQv6.0   
 
