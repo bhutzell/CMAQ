@@ -86,7 +86,7 @@ C    This module estimates soil NO and HONO emissions using a BDSNP type approac
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          FUNCTION SEGA_INIT( JDATE, JTIME, TSTEP ) RESULT ( SUCCESS )
 C Revision History:
-C   May 2025: J. Bash adapted from MGEMS_INIT in MGEMS_MOD.F
+C   May 2025: J. Bash adapted from MGEMS_INIT in MGEMS.F
 
             USE UTILIO_DEFN
             USE HGRD_DEFN

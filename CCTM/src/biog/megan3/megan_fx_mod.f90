@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------!
-!  The Community Multiscale Air Quality (CMAQ) system software is insystem     !
+!  The Community Multiscale Air Quality (CMAQ) system software is in     !
 !  continuous development by various groups and is based on information  !
 !  from these groups: Federal Government employees, contractors working  !
 !  within a United States Government contract, and non-Federal sources   !
