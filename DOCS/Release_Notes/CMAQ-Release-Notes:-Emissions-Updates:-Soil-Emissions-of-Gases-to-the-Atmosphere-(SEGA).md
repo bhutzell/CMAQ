@@ -34,51 +34,52 @@ The global arithmetic mean NO emission factors of [Steinkamp](http://www.atmos-c
 F<sub>fert</sub> is an empirical function that estimates when fertilizer is expected to be applied to agricultural soils. This is both a function of the one-meter soil temperature and the change in daylength. Both functions assume a normal distribution of values around an optimal point. The daylength function peaks at the spring equinox and has a minimum at the fall equinox. The soil temperature function has a peak at 10<sup>o</sup> C, the minimum recommended germination temperature for corn ([Abendroth et al., 2017](https://doi.org/10.2134/cftm2017.02.0015)). The seasonality function attenuates towards the tropics where a floor value at 5% to represent the lack of seasonality in the tropics.
 
 **Impact on results:**   
-Generally, this option increases estimated ambient HONO and NO in arid areas and decreases soil NO under high soil moisture conditions. This results in increased ozone in the Western and decreases in the Eastern U.S. for HEMI and 12US1 simulations. Soil NO emissions are generally higher than the BEIS and MEGAN Yienger and Levy 1995 (YL) implementation and lower than the MEGAN implementation of BDSNP. The figures shown below are based on simulations conducted prior to a bug fix to the seasonality of fertilizer emissions. This bug fix results in higher soil NOx emissions in January-June and lower soil NOx emissions in July-December in the northern hemisphere.  
+Generally, this option increases estimated ambient HONO and NO in arid areas and decreases soil NO under high soil moisture conditions. This results in increased ozone in the Western and decreases in the Eastern U.S. for HEMI and 12US1 simulations. Soil NO emissions are generally higher than the BEIS and MEGAN Yienger and Levy 1995 (YL) implementation and lower than the MEGAN implementation of BDSNP. The figures shown below are based on simulations conducted prior to a bug fix to the seasonality of fertilizer emissions. This bug fix results in higher soil NOx emissions in January-June and lower soil NOx emissions in July-December in the northern hemisphere. Also note that the new soil NOx module was initially named "SAGE" rather "SEGA", and the earlier name is present in some of the figures below.  
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure1.png) 
-Figure 1: 2022 Hemispheric CAMS NO (left: 5.2 Tg annually) and SEGA NO (right: 5.4 Tg annually). 
+![image](./images/emissions/cmaqv6.0_SEGA_Figure1.png)  
+Figure 1: 2022 Hemispheric CAMS NO (left: 5.2 Tg annually) and SEGA NO (right: 5.4 Tg annually).
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure2.png)
-Figure 2: 2022 Hemispheric diurnal emissions profile (right) and emissions time series (right) 
+![image](./images/emissions/cmaqv6.0_SEGA_Figure2.png)  
+Figure 2: 2022 Hemispheric diurnal emissions profile (right) and emissions time series (right)
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure3.png)
-Figure 3: 2018 Hemispheric CAMS NO (left: 5.0 Tg annually) and SEGA NO (right: 4.4 Tg annually). 
+![image](./images/emissions/cmaqv6.0_SEGA_Figure3.png)  
+Figure 3: 2018 Hemispheric CAMS NO (left: 5.0 Tg annually) and SEGA NO (right: 4.4 Tg annually).
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure4.png)
-Figure 4: 2018 Hemispheric diurnal emissions profile (right) and emissions time series (right) 
+![image](./images/emissions/cmaqv6.0_SEGA_Figure4.png)  
+Figure 4: 2018 Hemispheric diurnal emissions profile (right) and emissions time series (right)
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure5.png)
-Figure 5: 2018 CONUS BEIS NO (left: 0.4 Tg annually) and SEGA NO (right: 0.5 Tg annually). 
+![image](./images/emissions/cmaqv6.0_SEGA_Figure5.png)  
+Figure 5: 2018 CONUS BEIS NO (left: 0.4 Tg annually) and SEGA NO (right: 0.5 Tg annually).
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure6.png)
-Figure 6: 2018 CONUS diurnal emissions profile (right) and emissions time series (right) 
+![image](./images/emissions/cmaqv6.0_SEGA_Figure6.png)  
+Figure 6: 2018 CONUS diurnal emissions profile (right) and emissions time series (right)
 
 SEGA NO emissions show a greater degree of variability than the gridded CAMS emissions but are generally close in magnitude for the domain. SEGA emissions peak in late May and Early June and are typically lower from July to August on the hemispheric scale. At the CONUS scale SEGA emissions are 23% higher than BEIS for 2018, exhibit a similar seasonality with higher emissions in fall and higher midday and lower nighttime NO emissions. 
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure7.png)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure7.png)  
 Figure 7, Annual boxplots of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SEGA (Red), and the Base case (Blue)
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure8.png)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure8.png)  
 Figure 8, Monthly boxplots of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SEGA (Red), and the Base case (Blue)
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure9.png)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure9.png)  
 Figure 9, Seasonal Kelly plot of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SEGA and the Base case (STAGE2)
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure10.png)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure10.png)  
 Figure 10, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2022 108 Hemi simulations with CRACMM3 for SEGA and the Base case (STAGE2)
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure11.png)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure11.png)  
 Figure 11, Annual boxplots of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SEGA (SOIL_GAS_R11; Red), and the Base case (Blue)
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure12.png)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure12.png)  
 Figure 12, Monthly boxplots of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SEGA (SOIL_GAS_R11; Red), and the Base case (Blue)
 
-![image](./images/emissions/cmaqv6.0_SEGA_Figure13.png)
+![image](./images/emissions/cmaqv6.0_SEGA_Figure13.png)  
 Figure 13, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2018 108 Hemi simulations with CB6r5 for SEGA (SOIL_GAS_R11) and the Base case
 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1332](https://github.com/USEPA/CMAQ_Dev/pull/1332/commits/56687957431443800ffdb28ed51e1e53540b0ac1) | [PR#1332](https://github.com/USEPA/CMAQ_Dev/pull/1332)  | 
-| | [PR#1379](https://github.com/USEPA/CMAQ_Dev/pull/1379) | 
+|[Merge for PR#1379](https://github.com/USEPA/CMAQ_Dev/commit/ab3f9bce2f7850f4ffea887a08272106bc6e7b42) | [PR#1379](https://github.com/USEPA/CMAQ_Dev/pull/1379) | 
+| | [PR#1386](https://github.com/USEPA/CMAQ_Dev/pull/1386) |
