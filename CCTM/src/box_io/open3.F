@@ -128,7 +128,8 @@ C...........   ARGUMENTS and their descriptions:
              write(6,'(6(A,1X))')'OPEN3: OUTPUT_FILES(NFILE)%VARNAMES(NVAR),UNITS(NVAR) = ',
      &       TRIM(OUTPUT_FILES(NFILE)%VARNAMES(NVAR)),TRIM(OUTPUT_FILES(NFILE)%UNITS(NVAR))
            END DO
-         END DO 
+         END DO
+         OUTPUT_FILES(NFILE)%FLUSHED = .TRUE.
       END IF
 1000  OPEN3 = .FALSE.
       WRITE(6,'(A)')'OPEN3 ERROR: Failed to create file, ' // TRIM(FNAME) // ', for routine, '

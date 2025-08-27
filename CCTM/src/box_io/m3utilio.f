@@ -6,6 +6,8 @@
          INCLUDE 'IODECL3.EXT'       !  I/O API function declarations
 
          INTEGER, PARAMETER :: MAX_IO_STRLEN = 10000
+
+         LOGICAL, PARAMETER :: NO_WRITE3 = .FALSE.
    
        INTERFACE XTRACT3
           MODULE PROCEDURE XTRACT3_0D,
@@ -30,11 +32,6 @@
      &                     WRITE3R4D
        END INTERFACE
 
-
-!      INTERFACE INDEX1
-!        MODULE PROCEDURE INDEX1_CHAR,
-!    &                    INDEXINT1
-!      END INTERFACE
 
        INTERFACE
          SUBROUTINE FETCH_CHR ( FILDEV, INBUF , LPOS , EOL , CHR )
@@ -80,14 +77,7 @@
                 END FUNCTION ENVYN
             END INTERFACE
 
-
-!      INTERFACE
-!        LOGICAL FUNCTION  CLOSE3( FNAME )
-!           IMPLICIT NONE
-!           CHARACTER*(*), INTENT(IN   ) :: FNAME   !  logical name of file Cto be opened
-!        END FUNCTION  CLOSE3
-!       END INTERFACE
-       
+     
        INTERFACE
          SUBROUTINE FETCH_WORD ( FILDEV , INBUF , LPOS, EOL , LINNUM, CHR ,
      &                     WORD )
@@ -106,47 +96,7 @@
            IMPLICIT NONE
          END FUNCTION CRLF
        END INTERFACE
-!      INTERFACE
-!        LOGICAL FUNCTION INTERPX ( FNAME, VNAME, CALLER,
-!    &                    COL0, COL1, ROW0, ROW1, LAY0, LAY1,
-!    &                    JDATE, JTIME, BUFFER )
-!         IMPLICIT NONE
-!          INCLUDE SUBST_SCENDATA
-!         CHARACTER*(*)   FNAME   !  logical name of file to be "opened"
-!         CHARACTER*(*)   CALLER  !  Calling program name
-!         CHARACTER*(*)   VNAME   !  variable name
-!         INTEGER   COL0        !  COLUMN for value
-!         INTEGER   COL1        !  COLUMN for value
-!         INTEGER   ROW0        !  ROW for value
-!         INTEGER   ROW1        !  ROW for value
-!         INTEGER   LAY0        !  LAYER for value
-!         INTEGER   LAY1        !  LAYER for value
-!         INTEGER   JDATE       !  Date for value
-!         INTEGER   JTIME       !  Time for value
-!         REAL   BUFFER ( : ) !  interpolation-output buffer array
-!        END FUNCTION INTERPX                               
-!      END INTERFACE
-!      INTERFACE
-!        LOGICAL FUNCTION  OPEN3 ( FNAME , FSTATUS , PNAME)
-!          IMPLICIT NONE
-!          CHARACTER*(*)   FNAME   !  logical name of file to be "opened"
-!          CHARACTER*(*)   PNAME   !  Calling program name
-!          INTEGER   FSTATUS       !  Not used
-!        END FUNCTION OPEN3         
-!        LOGICAL FUNCTION  DESC3 ( FNAME )
-!          IMPLICIT NONE
-!          CHARACTER*(*)   FNAME   !  logical name of file to be described.
-!        END FUNCTION DESC3
-!      END INTERFACE
-!      INTERFACE
-!        LOGICAL FUNCTION  CHECK3 ( FNAME , VNAME , JDATE , JTIME )
-!          IMPLICIT NONE
-!          CHARACTER*(*)   FNAME   !  logical name of file to be "opened"
-!          CHARACTER*(*)   VNAME   !  Variable to check
-!          INTEGER   JDATE       !  Model date
-!          INTEGER   JTIME       !  Model time
-!        END FUNCTION CHECK3
-!      END INTERFACE
+
        INTERFACE
       subroutine m3exit ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
       implicit none
@@ -264,22 +214,6 @@
        private :: quicksort
 
        INTERFACE
-!       LOGICAL FUNCTION INTERPX ( FNAME, VNAME, CALLER,
-!    &                    COL0, COL1, ROW0, ROW1, LAY0, LAY1,
-!    &                    JDATE, JTIME, BUFFER )
-!        CHARACTER(LEN=*), INTENT(IN   ) :: FNAME           !  logical file name
-!        CHARACTER(LEN=*), INTENT(IN   ) :: VNAME           !  variable name, or 'ALL'
-!        CHARACTER(LEN=*), INTENT(IN   ) :: CALLER          !  name of caller
-!        INTEGER,          INTENT(IN   ) :: LAY0            !  lower layer bound for XTRACT3
-!        INTEGER,          INTENT(IN   ) :: LAY1            !  upper layer bound for XTRACT3
-!        INTEGER,          INTENT(IN   ) :: ROW0            !  lower row   bound for XTRACT3
-!        INTEGER,          INTENT(IN   ) :: ROW1            !  upper row   bound for XTRACT3
-!        INTEGER,          INTENT(IN   ) :: COL0            !  lower col   bound for XTRACT3
-!        INTEGER,          INTENT(IN   ) :: COL1            !  upper col   bound for XTRACT3
-!        INTEGER,          INTENT(IN   ) :: JDATE           !  date, formatted YYYYDDD
-!        INTEGER,          INTENT(IN   ) :: JTIME           !  time, formatted HHMMSS
-!        REAL,             INTENT(  OUT) :: BUFFER( * )     !  interpolation-output buffer array
-!       END FUNCTION INTERPX
         LOGICAL   FUNCTION  CHECK3 ( FNAME , VNAME , JDATE , JTIME )
          CHARACTER(LEN=*), INTENT( IN ) :: FNAME   !  logical name of file to be "opened"
          CHARACTER(LEN=*), INTENT( IN ) :: VNAME   !  Variable to check
@@ -326,11 +260,12 @@
          INTEGER                :: JTIME    = 0
          INTEGER                :: NSTEPS   = 0
          INTEGER                :: FILLED   = 0
-         LOGICAL                :: FLUSHED  = .TRUE.
+         LOGICAL                :: FLUSHED  = .FALSE.
          LOGICAL                :: HEADER   = .TRUE.
          CHARACTER(LEN=16), ALLOCATABLE :: VARNAMES(:)
          CHARACTER(LEN=16), ALLOCATABLE :: UNITS(:)
          REAL,              ALLOCATABLE :: VALUES(:)
+         LOGICAL,           ALLOCATABLE :: WRITTEN(:)
       END TYPE OUTPUT_FILE
 
       INTEGER :: N_OUTPUT_FILES = 0
@@ -366,6 +301,7 @@
           ALLOCATE( OUTPUT_FILES(NFILE)%VARNAMES( NVARS ),
      &              OUTPUT_FILES(NFILE)%UNITS( NVARS ),
      &              OUTPUT_FILES(NFILE)%VALUES( NVARS ),
+     &              OUTPUT_FILES(NFILE)%WRITTEN( NVARS ),
      &              STAT =  ALSTAT)
           IF( ALSTAT .NE. 0 )THEN
             WRITE(6,'(A)')"ALLOCATION ERROR in M3UTILIO FUNCTION: SETUP_OUTPUT_FILE"
@@ -379,6 +315,7 @@
              OUTPUT_FILES(NFILE)%VARNAMES( NVAR ) = VARNAMES( NVAR )
              OUTPUT_FILES(NFILE)%UNITS( NVAR )    = UNITS( NVAR )
              OUTPUT_FILES(NFILE)%VALUES( NVAR )   = AMISS3
+             OUTPUT_FILES(NFILE)%WRITTEN( NVAR )  = .FALSE.
           END DO
           
         END FUNCTION SETUP_OUTPUT_FILE
@@ -1476,209 +1413,16 @@ c search box initial conditions
                END IF
             END DO
          END IF
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_2D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            L = LEN_TRIM(VNAME)
-            M = LEN(VNAME)
-
-            VARIABLE( 1:L )   = VNAME( 1:L )
-            VARIABLE( L+1:M ) = ' '
-              
-       
-            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_2D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-         
-            IF ( INDEX(TRIM(VNAME),'WBAR') .GT. 0 ) THEN
-               BUFFER  = BXM_WBAR
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-                                
-            IF ( INDEX(TRIM(VNAME),'SEAICE') .GT. 0 ) THEN
-                 BUFFER  = BXM_SEAICE
-                 XTRACT3_2D = .TRUE.
-                 RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'CLDT') .GT. 0 ) THEN
-               BUFFER  = BXM_CLDT
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'CLDB') .GT. 0 ) THEN
-               BUFFER  = BXM_CLDB
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'CFRAC') .GT. 0 ) THEN
-               BUFFER  = BXM_CFRAC
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'SLTYP') .GT. 0 ) THEN
-               BUFFER  = 5.0 ! set soil type to loam
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'TEMPG') .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_2D = .TRUE.
-                  RETURN
-            ENDIF
-   
-   
-            IF ( INDEX(TRIM(VNAME),'RCA') .GT. 0 ) THEN
-               BUFFER  = -1.0
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-   
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            IF ( INDEX(TRIM(VNAME),'TA') .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_2D = .TRUE.
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_2D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'QV') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = QV
-                  XTRACT3_2D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENS') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = DENS
-                  XTRACT3_2D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENSA_J') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = DENS_J
-                  XTRACT3_2D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'ZH') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = 50.0
-                  XTRACT3_2D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  OCEAN_1 variables
+c  Meteorological and Geophysical Data
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
    
-            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-
-
-            IF ( INDEX(TRIM(VNAME),'CHLO') .GT. 0 ) THEN
-               BUFFER  = 0.0 
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-
-
-
-            IF ( INDEX(TRIM(VNAME),'DMS') .GT. 0 ) THEN
-               BUFFER  = 0.0
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  GRID_CRO_2D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            IF ( INDEX(TRIM(VNAME),'LAT') .GT. 0 ) THEN
-               BUFFER  = BXM_LAT
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'LON') .GT. 0 ) THEN
-               BUFFER  = BXM_LON
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-                                 
-            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'MSFX2') .GT. 0 ) THEN
-               BUFFER  = 1.0
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'HT') .GT. 0 ) THEN
-               BUFFER  = BXM_HT
-               XTRACT3_2D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'LUFRAC_') .GT. 0 ) THEN
-              IF ( INDEX(TRIM(VNAME),'LUFRAC_04') .GT. 0 ) THEN
-                 BUFFER = 1.0
-              ELSE
-                 BUFFER = 0.0
-              END IF
-              XTRACT3_2D = .TRUE.
-              RETURN
-            ENDIF
+         IF( XTRACT_METGEODATA( VNAME,CONC ) )THEN
+             BUFFER = CONC
+             XTRACT3_2D = .TRUE.
+             RETURN
+         ENDIF
 
             BUFFER  = 1.0E-30
             PRINT*,"XTRACT3_2D: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
@@ -1735,6 +1479,7 @@ C...........   ARGUMENTS and their descriptions:
         LOGICAL, SAVE :: FIRST_CALL = .TRUE.
         INTEGER, SAVE :: FIRST_DATE = -1
         INTEGER, SAVE :: FIRST_TIME = -1
+        REAL          :: CONC
 
 c.....set date and time of first call
         IF( FIRST_CALL )THEN
@@ -1745,212 +1490,18 @@ c.....set date and time of first call
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_2D variables
+c  Meteorological and Geophysical Data
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
    
-            L = LEN_TRIM(VNAME)
-            M = LEN(VNAME)
+         IF( XTRACT_METGEODATA( VNAME,CONC ) )THEN
+             BUFFER = INT (CONC)
+             XTRACT3_2DI = .TRUE.
+             RETURN
+         ENDIF
 
-            VARIABLE( 1:L )   = VNAME( 1:L )
-            VARIABLE( L+1:M ) = ' '
-              
-       
-            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_2DI = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-         
-            IF ( INDEX(TRIM(VNAME),'WBAR') .GT. 0 ) THEN
-               BUFFER  = BXM_WBAR
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-                                
-            IF ( INDEX(TRIM(VNAME),'SEAICE') .GT. 0 ) THEN
-                 BUFFER  = BXM_SEAICE
-                 XTRACT3_2DI = .TRUE.
-                 RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'CLDT') .GT. 0 ) THEN
-               BUFFER  = BXM_CLDT
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'CLDB') .GT. 0 ) THEN
-               BUFFER  = BXM_CLDB
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'CFRAC') .GT. 0 ) THEN
-               BUFFER  = BXM_CFRAC
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'SLTYP') .GT. 0 ) THEN
-               BUFFER  = 5.0 ! set soil type to loam
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'TEMPG') .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_2DI = .TRUE.
-                  RETURN
-            ENDIF
-   
-   
-            IF ( INDEX(TRIM(VNAME),'RCA') .GT. 0 ) THEN
-               BUFFER  = -1.0
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-   
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            IF ( INDEX(TRIM(VNAME),'TA') .GT. 0 ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_2DI = .TRUE.
-                  RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_2DI = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'QV') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = QV
-                  XTRACT3_2DI = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENS') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = DENS
-                  XTRACT3_2DI = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENSA_J') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = DENS_J
-                  XTRACT3_2DI = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'ZH') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = 50.0
-                  XTRACT3_2DI = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  OCEAN_1 variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-
-
-            IF ( INDEX(TRIM(VNAME),'CHLO') .GT. 0 ) THEN
-               BUFFER  = 0.0 
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-
-
-
-            IF ( INDEX(TRIM(VNAME),'DMS') .GT. 0 ) THEN
-               BUFFER  = 0.0
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  GRID_CRO_2D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            IF ( INDEX(TRIM(VNAME),'LAT') .GT. 0 ) THEN
-               BUFFER  = BXM_LAT
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'LON') .GT. 0 ) THEN
-               BUFFER  = BXM_LON
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-                                 
-            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'MSFX2') .GT. 0 ) THEN
-               BUFFER  = 1.0
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'HT') .GT. 0 ) THEN
-               BUFFER  = BXM_HT
-               XTRACT3_2DI = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'LUFRAC_') .GT. 0 ) THEN
-              IF ( INDEX(TRIM(VNAME),'LUFRAC_04') .GT. 0 ) THEN
-                 BUFFER = 1.0
-              ELSE
-                 BUFFER = 0.0
-              END IF
-              XTRACT3_2DI = .TRUE.
-              RETURN
-            ENDIF
-
-            BUFFER  = 1.0E-30
+            BUFFER  = 0
             PRINT*,"XTRACT3_2DI: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
-            PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
+            PRINT*,"Setting ", TRIM(VNAME),' to 0'
             XTRACT3_2DI = .TRUE.
       
       RETURN
@@ -2019,200 +1570,16 @@ c search box initial conditions
                END IF
             END DO
           END IF
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_3D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-         
-            IF ( INDEX(TRIM(VNAME),'WBAR') .GT. 0 ) THEN
-               BUFFER  = BXM_WBAR
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-                                
-            IF ( INDEX(TRIM(VNAME),'SEAICE') .GT. 0 ) THEN
-                 BUFFER  = BXM_SEAICE
-                 XTRACT3_3D = .TRUE.
-                 RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'CLDT') .GT. 0 ) THEN
-               BUFFER  = BXM_CLDT
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'CLDB') .GT. 0 ) THEN
-               BUFFER  = BXM_CLDB
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'CFRAC') .GT. 0 ) THEN
-               BUFFER  = BXM_CFRAC
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'SLTYP') .GT. 0 ) THEN
-               BUFFER  = 5.0 ! set soil type to loam
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-   
-   
-            IF ( INDEX(TRIM(VNAME),'RCA') .GT. 0 ) THEN
-               BUFFER  = -1.0
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-   
-   
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            IF ( INDEX(TRIM(VNAME),'TA') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_3D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_3D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'QV') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = QV
-                  XTRACT3_3D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENS') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = DENS
-                  XTRACT3_3D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENSA_J') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = DENS_J
-                  XTRACT3_3D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'ZH') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = 50.0
-                  XTRACT3_3D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  OCEAN_1 variables
+c  Meteorological and Geophysical Data
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
    
-            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-
-
-            IF ( INDEX(TRIM(VNAME),'CHLO') .GT. 0 ) THEN
-               BUFFER  = 0.0 
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-
-
-
-            IF ( INDEX(TRIM(VNAME),'DMS') .GT. 0 ) THEN
-               BUFFER  = 0.0
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  GRID_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            IF ( INDEX(TRIM(VNAME),'LAT') .GT. 0 ) THEN
-               BUFFER  = BXM_LAT
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'LON') .GT. 0 ) THEN
-               BUFFER  = BXM_LON
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-                                 
-            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'MSFX2') .GT. 0 ) THEN
-               BUFFER  = 1.0
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'HT') .GT. 0 ) THEN
-               BUFFER  = BXM_HT
-               XTRACT3_3D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'LUFRAC_') .GT. 0 ) THEN
-              IF ( INDEX(TRIM(VNAME),'LUFRAC_04') .GT. 0 ) THEN
-                 BUFFER = 1.0
-              ELSE
-                 BUFFER = 0.0
-              END IF
-              XTRACT3_3D = .TRUE.
-              RETURN
-            END IF 
+         IF( XTRACT_METGEODATA( VNAME,CONC ) )THEN
+             BUFFER = CONC
+             XTRACT3_3D = .TRUE.
+             RETURN
+         ENDIF
 
             BUFFER  = 1.0E-30
             PRINT*,"XTRACT3_3D: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
@@ -2370,198 +1737,17 @@ c search box initial conditions
                END IF
             END DO
          END IF 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_0D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-         
-            IF ( INDEX(TRIM(VNAME),'WBAR') .GT. 0 ) THEN
-               BUFFER  = BXM_WBAR
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-                                
-            IF ( INDEX(TRIM(VNAME),'SEAICE') .GT. 0 ) THEN
-                 BUFFER  = BXM_SEAICE
-                 XTRACT3_0D = .TRUE.
-                 RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'CLDT') .GT. 0 ) THEN
-               BUFFER  = BXM_CLDT
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'CLDB') .GT. 0 ) THEN
-               BUFFER  = BXM_CLDB
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'CFRAC') .GT. 0 ) THEN
-               BUFFER  = BXM_CFRAC
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'SLTYP') .GT. 0 ) THEN
-               BUFFER  = 5.0 ! set soil type to loam
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'RCA') .GT. 0 ) THEN
-               BUFFER  = -1.0
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-   
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            IF ( INDEX(TRIM(VNAME),'TA') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_0D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_0D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'QV') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = QV
-                  XTRACT3_0D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENS') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = DENS
-                  XTRACT3_0D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENSA_J') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = DENS_J
-                  XTRACT3_0D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'ZH') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = 50.0
-                  XTRACT3_0D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  OCEAN_1 variables
+c  Meteorological and Geophysical Data
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
    
-            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
+         IF( XTRACT_METGEODATA( VNAME,CONC ) )THEN
+             BUFFER = CONC
+             XTRACT3_0D = .TRUE.
+             RETURN
+         ENDIF
 
-
-            IF ( INDEX(TRIM(VNAME),'CHLO') .GT. 0 ) THEN
-               BUFFER  = 0.0 
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-
-
-
-            IF ( INDEX(TRIM(VNAME),'DMS') .GT. 0 ) THEN
-               BUFFER  = 0.0
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  GRID_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            IF ( INDEX(TRIM(VNAME),'LAT') .GT. 0 ) THEN
-               BUFFER  = BXM_LAT
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'LON') .GT. 0 ) THEN
-               BUFFER  = BXM_LON
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-                                 
-            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'MSFX2') .GT. 0 ) THEN
-               BUFFER  = 1.0
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'HT') .GT. 0 ) THEN
-               BUFFER  = BXM_HT
-               XTRACT3_0D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'LUFRAC_') .GT. 0 ) THEN
-              IF ( INDEX(TRIM(VNAME),'LUFRAC_04') .GT. 0 ) THEN
-                 BUFFER = 1.0
-              ELSE
-                 BUFFER = 0.0
-              END IF
-              XTRACT3_0D = .TRUE.
-              RETURN
-            ENDIF
 
             BUFFER  = 1.0E-30
             PRINT*,"XTRACT3_0D: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
@@ -2637,199 +1823,14 @@ c search box initial conditions
          END IF
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_2D variables
+c  Meteorological and Geophysical Data
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
    
-            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_4D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-         
-            IF ( INDEX(TRIM(VNAME),'WBAR') .GT. 0 ) THEN
-               BUFFER  = BXM_WBAR
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-                                
-            IF ( INDEX(TRIM(VNAME),'SEAICE') .GT. 0 ) THEN
-                 BUFFER  = BXM_SEAICE
-                 XTRACT3_4D = .TRUE.
-                 RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'CLDT') .GT. 0 ) THEN
-               BUFFER  = BXM_CLDT
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'CLDB') .GT. 0 ) THEN
-               BUFFER  = BXM_CLDB
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'CFRAC') .GT. 0 ) THEN
-               BUFFER  = BXM_CFRAC
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'RCA') .GT. 0 ) THEN
-               BUFFER  = -1.0
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-
-            IF ( INDEX(TRIM(VNAME),'SLTYP') .GT. 0 ) THEN
-               BUFFER  = 5.0 ! set soil type to loam
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-   
-   
-   
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  MET_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-   
-            IF ( INDEX(TRIM(VNAME),'TA') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_TEMP
-                  XTRACT3_4D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'PRES') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = CELL_PRES
-                  XTRACT3_4D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'QV') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = QV
-                  XTRACT3_4D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENS') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = DENS
-                  XTRACT3_4D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'DENSA_J') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = DENS_J
-                  XTRACT3_4D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'ZH') .GT. 0 ) THEN
-               IF ( LDEFAULT ) THEN
-                  BUFFER  = 50.0
-                  XTRACT3_4D = .TRUE.
-                  RETURN
-               ELSE
-               ENDIF
-            ENDIF
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  OCEAN_1 variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-
-
-            IF ( INDEX(TRIM(VNAME),'CHLO') .GT. 0 ) THEN
-               BUFFER  = 0.0 
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-
-
-
-            IF ( INDEX(TRIM(VNAME),'DMS') .GT. 0 ) THEN
-               BUFFER  = 0.0
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  GRID_CRO_3D variables
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            IF ( INDEX(TRIM(VNAME),'LAT') .GT. 0 ) THEN
-               BUFFER  = BXM_LAT
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'LON') .GT. 0 ) THEN
-               BUFFER  = BXM_LON
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-                                 
-            IF ( INDEX(TRIM(VNAME),'OPEN') .GT. 0 ) THEN
-               BUFFER  = BXM_OPEN
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'SURF') .GT. 0 ) THEN
-               BUFFER  = BXM_SURF
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'MSFX2') .GT. 0 ) THEN
-               BUFFER  = 1.0
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'HT') .GT. 0 ) THEN
-               BUFFER  = BXM_HT
-               XTRACT3_4D = .TRUE.
-               RETURN
-            ENDIF
-   
-            IF ( INDEX(TRIM(VNAME),'LUFRAC_') .GT. 0 ) THEN
-              IF ( INDEX(TRIM(VNAME),'LUFRAC_04') .GT. 0 ) THEN
-                 BUFFER = 1.0
-              ELSE
-                 BUFFER = 0.0
-              END IF
-              XTRACT3_4D = .TRUE.
-              RETURN
-            ENDIF
+         IF( XTRACT_METGEODATA( VNAME,CONC ) )THEN
+             BUFFER = CONC
+             XTRACT3_4D = .TRUE.
+             RETURN
+         ENDIF
 
             BUFFER  = 1.0E-30
             PRINT*,"XTRACT3_4D: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
@@ -2864,20 +1865,20 @@ C...........   ARGUMENTS and their descriptions:
            LOGICAL :: WRITE_ALL
            LOGICAL :: NEW_MOMENT = .TRUE.
 
-!          WRITE3 = .TRUE.
-!          RETURN
+           IF( NO_WRITE3 )THEN
+              WRITE3R = .TRUE.
+              RETURN
+           END IF
 
            FILE_ID = 0
            DO NVAR = 1,N_OUTPUT_FILES
-!              write(6,'(6(A,1X))')'WRITE3: FNAME,OUTPUT_FILES(NVAR)%FILENAME = ',
-!     &        TRIM(FNAME),TRIM(OUTPUT_FILES(NVAR)%FILENAME)
-              IF ( INDEX(TRIM(OUTPUT_FILES(NVAR)%FILENAME),TRIM(FNAME)) .GT. 0 ) THEN
+              IF ( TRIM(OUTPUT_FILES(NVAR)%FILENAME) .EQ. TRIM(FNAME) ) THEN
                 FILE_ID = NVAR
                 EXIT
               END IF
            END DO
            IF( FILE_ID .LT. 1 )THEN
-             WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' is not opened.'
+             WRITE(6,'(A)')'WRITE3R ERROR: ' // TRIM(FNAME) // ' is not opened.'
              WRITE3R = .FALSE.
              RETURN
            END IF
@@ -2908,7 +1909,6 @@ C...........   ARGUMENTS and their descriptions:
            ELSE
                VAR_ID = 0
                DO NVAR = 1,OUTPUT_FILES(FILE_ID)%NVARS
-!                  IF ( INDEX(TRIM(OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)),TRIM(VNAME)) .GT. 0 ) THEN
                   IF ( OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR) .EQ. VNAME ) THEN
                     VAR_ID = NVAR
                     EXIT
@@ -2920,7 +1920,10 @@ C...........   ARGUMENTS and their descriptions:
                  WRITE3R = .FALSE.
                  RETURN
                END IF
-               OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+               IF ( .NOT. OUTPUT_FILES(FILE_ID)%WRITTEN( VAR_ID ) ) THEN
+                  OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+                  OUTPUT_FILES(FILE_ID)%WRITTEN( VAR_ID ) = .TRUE.
+               END IF
                IF( OUTPUT_FILES(FILE_ID)%FILLED .EQ. OUTPUT_FILES(FILE_ID)%NVARS )THEN
                    WRITE_ALL = .TRUE.
                ELSE
@@ -2928,17 +1931,19 @@ C...........   ARGUMENTS and their descriptions:
                END IF
                OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = BUFFER(1)
            END IF
-           IF ( NEW_MOMENT ) THEN
-             OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
-             OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+
+!           WRITE_ALL = ( WRITE_ALL 
+!     &              .OR. ( NEW_MOMENT .AND. .NOT. OUTPUT_FILES(FILE_ID)%FLUSHED ) )
+           IF ( WRITE_ALL )THEN
+              WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
+     &         (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
+              OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+              OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
+              OUTPUT_FILES(FILE_ID)%FILLED = 0
+              OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+              OUTPUT_FILES(FILE_ID)%WRITTEN = .FALSE.
            ELSE
-             BACKSPACE(UNIT = IO_UNIT, ERR = 1000, IOSTAT = IOS)
-             OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
-           END IF
-           WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
-     &     (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
-           IF ( WRITE_ALL ) THEN
-!             OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+              OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
            END IF
 
            WRITE3R = .TRUE.
@@ -2972,14 +1977,14 @@ C...........   ARGUMENTS and their descriptions:
            LOGICAL :: WRITE_ALL
            LOGICAL :: NEW_MOMENT = .TRUE.
 
-!          WRITE3I = .TRUE.
-!          RETURN
+           IF( NO_WRITE3 )THEN
+              WRITE3I = .TRUE.
+              RETURN
+           END IF
 
            FILE_ID = 0
            DO NVAR = 1,N_OUTPUT_FILES
-!              write(6,'(6(A,1X))')'WRITE3: FNAME,OUTPUT_FILES(NVAR)%FILENAME = ',
-!     &        TRIM(FNAME),TRIM(OUTPUT_FILES(NVAR)%FILENAME)
-              IF ( INDEX(TRIM(OUTPUT_FILES(NVAR)%FILENAME),TRIM(FNAME)) .GT. 0 ) THEN
+              IF ( TRIM(OUTPUT_FILES(NVAR)%FILENAME) .EQ. TRIM(FNAME) ) THEN
                 FILE_ID = NVAR
                 EXIT
               END IF
@@ -3012,11 +2017,10 @@ C...........   ARGUMENTS and their descriptions:
                WRITE_ALL = .TRUE.
                NVAR = OUTPUT_FILES(FILE_ID)%NVARS
                OUTPUT_FILES(FILE_ID)%FILLED = NVAR
-               OUTPUT_FILES(FILE_ID)%VALUES(1:NVAR) = BUFFER(1,1:NVAR)
+               OUTPUT_FILES(FILE_ID)%VALUES(1:NVAR) = REAL(BUFFER(1,1:NVAR))
            ELSE
                VAR_ID = 0
                DO NVAR = 1,OUTPUT_FILES(FILE_ID)%NVARS
-!                  IF ( INDEX(TRIM(OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)),TRIM(VNAME)) .GT. 0 ) THEN
                   IF ( OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR) .EQ. VNAME ) THEN
                     VAR_ID = NVAR
                     EXIT
@@ -3028,25 +2032,30 @@ C...........   ARGUMENTS and their descriptions:
                  WRITE3I = .FALSE.
                  RETURN
                END IF
-               OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+               IF ( .NOT. OUTPUT_FILES(FILE_ID)%WRITTEN( VAR_ID ) ) THEN
+                  OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+                  OUTPUT_FILES(FILE_ID)%WRITTEN( VAR_ID ) = .TRUE.
+               END IF
                IF( OUTPUT_FILES(FILE_ID)%FILLED .EQ. OUTPUT_FILES(FILE_ID)%NVARS )THEN
                    WRITE_ALL = .TRUE.
                ELSE
                    WRITE_ALL = .FALSE.
                END IF
-               OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = BUFFER(1,1)
+               OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = REAL(BUFFER(1,1))
            END IF
-           IF ( NEW_MOMENT ) THEN
-             OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
-             OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+
+!           WRITE_ALL = ( WRITE_ALL 
+!     &              .OR. ( NEW_MOMENT .AND. .NOT. OUTPUT_FILES(FILE_ID)%FLUSHED ) )
+           IF ( WRITE_ALL )THEN
+              WRITE(IO_UNIT,'(2(I7,","),4000(24X,I8,","))')JDATE,JTIME,
+     &         (INT(OUTPUT_FILES(FILE_ID)%VALUES(NVAR)),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
+              OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+              OUTPUT_FILES(FILE_ID)%FILLED  = 0
+              OUTPUT_FILES(FILE_ID)%VALUES = REAL( IMISS3 )
+              OUTPUT_FILES(FILE_ID)%WRITTEN = .FALSE.
+              OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
            ELSE
-             BACKSPACE(UNIT = IO_UNIT, ERR = 1000, IOSTAT = IOS)
-             OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
-           END IF
-           WRITE(IO_UNIT,'(2(I7,","),4000(26X,I8,","))')JDATE,JTIME,
-     &     (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
-           IF ( WRITE_ALL ) THEN
-!             OUTPUT_FILES(FILE_ID)%VALUES = IMISS3
+              OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
            END IF
 
            WRITE3I = .TRUE.
@@ -3080,20 +2089,20 @@ C...........   ARGUMENTS and their descriptions:
   
            LOGICAL :: WRITE_ALL
 
-!          WRITE3 = .TRUE.
-!          RETURN
+           IF( NO_WRITE3 )THEN
+              WRITE3R2D = .TRUE.
+              RETURN
+           END IF
 
            FILE_ID = 0
            DO NVAR = 1,N_OUTPUT_FILES
-!              write(6,'(6(A,1X))')'WRITE3: FNAME,OUTPUT_FILES(NVAR)%FILENAME = ',
-!     &        TRIM(FNAME),TRIM(OUTPUT_FILES(NVAR)%FILENAME)
-              IF ( INDEX(TRIM(OUTPUT_FILES(NVAR)%FILENAME),TRIM(FNAME)) .GT. 0 ) THEN
+              IF ( TRIM(OUTPUT_FILES(NVAR)%FILENAME) .EQ. TRIM(FNAME) ) THEN
                 FILE_ID = NVAR
                 EXIT
               END IF
            END DO
            IF( FILE_ID .LT. 1 )THEN
-             WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' is not opened.'
+             WRITE(6,'(A)')'WRITE3R2D ERROR: ' // TRIM(FNAME) // ' is not opened.'
              WRITE3R2D = .FALSE.
              RETURN
            END IF
@@ -3125,7 +2134,6 @@ C...........   ARGUMENTS and their descriptions:
            ELSE
                VAR_ID = 0
                DO NVAR = 1,OUTPUT_FILES(FILE_ID)%NVARS
-!                  IF ( INDEX(TRIM(OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)),TRIM(VNAME)) .GT. 0 ) THEN
                   IF ( OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR) .EQ. VNAME ) THEN
                     VAR_ID = NVAR
                     EXIT
@@ -3137,7 +2145,10 @@ C...........   ARGUMENTS and their descriptions:
                  WRITE3R2D = .FALSE.
                  RETURN
                END IF
-               OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+               IF ( .NOT. OUTPUT_FILES(FILE_ID)%WRITTEN( VAR_ID ) ) THEN
+                  OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+                  OUTPUT_FILES(FILE_ID)%WRITTEN( VAR_ID ) = .TRUE.
+               END IF
                IF( OUTPUT_FILES(FILE_ID)%FILLED .EQ. OUTPUT_FILES(FILE_ID)%NVARS )THEN
                    WRITE_ALL = .TRUE.
                ELSE
@@ -3145,17 +2156,19 @@ C...........   ARGUMENTS and their descriptions:
                END IF
                OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = BUFFER(1,1)
            END IF
-           IF ( NEW_MOMENT ) THEN
-             OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
-             OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+
+!           WRITE_ALL = ( WRITE_ALL 
+!     &              .OR. ( NEW_MOMENT .AND. .NOT. OUTPUT_FILES(FILE_ID)%FLUSHED ) )
+           IF ( WRITE_ALL )THEN
+              WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
+     &         (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
+              OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+              OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
+              OUTPUT_FILES(FILE_ID)%FILLED = 0
+              OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+              OUTPUT_FILES(FILE_ID)%WRITTEN = .FALSE.
            ELSE
-             BACKSPACE(UNIT = IO_UNIT, ERR = 1000, IOSTAT = IOS)
-             OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
-           END IF
-           WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
-     &     (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
-           IF ( WRITE_ALL ) THEN
-!             OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+              OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
            END IF
 
            WRITE3R2D = .TRUE.
@@ -3188,20 +2201,20 @@ C...........   ARGUMENTS and their descriptions:
            LOGICAL :: WRITE_ALL
            LOGICAL :: NEW_MOMENT = .TRUE.
 
-!          WRITE3 = .TRUE.
-!          RETURN
+           IF( NO_WRITE3 )THEN
+              WRITE3R3D = .TRUE.
+              RETURN
+           END IF
 
            FILE_ID = 0
            DO NVAR = 1,N_OUTPUT_FILES
-!              write(6,'(6(A,1X))')'WRITE3: FNAME,OUTPUT_FILES(NVAR)%FILENAME = ',
-!     &        TRIM(FNAME),TRIM(OUTPUT_FILES(NVAR)%FILENAME)
-              IF ( INDEX(TRIM(OUTPUT_FILES(NVAR)%FILENAME),TRIM(FNAME)) .GT. 0 ) THEN
+              IF ( TRIM(OUTPUT_FILES(NVAR)%FILENAME) .EQ. TRIM(FNAME) ) THEN
                 FILE_ID = NVAR
                 EXIT
               END IF
            END DO
            IF( FILE_ID .LT. 1 )THEN
-             WRITE(6,'(A)')'WRITE3 ERROR: ' // TRIM(FNAME) // ' is not opened.'
+             WRITE(6,'(A)')'WRITE3RD ERROR: ' // TRIM(FNAME) // ' is not opened.'
              WRITE3R3D = .FALSE.
              RETURN
            END IF
@@ -3232,7 +2245,6 @@ C...........   ARGUMENTS and their descriptions:
            ELSE
                VAR_ID = 0
                DO NVAR = 1,OUTPUT_FILES(FILE_ID)%NVARS
-!                  IF ( INDEX(TRIM(OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)),TRIM(VNAME)) .GT. 0 ) THEN
                   IF ( OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR) .EQ. VNAME ) THEN
                     VAR_ID = NVAR
                     EXIT
@@ -3244,7 +2256,10 @@ C...........   ARGUMENTS and their descriptions:
                  WRITE3R3D = .FALSE.
                  RETURN
                END IF
-               OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+               IF ( .NOT. OUTPUT_FILES(FILE_ID)%WRITTEN( VAR_ID ) ) THEN
+                  OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+                  OUTPUT_FILES(FILE_ID)%WRITTEN( VAR_ID ) = .TRUE.
+               END IF
                IF( OUTPUT_FILES(FILE_ID)%FILLED .EQ. OUTPUT_FILES(FILE_ID)%NVARS )THEN
                    WRITE_ALL = .TRUE.
                ELSE
@@ -3252,17 +2267,19 @@ C...........   ARGUMENTS and their descriptions:
                END IF
                OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = BUFFER(1,1,1)
            END IF
-           IF ( NEW_MOMENT ) THEN
-             OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
-             OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+
+!           WRITE_ALL = ( WRITE_ALL 
+!     &              .OR. ( NEW_MOMENT .AND. .NOT. OUTPUT_FILES(FILE_ID)%FLUSHED ) )
+           IF ( WRITE_ALL )THEN
+              WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
+     &         (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
+              OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+              OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
+              OUTPUT_FILES(FILE_ID)%FILLED = 0
+              OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+              OUTPUT_FILES(FILE_ID)%WRITTEN = .FALSE.
            ELSE
-             BACKSPACE(UNIT = IO_UNIT, ERR = 1000, IOSTAT = IOS)
-             OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
-           END IF
-           WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
-     &     (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
-           IF ( WRITE_ALL ) THEN
-!             OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+              OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
            END IF
 
            WRITE3R3D = .TRUE.
@@ -3297,14 +2314,14 @@ C...........   ARGUMENTS and their descriptions:
            LOGICAL :: WRITE_ALL
            LOGICAL :: NEW_MOMENT = .TRUE.
 
-!          WRITE3 = .TRUE.
-!          RETURN
+           IF( NO_WRITE3 )THEN
+              WRITE3R4D = .TRUE.
+              RETURN
+           END IF
 
            FILE_ID = 0
            DO NVAR = 1,N_OUTPUT_FILES
-!              write(6,'(6(A,1X))')'WRITE3: FNAME,OUTPUT_FILES(NVAR)%FILENAME = ',
-!     &        TRIM(FNAME),TRIM(OUTPUT_FILES(NVAR)%FILENAME)
-              IF ( INDEX(TRIM(OUTPUT_FILES(NVAR)%FILENAME),TRIM(FNAME)) .GT. 0 ) THEN
+              IF ( TRIM(OUTPUT_FILES(NVAR)%FILENAME) .EQ. TRIM(FNAME) ) THEN
                 FILE_ID = NVAR
                 EXIT
               END IF
@@ -3341,7 +2358,6 @@ C...........   ARGUMENTS and their descriptions:
            ELSE
                VAR_ID = 0
                DO NVAR = 1,OUTPUT_FILES(FILE_ID)%NVARS
-!                  IF ( INDEX(TRIM(OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)),TRIM(VNAME)) .GT. 0 ) THEN
                   IF ( OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR) .EQ. VNAME ) THEN
                     VAR_ID = NVAR
                     EXIT
@@ -3353,7 +2369,10 @@ C...........   ARGUMENTS and their descriptions:
                  WRITE3R4D = .FALSE.
                  RETURN
                END IF
-               OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+               IF ( .NOT. OUTPUT_FILES(FILE_ID)%WRITTEN( VAR_ID ) ) THEN
+                  OUTPUT_FILES(FILE_ID)%FILLED = OUTPUT_FILES(FILE_ID)%FILLED + 1
+                  OUTPUT_FILES(FILE_ID)%WRITTEN( VAR_ID ) = .TRUE.
+               END IF
                IF( OUTPUT_FILES(FILE_ID)%FILLED .EQ. OUTPUT_FILES(FILE_ID)%NVARS )THEN
                    WRITE_ALL = .TRUE.
                ELSE
@@ -3361,17 +2380,19 @@ C...........   ARGUMENTS and their descriptions:
                END IF
                OUTPUT_FILES(FILE_ID)%VALUES(VAR_ID) = BUFFER(1,1,1,1)
            END IF
-           IF ( NEW_MOMENT ) THEN
-             OUTPUT_FILES(FILE_ID)%NSTEPS = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
-             OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+           
+!           WRITE_ALL = ( WRITE_ALL 
+!     &              .OR. ( NEW_MOMENT .AND. .NOT. OUTPUT_FILES(FILE_ID)%FLUSHED ) )
+           IF ( WRITE_ALL )THEN
+              WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
+     &         (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
+              OUTPUT_FILES(FILE_ID)%FLUSHED = .TRUE.
+              OUTPUT_FILES(FILE_ID)%NSTEPS  = OUTPUT_FILES(FILE_ID)%NSTEPS + 1
+              OUTPUT_FILES(FILE_ID)%FILLED = 0
+              OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+              OUTPUT_FILES(FILE_ID)%WRITTEN = .FALSE.
            ELSE
-             BACKSPACE(UNIT = IO_UNIT, ERR = 1000, IOSTAT = IOS)
-             OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
-           END IF
-           WRITE(IO_UNIT,'(2(I7,","),4000(18X,ES16.4,","))')JDATE,JTIME,
-     &     (OUTPUT_FILES(FILE_ID)%VALUES(NVAR),NVAR=1,OUTPUT_FILES(FILE_ID)%NVARS)
-           IF ( WRITE_ALL ) THEN
-!             OUTPUT_FILES(FILE_ID)%VALUES = AMISS3
+              OUTPUT_FILES(FILE_ID)%FLUSHED = .FALSE.
            END IF
 
            WRITE3R4D = .TRUE.
