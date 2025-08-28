@@ -30,13 +30,15 @@ C
 C*************************************************************************
       MODULE ENV_VARS
 
-      CHARACTER*256  SITE_FILE       ! Site info file
+      INTEGER, PARAMETER :: MAXLEN = 1000
 
-      CHARACTER*16   TABLE_TYPE      ! Table type on input (IMPROVE, CASTNET, MDN, NADP, STN)
+      CHARACTER(MAXLEN) SITE_FILE    ! Site info file
 
-      CHARACTER*256  IN_TABLE        ! Input table of actual values  
+      CHARACTER*16      TABLE_TYPE   ! Table type on input (IMPROVE, CASTNET, MDN, NADP, STN)
 
-      CHARACTER*256  OUT_TABLE       ! Output table containing both actual and modeled values 
+      CHARACTER(MAXLEN) IN_TABLE     ! Input table of actual values  
+
+      CHARACTER(MAXLEN) OUT_TABLE    ! Output table containing both actual and modeled values 
 
       INTEGER        START_DATE      ! starting date of period to process
       INTEGER        START_TIME      ! starting time of period to process

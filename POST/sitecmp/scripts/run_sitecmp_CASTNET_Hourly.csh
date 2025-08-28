@@ -107,9 +107,6 @@
  setenv TIME_SHIFT 0
 
 #> indicate whether or not to check QA flag (default Y)
- setenv QA_FLAG_CHECK N 
-
-#> indicate whether or not to check QA flag (default Y)
  setenv QA_FLAG_CHECK Y 
  setenv QA_FLAG_VALUES "#BCDFHIJKLMNPRTY" 
 
