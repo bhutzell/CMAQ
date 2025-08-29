@@ -86,4 +86,9 @@ C....................................................................
 
 #endif
 
+#ifndef m3box
+      LOGICAL, EXTERNAL :: FLUSH3
+!close m3box
+#endif
+
       END MODULE UTILIO_DEFN

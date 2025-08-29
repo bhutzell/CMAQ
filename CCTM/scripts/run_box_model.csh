@@ -52,7 +52,7 @@ echo 'Start Model Run At ' `date`
 #> libraries using config.cmaq. Options: intel | gcc | pgi
  if ( ! $?compiler ) then
    setenv compiler intel
-   setenv compiler pgi
+#  setenv compiler pgi
 #  setenv compiler gcc
  endif
  if ( ! $?compilerVrsn ) then
@@ -373,7 +373,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Initial conditions
   if ($NEW_START == true || $NEW_START == TRUE ) then
      setenv ICFILE CCTM_ICON_${ICBC_LAB}_12NE3_20180701.nc
-     setenv BOX_IC_FILE ${WORKDIR}/cracmm1haps_NorthCarolina_Summer.txt
+     setenv BOX_IC_FILE ${BLD}/cracmm1haps_NorthCarolina_Summer.txt
      setenv INIT_MEDC_1 notused
   else
      set ICpath = $OUTDIR
@@ -800,10 +800,10 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_RUNLEN      $NSTEPS
   setenv CTM_TSTEP       $TSTEP
   setenv INIT_CONC_1 $ICpath/$ICFILE
-  if( ! ( -e ${INIT_CONC_1} ) )then
-     ls ${INIT_CONC_1}
-     exit()
-  endif
+# if( ! ( -e ${INIT_CONC_1} ) )then
+#    ls ${INIT_CONC_1}
+#    exit()
+# endif
   setenv BNDY_CONC_1 $BCpath/$BCFILE
   setenv OMI $OMIpath/$OMIfile
   setenv MIE_TABLE $OUTDIR/mie_table_coeffs_${compilerString}.txt

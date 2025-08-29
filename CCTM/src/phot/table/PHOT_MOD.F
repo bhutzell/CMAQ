@@ -483,7 +483,7 @@ C begin loop on unit numbers
       WRITE( LUNOUT,2003 ) ( IUN, AVAIL( IUN ), IUN = 1, MAXUN )
 2003  FORMAT( 1X, 'Available unit numbers are: ' /
      &       3( 1X, 20( I2, '-', L1, 2X) / ) )
-      STOP
+      CALL M3EXIT( "FILE_UNIT", 0, 0, ":Fatal Error", 0 )
       END FUNCTION FILE_UNIT
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE GET_JTABLE( JDATE, JTIME ) 
@@ -501,7 +501,11 @@ C
 C*********************************************************************
 C
 
+#ifdef m3box
       USE GET_ENV_VARS
+#else
+      USE UTILIO_DEFN
+#endif
       USE RXNS_DATA
       USE JVAL_PARMS
       USE CONST
@@ -615,6 +619,8 @@ C...........LOCAL VARIABLES and their descriptions:
       CHARACTER( 3 ) :: MONTHS(1:12) = (/ 
      &      'Jan','Feb','Mar','Apr','May','Jun',
      &      'Jul','Aug','Sep','Oct','Nov','Dec' /)
+      CHARACTER(LEN = :), ALLOCATABLE :: SDATE
+
 
       LOGICAL, SAVE :: INITIALIZE = .TRUE.
 
@@ -634,7 +640,7 @@ C...check for the existence of TOMS data
 !     IF ( STATUS .EQ. 1 ) THEN
 !       MSG = 'Environment variable improperly formatted'
 !       WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-!       STOP
+!       CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
 !     ELSE IF ( STATUS .EQ. -1 ) THEN
 !       MSG = 'Environment variable set, but empty ... Using default:'
 !       WRITE( 6, '(5X, A, L9)' ) MSG, TOMS_EXIST
@@ -650,7 +656,12 @@ C...check for the existence of TOMS data
 C...convert julian date to year, month, and day
 C...  and to yyyymmdd format
 
+#ifdef m3box
       CALL JULIAN_YEAR_MONTH_DAY (JDT,YEAR,MONTH,DAY)
+#else
+      YEAR = INT( JDT/1000 )
+      CALL DAYMON( JDT,MONTH,DAY )
+#endif
       IDATE = YEAR * 10000 + MONTH * 100 + DAY
 
       WRITE( 6, 2005 ) TRIM( MONTHS( MONTH ) ), DAY, YEAR
@@ -882,10 +893,13 @@ C...load output array and convert from 1/sec to 1/min
 
 C...write output file with file header
 
+#ifdef m3box
       CALL VALUE_NAME ( JVFILE, EQNAME )
-      JVUNIT = FILE_UNIT( )
+#else
+      CALL NAMEVAL ( JVFILE, EQNAME )
+#endif
 
-      OPEN ( UNIT = JVUNIT,
+      OPEN ( NEWUNIT = JVUNIT,
      &       FILE = EQNAME,
      &       FORM = 'FORMATTED',
      &       STATUS = 'UNKNOWN',
@@ -896,7 +910,7 @@ C...check for open errors
       IF ( IOST .NE. 0) THEN
         MSG = 'Could not open the JVALUE data file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       WRITE( 6, 2011 ) JVUNIT, EQNAME
@@ -1198,7 +1212,7 @@ C...stop program if wavelength data type not found
 
           MSG = 'Unrecognized spectra type in CSQY file '
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
 
         END IF
 
@@ -1818,7 +1832,9 @@ C                        beginning, and ending data)
 C
 C*********************************************************************
 
+#ifdef m3box
       USE GET_ENV_VARS
+#endif
       USE RXNS_DATA
       USE  JVAL_PARMS
 
@@ -1841,8 +1857,8 @@ C...........LOCAL VARIABLES and their descriptions:
       CHARACTER(16)  :: CQDIR = 'CSQY'     ! directory for CSQY data
       CHARACTER(16)  :: PHOTID             ! reaction id's
       CHARACTER(80)  :: MSG   = '    '     ! message
-      CHARACTER(255) :: CQFILE             ! input filename buffer
-      CHARACTER(255) :: EQNAME
+      CHARACTER(255) :: CQFILE = ''        ! input filename buffer
+      CHARACTER(255) :: EQNAME = ''
 
       INTEGER      IWL                 ! wavelength index
       INTEGER      NWL                 ! # of wlbands
@@ -1862,21 +1878,20 @@ C...........LOCAL VARIABLES and their descriptions:
 C*********************************************************************
 C     begin body of subroutine READCSQY
 
-C...get a unit number for CSQY files
-
-      CQUNIT = FILE_UNIT( )
-
 C...loop over the number of reactions, reading each file
 
       DO 801 IPHOT = 1, NPHOTAB
 
 C...open input file
 
-        CQFILE = PHOTAB( IPHOT )
+#ifdef m3box
         CALL VALUE_NAME ( CQDIR, EQNAME )
-        CQFILE = TRIM( EQNAME ) // '/' // TRIM( CQFILE )
+#else
+        CALL NAMEVAL ( CQDIR, EQNAME )
+#endif
+        CQFILE = TRIM( EQNAME ) // '/' // TRIM( PHOTAB( IPHOT ) )
 
-        OPEN( UNIT = CQUNIT,
+        OPEN( NEWUNIT = CQUNIT,
      &        FILE = CQFILE,
      &        STATUS = 'OLD',
      &        IOSTAT = IOST )
@@ -1884,9 +1899,10 @@ C...open input file
 C...check for open errors
 
         IF ( IOST .NE. 0) THEN
-          MSG = 'Could not open ' // PHOTAB( IPHOT ) // ' data file'
+          MSG = 'Could not open ' // PHOTAB( IPHOT ) // ' data file:'
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          WRITE(6,'(A)') TRIM( CQFILE )
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
         WRITE( 6, 2001 ) CQUNIT, CQFILE
@@ -1901,7 +1917,7 @@ C...check for read errors
           MSG = 'Errors occurred while reading PHOTID for ' //
      &           PHOTAB( IPHOT )
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
 C...get type of data (e.g. centered, beginning, ending, or point wavelen
@@ -1916,7 +1932,7 @@ C...check for read errors
           MSG = 'Errors occurred while reading TYPE for ' //
      &           PHOTAB( IPHOT )
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
         IF ( TYPE .EQ. '!' ) GO TO 101
@@ -1931,7 +1947,7 @@ C...check for read errors
           MSG = 'Errors occurred while reading FACTOR for ' //
      &           PHOTAB( IPHOT )
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
 C...reinitialize arrays
@@ -1958,7 +1974,7 @@ C...check for read errors
             MSG = 'Errors occurred while reading WL,CS,QY for ' //
      &             PHOTAB( IPHOT )
             WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-            STOP
+            CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
           END IF
 
 C...end loop if we reach EOF, otherwise continue looping
@@ -2024,7 +2040,9 @@ C     F(mxwl)               - extraterrestrial solar irradiance
 C
 C*********************************************************************
 
+#ifdef m3box
       USE GET_ENV_VARS
+#endif
       USE  JVAL_PARMS
 
 
@@ -2059,10 +2077,14 @@ C     begin body of subroutine READET
 
 C...open and read the wavelength bands and extraterrestrial radiation
 
+#ifdef m3box
       CALL VALUE_NAME ( ETFILE, EQNAME )
-      ETUNIT = FILE_UNIT( )
+#else
+      CALL NAMEVAL ( ETFILE, EQNAME )
+#endif
 
-      OPEN( UNIT = ETUNIT,
+
+      OPEN( NEWUNIT = ETUNIT,
      &      FILE = EQNAME,
      &      STATUS = 'OLD',
      &      IOSTAT = IOST )
@@ -2072,7 +2094,7 @@ C...check for open errors
       IF ( IOST .NE. 0 ) THEN
         MSG = 'Could not open the ET data file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       WRITE( 6, 2001 ) ETUNIT, EQNAME
@@ -2088,7 +2110,7 @@ C...check for read errors
       IF ( IOST .NE. 0 ) THEN
         MSG = 'Errors occurred while reading TYPE from ET file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       IF ( TYPE .EQ. '!' ) GO TO 101
@@ -2102,7 +2124,7 @@ C...check for read errors
       IF ( IOST .NE. 0 ) THEN
         MSG = 'Errors occurred while reading FACTOR from ET file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
 C...initialize arrays
@@ -2128,7 +2150,7 @@ C...check for read errors
         IF ( IOST .GT. 0 ) THEN
           MSG = 'Errors occurred while reading WL,F from ET file'
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
 C...end loop if we reach EOF, otherwise continue looping
@@ -2192,7 +2214,7 @@ C...stop program if wavelength data type not found
 
         MSG = 'Unrecognized spectra type in ' // TRIM( EQNAME )
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
 
       END IF
 
@@ -2220,7 +2242,9 @@ C     O2ABS - absorption cross sections for molecular oxygen
 C
 C*********************************************************************
 
+#ifdef m3box
       USE GET_ENV_VARS
+#endif
       USE  JVAL_PARMS
 
 
@@ -2257,12 +2281,15 @@ C     begin body of subroutine
 
 C...get a unit number for CSQY files
 
+#ifdef m3box
       CALL VALUE_NAME ( O2FILE, EQNAME )
-      O2UNIT = FILE_UNIT( )
+#else
+      CALL NAMEVAL ( O2FILE, EQNAME )
+#endif
 
 C...open input file
 
-      OPEN( UNIT = O2UNIT,
+      OPEN( NEWUNIT = O2UNIT,
      &      FILE = EQNAME,
      &      STATUS = 'OLD',
      &      IOSTAT = IOST )
@@ -2272,7 +2299,7 @@ C...check for open errors
       IF ( IOST .NE. 0 ) THEN
         MSG = 'Could not open the O2ABS data file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       WRITE( 6, 2001 ) O2UNIT, EQNAME
@@ -2286,7 +2313,7 @@ C...check for read errors
       IF ( IOST .NE. 0 ) THEN
         MSG = 'Errors occurred while reading PHOTID from O2ABS file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
 C...get type of data (e.g. centered, beginning, ending, or point wavelen
@@ -2300,7 +2327,7 @@ C...check for read errors
       IF ( IOST .NE. 0 ) THEN
         MSG = 'Errors occurred while reading TYPE from O2ABS file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       IF ( TYPE .EQ. '!' ) GO TO 101
@@ -2314,7 +2341,7 @@ C...check for read errors
       IF ( IOST .NE. 0 ) THEN
         MSG = 'Errors occurred while reading FACTOR from O2ABS file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
 C...reinitialize arrays
@@ -2338,7 +2365,7 @@ C...check for read errors
         IF ( IOST .GT. 0 ) THEN
           MSG = 'Errors occurred while reading WL,CS from O2ABS file'
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
 C...end loop if we reach EOF, otherwise continue looping
@@ -2388,7 +2415,9 @@ C     O3ABS - absorption cross sections for molecular oxygen
 C
 C*********************************************************************
 
+#ifdef m3box
       USE GET_ENV_VARS
+#endif
       USE JVAL_PARMS
 
       IMPLICIT NONE
@@ -2424,12 +2453,16 @@ C     begin body of subroutine
 
 C...get a unit number for CSQY files
 
+#ifdef m3box
       CALL VALUE_NAME ( O3FILE, EQNAME )
-      O3UNIT = FILE_UNIT( )
+#else
+      CALL NAMEVAL ( O3FILE, EQNAME )
+#endif
+
 
 C...open input file
 
-      OPEN( UNIT = O3UNIT,
+      OPEN( NEWUNIT = O3UNIT,
      &      FILE = EQNAME,
      &      STATUS = 'OLD',
      &      IOSTAT = IOST )
@@ -2439,7 +2472,7 @@ C...check for open errors
       IF ( IOST .NE. 0) THEN
         MSG = 'Could not open the O3ABS data file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       WRITE( 6, 2001 ) O3UNIT, EQNAME
@@ -2453,7 +2486,7 @@ C...check for read errors
       IF ( IOST .NE. 0 ) THEN
         MSG = 'Errors occurred while reading PHOTID from O3ABS file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
 C...get type of data (e.g. centered, beginning, ending, or point wavelen
@@ -2467,7 +2500,7 @@ C...check for read errors
       IF ( IOST .NE. 0) THEN
         MSG = 'Errors occurred while reading TYPE from O3ABS file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       IF ( TYPE .EQ. '!' ) GO TO 101
@@ -2481,7 +2514,7 @@ C...check for read errors
       IF ( IOST .NE. 0 ) THEN
         MSG = 'Errors occurred while reading FACTOR from O3ABS file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
 C...reinitialize arrays
@@ -2505,7 +2538,7 @@ C...check for read errors
         IF ( IOST .GT. 0 ) THEN
           MSG = 'Errors occurred while reading WL,CS from O3ABS file'
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
 C...end loop if we reach EOF, otherwise continue looping
@@ -2559,7 +2592,9 @@ C     XDOBS(nlat,MONTH)    - average dobson values
 C
 C*********************************************************************
 
+#ifdef m3box
       USE GET_ENV_VARS
+#endif
       USE JVAL_PARMS
 
 
@@ -2598,10 +2633,13 @@ C...  molecules/cm**3).  T and M data is from Louis (Ph.D. thesis 1974
 C...  U.of Colorado).  O3 profiles are from Isaksen et al.
 C...  diabatic 2D model
 
+#ifdef m3box
       CALL VALUE_NAME ( PFFILE, EQNAME )
-      PFUNIT = FILE_UNIT( )
+#else
+      CALL NAMEVAL ( PFFILE, EQNAME )
+#endif
 
-      OPEN( UNIT = PFUNIT,
+      OPEN( NEWUNIT = PFUNIT,
      &      FILE = EQNAME,
      &      STATUS = 'OLD',
      &      IOSTAT = IOST )
@@ -2611,7 +2649,7 @@ C...check for open errors
       IF ( IOST .NE. 0) THEN
         MSG = 'Could not open the PROFILES data file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       WRITE( 6, 2001 ) PFUNIT, EQNAME
@@ -2629,7 +2667,7 @@ C...check for read errors
           IF ( IOST .GT. 0) THEN
             MSG = 'Errors occurred while reading XO3 in PROFILES file'
             WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-            STOP
+            CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
          END IF
 
         END DO
@@ -2645,7 +2683,7 @@ C...check for read errors
           IF ( IOST .GT. 0) THEN
             MSG = 'Errors occurred while reading XT in PROFILES file'
             WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-            STOP
+            CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
           END IF
         END DO
 
@@ -2660,7 +2698,7 @@ C...check for read errors
           IF ( IOST .GT. 0) THEN
             MSG = 'Errors occurred while reading XAIR in PROFILES file'
             WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-            STOP
+            CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
           END IF
 
         END DO
@@ -2679,7 +2717,7 @@ C...check for read errors
         IF ( IOST .GT. 0) THEN
           MSG = 'Errors occurred while reading XDOBS in PROFILES file'
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
       END DO
@@ -2701,7 +2739,7 @@ C...check for read errors
         IF ( IOST .GT. 0) THEN
           MSG ='Errors occurred while reading STD PROF in PROFILES file'
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
       END DO
@@ -2736,7 +2774,9 @@ C     04/10/96  Program received from NASA via web/ftp
 C
 C*********************************************************************
 
+#ifdef m3box
       USE GET_ENV_VARS
+#endif
       USE JVAL_PARMS
 
       IMPLICIT NONE
@@ -2785,10 +2825,14 @@ C...calculate latitudes and longitudes
 
 C...open the input file
 
-      TMUNIT = FILE_UNIT( )
+#ifdef m3box
       CALL VALUE_NAME ( TMFILE, EQNAME )
+#else
+      CALL NAMEVAL ( TMFILE, EQNAME )
+#endif
 
-      OPEN ( UNIT = TMUNIT,
+
+      OPEN ( NEWUNIT = TMUNIT,
      &       FILE = EQNAME,
      &       FORM = 'FORMATTED',
      &       STATUS = 'OLD',
@@ -2799,7 +2843,7 @@ C...check for open errors
       IF ( IOST .NE. 0 ) THEN
         MSG = 'Could not open the TOMS data file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       WRITE( 6, 2001 ) TMUNIT, EQNAME
@@ -2825,7 +2869,7 @@ C...read longitude info and allocate array
       IF ( ALLOCSTAT .NE. 0 ) THEN
         MSG = 'Failure allocating LON'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       DO ILON = 1, NLON
@@ -2840,7 +2884,7 @@ C...read latitude info and allocate array
       IF ( ALLOCSTAT .NE. 0 ) THEN
         MSG = 'Failure allocating LAT'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       DO ILAT = 1, NLAT
@@ -2853,7 +2897,7 @@ C...allocate and read in the data into the array ozone
       IF ( ALLOCSTAT .NE. 0 ) THEN
         MSG = 'Failure allocating OZONE'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-        STOP
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
       DO ILAT = 1, NLAT
@@ -2863,7 +2907,7 @@ C...allocate and read in the data into the array ozone
         IF ( IOST .NE. 0) THEN
           MSG = 'Errors occurred while reading TOMS file'
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
-          STOP
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
       END DO

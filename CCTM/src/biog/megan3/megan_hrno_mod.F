@@ -127,11 +127,6 @@ C Local Variables:
       CHARACTER( 20 ) :: time_stamp
 #endif
 
-#ifndef m3box
-      LOGICAL, EXTERNAL :: FLUSH3
-!close m3box
-#endif
-
 C-----------------------------------------------------------------------------
 C--- Part 1: Keeping track of rainfall pulses
 C-----------------------------------------------------------------------------

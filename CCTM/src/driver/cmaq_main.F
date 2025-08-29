@@ -31,7 +31,10 @@
 
         USE RUNTIME_VARS
         USE UTILIO_DEFN
+#ifdef m3box
         USE DRIVER_INPUTS, ONLY: SET_BOX_INPUTS
+!close m3box
+#endif
 #ifdef parallel
         USE MPI
 #endif
@@ -77,9 +80,11 @@ C processes (NPROCS)
         ! Initialize all runscript environmental variables
         CALL INIT_ENV_VARS( 0, 0 )
 
+#ifdef m3box
         ! retrieve box met and geo data
         CALL SET_BOX_INPUTS()
-
+!close m3box
+#endif
         MODEL_TSTEP = LOCAL_TSTEP
 
         TOTSECS  = TIME2SEC( RUNLEN )
