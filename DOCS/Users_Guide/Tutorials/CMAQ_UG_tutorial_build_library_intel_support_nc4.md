@@ -115,7 +115,7 @@ Example:
 ```
 vi intel-2024
 ```
-copy the following and paste it in the intel-2024 file:
+copy the following and paste it in the intel-2024 file, note, edit the 'set basedir' to specify the path on your system:
 ```
 #%Module
   
@@ -141,7 +141,7 @@ Next, create the module file and save it to the netcdf-4.5.3-for_nc4 directory
 ```
 vi  ifort-2024.2.1
 ```
-copy the following text and place it in the ifort-2024.2.1 file:
+copy the following text and place it in the ifort-2024.2.1 file, edit the 'set basedir line to specify the path on your system:
 ```
 #%Module
 proc ModulesHelp { } {
