@@ -83,8 +83,8 @@ If this is successful, you will see a stream of log messages including the m3too
 
 Output
 ```
-cd /proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel/ioapi-3.2/Linux2_x86_64ifx; ifx -auto -warn notruncated_source -Bstatic -static-intel -I/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel/ioapi-3.2/ioapi -I/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel/ioapi-3.2/Linux2_x86_64ifx -DIOAPI_NCF4=1 -DAUTO_ARRAYS=1 -DF90=1 -DFLDMN=1 -DFSTR_L=int -DIOAPI_NO_STDOUT=1 -DAVOID_FLUSH=1 -DBIT32=1 -O3 -unroll -stack-temps -safe-cray-ptr -convert big_endian -assume byterecl  -traceback                                           -DIOAPI_NCF4=1 -DAUTO_ARRAYS=1 -DF90=1 -DFLDMN=1 -DFSTR_L=int -DIOAPI_NO_STDOUT=1 -DAVOID_FLUSH=1 -DBIT32=1 -c /proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel/ioapi-3.2/m3tools/wrfwndw.f90
-cd /proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel/ioapi-3.2/Linux2_x86_64ifx; ifx -auto -warn notruncated_source -Bstatic -static-intel  wrfwndw.o -L/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel/ioapi-3.2/Linux2_x86_64ifx -lioapi -L/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel/lib -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lm -lcurl -lz -lsz -ldl -lm  -lnetcdf -qopenmp -shared-intel   -o wrfwndw
+cd /proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build/LIBRARIES_intel/ioapi-3.2/Linux2_x86_64ifx; ifx -auto -warn notruncated_source -Bstatic -static-intel -I/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build/LIBRARIES_intel/ioapi-3.2/ioapi -I/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build/LIBRARIES_intel/ioapi-3.2/Linux2_x86_64ifx -DIOAPI_NCF4=1 -DAUTO_ARRAYS=1 -DF90=1 -DFLDMN=1 -DFSTR_L=int -DIOAPI_NO_STDOUT=1 -DAVOID_FLUSH=1 -DBIT32=1 -O3 -unroll -stack-temps -safe-cray-ptr -convert big_endian -assume byterecl  -traceback                                           -DIOAPI_NCF4=1 -DAUTO_ARRAYS=1 -DF90=1 -DFLDMN=1 -DFSTR_L=int -DIOAPI_NO_STDOUT=1 -DAVOID_FLUSH=1 -DBIT32=1 -c /proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build/LIBRARIES_intel/ioapi-3.2/m3tools/wrfwndw.f90
+cd /proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build/LIBRARIES_intel/ioapi-3.2/Linux2_x86_64ifx; ifx -auto -warn notruncated_source -Bstatic -static-intel  wrfwndw.o -L/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build/LIBRARIES_intel/ioapi-3.2/Linux2_x86_64ifx -lioapi -L/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build/LIBRARIES_intel/lib -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lm -lcurl -lz -lsz -ldl -lm  -lnetcdf -qopenmp -shared-intel   -o wrfwndw
 ifx: command line warning #10121: overriding '-static-intel' with '-shared-intel'
 
 ```
@@ -125,7 +125,7 @@ proc ModulesHelp { } {
 
 module-whatis "This module adds ioapi-3.2/intel-2024 to your path\n"
 
-set basedir "/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel/ioapi-3.2"
+set basedir "/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build/LIBRARIES_intel/ioapi-3.2"
 prepend-path PATH "${basedir}/Linux2_x86_64ifx"
 prepend-path LD_LIBRARY_PATH "${basedir}/ioapi/fixed_src"
 ```
@@ -150,7 +150,7 @@ proc ModulesHelp { } {
 
 module-whatis "This module adds netcdf-4.5.3-for_nc4/ifort-2024.2.1 to your path\n"
 
-set basedir "/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel/"
+set basedir "/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build/LIBRARIES_intel/"
 prepend-path PATH "${basedir}/bin"
 prepend-path LD_LIBRARY_PATH "${basedir}/lib"
 module load intel/2024.2.1
@@ -645,7 +645,7 @@ note, the paths need to be edited to match the location for your installation
 ```
 #>  Intel fortran compiler......................................................
     case intel:
-       setenv BUILD /proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel
+       setenv BUILD /proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build/LIBRARIES_intel
        setenv MPI /nas/sycamore/apps/intel/2024.2.1/intel/oneapi/mpi/latest
 
 
