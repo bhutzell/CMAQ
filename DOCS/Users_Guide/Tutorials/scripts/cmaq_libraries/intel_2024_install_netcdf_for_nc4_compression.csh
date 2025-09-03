@@ -67,9 +67,6 @@ setenv ZIP_STATIC TRUE
 cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$cwd/LIBRARIES_intel -DCMAKE_C_COMPILER=icx ..
 make
 make install
-## copy the libraries from lib64 to lib
-cd $INSTDIR/lib64
-cp * ../lib
 
    #-----
    # Build szip

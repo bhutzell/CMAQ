@@ -24,8 +24,8 @@ mkdir -p $cwd/CMAQv5.5/build
 
 ```
 cd $cwd/CMAQv5.5/build
-wget https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/Tutorials/scripts/cmaq_libraries/intel_2024_install_netcdf_for_nc4_compression.csh
-wget https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/Tutorials/scripts/cmaq_libraries/intel_2024_install_ioapi_for_nc4_compression.csh
+wget https://raw.githubusercontent.com/USEPA/CMAQ/9bd3734176479c2e49139fea98e1d5e8a16170e3/DOCS/Users_Guide/Tutorials/scripts/cmaq_libraries/intel_20.2_install_netcdf_for_nc4_compression.csh
+wget https://raw.githubusercontent.com/USEPA/CMAQ/9bd3734176479c2e49139fea98e1d5e8a16170e3/DOCS/Users_Guide/Tutorials/scripts/cmaq_libraries/intel_2024_install_ioapi_for_nc4_compression.csh
 ```
 
 
@@ -40,6 +40,9 @@ module load intel/2024.2.1
 ```
 ./intel_2024_install_netcdf_for_nc4_compression.csh
 ```
+
+Verify that you get the message "Congratulations! You have successfully installed the netCDF Fortran Libraries"
+If not, please seek assistance from the [CMAS Center Forum](https://forum.cmascenter.org/c/cmaq/7)
 
 ### Run script to install the I/O API Library
 
