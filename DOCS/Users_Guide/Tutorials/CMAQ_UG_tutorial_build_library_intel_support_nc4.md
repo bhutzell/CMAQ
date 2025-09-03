@@ -191,7 +191,7 @@ Currently Loaded Modules:
 
 ### To build and run for the CB6r5 mechanism and m3dry deposition scheme see the following tutorial:
 
-[CMAQ Installation Tutorial for CRACMM2](CMAQ_UG_tutorial_benchmark.md)
+[CMAQ Installation Tutorial for CB6r5](CMAQ_UG_tutorial_benchmark.md)
 
 ### To build and run WRF-CMAQ see the following tutorial
 
