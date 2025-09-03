@@ -251,6 +251,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ENDIF
 
 ! Assuming NLCD40 is set LANDUSE scheme in centralized_io_module   
+            IF ( LEN_TRIM( VNAME ) .LT. 7 )RETURN
+
             IF ( VNAME(1:7) .EQ. 'LUFRAC_' ) THEN
               IF ( TRIM(VNAME) .EQ. TRIM(BXM_LU) ) THEN
                  VNAME_VALUE = 1.0
