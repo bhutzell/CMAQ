@@ -113,9 +113,9 @@ Next, create the module file named intel-2024 and save it to the ioapi-3.2 direc
 Example:
 
 ```
-cat intel-2024
+vi intel-2024
 ```
-output:
+copy the following and paste it in the intel-2024 file:
 ```
 #%Module
   
@@ -139,9 +139,9 @@ mkdir -p $cwd/Modules/modulefiles/netcdf-4.5.3-for_nc4
 Next, create the module file and save it to the netcdf-4.5.3-for_nc4 directory
 
 ```
-cat  ifort-2024.2.1
+vi  ifort-2024.2.1
 ```
-output:
+copy the following text and place it in the ifort-2024.2.1 file:
 ```
 #%Module
 proc ModulesHelp { } {
