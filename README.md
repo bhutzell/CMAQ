@@ -45,6 +45,7 @@ This CMAQv6.0 alpha release allows early adopters:
   * Direct user specification of inorganic aerosol mass transfer is now possible! Previously, CMAQ only supported hybrid mass transfer (dynamic for coarse, equilibrium for fine). Now users can assess trade-offs by forcing all modes to dynamic or equilibrium and compare to the default approach.
 
 * **Improved methods for land-surface impacts on deposition, emissions, and dilution** 
+  * The new Soil Emissions of Gases to the Atmosphere (SEGA) module provides a simple, meteorological dependent method to calculate soil NO and HONO emissions for regional to global applications.
   *	The resistance to dry deposition of volatile carbon-containing compounds has been increased consistent with their vapor-pressures. This increases VOC and CO concentrations across model applications.
   * Boundary-layer mixing dynamics in stable conditions have been made consistent with upstream meteorological models.
   * Enhanced options for online coupling of CMAQ chemistry to meteorological models. First public release of a unified coupler to support WRF-CMAQ and MPAS-CMAQ in a harmonized framework.
