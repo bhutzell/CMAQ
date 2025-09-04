@@ -197,8 +197,8 @@
      &                       T24y(:,:),          ! from MEGAN_SOILINP data
      &                       SW24y(:,:),         ! from MEGAN_SOILINP data
      &                       lai_y(:,:),         ! from MEGAN_SOILINP data
-     &                       THETAP(:,:),        ! from SAGE SOILINP
-     &                       FREEZEPERIOD(:,:)   ! from SAGE SOILINP
+     &                       THETAP(:,:),        ! from SEGA SOILINP
+     &                       FREEZEPERIOD(:,:)   ! from SEGA SOILINP
 
 
 
@@ -541,15 +541,15 @@
              call log_subheading( logdev, 'Open Biogenic Emission Files' )
              if (BIOGEMIS_BEIS) then
                 call biogemis_setup
-                if(.not.USE_SAGE_N) then 
+                if(.not.USE_SEGA_N) then 
                    call beis_norm_emis_setup
                 end if
              end if
              if (BIOGEMIS_MEGAN) then
                 call megan_setup
              end if
-             if (USE_SAGE_N_EF) then
-                call sage_ef_setup              
+             if (USE_SEGA_N_EF) then
+                call sega_ef_setup              
              end if
 
              call log_subheading( logdev, 'Open Other Surface Data Files' )
@@ -585,7 +585,7 @@
                 call retrieve_ltng_param_data 
              end if
 #endif
-             if (BIOGEMIS_BEIS .or. BIOGEMIS_MEGAN .or. USE_SAGE_N) then
+             if (BIOGEMIS_BEIS .or. BIOGEMIS_MEGAN .or. USE_SEGA_N) then
                 call soilinp_setup
              end if
 
@@ -2930,7 +2930,7 @@
           USE UTILIO_DEFN
           use HGRD_DEFN, only : ncols, nrows
           use RUNTIME_VARS, only : NEW_START, BIOGEMIS_MEGAN, BIOGEMIS_BEIS,
-     &                             BDSNP_MEGAN, IGNORE_SOILINP, USE_SAGE_N
+     &                             BDSNP_MEGAN, IGNORE_SOILINP, USE_SEGA_N
 
 
           INCLUDE SUBST_FILES_ID             ! file name parameters
@@ -2940,7 +2940,7 @@
           character( 20 )            :: loc_time_stamp
           Character( 40 ), parameter :: msoilinp = 'MEGAN_SOILINP'
           Character( 40 ), parameter :: bsoilinp = 'BEIS_SOILINP'
-          Character( 40 ), parameter :: sage_int = 'SAGE_SOILINIT'
+          Character( 40 ), parameter :: sega_int = 'SEGA_SOILINIT'
           Character( 40 ), parameter :: bdsnpinp = 'BDSNPINP'
 
           CHARACTER( 16 )  :: var
@@ -2948,12 +2948,12 @@
           integer :: stat, i, j, k, fnumb, fnumm
           real, allocatable :: t24sum(:,:), sw24sum(:,:)
 
-          if( USE_SAGE_N .and. BDSNP_MEGAN) Then
-                MESG = 'ERROR: Correct the run script USE_SAGE_N and BDSNP_MEGAN cannot both be set to Y.'
+          if( USE_SEGA_N .and. BDSNP_MEGAN) Then
+                MESG = 'ERROR: Correct the run script USE_SEGA_N and BDSNP_MEGAN cannot both be set to Y.'
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT3 )
           end if
 
-          if (BIOGEMIS_BEIS .and. .not. USE_SAGE_N) then
+          if (BIOGEMIS_BEIS .and. .not. USE_SEGA_N) then
              ALLOCATE( PTYPE( NCOLS,NROWS ),
      &                 PULSEDATE( NCOLS,NROWS ),
      &                 PULSETIME( NCOLS,NROWS ),
@@ -3019,7 +3019,7 @@
              ndeprate  = 0.0
           end if
 
-          if (USE_SAGE_N) then
+          if (USE_SEGA_N) then
              ALLOCATE( PFACTOR      ( ncols,nrows ),
      &                 DRYPERIOD    ( ncols,nrows ), 
      &                 FREEZEPERIOD ( ncols,nrows ), 
@@ -3027,7 +3027,7 @@
      &                 STAT=STAT )
 
              if (stat .ne. 0) then
-                MESG = 'Failure SAGE arrays'
+                MESG = 'Failure SEGA arrays'
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT3 )
              end if
              PFACTOR      = 1.0
@@ -3037,7 +3037,7 @@
           end if
 
            
-          if (BIOGEMIS_BEIS .and. .not. NEW_START .and. .not. IGNORE_SOILINP .and. .not. USE_SAGE_N) then
+          if (BIOGEMIS_BEIS .and. .not. NEW_START .and. .not. IGNORE_SOILINP .and. .not. USE_SEGA_N) then
 #ifdef mpas
              ! file will be opened automatically when it is indicated in FILE_INFO
 
@@ -3321,38 +3321,38 @@
 #endif
              end if ! bdsnp check
           end if ! megan check
-          if (USE_SAGE_N .and. .not. NEW_START .and. .not. IGNORE_SOILINP) then
+          if (USE_SEGA_N .and. .not. NEW_START .and. .not. IGNORE_SOILINP) then
 #ifdef mpas
              ! file will be opened automatically when it is indicated in FILE_INFO
 
-             call mio_fread (sage_int, 'PFACTOR', pname, ptype(:,1))
-             call mio_fread (sage_int, 'DRYPERIOD', pname, pulsedate(:,1))
-             call mio_fread (sage_int, 'FREEZEPERIOD', pname, pulsetime(:,1))
-             call mio_fread (sage_int, 'THETAP', pname, pulsetime(:,1))
-             fnumb = mio_search (sage_int)
+             call mio_fread (sega_int, 'PFACTOR', pname, ptype(:,1))
+             call mio_fread (sega_int, 'DRYPERIOD', pname, pulsedate(:,1))
+             call mio_fread (sega_int, 'FREEZEPERIOD', pname, pulsetime(:,1))
+             call mio_fread (sega_int, 'THETAP', pname, pulsetime(:,1))
+             fnumb = mio_search (sega_int)
 #else
-             IF ( .NOT. OPEN3( sage_int, FSREAD3, PNAME ) ) THEN
-                mesg = 'Open failure for ' // sage_int
+             IF ( .NOT. OPEN3( sega_int, FSREAD3, PNAME ) ) THEN
+                mesg = 'Open failure for ' // sega_int
                 Call M3EXIT( PNAME, 0, 0, mesg, XSTAT1 )
              END IF
              n_opened_file = n_opened_file + 1
 
 ! Get description of NO rain data file
-             IF ( .NOT. DESC3( sage_int ) ) THEN
+             IF ( .NOT. DESC3( sega_int ) ) THEN
                 MESG = 'Could not get description of file "' //
-     &                  TRIM( sage_int ) // '"'
+     &                  TRIM( sega_int ) // '"'
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
              END IF
 
 ! Check that the file start date and time are consistent
              IF ( SDATE3D .NE. cio_model_sdate ) THEN
-                WRITE( MESG, 94012 ) 'Cannot use sage_int file; ' //
+                WRITE( MESG, 94012 ) 'Cannot use sega_int file; ' //
      &              'found date ', SDATE3D, ' expecting ', cio_model_sdate
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
              END IF
 
              IF ( STIME3D .NE. cio_model_stime ) THEN
-                WRITE( MESG, 94012 ) 'Cannot use sage_int file; ' //
+                WRITE( MESG, 94012 ) 'Cannot use sega_int file; ' //
      &              'found time ', STIME3D, ' expecting ', cio_model_stime
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
              END IF
@@ -3360,42 +3360,42 @@
 94012        FORMAT( A, F10.2, 1X, A, I3, ',', I3 )
 
              VAR = 'PFACTOR'
-             IF ( .NOT. XTRACT3( sage_int, 'PFACTOR', 1, 1,
+             IF ( .NOT. XTRACT3( sega_int, 'PFACTOR', 1, 1,
      &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
      &                           0, 0, PFACTOR ) ) THEN
                 MESG = 'Could not read "' // TRIM( VAR ) //
-     &                 '" from file "' // TRIM( sage_int ) // '"'
+     &                 '" from file "' // TRIM( sega_int ) // '"'
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
              END IF
 
              VAR = 'DRYPERIOD'
-             IF ( .NOT. XTRACT3( sage_int, VAR, 1, 1,
+             IF ( .NOT. XTRACT3( sega_int, VAR, 1, 1,
      &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
      &                           0, 0, DRYPERIOD ) ) THEN
                 MESG = 'Could not read "' // TRIM( VAR ) //
-     &                 '" from file "' // TRIM( sage_int ) // '"'
+     &                 '" from file "' // TRIM( sega_int ) // '"'
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
              END IF
 
              VAR = 'FREEZEPERIOD'
-             IF ( .NOT. XTRACT3( sage_int, VAR, 1, 1,
+             IF ( .NOT. XTRACT3( sega_int, VAR, 1, 1,
      &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
      &                           0, 0, FREEZEPERIOD ) ) THEN
                 MESG = 'Could not read "' // TRIM( VAR ) //
-     &                 '" from file "' // TRIM( sage_int ) // '"'
+     &                 '" from file "' // TRIM( sega_int ) // '"'
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
              END IF
 
              VAR = 'THETAP'
-             IF ( .NOT. XTRACT3( sage_int, VAR, 1, 1,
+             IF ( .NOT. XTRACT3( sega_int, VAR, 1, 1,
      &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
      &                           0, 0, THETAP ) ) THEN
                 MESG = 'Could not read "' // TRIM( VAR ) //
-     &                 '" from file "' // TRIM( sage_int ) // '"'
+     &                 '" from file "' // TRIM( sega_int ) // '"'
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
              END IF
 #endif
-          end if ! end SAGE section
+          end if ! end SEGA section
           if (BIOGEMIS_MEGAN) then
              deallocate (t24sum, sw24sum)
           end if
@@ -5431,13 +5431,13 @@ C Read the various categories of normalized emissions
         end subroutine beis_norm_emis_setup
 
 ! -------------------------------------------------------------------------
-        subroutine sage_ef_setup
+        subroutine sega_ef_setup
 
           USE UTILIO_DEFN
           use HGRD_DEFN, only : ncols, nrows
 
-          Character( 40 ), parameter :: pname = 'sage_ef_setup'
-          Character( 40 ), parameter :: fname = 'SAGE_EF'
+          Character( 40 ), parameter :: pname = 'sega_ef_setup'
+          Character( 40 ), parameter :: fname = 'SEGA_EF'
 
           CHARACTER( 256 ) :: MESG
           CHARACTER( 16 ) :: VAR
@@ -5485,7 +5485,7 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           END IF
 
-        end subroutine sage_ef_setup
+        end subroutine sega_ef_setup
 
 ! -------------------------------------------------------------------------
         subroutine depv_data_setup
