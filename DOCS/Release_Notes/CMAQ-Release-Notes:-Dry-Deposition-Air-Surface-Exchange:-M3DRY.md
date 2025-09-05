@@ -1,11 +1,10 @@
 # M3DRY
-
 ### Runtime Deposition Options
-[Jon Pleim](mailto:pleim.jon@pa.gov), U.S. Environmental Protection Agency    
+**Jon Pleim**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Science Update  
-**Release Version/Date**:  V6.0 
+**Release Version/Date**:  V6.0   
 
-**Description**:  
+**Description**:   
 Allows the user to specify M3Dry (default) or STAGE dry deposition options from the run script. 
 
 **Significance and Impact**:   
@@ -19,7 +18,7 @@ Updated relative reactivity for carbon species following Raoult’s law changing
 ### Updates of minimum Kz for M3Dry
 [Jon Pleim](mailto:pleim.jon@pa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
-**Release Version/Date**:  V6.0 
+**Release Version/Date**:  V6.0   
 
 **Description**:   
 Changes the minimum Kz from 1.0 m2/s to 0.01 m2/s when the Kzmin flag is set to False.  This minimum Kz is the same as used in WRF.  Also, when Kzmin flag is set to True, changes the height above ground where Kzmin is set according to fraction of urban LU from 500 m to the PBLHT.
@@ -36,7 +35,7 @@ When using the new UACM option in WRF-CMAQ Kzmin should be False.
 
 
 ### Revised dry dep flux for NH3
-[Jon Pleim](mailto:pleim.jon@epa.gov), U.S. Environmental Protection Agency  
+**Jon Pleim**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Science Update  
 **Release Version/Date**: CMAQv5.5    
 
@@ -54,8 +53,8 @@ Second part changes NH3 deposition when running without ammonia bi-directional e
 <table>
 <thead>
 <tr>
-<th><img width="100%" src="https://github.com/user-attachments/assets/55c33725-ff52-4d28-9093-7c26f545f02d"></th>
-<th><img width="100%" src="https://github.com/user-attachments/assets/ad68c147-30af-40ee-87f0-6f9420dce0c5"></th>
+<th><img width="100%" src="./images/dry-deposition/cmaqv6.0_seasonal_mean_difference_ozone_mixing_ratio.png"></th>
+<th><img width="100%" src="./images/dry-deposition/cmaqv6.0_seasonal_mean_difference_PM2.5_concentration.png"></th>
 </tr>
 </table>
 
@@ -66,7 +65,7 @@ Second part changes NH3 deposition when running without ammonia bi-directional e
 
 
 ### New Aerosol Deposition Model (aero_depv)  
-[Jon Pleim](mailto:pleim.jon@epa.gov), U.S. Environmental Protection Agency  
+**Jon Pleim**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Science Update  
 **Release Version/Date**: CMAQv5.4  
 

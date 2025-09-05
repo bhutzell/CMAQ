@@ -1,5 +1,5 @@
 ### BEIS Updates
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Science Update and Bug Fix  
 **Release Version/Date**: CMAQv5.4  
 **Description**:  
@@ -28,12 +28,12 @@ BELD 6 updates:
 
 The seasonality updates require one less input file and two fewer environment variables. Leaf off and leaf on conditions are now represented as a gradient rather than a binary variable and are in better agreement with long term means from the U.S.A. National Phenological Network observations (USANPN). This change did not have a large impact on BVOC emissions due to the temperature dependence on emissions. 
   
-![image](https://user-images.githubusercontent.com/12100276/165358483-8df7e5fd-0241-46f5-963a-bae38bf28e16.png)
+![image](./images/emissions/cmaqv6.0_comparison_leaf_onset_observations.png)
 Comparison USANPN observations leaf onset observations for April 15th (top), the BEIS4 parameterization adopted from the WRF PX land surface scheme (bottom left), and the BEIS3 bioseasons file representation (bottom right)
  
 The correction to the canopy light model resulted in similar emissions as BEIS3 but in much higher simulated CMAQ  isoprene, methanol, and MBO concentrations due to an increase in emissions during the morning and evening transition where the modeled boundary layer height is relatively low. This resulted in approximately a 30% increase in estimated isoprene concentrations in July. The updates to BELD increased isoprene emissions in the Southeast by  approximately another 20% and monoterpene emissions decreased by approximately 20% due to changes in emission factors and differences between the biomass estimates of Wilson et al. 2013 used in BELD 6 and the domain wide assumptions used in BELD 5.
  
-![image](https://user-images.githubusercontent.com/12100276/165358526-0f2b989e-3ef2-441e-a32f-c42163bedcb8.png)
+![image](./images/emissions/cmaqv6.0_daily_AQS_isoprene_observations_compared_emission_factors.png)
 Daily AQS isoprene observations (grey) and July 2016 results from this merge with BELD6 emission factors (red), prior to this merge with BELD6 emission factors (blue), and the research branch with BELD5 emission factors (green)
 
 **References**: 

@@ -1,8 +1,31 @@
+### KMT2 rate updates and minor bugfix
+[Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Rate coefficient update and bug fix  
+**Release Version/Date**: CMAQv6.0  
+
+**Description**: 
+This PR updates rate coefficients for the glyoxylic acid and glyoxylate reactions with hydroxyl in cloud water following Tan et al., 2009. Additionally, there was a minor bug fix (removal of a parenthesis) following a recent update. 
+
+**Significance and Impact**:  
+Impacts are expected to be minor. Now the rate coefficients are more consistent with those used in Fahey et al. (2025).
+
+**References**: 
+Fahey, K.M., Sareen, N., Carlton, A.G., and Hutzell, W.T.: Updated In-Cloud Secondary Aerosol Production in the Northern Hemisphere Predicted by the Community Multiscale Air Quality Modeling System. ACS Earth and Space Chemistry, 9 (5), 1043-1059,
+doi: 10.1021/acsearthspacechem.4c00370, 2025. 
+
+Tan, Y., Perri, M.J., Seitzinger, S.P., Turpin, B.J.: Effects of precursor concentration and acidic sulfate in aqueous glyoxal-OH radical oxidation and implications for secondary organic aerosol. Env. Sci. Technol.,
+43, 8105-8112, doi: 10.1021/es901742f, 2009. 
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1339](https://github.com/USEPA/CMAQ/commit/ccb92633ebe4cd73ef738e4f16899c4eb95e2f0d) | [PR#1339](https://github.com/USEPA/CMAQ_Dev/pull/1339)  |
 
 ### Streamline Mapping to Default Cloud Chemistry Solver
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
 **Type of update**: Infrastructure Improvement  
-**Release Version/Date**: CMAQv6.0 
+**Release Version/Date**: CMAQv6.0    
+
 **Description**:  
 This current PR is aimed at some minor updates to simplify the mapping of cldproc vectors to the aqueous chemistry routine via **AQ_DATA**.  
 - High-level variables have been renamed for less confusion. For example, ngas is replaced with n_aq_gas to indicate it is relevant to the aqueous chemistry solver. Likewise naddaer and naer are replaced with one variable, n_aq_aer.
@@ -27,21 +50,44 @@ The following limited updates were made to **aqchem**:
 
 **Internal PRs**: [PR#1130](https://github.com/USEPA/CMAQ_Dev/pull/1130)  
 
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1130](https://github.com/USEPA/CMAQ/commit/8d607848cdfe7b1f1b139dbb968145f092fb9714) | [PR#1130](https://github.com/USEPA/CMAQ_Dev/pull/1130)  |
 
+### Minor bug fixes to cloud processing
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
+**Type of update**: Maintenance  
+**Release Version/Date**:  CMAQv6.0   
+
+**Description**:  
+Two issues are addressed.   
+
+(1) The model crashes when compiled in column mode with gcc in debug mode. The problem is that two arrays are added together that don't have the same dimension lengths. An explicit loop is added to address this.
+
+(2) The model crashes with Sulfur-Tracking on. The aqueous chemistry surrogate for SULF_ICBC does not exist, and has never existed. Before the cloud chemistry mapping was updated, there was no check for this error. Now the model correctly crashes because this error exists. 
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1263](https://github.com/USEPA/CMAQ/commit/2f07b7813e6a632f256041c3d901f39e1fd96d90) | [PR#1263](https://github.com/USEPA/CMAQ_Dev/pull/1263)  |
 
 ### Removal of acm_ae6_mp Cloud Module
-**Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Maintenance  
-**Release Version/Date**:  CMAQv6.0  
-**Description**:  The acm_ae6_mp cloud mechanism was previously used with multipollutant configurations of the CMAQ model. However, it no longer works with any existing chemical mechanism and is scientifically obsolete. This unused option is removed in this PR.  
-**Significance and Impact**: Since it has not been possible to use this option for several model releases, its removal is not expected to have any significant impacts on the user community.  
-**Internal PRs**: [PR#1236](https://github.com/USEPA/CMAQ_Dev/pull/1236)  
+**Release Version/Date**:  CMAQv6.0   
 
+**Description**:  The acm_ae6_mp cloud mechanism was previously used with multipollutant configurations of the CMAQ model. However, it no longer works with any existing chemical mechanism and is scientifically obsolete. This unused option is removed in this PR.  
+
+**Significance and Impact**: Since it has not been possible to use this option for several model releases, its removal is not expected to have any significant impacts on the user community.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1236](https://github.com/USEPA/CMAQ/commit/72f92b2a7e26b4d9ef16f2f7fbaa976bf77fbac3) | [PR#1236](https://github.com/USEPA/CMAQ_Dev/pull/1236)  |
 
 ###  Cleanup of unit conversions and wetdep output mapping  
-[Ben Murphy](mailto:murphy.benjamin@epa.gov), U.S. Environmental Protection Agency      
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
 **Type of update**: Science Update    
-**Release Version/Date**: CMAQv5.5  
+**Release Version/Date**: CMAQv5.5   
 
 **Description**:  
 In CMAQv5.4 and prior, there are at least 3 or 4 different mapped vectors through which data is passed when translating from CGRID to the local arrays within scavwdep and aqchem. Each of these steps constrains the flexibility to expand gas and aerosol components and necessitates the differentiation of codes to maintain separate modules. For example, 'mp', and 'kmt' flavors require special versions of AQ_DATA and/or aq_map to handle mapping. Unfortunately, when the various optional modules for cloud chemistry diverge, it becomes much less likely that instrumented codes like STM and ISAM will be applied across all options. It is also more difficult to keep cloud process codes like CONVCLD and RESCLD consistent across all options.
@@ -68,8 +114,9 @@ This is a bug fix updating the treatment of aerosol-to-aqueous surrogates (AE2AQ
 **Significance and Impact**:  
 These updates correct the in-cloud treatment and post-cloud redistribution of inert aerosol species. PM2.5 impacts are minor. 
 
-![Fahey_AE2AQ_BugFix](https://github.com/user-attachments/assets/4a16562f-faa3-4c0c-a59b-817d30cda615)
+![Fahey_AE2AQ_BugFix](./images/chemistry/cmaqv6.0_bug_fix_for_AE2AQ_surrogates.png)
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#976](https://github.com/USEPA/CMAQ/commit/53d0884fc138ab2cb48cf733de961be448b4395d) | [PR#976](https://github.com/USEPA/CMAQ_Dev/pull/976)  | 
+

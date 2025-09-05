@@ -19,9 +19,9 @@ For the STYRENE model species as in the cb6r5hap_ae7_aq mechanism, predicted con
 |[Merge for PR#1135](https://github.com/USEPA/CMAQ/commit/a986c29b820d4f2e6a4beb62749d5110d0398392) | [PR#1135](https://github.com/USEPA/CMAQ_Dev/pull/1135)  |
 
 #####   Uncorrected Model.   
-![Jul_01_2018_DegError_vs_DegError_STYRENE_Jul_01_2018_Layer1_TilePlot](https://github.com/user-attachments/assets/8d44a904-535d-41db-b599-47d61aca91a0)
+![Jul_01_2018_DegError_vs_DegError_STYRENE_Jul_01_2018_Layer1_TilePlot](./images/chemistry/cmaqv6.0_Jul_01_2018_DegError_vs_DegError_STYRENE_Jul_01_2018_Layer1_TilePlot.png)
 #####   Corrected Module.   
-![Jul_01_2018_DegFix_vs_DegFix_STYRENE_Jul_01_2018_Layer1_TilePlot](https://github.com/user-attachments/assets/b949ec25-a962-4218-bb32-588acfc1f806)
+![Jul_01_2018_DegFix_vs_DegFix_STYRENE_Jul_01_2018_Layer1_TilePlot](./images/chemistry/cmaqv6.0_Jul_01_2018_DegFix_vs_DegFix_STYRENE_Jul_01_2018_Layer1_TilePlot.png)
 
 The error and its removal do not affect predictions of other model species.
 

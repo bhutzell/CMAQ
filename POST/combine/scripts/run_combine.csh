@@ -106,11 +106,11 @@
   #> Define name of input files needed for combine program.
   #> File [1]: CMAQ conc/aconc file
   #> File [2]: MCIP METCRO3D file
-  #> File [3]: CMAQ AELMO file
+  #> File [3]: CMAQ ELMO1_DEFAULT file
   #> File [4]: MCIP METCRO2D file
    setenv INFILE1 $CCTMOUTDIR/CCTM_ACONC_${RUNID}_$YYYY$MM$DD.nc
    setenv INFILE2 $METDIR/METCRO3D_$YY$MM$DD.nc
-   setenv INFILE3 $CCTMOUTDIR/CCTM_AELMO_${RUNID}_$YYYY$MM$DD.nc
+   setenv INFILE3 $CCTMOUTDIR/CCTM_ELMO1_DEFAULT_${RUNID}_$YYYY$MM$DD.nc
    setenv INFILE4 $METDIR/METCRO2D_$YY$MM$DD.nc
 
   #> Executable call:
@@ -149,7 +149,7 @@
 
   #> Define name of combine output file to save hourly total deposition.
   #> A new file will be created for each month/year.
-   setenv OUTFILE ${POSTDIR}/COMBINE_DEP_${RUNID}_$YYYY$MM
+   setenv OUTFILE ${POSTDIR}/COMBINE_DEP_${RUNID}_$YYYY$MM.nc
 
   #> Define name of input files needed for combine program.
   #> File [1]: CMAQ DRYDEP file

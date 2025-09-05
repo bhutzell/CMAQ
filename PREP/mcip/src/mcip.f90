@@ -74,6 +74,8 @@ PROGRAM mcip
 !                        (T. Spero)
 !           09 Jul 2019  Remove argument CTMLAYS from subroutine READNML.
 !                        (T. Spero)
+!           12 May 2025  Moved the call to GRIDOUT back to the time-independent
+!                        section to avoid redundant writes. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE mcipparm
@@ -163,13 +165,13 @@ PROGRAM mcip
     IF ( first ) THEN
       CALL statflds                   ! Put time-independent fields on MCIP grid
       CALL gridproc                   ! Parse and process time-independent data.
+      CALL gridout (sdate, stime)     ! Output time-independent data.
       first = .FALSE.
     ENDIF
 
     CALL dynflds                      ! Put time-varying fields on MCIP grid.
 
     CALL ctmproc                      ! Parse and process time-varying data.
-    CALL gridout (sdate, stime)       ! Output time-independent data.
     CALL ctmout  (mcip_now, sdate, stime)        ! Output time-varying data.
 
 

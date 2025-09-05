@@ -27,7 +27,7 @@ C
 C  KEY SUBROUTINES/FUNCTIONS CALLED:  HRINIT, HRCALCKS, HRSOLVER
 C                                     FIND_DEGRADED, INIT_DEGRADE, FINAL_DEGRADE
 C
-C  REVISION HISTORY: Created by EBI solver program, Nov 22, 2024
+C  REVISION HISTORY: Created by EBI solver program, Jul 25, 2025
 C                       Based on the algorithm in "Test of Two Numerical
 C                       Schemes for Use in Atmospheric Transport-Chemistry
 C                       Models", O. Hertel, R. Berkowicz, J. Christensen,
@@ -492,7 +492,7 @@ c..unit conversion for current gridcell
                   IF( CONVERT_CONC( SPC ) )THEN
                      DO NP = 1, NPMAX
                         SENGRID( C,R,L,NP,S ) = REAL ( INV_DENS*FORWARD_CONV( SPC ) )
-     &                                     * SENGRID( C,R,L,NP,S )
+     &                                        * SENGRID( C,R,L,NP,S )
                      END DO
                   END IF
                END DO
@@ -506,10 +506,10 @@ c..revert back to original units
                   IF( CONVERT_CONC( SPC ) )THEN
                       DO NP = 1, NPMAX
                         SENGRID( C,R,L,NP,S ) = REAL( REVERSE_CONV( SPC ) * DENS( C,R,L ) )
-     &                                 * SENGRID( C,R,L,NP,S )
+     &                                        * SENGRID( C,R,L,NP,S )
                       END DO
                   ENDIF
-               END DO               
+               END DO
 #endif
 
             END DO

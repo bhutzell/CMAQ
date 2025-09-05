@@ -252,8 +252,6 @@ ANH4K           ,ug m-3    ,ANH4K[1]
 ASO4IJ          ,ug m-3    ,ASO4I[1]+ASO4J[1]
 ASO4K           ,ug m-3    ,ASO4K[1]
 AHMSJ           ,ug m-3    ,AHMSJ[1]
-AFEK            ,ug m-3    ,0.02695*ASOIL[1]+0.0467*ACORS[1]
-AMNK            ,ug m-3    ,0.00075*ASOIL[1]+0.0011*ACORS[1]
 
 !! Organic Particle Species
 ! Why is there an APOCI and APOCJ in the output? It doesn't match below
@@ -278,7 +276,7 @@ ASOCJ     ,ugC m-3,  AHOMJ[1]/2.08 + AELHOMJ[1]/1.67 + AISO3NOSJ[1]/2.27 \
                    + AISO3OSJ[1]/3.6 + AGLYOLIGJ[1]/2.13 + AORGCJ[1]/2  \
                    + AOP3J[1]/1.92 + ASOATJ[1]/2.31 + AROCN2OXY2J[1]/1.42 \
                    + AISO4J[1]/2.80 + AISO5J[1]/2.50 \
-                   + AHONITJ[1]/2.21 + ATRPNJ[1]/1.79 + AMTN1J[1]/2.13 \
+                   + AHONITJ[1]/2.21 + ATRPNJ[1]/1.79 + AMTN1J[1]/2.43 \
                    + AROCN2OXY4J[1]/1.67 + AROCN2OXY8J[1]/2.17 + AROCN1OXY1J[1]/1.29 \
                    + AROCN1OXY3J[1]/1.54 + AROCN1OXY6J[1]/1.92 + AROCP0OXY2J[1]/1.42 \
                    + AROCP0OXY4J[1]/1.67 + AROCP1OXY1J[1]/1.29 + AROCP1OXY3J[1]/1.54 \
@@ -344,7 +342,7 @@ ATOTJ           ,ug m-3    ,ASO4J[1] + ANH4J[1] + ANO3J[1] + ANAJ[1]   \
                            +ACLJ[1] + AECJ[1] + AOMJ[0] + AOTHRJ[1]    \
                            +AFEJ[1] + AALJ[1] + ASIJ[1] + ATIJ[1]      \
                            +ACAJ[1] + AMGJ[1] + AKJ[1] + AMNJ[1]       \
-			   +AHMSJ[1]        
+			               +AHMSJ[1]        
 
 ATOTK           ,ug m-3    ,ASO4K[1] + ANH4K[1] + ANO3K[1] + ACLK[1]   \
                            +ACORS[1] + ASOIL[1] + ASEACAT[1]
@@ -356,7 +354,7 @@ AUNSPEC1IJ      ,ug m-3    ,ATOTIJ[0] - (ASO4IJ[0] + ANO3IJ[0]         \
                                          +ANH4IJ[0] + ACLIJ[0]         \
                                          +ANAIJ[0] + AECIJ[0]          \
                                          +AOCIJ[0] + ASOILJ[0]         \
-					 +AHMSJ[0])       
+					                     +AHMSJ[0])       
 !! Non-Carbon Organic Mass
 ANCOMIJ         ,ug m-3    ,AOMIJ[0] - AOCIJ[0]
 

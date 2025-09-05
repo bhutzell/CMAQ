@@ -23,7 +23,7 @@ Updates regarding the photolysis processes do not alter model predictions. The c
 |[Merge for PR#1178](https://github.com/USEPA/CMAQ/commit/1752ce0d71f76485798cad916a5505c8c65eac2c) | [PR#1178](https://github.com/USEPA/CMAQ_Dev/pull/1178)  | 
 
 ### Updated OMI.dat file that contains data from 2005 through 2024
-[Kirk Baker](mailto:baker.kirk@epa.gov), U.S. Environmental Protection Agency    
+**Kirk Baker**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: New ancillary input file   
 **Release Version/Date**:  CMAQv6.0
 
@@ -59,7 +59,7 @@ The other error is a a model crash when the cb6r5hap_ae7_aq mechanism is used fo
 
 
 ### Updates to diagnostics for Inline Photolysis
-**Primary Contact**: [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix, New Feature   
 **Release Version/Date**:  CMAQv6.0    
 **Description**:  This update replaces total extinction coefficients in the PHOTDIAG3 diagnostic file with cloud extinction coefficients. The replacement seeks to give a informative diagnostic on what sources are attenuating light in a grid cell. The update also adds calculating aerosol extinction coefficients and asymmetry parameters when the sun is below horizon if PHOTDIAG is _**yes**_. The motive seeks to expand model time steps for evaluating the aerosol optical properties.  
@@ -107,7 +107,7 @@ Fast, J. D., Gustafson Jr., W. I., Easter, R. C., Zaveri, R. A., Barnard, J. C.,
 |[Merge for PR#1034](https://github.com/USEPA/CMAQ/commit/8dbab2dd301bbc148c707ed0b1659df2b3c6e850) | [PR#1034](https://github.com/USEPA/CMAQ_Dev/pull/1034)  |  
 
 ### Correct sub-grid cloud effect on in-line photolysis frequencies
-[[William T. Hutzell](mailto:hutzell.bill@epa.gov)], U.S. Environmental Protection Agency    
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
 

@@ -173,7 +173,7 @@ Verify that the BLD directory contains a namelist called
 
 ```
 cd BLD_CCTM_v55_gcc_cb6r5_ae7_aq_m3dry
-ls CMAQ_Control_DESID_cb6r5_ae7_aq.nml
+ls CMAQ_Control_cb6r5_ae7_aq.nml
 ```
 
 

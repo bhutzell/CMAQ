@@ -172,7 +172,7 @@ C External Functions:
            REAL( 8 ), INTENT( INOUT ) :: AEROSOL( :,: ) ! aerosol concentrations (mol/molV)
            REAL( 8 ), INTENT( INOUT ) :: GASWDEP( : )   ! gas phase wet deposition array (mm mol/liter)
            REAL( 8 ), INTENT( INOUT ) :: AERWDEP( :,: ) ! aerosol wet deposition array (mm mol/liter)
-	       REAL,      INTENT( IN )  :: COSZ      ! cosine solar zenith angle
+           REAL,      INTENT( IN )  :: COSZ      ! cosine solar zenith angle
         END SUBROUTINE AQCHEM
       END INTERFACE      
 
@@ -186,7 +186,7 @@ C...  event-statistics variables.
         FIRSTIME = .FALSE.
 
         CALL AQ_DATA_INIT()  
-	
+
         ALLOCATE ( GAS    ( N_AQ_GAS ),
      &             GASWDEP( N_AQ_GAS ),
      &             AEROSOL( N_AQ_AER, N_MODE),

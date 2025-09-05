@@ -39,35 +39,35 @@
 
 c...Tagging maps
       CHARACTER( 16 ), ALLOCATABLE :: ISAM_SPEC( :,: )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_SAtoCGR( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_CGRtoSA( : )
-      LOGICAL, ALLOCATABLE, SAVE   :: L_ISAM_AERO( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_ISAMtoAERO( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_AEROtoSA( :,: )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_AEROGAStoSA( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_AEROCTRtoSA( : )
-      LOGICAL, ALLOCATABLE, SAVE   :: IS_SPC_AEROSOL( :,: )
-      LOGICAL, ALLOCATABLE, SAVE   :: TRANSPORT_SPC ( : )
-      LOGICAL, ALLOCATABLE, SAVE   :: ISAM_SPECIES_BIAS( :,: )
-      INTEGER, ALLOCATABLE, SAVE   :: STREAM_TO_TAG ( :,: )
-      INTEGER, ALLOCATABLE, SAVE   :: TAGS_PER_STREAM( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_DIFFtoSA( : )
-      INTEGER, ALLOCATABLE, SAVE   :: MAP_ADVtoSA( : )
+      INTEGER, ALLOCATABLE         :: MAP_SAtoCGR( : )
+      INTEGER, ALLOCATABLE         :: MAP_CGRtoSA( : )
+      LOGICAL, ALLOCATABLE         :: L_ISAM_AERO( : )
+      INTEGER, ALLOCATABLE         :: MAP_ISAMtoAERO( : )
+      INTEGER, ALLOCATABLE         :: MAP_AEROtoSA( :,: )
+      INTEGER, ALLOCATABLE         :: MAP_AEROGAStoSA( : )
+      INTEGER, ALLOCATABLE         :: MAP_AEROCTRtoSA( : )
+      LOGICAL, ALLOCATABLE         :: IS_SPC_AEROSOL( :,: )
+      LOGICAL, ALLOCATABLE         :: TRANSPORT_SPC ( : )
+      LOGICAL, ALLOCATABLE         :: ISAM_SPECIES_BIAS( :,: )
+      INTEGER, ALLOCATABLE         :: STREAM_TO_TAG ( :,: )
+      INTEGER, ALLOCATABLE         :: TAGS_PER_STREAM( : )
+      INTEGER, ALLOCATABLE         :: MAP_DIFFtoSA( : )
+      INTEGER, ALLOCATABLE         :: MAP_ADVtoSA( : )
  
-      INTEGER, ALLOCATABLE, SAVE   :: ISAM_TO_AERO( : )  ! maps tracked species to bulk concentration if aerosol species
-      INTEGER, ALLOCATABLE, SAVE   :: SA_AERO_INDX( : )  ! index of tracked aerosol in ISAM concentration array
+      INTEGER, ALLOCATABLE         :: ISAM_TO_AERO( : )  ! maps tracked species to bulk concentration if aerosol species
+      INTEGER, ALLOCATABLE         :: SA_AERO_INDX( : )  ! index of tracked aerosol in ISAM concentration array
 
-      INTEGER, ALLOCATABLE, SAVE   :: ISAM_PVO3_MAP( : ) ! potential vorticity map
+      INTEGER, ALLOCATABLE         :: ISAM_PVO3_MAP( : ) ! potential vorticity map
 
       INTEGER ::     NSPC_SA_AE        ! number of tracked species that are aerosols
       INTEGER ::     N_SA_AEROSPC      ! number of unique aerospc in all tracked aerosols
 
-      INTEGER, SAVE ::     NSPC_SA
-      INTEGER, SAVE ::     NTAG_SA
-      INTEGER, SAVE ::     NSPC_TRANSPORT
+      INTEGER ::     NSPC_SA
+      INTEGER ::     NTAG_SA
+      INTEGER ::     NSPC_TRANSPORT
       INTEGER, PARAMETER :: NBIAS = 4 
-      INTEGER, SAVE ::     N_VOC_BIAS
-      INTEGER, SAVE ::     N_NOY_BIAS
+      INTEGER ::     N_VOC_BIAS
+      INTEGER ::     N_NOY_BIAS
 
 c...Define Allocatable Apportionment Arrays
       REAL, POINTER :: ISAM  ( :,:,:,:,: )
@@ -80,29 +80,29 @@ c...Define Allocatable Apportionment Arrays
       REAL, ALLOCATABLE :: SA_VDEMIS_DIFF( :,:,:,:,: ) 
 
 c...Variables regarding the tag list
-      CHARACTER( 16 ), ALLOCATABLE, SAVE :: TAGNAME( : )
-      CHARACTER( 256 )                    :: TAGCLASSES = ' '
-      CHARACTER( 1024 ), ALLOCATABLE, SAVE :: TAGSTREAMS_TEMP( : )
-      CHARACTER( 96 ), ALLOCATABLE, SAVE :: TAGSTREAMS( :, : )
-      INTEGER, ALLOCATABLE, SAVE         :: TAGSTREAMS_NUM( : )
+      CHARACTER( 16 ), ALLOCATABLE       :: TAGNAME( : )
+      CHARACTER( 256 )                   :: TAGCLASSES = ' '
+      CHARACTER( 1024 ), ALLOCATABLE     :: TAGSTREAMS_TEMP( : )
+      CHARACTER( 96 ), ALLOCATABLE       :: TAGSTREAMS( :, : )
+      INTEGER, ALLOCATABLE               :: TAGSTREAMS_NUM( : )
 
-      CHARACTER( 1024 ), ALLOCATABLE, SAVE :: ISAMRGN_TEMP( : )
-      CHARACTER( 96 ), ALLOCATABLE, SAVE :: ISAMRGN( :, : )
-      INTEGER, ALLOCATABLE, SAVE         :: ISAMRGN_NUM( : )
-      INTEGER, ALLOCATABLE, SAVE         :: ISAMRGN_MAP( :, : )
+      CHARACTER( 1024 ), ALLOCATABLE     :: ISAMRGN_TEMP( : )
+      CHARACTER( 96 ), ALLOCATABLE       :: ISAMRGN( :, : )
+      INTEGER, ALLOCATABLE               :: ISAMRGN_NUM( : )
+      INTEGER, ALLOCATABLE               :: ISAMRGN_MAP( :, : )
 
 c...Logical values for tagging species
-      LOGICAL, SAVE :: L_EC      = .FALSE.
-      LOGICAL, SAVE :: L_OC      = .FALSE.
-      LOGICAL, SAVE :: L_SO4     = .FALSE.
-      LOGICAL, SAVE :: L_NO3     = .FALSE.
-      LOGICAL, SAVE :: L_NH4     = .FALSE.
-      LOGICAL, SAVE :: L_PM25    = .FALSE.
-      LOGICAL, SAVE :: L_OZONE   = .FALSE.
-      LOGICAL, SAVE :: L_VOC     = .FALSE.
-      LOGICAL, SAVE :: L_CL      = .FALSE.
+      LOGICAL :: L_EC      = .FALSE.
+      LOGICAL :: L_OC      = .FALSE.
+      LOGICAL :: L_SO4     = .FALSE.
+      LOGICAL :: L_NO3     = .FALSE.
+      LOGICAL :: L_NH4     = .FALSE.
+      LOGICAL :: L_PM25    = .FALSE.
+      LOGICAL :: L_OZONE   = .FALSE.
+      LOGICAL :: L_VOC     = .FALSE.
+      LOGICAL :: L_CL      = .FALSE.
       
-      LOGICAL, SAVE :: SA_BIDI = .FALSE.
+      LOGICAL :: SA_BIDI   = .FALSE.
 
 ! Chemical Mechanism Lists for Populating ISAM Species Arrays
       TYPE ISAM_LIST
@@ -119,14 +119,14 @@ c...Logical values for tagging species
 !     LOGICAL, SAVE :: L_CHEMISTRY
 
 ! Cloud Module variables - sln 4 june 2018
-      REAL, SAVE :: DEPSUM_SAVE = 0.0
-      REAL, SAVE :: DS4_SAVE    = 0.0
-      REAL, SAVE :: REMOV_SAVE  = 0.0
+      REAL :: DEPSUM_SAVE = 0.0
+      REAL :: DS4_SAVE    = 0.0
+      REAL :: REMOV_SAVE  = 0.0
 
-      REAL, SAVE :: DEPSUM_AORGC_SAVE = 0.0
-      REAL, SAVE :: DGLY1_SAVE        = 0.0 
-      REAL, SAVE :: DMGLY1_SAVE       = 0.0  
-      REAL, SAVE :: REMOV_AORGC_SAVE  = 0.0
+      REAL :: DEPSUM_AORGC_SAVE = 0.0
+      REAL :: DGLY1_SAVE        = 0.0 
+      REAL :: DMGLY1_SAVE       = 0.0  
+      REAL :: REMOV_AORGC_SAVE  = 0.0
 
 c...Final, combined tags
       INTEGER                      :: N_SPCTAG
@@ -135,18 +135,18 @@ c...Final, combined tags
       CHARACTER( 16 ), ALLOCATABLE :: VNAM_SPCTAG( : )
 
 C ...Tagging indices for bcon, others, icon
-      INTEGER, SAVE :: BIDITAG = 0
-      INTEGER, SAVE :: BCONTAG = 0
-      INTEGER, SAVE :: OTHRTAG = 0
-      INTEGER, SAVE :: ICONTAG = 0
+      INTEGER :: BIDITAG = 0
+      INTEGER :: BCONTAG = 0
+      INTEGER :: OTHRTAG = 0
+      INTEGER :: ICONTAG = 0
 
       REAL, PRIVATE, ALLOCATABLE :: BUFF2( :,: )
 
 ! Diffusion module variables
-      REAL, ALLOCATABLE, SAVE :: SA_DDEP( :,:,: ), SA_DDEP0( :,:,: )
+      REAL, ALLOCATABLE :: SA_DDEP( :,:,: ), SA_DDEP0( :,:,: )
 
 ! Advection module variables
-      LOGICAL, ALLOCATABLE, SAVE :: BCON_SPC( : )
+      LOGICAL, ALLOCATABLE :: BCON_SPC( : )
 
         INTEGER, PARAMETER, PRIVATE :: MAX_STRING     = 32  ! max length of tagclass name
         INTEGER, PARAMETER, PRIVATE :: MAX_TAGCLASSES = 200 ! max number of tagclasses
@@ -979,6 +979,7 @@ c----------------------------------------------------------
         ! Activate Particulate Ions if Requested
         IF ( INDEX( TAGCLASSES,'PM_IONS' ) .NE. 0 ) THEN
           FOUND_SPECIES = .FALSE.
+          CALL ADD_ISAM_SPEC( 'ACL', FOUND_SPECIES, IMECH )
           CALL ADD_ISAM_SPEC( 'ANA', FOUND_SPECIES, IMECH )
           CALL ADD_ISAM_SPEC( 'AMG', FOUND_SPECIES, IMECH )
           CALL ADD_ISAM_SPEC( 'AK', FOUND_SPECIES, IMECH )

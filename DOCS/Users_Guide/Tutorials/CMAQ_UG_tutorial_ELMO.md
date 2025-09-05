@@ -14,7 +14,8 @@ Create a new line and set the value of Keywd_name(x) equal to the name of your n
 index indicating the position of your Keyword in the full Keyword list. There is nothing consequential about the order 
 of ELMO Keywords, but indices cannot repeat. If you choose a number in the middle of the existing list, you must increment 
 the index of every Keyword after it in the list. The easiest choice is just to make x equal to 1 greater than the 
-current largest Keyword index.  
+current largest Keyword index. Be sure to change the value of N_Keywords in the ELMO_INIT section above to the total number of 
+keywords. If you have only added one keyword, then just increase the value of N_Keywords by 1.  
 
 #### STEP 2: Add Contents for Your Keyword  
 
@@ -26,6 +27,24 @@ variables, meteorological variables, other Keywords, or any other variable type 
 Your Keyword is ready for use in File_Vars to activate variables for your simulation's output files.
 
 ------------
+
+### Add ELMO Composite 
+
+#### STEP 1: Modify the Chemical Control Namelist  
+
+The Chemical Control Namelist is mechanism-dependent and defines all composite variables that ELMO can use. The CMAQ Control
+Namelist can then activate any of these composites and direct them to any ELMO output file. [Appendix F][link_appendix_f], section F.2.2,
+describes the format of the Composite declarations in the Chemical Control Namelists. This approach is designed especially for 
+linear combinations of other ELMO variables in mind. For example, a sum of CMAQ transported species, other ELMO Composites, or Derived 
+Variables can be implemented readily, with or without coefficients. Appendix F also contains an explanation of the aerosol size 
+or phase descriptors and options for unit conversions. 
+
+#### STEP 2: Add Composite Variable Name to CMAQ Control File
+
+ELMO is now equipped to output your Composite variable. You may add it to File_Vars in [CMAQ_Control.nml][link_cmaq_ctrl] for any custom 
+output file you like, or you may add it to the contents of any ELMO Keyword.  
+
+-----------
 
 ### Add Derived Variables to ELMO Source Code
 
@@ -44,11 +63,11 @@ should contain values for:
 This name can also be used in the contents of any Keyword to activate it with a group of other variables.  
 - The ID_ of the variable.
 - The variable type: 
-    - ET_DRVD - a derived ELMO variable. These should be mass concentrations or mixing ratios. These can presumably be 
+    - ET_DRVD - a derived ELMO variable. These should be mass concentrations or mixing ratios. These can be 
     refined in source-oriented applications like ISAM and DDM.  
-    - ET_DRVD_DDEP - a derived ELMO variable for dry deposition fluxes. These can presumably be 
+    - ET_DRVD_DDEP - a derived ELMO variable for dry deposition fluxes. These can be 
     refined in source-oriented applications like ISAM and DDM.  
-    - ET_DRVD_WDEP - a derived ELMO variable for wet deposition fluxes. These can presumably be 
+    - ET_DRVD_WDEP - a derived ELMO variable for wet deposition fluxes. These can be 
     refined in source-oriented applications like ISAM and DDM.  
     - ET_AEROPROP - an aerosol property. These variables describe the aerosol size distribution (e.g. number concentration, 
     diameter, density, etc.) or some chemical property (e.g. O:C, pH).  
@@ -78,7 +97,7 @@ In ELMO_DERIVED_CALC.F, add a case to the select case statement for the variable
 your variable. Within the case, set outval equal to the value of your new variable in the current local grid cell (C1,R1,L1), and 
 make any appropriate modifications. Again, use the approach for ELMO_AOD_550 as a guide.  
 
-#### STEP 7: Add Variable Name to CMAQ Control File
+#### STEP 7: Add Derived Variable Name to CMAQ Control File
 
 ELMO is now equipped to output your variable. You may add it to File_Vars in [CMAQ_Control.nml][link_cmaq_ctrl] for any custom output file you like, or 
 you may add it to the contents of any ELMO Keyword.  
@@ -88,10 +107,14 @@ you may add it to the contents of any ELMO Keyword.
 
 [link_elmo_data]: ../../../CCTM/src/driver/ELMO_DATA.F
 [link_cmaq_ctrl]: ../../../CCTM/src/driver/CMAQ_Control.F
+[link_appendix_f]: ../Appendix/CMAQ_UG_appendixF_elmo_output.md
 
 <!-- END_OF_COMMENT -->
 
 [link_elmo_data]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/driver/ELMO_DATA.F
 [link_cmaq_ctrl]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/driver/CMAQ_Control.F
+[link_appendix_f]: https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixF_elmo_output.md
+
+
 
 

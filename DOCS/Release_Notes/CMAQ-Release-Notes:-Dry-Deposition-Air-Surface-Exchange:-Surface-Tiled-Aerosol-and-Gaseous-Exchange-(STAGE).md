@@ -1,18 +1,13 @@
 # STAGE
+### STAGE Updates
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
+**Type of update**:  Science Update, Bug Fix    
+**Release Version/Date**:  CMAQv6.0  
 
-### Runtime Deposition Options
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**:  Science Update, Documentation  
-**Release Version/Date**:  V6.0
-
-**Description and/or issue being addressed**:  
-Allows the user to specify M3Dry (default) or STAGE dry deposition options from the run script. 
+**Description and/or issue being addressed**:   
+Change to STAGE implementation of the tiling parameterizations for aerodynamic and stomatal resistances.  Corrections are made to the tiled LAI that better represents parameterizations in costal areas.
 
 **Significance and Impact**:  
-
-The STAGE implementation includes a change to the tiling parameterizations for aerodynamic and stomatal resistances.
-Corrections to the tiled LAI that better represents parameterizations in costal areas.
-
 Tiled deposition to partially snow covered land was incorrectly modeled as resistances in series and are now modeled as resistances in parallel. This results to higher deposition to partially snow covered land.
 
 Bidirectional HCHO exchange and leaf micro wetness is updated as parameterized in [Skipper et al. 2024](https://doi.org/10.5194/acp-24-12903-2024). Earlier versions of STAGE modeled leaf wetness as a function of relative humidity for O<sub>3</sub> and NH<sub>3</sub>. Here we apply the leaf surface micro wetness as a function of relative humidity following [Burkhardt et al. 2009](https://doi.org/10.5194/bg-6-67-2009) and is applied for all deposited species. This required an update in the NH<sub>3</sub> cuticular resistance from [Massad et al. 2010](https://doi.org/10.5194/acp-10-10359-2010) to [Ramsay et al. 2021](https://doi.org/10.5194/bg-18-2809-2021) to accommodate a universal representation of leaf micro wetness.  This results in similar results for NH<sub>3</sub> bidirectional exchange simulations and lower estimated NH<sub>3</sub> concentrations when NH<sub>3</sub> bidirectional exchange is not selected and a consistent representation for both options.
@@ -21,16 +16,47 @@ Tiled R<sub>st</sub> is scaled by land use type based on the minimum stomatal re
 
 Tiled R<sub>a</sub> is now parameterized as R<sub>a</sub> = Pr<sub>o</sub>U/u<sub>*</sub><sup>2</sup> and stability corrections are implicitly included by applying  [Byun et al. 1999](https://www.cmascenter.org/cmaq/science_documentation/) Equations 12-30, 12-40, 12-42, and 12-46. 
 
-STAGE was modified to support DDM-3D. 
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321/commits/d387fd332650055d71fb4de373dc25d92ab86730) | [PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321)  |
+
+
+### Runtime Deposition Options and Add Support for DDM-3D
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
+**Type of update**:  Science Update   
+**Release Version/Date**:  CMAQv6.0    
+
+**Description and/or issue being addressed**:  
+Allows the user to specify M3Dry (default) or STAGE dry deposition options from the run script. STAGE was also modified to support DDM-3D. 
+
+**Significance and Impact**:   
+STAGE and M3DRY deposition modules are now both built in model executables and may be selected at run-time.  CMAQ DDM-3D may now be run with either deposition module. 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321/commits/d387fd332650055d71fb4de373dc25d92ab86730) | [PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321)  |
 
+### Diagnostic NH3 Emissions from Agriculture and Biogenic Sources
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
+**Type of update**: Diagnostic Update     
+**Release Version/Date**:  CMAQv6.0  
+
+**Description and/or issue being addressed**:  
+Agricultural and biogenic NH3 emissions diagnostics added to the DRYDEP output file. Users will be able to get these diagnostic outputs when the NH3 bidirectional exchange flag is turned on in the run script for CONUS runs 2023 and later.
+
+**Significance and Impact**:  
+This only adds diagnostic data and does not change results or impact run time.
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1362](https://github.com/USEPA/CMAQ/commit/87987a81d6c9a3975082fd25268af6db3e23fc40) | [PR#1362](https://github.com/USEPA/CMAQ_Dev/pull/1362)  |
+
+
 ### Update to Minimum Kz and Kz0ut in the STAGE deposition option
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**:  Science Update, Documentation  
-**Release Version/Date**:  V6.0
+**Release Version/Date**:  CMAQv6.0  
 
 **Description**:   
 This pull request updates minimum Kz value to only be applied in the PBL and sets the minimum Kz0ut value from 1 m2/s to 0.01 m2/s in accordance to WRF 4 PX and YSU PBL schemes. 
@@ -46,9 +72,9 @@ The revised Kz0ut results in substantially more O3 titration and higher NOx and 
 |[Merge for PR#1278](https://github.com/USEPA/CMAQ/commit/23654ff0e2f4371354ec357bff96845b7e4eff9a) | [PR#1278](https://github.com/USEPA/CMAQ_Dev/pull/1278)  |
 
 ### Restored the impact of dry deposition factor on diagnostic deposition velocity outputs
-**Primary Contact**: [Jesse Bash(mailto:bash.jesse@epa.gov)], U.S. Environmental Protection Agency    
-**Type of update**: Bug Fix   
-**Release Version/Date**:  v6.0
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
+**Type of update**: Bug Fix    
+**Release Version/Date**:  CMAQv6.0  
 
 **Description**:  
 This update is needed for the dry deposition velocity diagnostic file to represent model sensitivities in which the user selects a dry deposition factor that is not unity.  
@@ -64,9 +90,9 @@ If the user selects a dry deposition factor for a surrogate deposition velocity 
 |[Merge for PR#1282](https://github.com/USEPA/CMAQ/commit/1c99863e38eee05a8e901a1204c402a98bdbf09d) | [PR#1282](https://github.com/USEPA/CMAQ_Dev/pull/1282)  |
 
 ### Model stop if STAGECTRL_NML environmental variable is missing
- [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Bug Fix   
-**Release Version/Date**:  v6.0
+ **Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
+**Type of update**: Bug Fix     
+**Release Version/Date**:  CMAQv6.0  
 
 **Description**:   
 This pull request modifies CMAQ to alert the user if the STAGECTRL_NML is not set in the runscript when the STAGE deposition option is used. 
@@ -79,11 +105,10 @@ Model results are unchanged.
 |[Merge for PR#1242](https://github.com/USEPA/CMAQ/commit/dd8fa43dbac447332e54d56a8cc100733ae1ce96) | [PR#1242](https://github.com/USEPA/CMAQ_Dev/pull/1242)  |
  
 
-
 ### STAGE gcc debug flag bug fix  
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Bug Fix   
-**Release Version/Date**:  v6.0
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
+**Type of update**: Bug Fix     
+**Release Version/Date**:  CMAQv6.0  
 
 **Description**:  
 STAGE with bidirectional NH3 exchange will currently crash when using a gcc build compiled with debug flags due to uninitialized F1_NH4 and F2_NH4 arrays in centralized_io_module.F. This occurs only when with the environment variable NEW_START = TRUE and these arrays are not populated but checked for NaNs in NH3_BIDI_MOD.F.  This pull request initialized  these arrays allowing the model to run when compiled with gcc debug flags.
@@ -96,12 +121,10 @@ This bugfix allows the user to run the model compiled with gcc debug flags using
 |[Merge for PR#1227](https://github.com/USEPA/CMAQ/commit/9d9d871b6921443c270f7eebea2e1893d6f25822) | [PR#1227](https://github.com/USEPA/CMAQ_Dev/pull/1227)  |
 
 
-
-
 ### Correction in an Underflow STAGE Emerson Aerosol Dry Deposition Option
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Bug Fix  
-**Release Version/Date**: CMAQ 5.5  
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
+**Type of update**: Bug Fix   
+**Release Version/Date**: CMAQv5.5    
 
 **Description**:   
 This pull request resolves an underflow issue in calculating the bounce correction term (R1) in the [Emerson et al. 2020](https://www.pnas.org/doi/10.1073/pnas.2014761117) (equation 2) aerosol dry deposition option in STAGE.   
@@ -115,9 +138,9 @@ This allows for CMAQ simulations using the STAGE Emersion aerosol dry deposition
 
 
 ### STAGE Minor Bugfix
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
-**Release Version/Date**: CMAQ 5.5  
+**Release Version/Date**: CMAQv5.5   
 
 **Description**:  
  This pull request address three issues in the STAGE deposition option.   
@@ -136,9 +159,9 @@ This pull request corrects a units typo in the  CMAQ_Control_STAGE.nml and the F
 
 
 ### Land Use and Deposition Species Mapping 
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency   
-**Type of update**: Bug Fix, New Feature   
-**Release Version/Date**: CMAQ 5.4   
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
+**Type of update**: Bug Fix, New Feature     
+**Release Version/Date**: CMAQv5.4    
 
 **Description**:   
 This update to STAGE has three primary parts: 
@@ -155,9 +178,9 @@ Overall, these result in a reduction in model run time, particularly when the MO
 |[Merge for PR#847](https://github.com/USEPA/CMAQ/commit/16f959108268dd2a55e2271a26d5d89a9ec54914) | [PR#847](https://github.com/USEPA/CMAQ_Dev/pull/847)  | 
 
 ### Updates to Gaseous and Aerosol Dry Deposition
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency   
-**Type of update**: Bug fix, New feature   
-**Release Version/Date**: CMAQ 5.4   
+**Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
+**Type of update**: Bug fix, New feature    
+**Release Version/Date**: CMAQv5.4    
 
 **Description**:   
 The STAGE option in CMAQ v5.5 now allows the user to specify key land use parameters for gaseous and aerosol dry deposition process using the CMAQ_Control_STAGE.nml name list. Default values have been populated using median observations from the TRY Plant Trait Database. These updates reduce the bias in summertime NH3 concentrations by approximately half.
@@ -180,34 +203,34 @@ This update to STAGE has 5 primary parts:
 4.	Land use specific parameters for aerosol deposition processes have now been moved to CMAQ_Control_STAGE.nml and the aerodynamic leaf width parameter has been updated based on TRY Plant Trait Database observations, assuming an oval leaf following [Campbell and Norman 1998](https://link.springer.com/book/10.1007/978-1-4612-1626-1).
 5.	The CSU [Emerson et al. 2020](https://doi.org/10.1073/pnas.2014761117) and Pleim et al. 2022 aerosol deposition options are now included as a runtime option. The CSU model has been modified to smoothly scale from leaf off to leaf on conditions and vegetated to non-vegetated conditions for the CMAQ application. This includes the incorporation of a two layer aerosol deposition model and replacing the product of the empirical factor 3 and u* with the integration of LAI(z) u*(z) from 0 to the canopy top using the in-canopy attenuation coefficient of [Yi 2008](https://doi.org/10.1175/2007JAMC1667.1). This matches the empirical factor of 3 at an LAI of approximately 5.3. When LAI = 0 this returns the deposition velocity for non-vegetated surfaces. Despite these changes, CMAQ model results, with an aerosol standard deviation of 1, are similar to the figures presented in Emerson et al. 2020.
 
-![image](https://user-images.githubusercontent.com/12100276/165372400-d045f7bd-c0c8-4780-9ce9-7c542cc2e4bb.png)
+![image](./images/dry-deposition/cmaqv6.0_deposition_velocity_as_a_function_of_particle_diameter.png)
 Deposition velocity as a function of particle diameter for the CSU model, M3Dry [PR#842](https://github.com/USEPA/CMAQ_Dev/pull/842), STAGE v5.3, and the STAGE-CSU modal parameterization [PR#883](https://github.com/USEPA/CMAQ_Dev/pull/883).
 
-![image](https://user-images.githubusercontent.com/12100276/165372939-ccfa2c55-8a45-4604-9a62-31e0887baa5e.png)
+![image](./images/dry-deposition/cmaqv6.0_deposition_pathways_of_STAGE-CSU_implementation.png)
 Deposition pathways of the STAGE-CSU implementation.
 
 **Significance and Impact**:  
 1.	This pull request revises the formula for Rb_leaf which results in lower resistances to vegetation with LAI > 4.6 and higher resistance to deposition otherwise. This primarily impacts HNO3 and other species with low/no canopy resistance. Model differences are small and typically less than 1 ppb.
 2.	Changes 2 and 3 result in about a 15% increase in summertime NH3 concentrations over the CONUS domain with decreases in heavily agricultural areas. This results in a reduction in the model bias and error.
 
-![image](https://user-images.githubusercontent.com/12100276/165373141-bac10392-8101-43fd-b322-3ebd566ef8d7.png)
+![image](./images/dry-deposition/cmaqv6.0_2016_evaluation_against_AMoN_concentrations_obs_by_PR.png)
 July 2016 Evaluation against AMoN concentrations, AMoN observations (grey), the STAGE v5.4 update [PR#883](https://github.com/USEPA/CMAQ_Dev/pull/883) (red), and [PR#842](https://github.com/USEPA/CMAQ_Dev/pull/842) (blue)
 
 3.	The Pleim et al. 2022 aerosol deposition options results are similar to [PR#842](https://github.com/USEPA/CMAQ_Dev/pull/842) while the Emerson et al. 2020 option results in a smaller reduction than Pleim et al. 2022 in ambient aerosol concentrations while still capturing the observed minimum in the aerosol deposition velocity. The Pleim et al. 2022 option was evaluated against a CONUS July 2016 simulation of a current build of M3Dry and the modeled PM was within 5% of each other. The differences in PM appear to be related to gaseous aerosol precursors due to differences in the gaseous deposition and BVOC emissions, the STAGE case used BEIS4/BELD6.
 
-![image](https://user-images.githubusercontent.com/12100276/165373756-a34c24ab-4615-48ff-bc4d-fd82ef69ca64.png)
+![image](./images/dry-deposition/cmaqv6.0_monthly_mean_PM2.5_from_M3Dry_STAGE.png)
 Monthly mean PM2.5 from M3Dry [PR#842](https://github.com/USEPA/CMAQ_Dev/pull/842) (left) and STAGE using the Pleim et al. 2022/M3Dry scheme (right).
 
-![image](https://user-images.githubusercontent.com/12100276/165373889-1d5e8c98-f79a-4ba4-822b-1cd587e65aea.png)
+![image](./images/dry-deposition/cmaqv6.0_time_series_and_scatter_of_PM2.5_from_M3Dry_and_STAGE.png)
 Time series of PM2.5 from M3Dry [PR#842](https://github.com/USEPA/CMAQ_Dev/pull/842), black, and STAGE using the M3Dry aerosol deposition velocity, red, (left) and a scatter plot between the two parameterizations (right).
 
-![image](https://user-images.githubusercontent.com/12100276/165374017-1e3a77be-6bf6-4b08-a58a-89252f4672b3.png)
+![image](./images/dry-deposition/cmaqv6.0_monthly_mean_PM2.5_from_STAGE_using_the_Emerson_and_Pleim.png)
 Monthly mean PM2.5 from STAGE using the Emerson et al. 2020/CSU scheme (left) and STAGE using the Pleim et al. 2022/M3Dry scheme (right).
 
-![image](https://user-images.githubusercontent.com/12100276/165374076-5c95bb86-a795-4ec9-9ad1-333c9f703050.png)
+![image](./images/dry-deposition/cmaqv6.0_time_series_and_scatter_of_PM2.5_from_Emerson_and_Pleim.png)
 Time series of PM2.5 from STAGE using the CSU aerosol deposition velocity, black, and STAGE using the M3Dry aerosol deposition parameterization, red, (left) and a scatter plot between the two parameterizations (right).
 
-![image](https://user-images.githubusercontent.com/12100276/165374388-27999a12-981f-4b15-b7f0-557a6471b691.png)
+![image](./images/dry-deposition/cmaqv6.0_stacked_bar_plots.png)
 July 2016 stacked barplots. From left to right, AQS daily observations, STAGE with CSU aerosol deposition option, STAGE with M3Dry aerosol deposition option, STAGE with v5.3 aerosol deposition option
 
 **References**:   

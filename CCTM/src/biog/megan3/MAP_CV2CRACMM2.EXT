@@ -377,14 +377,14 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 51) , SPMH_MAP_CRACMM2(51)     
-     &    / 'caryophyllene_b  ',  51        / 
+     &    / 'caryophyllene_b ',  51        / 
        DATA MECH_NAM_CRACMM2(51 )  , MECH_MAP_CRACMM2( 51)  
      &    / 'SESQ    ', 12     /  
        DATA CONV_FAC_CRACMM2( 51)   
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 52) , SPMH_MAP_CRACMM2(52)     
-     &    / 'caryophyllene_c_i  ',  52        / 
+     &    / 'caryophyllene_c_i',  52        / 
        DATA MECH_NAM_CRACMM2(52 )  , MECH_MAP_CRACMM2( 52)  
      &    / 'SESQ    ', 12     /  
        DATA CONV_FAC_CRACMM2( 52)   
@@ -496,7 +496,7 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 68) , SPMH_MAP_CRACMM2(68)     
-     &    / '2ethyl_hexyl_salate  ',  68        / 
+     &    / '2ethyl_hexyl_salate',  68        / 
        DATA MECH_NAM_CRACMM2(68 )  , MECH_MAP_CRACMM2( 68)  
      &    / 'VROCP2OXY2    ', 16     /  
        DATA CONV_FAC_CRACMM2( 68)   
@@ -685,7 +685,7 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 95) , SPMH_MAP_CRACMM2(95)     
-     &    / '2_methylprop_1_ene  ',  95        / 
+     &    / '2_methylprop_1_ene',  95        / 
        DATA MECH_NAM_CRACMM2(95 )  , MECH_MAP_CRACMM2( 95)  
      &    / 'OLT    ', 2     /  
        DATA CONV_FAC_CRACMM2( 95)   
@@ -755,7 +755,7 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 105) , SPMH_MAP_CRACMM2(105)     
-     &    / 'geranyl_acetone  ',  105        / 
+     &    / 'geranyl_acetone ',  105        / 
        DATA MECH_NAM_CRACMM2(105 )  , MECH_MAP_CRACMM2( 105)  
      &    / 'VROCP6ARO    ', 8     /  
        DATA CONV_FAC_CRACMM2( 105)   
@@ -839,7 +839,7 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 117) , SPMH_MAP_CRACMM2(117)     
-     &    / '2_met_butanenitrile  ',  117        / 
+     &    / '2_met_butanenitrile',  117        / 
        DATA MECH_NAM_CRACMM2(117 )  , MECH_MAP_CRACMM2( 117)  
      &    / 'HC3    ', 5     /  
        DATA CONV_FAC_CRACMM2( 117)   
@@ -923,7 +923,7 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 129) , SPMH_MAP_CRACMM2(129)     
-     &    / 'benzyl_benzoate  ',  129        / 
+     &    / 'benzyl_benzoate ',  129        / 
        DATA MECH_NAM_CRACMM2(129 )  , MECH_MAP_CRACMM2( 129)  
      &    / 'VROCP5ARO    ', 13     /  
        DATA CONV_FAC_CRACMM2( 129)   
@@ -972,21 +972,21 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 136) , SPMH_MAP_CRACMM2(136)     
-     &    / 'coniferyl_alcohol  ',  136        / 
+     &    / 'coniferyl_alcohol',  136        / 
        DATA MECH_NAM_CRACMM2(136 )  , MECH_MAP_CRACMM2( 136)  
      &    / 'VROCP1OXY3    ', 15     /  
        DATA CONV_FAC_CRACMM2( 136)   
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 137) , SPMH_MAP_CRACMM2(137)     
-     &    / '2met_nonatriene  ',  137        / 
+     &    / '2met_nonatriene ',  137        / 
        DATA MECH_NAM_CRACMM2(137 )  , MECH_MAP_CRACMM2( 137)  
      &    / 'FURAN    ', 6     /  
        DATA CONV_FAC_CRACMM2( 137)   
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 138) , SPMH_MAP_CRACMM2(138)     
-     &    / 'ethyl_cinnamate  ',  138        / 
+     &    / 'ethyl_cinnamate ',  138        / 
        DATA MECH_NAM_CRACMM2(138 )  , MECH_MAP_CRACMM2( 138)  
      &    / 'VROCP5ARO    ', 13     /  
        DATA CONV_FAC_CRACMM2( 138)   
@@ -1049,14 +1049,14 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 147) , SPMH_MAP_CRACMM2(147)     
-     &    / 'hydrogen_cyanide  ',  147        / 
+     &    / 'hydrogen_cyanide',  147        / 
        DATA MECH_NAM_CRACMM2(147 )  , MECH_MAP_CRACMM2( 147)  
      &    / 'SLOWROC    ', 37     /  
        DATA CONV_FAC_CRACMM2( 147)   
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 148) , SPMH_MAP_CRACMM2(148)     
-     &    / 'isobutyronitrile  ',  148        / 
+     &    / 'isobutyronitrile',  148        / 
        DATA MECH_NAM_CRACMM2(148 )  , MECH_MAP_CRACMM2( 148)  
      &    / 'SLOWROC    ', 37     /  
        DATA CONV_FAC_CRACMM2( 148)   
@@ -1126,14 +1126,14 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 158) , SPMH_MAP_CRACMM2(158)     
-     &    / 'met_vinylketone  ',  158        / 
+     &    / 'met_vinylketone ',  158        / 
        DATA MECH_NAM_CRACMM2(158 )  , MECH_MAP_CRACMM2( 158)  
      &    / 'MVK    ', 39     /  
        DATA CONV_FAC_CRACMM2( 158)   
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 159) , SPMH_MAP_CRACMM2(159)     
-     &    / 'p_coumaric_acid  ',  159        / 
+     &    / 'p_coumaric_acid ',  159        / 
        DATA MECH_NAM_CRACMM2(159 )  , MECH_MAP_CRACMM2( 159)  
      &    / 'VROCP1OXY3    ', 15     /  
        DATA CONV_FAC_CRACMM2( 159)   
@@ -1147,7 +1147,7 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 161) , SPMH_MAP_CRACMM2(161)     
-     &    / 'phenylacetaldehyde  ',  161        / 
+     &    / 'phenylacetaldehyde',  161        / 
        DATA MECH_NAM_CRACMM2(161 )  , MECH_MAP_CRACMM2( 161)  
      &    / 'BALD    ', 33     /  
        DATA CONV_FAC_CRACMM2( 161)   
@@ -1161,7 +1161,7 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 163) , SPMH_MAP_CRACMM2(163)     
-     &    / 'salicylaldehyde  ',  163        / 
+     &    / 'salicylaldehyde ',  163        / 
        DATA MECH_NAM_CRACMM2(163 )  , MECH_MAP_CRACMM2( 163)  
      &    / 'BALD    ', 33     /  
        DATA CONV_FAC_CRACMM2( 163)   
@@ -1203,7 +1203,7 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 169) , SPMH_MAP_CRACMM2(169)     
-     &    / 'z3_hexen_1yl_butyrate  ',  169        / 
+     &    / 'z3_hexen_1yl_butyrate',  169        / 
        DATA MECH_NAM_CRACMM2(169 )  , MECH_MAP_CRACMM2( 169)  
      &    / 'VROCP6ARO    ', 8     /  
        DATA CONV_FAC_CRACMM2( 169)   
@@ -1336,7 +1336,7 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 188) , SPMH_MAP_CRACMM2(188)     
-     &    / 'met_propenyl_2s  ',  189        / 
+     &    / 'met_propenyl_2s ',  189        / 
        DATA MECH_NAM_CRACMM2(188 )  , MECH_MAP_CRACMM2( 188)  
      &    / 'OLI    ', 25     /  
        DATA CONV_FAC_CRACMM2( 188)   
@@ -1413,7 +1413,7 @@ C=======================================================================
      &    / 1      /
 
        DATA SPMH_NAM_CRACMM2( 199) , SPMH_MAP_CRACMM2(199)     
-     &    / 'carbon_monoxide  ',  200       / 
+     &    / 'carbon_monoxide ',  200       / 
        DATA MECH_NAM_CRACMM2(199 )  , MECH_MAP_CRACMM2( 199)  
      &    / 'CO         ', 46     /  
        DATA CONV_FAC_CRACMM2( 199)   

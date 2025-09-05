@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ===================== CCTMv5.4.X Run Script ========================= 
+# ===================== CCTMv6.X Run Script ========================= 
 # Usage: run.cctm.csh >&! cctm_2010_4CALIF1.log &                                
 #
 # To report problems or request help with this script/program:     
@@ -33,7 +33,7 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters and Labels for Configuring the Simulation
- set VRSN      = v55               #> Code Version
+ set VRSN      = v6a1             #> Code Version
  set PROC      = mpi                #> serial or mpi
  setenv MECH     saprc07tic_ae7i_aq #> Mechanism ID
  set EMIS      = 2011eh_saprc_10g   #> Emission Inventory Details
@@ -151,7 +151,7 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
 setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
-setenv CTM_BROWN_VEG Y       #> use NPV input files to limit dust emissions [ default: N ]
+setenv CTM_BROWN_VEG Y       #> when using CTM_WB_DUST, use non-photosynthetic (brown) vegetation input files to limit dust emissions [ default: N ]
 setenv CTM_LNO_ONLINE N      #> turn on lightning NOx [ default: N ]
                              #> alternatively LNOx emissions can also be read in as external emissions inputs,
                              #> in this case, please setenv this variable to N to avoid double counting
@@ -175,8 +175,8 @@ setenv CTM_PVO3 N            #> consider potential vorticity module for O3 trans
 setenv CTM_BIOGEMIS_BE Y     #> calculate in-line biogenic emissions with BEIS [ default: N ]
 setenv CTM_BIOGEMIS_MG N     #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N         #> turns on BDSNP soil NO emissions [ default: N ]
-setenv USE_SAGE_N Y          #> turns on EPA soil NO and HONO emissions [ default: N ]
-setenv USE_SAGE_N_EF N       #> Use BEIS input emission factor file for soil NO and HONO [ default: N ]
+setenv USE_SEGA_N N          #> turns on EPA soil NO and HONO emissions [ default: N ]
+setenv USE_SEGA_N_EF N       #> Use BEIS input emission factor file for soil NO and HONO [ default: N ]
 
 setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affecting photolysis
                              #> frequencies ( 3 is the default value )
@@ -322,7 +322,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Ozone column data
   set OMIfile   = omi_cmaq_2005through2024_27x27.dat
 
-  # If using BROWN_VEG option, then set the path to the NPV input files
+  # If using BROWN_VEG option, then set the path to the non-photosynthetic vegetation (NPV) input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
        setenv PV_AVG_FILE ${INPDIR}/surface/pv_avg.dat
        setenv NPV_AVG_FILE ${INPDIR}/surface/npv_avg.dat
@@ -332,16 +332,16 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set OPTfile = PHOT_OPTICS.dat
 
   #> MCIP meteorology files 
-  setenv GRID_BDY_2D $METpath/GRIDBDY2D.$GRID_NAME.${NZ}L.$YYMMDD  # GRID files are static, not day-specific
-  setenv GRID_CRO_2D $METpath/GRIDCRO2D.$GRID_NAME.${NZ}L.$YYMMDD
-# setenv GRID_CRO_3D $METpath/GRIDCRO3D.$GRID_NAME.${NZ}L.$YYMMDD
+  setenv GRID_BDY_2D $METpath/GRIDBDY2D.4CALIF1.${NZ}L.$YYMMDD  # GRID files are static, not day-specific
+  setenv GRID_CRO_2D $METpath/GRIDCRO2D.4CALIF1.${NZ}L.$YYMMDD
+# setenv GRID_CRO_3D $METpath/GRIDCRO3D.4CALIF1.${NZ}L.$YYMMDD
   setenv GRID_CRO_3D '' # this file not used or available
-  setenv GRID_DOT_2D $METpath/GRIDDOT2D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_CRO_2D  $METpath/METCRO2D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_CRO_3D  $METpath/METCRO3D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_DOT_3D  $METpath/METDOT3D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_BDY_3D  $METpath/METBDY3D.$GRID_NAME.${NZ}L.$YYMMDD
-#  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.$GRID_NAME.${NZ}L.$YYMMDD
+  setenv GRID_DOT_2D $METpath/GRIDDOT2D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_CRO_2D  $METpath/METCRO2D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_CRO_3D  $METpath/METCRO3D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_DOT_3D  $METpath/METDOT3D.4CALIF1.${NZ}L.$YYMMDD
+  setenv MET_BDY_3D  $METpath/METBDY3D.4CALIF1.${NZ}L.$YYMMDD
+#  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.4CALIF1.${NZ}L.$YYMMDD
 
   #> Control Files
   #>
@@ -443,10 +443,10 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      setenv LTNGPARMS_FILE ${IN_LTpath}/LTNG_AllParms_12US1.ncf #> lightning parameter file; ignore if LTNGPARAM = N
   endif
 
-  if( $USE_SAGE_N == 'Y' ) then
-     setenv SAGE_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
-     if( $USE_SAGE_N_EF == 'Y') then
-        setenv SAGE_EF /work/MOD3APP/ezv/2020_NEI/BEIS4/12US1/BEIS4_SAGE_beld6_norm_emis_4CALIF1.ncf
+  if( $USE_SEGA_N == 'Y' ) then
+     setenv SEGA_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
+     if( $USE_SEGA_N_EF == 'Y') then
+        setenv SEGA_EF ${INPDIR}/surface/BEIS4_SEGA_beld6_norm_emis_4CALIF1.ncf
      endif
   endif
 
@@ -467,8 +467,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   if ( $CTM_BIOGEMIS_BE == 'Y' ) then   
      set IN_BEISpath = ${INPDIR}/surface
      setenv GSPRO          $BLD/gspro_biogenics.txt
-     setenv BEIS_NORM_EMIS $IN_BEISpath/b3grd_4CALIF1_2011en_cb6_10.ncf
-     if ($USE_SAGE_N == 'N') then
+     setenv BEIS_NORM_EMIS ${IN_BEISpath}/b3grd_4CALIF1_2011en_cb6_10.ncf
+     if ($USE_SEGA_N == 'N') then
         setenv BEIS_SOILINP    $OUTDIR/CCTM_BSOILOUT_${RUNID}_${YESTERDAY}.nc
      endif
                              #> Biogenic NO soil input file; ignore if NEW_START = TRUE
@@ -591,7 +591,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_DRY_DEP_1   "$OUTDIR/CCTM_DRYDEP_${CTM_APPL}.nc -v"     #> Hourly Dry Deposition
   setenv CTM_DEPV_DIAG   "$OUTDIR/CCTM_DEPV_${CTM_APPL}.nc -v"       #> Dry Deposition Velocities
   setenv B3GTS_S         "$OUTDIR/CCTM_B3GTS_S_${CTM_APPL}.nc -v"    #> Biogenic Emissions
-  setenv SAGE_SOILOUT    "$OUTDIR/CCTM_SSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
+  setenv SEGA_SOILOUT    "$OUTDIR/CCTM_SSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
   setenv BEIS_SOILOUT    "$OUTDIR/CCTM_BSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
   setenv MEGAN_SOILOUT   "$OUTDIR/CCTM_MSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
   setenv BDSNPOUT        "$OUTDIR/CCTM_BDSNPOUT_${CTM_APPL}.nc"      #> Soil Emissions
@@ -629,7 +629,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   set OUT_FILES = (${FLOOR_FILE} ${S_CGRID} ${CTM_CONC_1} ${A_CONC_1} ${MEDIA_CONC}         \
              ${CTM_DRY_DEP_1} $CTM_DEPV_DIAG $B3GTS_S $MEGAN_SOILOUT $BEIS_SOILOUT $BDSNPOUT \
-             $SAGE_SOILOUT $CTM_WET_DEP_1 $CTM_WET_DEP_2 $CTM_ELMO_1 $CTM_AELMO_1             \
+             $SEGA_SOILOUT $CTM_WET_DEP_1 $CTM_WET_DEP_2 $CTM_ELMO_1 $CTM_AELMO_1             \
              $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 $CTM_SSEMIS_1 $CTM_DUST_EMIS_1 $CTM_IPR_1 $CTM_IPR_2       \
              $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_DRY_DEP_MOS                 \
              $CTM_DEPV_MOS $CTM_VDIFF_DIAG $CTM_VSED_DIAG $CTM_LTNGDIAG_1 $CTM_LTNGDIAG_2 $CTM_VEXT_1 )             
@@ -656,15 +656,15 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      #> remove previous log files
      foreach file ( ${log_test} )
         #echo "Deleting log file: $file"
-        /bin/rm -f $file  
+        rm -f $file  
      end
 
      #> remove previous output files
      foreach file ( ${out_test} )
         #echo "Deleting output file: $file"
-        /bin/rm -f $file  
+        rm -f $file  
      end
-     /bin/rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
+     rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
 
   else
      #> error if previous log files exist

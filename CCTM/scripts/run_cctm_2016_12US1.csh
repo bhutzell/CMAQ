@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ===================== CCTMv5.4.X Run Script ========================= 
+# ===================== CCTMv6.X Run Script ========================= 
 # Usage: run.cctm >&! cctm_2016_12US1.log &                                
 #
 # To report problems or request help with this script/program:
@@ -33,7 +33,7 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v55              #> Code Version
+ set VRSN      = v6a1              #> Code Version
  set PROC      = mpi               #> serial or mpi
  setenv MECH     cb6r5_ae7_aq      #> Mechanism ID
  set EMIS      = 2016fh            #> Emission Inventory Details
@@ -150,9 +150,9 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 #> Science Options
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
-setenv CTM_WB_DUST N         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
-setenv CTM_BROWN_VEG Y       #> use NPV input files to limit dust emissions [ default: N ]
-setenv CTM_LNO_ONLINE Y      #> turn on lightning NOx [ default: N ]
+setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
+setenv CTM_BROWN_VEG Y       #> when using CTM_WB_DUST, use non-photosynthetic (brown) vegetation input files to limit dust emissions [ default: N ]
+setenv CTM_LNO_ONLINE Y      #> turn on lightning NOx emissions [ default: N ]
                              #> alternatively LNOx emissions can also be read in as external emissions inputs,
                              #> in this case, please setenv this variable to N to avoid double counting
 setenv KZMIN Y               #> use Min Kz option in edyintb [ default: Y ], 
@@ -162,7 +162,7 @@ setenv CLM_VERSION N         #> WRF CLM LSM
 setenv NOAH_VERSION N        #> WRF NOAH LSM
 setenv CTM_ABFLUX Y          #> ammonia bi-directional flux for in-line deposition 
                              #>    velocities [ default: N ]
-setenv CTM_BIDI_FERT_NH3 T   #> subtract fertilizer NH3 from emissions because it will be handled
+setenv CTM_BIDI_FERT_NH3 Y   #> subtract fertilizer NH3 from emissions because it will be handled
                              #>    by the BiDi calculation [ default: Y ]
 setenv CTM_HGBIDI N          #> mercury bi-directional flux for in-line deposition 
                              #>    velocities [ default: N ]
@@ -177,8 +177,8 @@ setenv CTM_PVO3 N            #> consider potential vorticity module for O3 trans
 setenv CTM_BIOGEMIS_BE Y     #> calculate in-line biogenic emissions with BEIS [ default: N ]
 setenv CTM_BIOGEMIS_MG N     #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N         #> turns on BDSNP soil NO emissions [ default: N ]
-setenv USE_SAGE_N Y          #> turns on EPA soil NO and HONO emissions [ default: N ]
-setenv USE_SAGE_N_EF N       #> Use BEIS input emission factor file for soil NO and HONO [ default: N ]
+setenv USE_SEGA_N N          #> turns on EPA soil NO and HONO emissions [ default: N ]
+setenv USE_SEGA_N_EF N       #> Use BEIS input emission factor file for soil NO and HONO [ default: N ]
 
 setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affecting photolysis
                              #> frequencies ( 3 is the default value )
@@ -329,7 +329,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Ozone column data
   set OMIfile   = omi_cmaq_2005through2024_27x27.dat
 
-  # If using BROWN_VEG option, then set the path to the NPV input files
+  # If using BROWN_VEG option, then set the path to the non-photosynthetic vegetation (NPV) input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
        setenv PV_AVG_FILE ${INPDIR}/surface/pv_avg.dat
        setenv NPV_AVG_FILE ${INPDIR}/surface/npv_avg.dat
@@ -463,10 +463,10 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      setenv LTNGPARMS_FILE ${IN_LTpath}/LTNG_AllParms_12US1.ncf #> lightning parameter file
   endif
 
-  if( $USE_SAGE_N == 'Y' ) then
-     setenv SAGE_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
-     if( $USE_SAGE_N_EF == 'Y') then
-        setenv SAGE_EF /work/MOD3APP/ezv/2020_NEI/BEIS4/12US1/BEIS4_SAGE_beld6_norm_emis_12US1.ncf
+  if( $USE_SEGA_N == 'Y' ) then
+     setenv SEGA_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
+     if( $USE_SEGA_N_EF == 'Y') then
+        setenv SEGA_EF ${INPDIR}/surface/BEIS4_SEGA_beld6_norm_emis_12US1.ncf
      endif
   endif
 
@@ -491,7 +491,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      set IN_BEISpath = ${INPDIR}/surface
      setenv GSPRO          ${BLD}/gspro_biogenics.txt
      setenv BEIS_NORM_EMIS $IN_BEISpath/b3grd.smoke30_beis361.12US1.2011NLCD_FIA5.1_CDL_norm_v3.ncf
-     if ($USE_SAGE_N == 'N') then
+     if ($USE_SEGA_N == 'N') then
         setenv BEIS_SOILINP    $OUTDIR/CCTM_BSOILOUT_${RUNID}_${YESTERDAY}.nc
      endif
                              #> Biogenic NO soil input file; ignore if NEW_START = TRUE
@@ -616,7 +616,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_DRY_DEP_1   "$OUTDIR/CCTM_DRYDEP_${CTM_APPL}.nc -v"     #> Hourly Dry Deposition
   setenv CTM_DEPV_DIAG   "$OUTDIR/CCTM_DEPV_${CTM_APPL}.nc -v"       #> Dry Deposition Velocities
   setenv B3GTS_S         "$OUTDIR/CCTM_B3GTS_S_${CTM_APPL}.nc -v"    #> Biogenic Emissions
-  setenv SAGE_SOILOUT    "$OUTDIR/CCTM_SSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
+  setenv SEGA_SOILOUT    "$OUTDIR/CCTM_SSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
   setenv BDSNPOUT        "$OUTDIR/CCTM_BDSNPOUT_${CTM_APPL}.nc"      #> Soil Emissions
   setenv BEIS_SOILOUT    "$OUTDIR/CCTM_BSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
   setenv MEGAN_SOILOUT   "$OUTDIR/CCTM_MSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
@@ -654,7 +654,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   set OUT_FILES = (${FLOOR_FILE} ${S_CGRID} ${CTM_CONC_1} ${A_CONC_1} ${MEDIA_CONC}         \
              ${CTM_DRY_DEP_1} $CTM_DEPV_DIAG $B3GTS_S $MEGAN_SOILOUT $BEIS_SOILOUT $BDSNPOUT \
-             $SAGE_SOILOUT $CTM_WET_DEP_1 $CTM_WET_DEP_2 $CTM_ELMO_1 $CTM_AELMO_1             \
+             $SEGA_SOILOUT $CTM_WET_DEP_1 $CTM_WET_DEP_2 $CTM_ELMO_1 $CTM_AELMO_1             \
              $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 $CTM_SSEMIS_1 $CTM_DUST_EMIS_1 $CTM_IPR_1 $CTM_IPR_2       \
              $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_DRY_DEP_MOS                 \
              $CTM_DEPV_MOS $CTM_VDIFF_DIAG $CTM_VSED_DIAG $CTM_LTNGDIAG_1 $CTM_LTNGDIAG_2 $CTM_VEXT_1 )

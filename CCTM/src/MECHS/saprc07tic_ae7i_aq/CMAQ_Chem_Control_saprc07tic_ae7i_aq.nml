@@ -317,41 +317,41 @@ CMPST =
                 'ppmV', 'GAS', 
                 'HCHO', 
 
-'ISOPRENE'    , 'Isoprene Concentration', 
-                'ppmV', 'GAS', 
-                'ISOPRENE', 
+!'ISOPRENE'    , 'Isoprene Concentration', 
+!                'ppmV', 'GAS', 
+!                'ISOPRENE', 
 
 'ACETALD'     , 'Acetaldehyde Concentration', 
                 'ppmV', 'GAS', 
                 'CCHO', 
 
-'ACETYLENE'   , 'Acetylene Concentration', 
-                'ppmV', 'GAS', 
-                'ACETYLENE', 
+!'ACETYLENE'   , 'Acetylene Concentration', 
+!                'ppmV', 'GAS', 
+!                'ACETYLENE', 
 
 'ETHANE'      , 'Ethane Concentration', 
                 'ppmV', 'GAS', 
                 'ALK1', 
 
-'ETHENE'      , 'Ethene Concentration', 
-                'ppmV', 'GAS', 
-                'ETHENE', 
+!'ETHENE'      , 'Ethene Concentration', 
+!                'ppmV', 'GAS', 
+!                'ETHENE', 
 
 'H2O2'        , 'Hydrogen Peroxide Concentration', 
                 'ppmV', 'GAS', 
                 'HO2H', 
 
-'TOLUENE'     , 'Toluene Concentration', 
-                'ppmV', 'GAS', 
-                'TOLUENE', 
+!'TOLUENE'     , 'Toluene Concentration', 
+!                'ppmV', 'GAS', 
+!                'TOLUENE', 
 
 'XYLENES'     , 'Xylenes Concentration', 
                 'ppmV', 'GAS', 
                 'MXYL + OXYL + PXYL', 
 
-'NAPHTHAL'    , 'Naphthalene Concentration', 
-                'ppmV', 'GAS', 
-                'NAPHTHAL', 
+!'NAPHTHAL'    , 'Naphthalene Concentration', 
+!                'ppmV', 'GAS', 
+!                'NAPHTHAL', 
 
 'ALKANES'     , 'Alkane Concentration', 
                 'ppmC', 'GAS', 
@@ -369,9 +369,9 @@ CMPST =
                 'ppmV', 'GAS', 
                 'NO + NO2', 
 
-'ISOPNS'      , 'Gas-Phase Isoprene Nitrates'
+'ISOPNS'      , 'Gas-Phase Isoprene Nitrates',
                 'ppmV', 'GAS',
-                'ISOPND + ISOPNB + NIT1 + NISOPOOH + MVKN + MACRN + ETHLN + RNO3I + PROPNN + 2.0*ISOPNN'
+                'ISOPND + ISOPNB + NIT1 + NISOPOOH + MVKN + MACRN + ETHLN + RNO3I + PROPNN + 2.0*ISOPNN',
 
 'NTR'         , 'Gas-Phase Organic Nitrates', 
                 'ppmV', 'GAS', 
@@ -396,7 +396,7 @@ CMPST =
 !-- Organic Composites --!
 'VOC'         , 'Volatile Organic Compound (VOC) Concentration',
                 'ppmC', 'GAS',
-                '3.*ACETONE + 2.*ACETYLENE + 3.*ACROLEIN + 4.*BACL + 4.*BUTADIENE13 + 2.*CCHO + 7.*CRES + 2.*ETHENE + 2.*ETOH + 2.*GLY + HCHO + 4.*MEK+ MEOH + 3.*MGLY + 4.*MVK + 5.*OLE1 + 5.*OLE2 + 6.*PRD2 + 3.*PROPENE + 3.*RCHO + 6.0*RNO3 + 2.*ALK1 + 3.*ALK2 + 4.*ALK3 + 5.*ALK4 + 8.*ALK5 + 3.*RCOOH + 2.*CCOOH + HCOOH + 10.*TERPENES + 5.*ISOPRENE + 15.*SESQ + 6.*BENZENE + 7.*TOLUENE + 8.*XYLENES + 10.*NAPHTHAL + 9.*TMBENZ124'  \
+                '3.*ACETONE + 2.*ACETYLENE + 3.*ACROLEIN + 4.*BACL + 4.*BUTADIENE13 + 2.*CCHO + 7.*CRES + 2.*ETHENE + 2.*ETOH + 2.*GLY + HCHO + 4.*MEK+ MEOH + 3.*MGLY + 4.*MVK + 5.*OLE1 + 5.*OLE2 + 6.*PRD2 + 3.*PROPENE + 3.*RCHO + 6.0*RNO3 + 2.*ALK1 + 3.*ALK2 + 4.*ALK3 + 5.*ALK4 + 8.*ALK5 + 3.*RCOOH + 2.*CCOOH + HCOOH + 10.*TERPENES + 5.*ISOPRENE + 15.*SESQ + 6.*BENZENE + 7.*TOLUENE + 8.*XYLENES + 10.*NAPHTHAL + 9.*TMBENZ124',
 
 !---------------------------------!
 !**** Particle Concentrations ****!
@@ -745,7 +745,7 @@ CMPST =
                 'ug m-3', 'TSP',
                 'ANO3',
 
-'TSP_INO3_PPM  , 'Total Inorganic Particulate Nitrate',
+'TSP_INO3_PPM' , 'Total Inorganic Particulate Nitrate',
                 'ppmV', 'TSP',
                 'ANO3',
 
@@ -785,7 +785,7 @@ CMPST =
 !-- Nitrate --!
 'TSP_NO3_PPM' , 'Total Inorganic and Organic Particulate Nitrate',
                 'ppmV', 'TSP',
-                'ANO3 + AMTNO3 + AISOPNN'
+                'ANO3 + AMTNO3 + AISOPNN',
 
 
 
@@ -921,7 +921,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.8373*DD_ASEACAT + 0.0626*DD_ASOIL + 0.0023*DD_ACORS',
 
-'DD_NA'       , 'Dry Dep of Particulate Sodium', 
+'DD_TSP_NA'   , 'Dry Dep of Particulate Sodium', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_NA + DD_PMC_NA',
 
@@ -933,9 +933,9 @@ CMPST =
                 'kg ha-1', 'DEP', 
                 'WD_ANA + WD_PMC_NA',
 
-'TD_NA'       , 'Total Dep of Particulate Sodium', 
+'TD_TSP_NA'   , 'Total Dep of Particulate Sodium', 
                 'kg ha-1', 'DEP', 
-                'DD_NA + WD_TSP_NA',
+                'DD_TSP_NA + WD_TSP_NA',
 
 !-- Chloride --!
 'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
@@ -950,6 +950,10 @@ CMPST =
                 'kg ha-1', 'DEP', 
                 'DD_PMF_CL + DD_PMC_CL',
 
+'WD_TSP_CL'   , 'Wet Dep of Particulate Chloride', 
+                'kg ha-1', 'DEP', 
+                'WD_ACL',
+
 !-- Calcium --!
 'DD_PMF_CA'   , 'Dry Dep of Fine-Mode Calcium', 
                 'kg ha-1', 'DEP_FINE', 
@@ -959,7 +963,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',                 
                 '0.032*DD_ASEACAT + 0.0838*DD_ASOIL + 0.0562*DD_ACORS',
 
-'DD_CA'       , 'Dry Dep of Particulate Calcium', 
+'DD_TSP_CA'   , 'Dry Dep of Particulate Calcium', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_CA + DD_PMC_CA',
 
@@ -1029,7 +1033,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.0997*DD_ASEACAT + 0.0170*DD_ASOIL + 0.0032*DD_ACORS',
 
-'DD_MG'       , 'Dry Dep of Particulate Magnesium', 
+'DD_TSP_MG'   , 'Dry Dep of Particulate Magnesium', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_MG + DD_PMC_MG',
 
@@ -1054,7 +1058,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.0310*DD_ASEACAT + 0.0242*DD_ASOIL + 0.0176*DD_ACORS',
 
-'DD_K'        , 'Dry Dep of Particulate Potassium', 
+'DD_TSP_K'    , 'Dry Dep of Particulate Potassium', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_K + DD_PMC_K',
 
@@ -1114,7 +1118,7 @@ CMPST =
 !-- Total Chloride --!
 'DD_TCL'      , 'Dry Dep of Total Chloride',
                 'kg ha-1', 'DEP',
-                'DD_TSP_CL + DD_CL2 + 0.972*DD_HCL + 0.6758*DD_HOCL + 0.4352*DD_CLNO2',
+                'DD_TSP_CL + 0.972*DD_HCL + 0.6758*DD_HOCL + 0.4352*DD_CLNO2',
 
 'WD_TCL'      , 'Wet Dep of Total Chloride',
                 'kg ha-1', 'DEP',

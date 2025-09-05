@@ -120,7 +120,7 @@ TR_SPECIES_DATA =
 
 If the tracer has emissions then it must be included as part of the DESID configuration for CMAQ. If the tracers are only being added to the initial or boundary conditions file then this step is not necessary. 
 
-The CO_EMIS tracer is designed to track the fate of CO emissions without any influence from initial or boundary conditions and therefore no IC/BC surrogate was specified and no additional species needs to be added to the initial condition file for this tracer. However, it must be specified in the mechanism-specific CMAQ_Control_DESID file found under CCTM/src/MECHS/*{mechanism name}* in the CMAQ repository. For example if running the cb6r3_ae7_aq mechanism, edit the CMAQ_Control_DESID_cb6r3_ae7_aq.nml  file to include the following line after the Custom Mapping Examples in the Emissions Scaling Rules section: 
+The CO_EMIS tracer is designed to track the fate of CO emissions without any influence from initial or boundary conditions and therefore no IC/BC surrogate was specified and no additional species needs to be added to the initial condition file for this tracer. However, it must be specified in the mechanism-specific CMAQ_Control file found under CCTM/src/MECHS/*{mechanism name}* in the CMAQ repository. For example if running the cb6r3_ae7_aq mechanism, edit the CMAQ_Control_cb6r3_ae7_aq.nml  file to include the following line after the Custom Mapping Examples in the Emissions Scaling Rules section: 
 
 ```
    ! Region      | Stream Label  |Emission | CMAQ-        |Phase/|Scale |Basis |Op
@@ -244,7 +244,7 @@ Further details on how to change and customize the emissions control file to the
 
 ### STEP 4: Modify CMAQ run script</strong>
 
-In the CMAQ run script, replace the default tracer namelist file `Species_Table_TR_0.nml` with the custom tracer namelist file created in STEP 1 and new DESID namelist file created in STEP 2 (if needed). Also replace the original input files (initial conditions, boundary conditions, and/or emissions) with the modified input files created in Step 3.
+In the CMAQ run script, replace the default tracer namelist file `Species_Table_TR_0.nml` with the custom tracer namelist file created in STEP 1 and new control namelist file created in STEP 2 (if needed). Also replace the original input files (initial conditions, boundary conditions, and/or emissions) with the modified input files created in Step 3.
 
 <!-- START_OF_COMMENT -->
 

@@ -281,9 +281,7 @@ PM25_SOIL       ,ug m-3    ,PM25_RCSOIL[1]
 PM25_SO4        ,ug m-3    ,PM25_SO4[1]
 PM25_HMS        ,ug m-3    ,PM25_HMS[1] 
 PM25_TOT        ,ug m-3    ,PM25[1] 
-!PM25_UNSPEC1    ,ug m-3    ,PM25_OTHWNC[1] 
-PM25_UNSPEC1    ,ug m-3    ,PM25[1]-(PM25_CL[1]+PM25_EC[1]+PM25_NA[1]+PM25_NH4[1] \
-                           +PM25_NO3[1]+PM25_OC[1]+PM25_RCSOIL[1]+PM25_SO4[1]+PM25_HMS[1])
+PM25_UNSPEC1    ,ug m-3    ,PM25_OTHWNC[1] 
 PM25_UNSPCRS    ,ug m-3    ,PM25_UNSPCRS[1] 
                            
 

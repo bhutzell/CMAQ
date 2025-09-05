@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ======================= CCTMv5.5.X Build Script ========================= 
+# ======================= CCTMv6.X Build Script ========================= 
 # Usage: bldit_cctm.csh <compiler> >&! bldit.cctm.log                          
 # Requirements: I/O API & netCDF libraries, a Fortran compiler,               
 #               and MPI for multiprocessor computing                     
@@ -90,11 +90,11 @@ set make_options = "-j"                #> additional options for make command if
 
 #> Working directory and Version IDs
  if ( $?ISAM_CCTM ) then
-     set VRSN  = v55_ISAM             #> model configuration ID for CMAQ_ISAM
+     set VRSN  = v6a1_ISAM             #> model configuration ID for CMAQ_ISAM
  else if ( $?DDM3D_CCTM ) then
-     set VRSN = v55_DDM3D             #> model configuration ID for CMAQ_DDM
+     set VRSN = v6a1_DDM3D             #> model configuration ID for CMAQ_DDM
  else
-     set VRSN = v55                   #> model configuration ID for CMAQ
+     set VRSN = v6a1                   #> model configuration ID for CMAQ
  endif
  
  set EXEC  = CCTM_${VRSN}.exe          #> executable name
@@ -135,7 +135,7 @@ set make_options = "-j"                #> additional options for make command if
  set ModPhot   = phot/inline                #> photolysis calculation module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/phot)
 
- setenv Mechanism cb6r5_ae7_aq              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
+ setenv Mechanism cracmm3                   #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
  set ModMech   = MECHS/${Mechanism}
 
  if ( ${Mechanism} =~ *ae7* ) then          #> ae7 family of aero and cloud chem
@@ -280,8 +280,6 @@ set make_options = "-j"                #> additional options for make command if
     set seL = se_snl
     set LIB2 = "${ioapi_lib}"
     set LIB3 = "${mpi_lib} ${extra_lib}"
-    set Str1 = (// Parallel / Include message passing definitions)
-    set Str2 = (include SUBST_MPI mpif.h;)
     # Distribute Environment to different machines if not done automatically 
     if ( $?DistrEnv ) then
       set PAR = ($PAR -Dcluster) 
@@ -299,8 +297,6 @@ set make_options = "-j"                #> additional options for make command if
     set Popt = NOOP
     set seL = sef90_noop
     set LIB2 = "${ioapi_lib} ${extra_lib}"
-    set Str1 =
-    set Str2 =
  endif 
 
 #> if DDM-3D is set, add the pre-processor flag for it.
@@ -385,13 +381,13 @@ set make_options = "-j"                #> additional options for make command if
 #> then move the include files as well and direct the Makefile
 #> to the current directory.
  if ( $?CopySrc ) then
-    /bin/cp -fp ${ICL_PAR}/*   ${Bld}
-    /bin/cp -fp ${ICL_CONST}/* ${Bld}
-    /bin/cp -fp ${ICL_FILES}/* ${Bld}
-    /bin/cp -fp ${ICL_EMCTL}/* ${Bld}
-    #/bin/cp -fp ${ICL_PA}/*    ${Bld}
+    cp -fp ${ICL_PAR}/*   ${Bld}
+    cp -fp ${ICL_CONST}/* ${Bld}
+    cp -fp ${ICL_FILES}/* ${Bld}
+    cp -fp ${ICL_EMCTL}/* ${Bld}
+    #cp -fp ${ICL_PA}/*    ${Bld}
     if ( $?ParOpt ) then
-       /bin/cp -fp ${ICL_MPI}/mpif.h ${Bld}
+       cp -fp ${ICL_MPI}/mpif.h ${Bld}
     endif
 
     set ICL_PAR   = .
@@ -518,10 +514,6 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "include SUBST_EMISPRM    $ICL_EMCTL/EMISPRM.EXT;"           >> $Cfile
  echo                                                              >> $Cfile
 
- if ( $?ParOpt ) then
-    echo "$Str1"                                                   >> $Cfile
-    echo "include SUBST_MPI        ./mpif.h;"                      >> $Cfile
- endif
  echo                                                              >> $Cfile
 
  set text = "stenex or se_noop"
@@ -786,7 +778,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     ln -s Makefile.mpas_cmaq Makefile
  else if ( ! $?build_wrf_cmaq ) then
     mv Makefile Makefile.$compilerString
-    if ( -e Makefile.$compilerString && -e Makefile ) rm Makefile
+    if ( -e Makefile.$compilerString) rm Makefile
     ln -s Makefile.$compilerString Makefile
  endif
 

@@ -278,7 +278,7 @@ C-----------------------------------------------------------------------
          IF ( ( GC_CKSUM .NE. GC_CKSUM ) .OR. ( GC_CKSUM*2. .EQ. GC_CKSUM ) .OR.
      &        ( AE_CKSUM .NE. AE_CKSUM ) .OR. ( AE_CKSUM*2. .EQ. AE_CKSUM ) .OR.
      &        ( NR_CKSUM .NE. NR_CKSUM ) .OR. ( NR_CKSUM*2. .EQ. NR_CKSUM ) ) THEN
-              WRITE( OUTDEV, '(7x,A,A)' ),'NaN or Infinity detected on processor ',TRIM(CMYPE)
+              WRITE( OUTDEV, '(7x,A,A)' ) 'NaN or Infinity detected on processor ',TRIM(CMYPE)
               WRITE( OUTDEV,1008 ) SCIPROC,GC_CKSUM/LCELLS,AE_CKSUM/LCELLS,NR_CKSUM/LCELLS
               CALL M3EXIT( PNAME, jdate, jtime,'NaN or Infinity detected in '//SCIPROC, 1 )
          END IF
@@ -293,7 +293,7 @@ C-----------------------------------------------------------------------
      &        ( AE_CKSUM .NE. AE_CKSUM ) .OR. ( AE_CKSUM*2. .EQ. AE_CKSUM ) .OR.
      &        ( NR_CKSUM .NE. NR_CKSUM ) .OR. ( NR_CKSUM*2. .EQ. NR_CKSUM ) .OR.
      &        ( TR_CKSUM .NE. TR_CKSUM ) .OR. ( TR_CKSUM*2. .EQ. TR_CKSUM ) ) THEN
-              WRITE( OUTDEV, '(7x,A,A)' ),'NaN or Infinity detected on processor ',TRIM(CMYPE)
+              WRITE( OUTDEV, '(7x,A,A)' ) 'NaN or Infinity detected on processor ',TRIM(CMYPE)
               WRITE( OUTDEV,1009 ) SCIPROC,GC_CKSUM/LCELLS,AE_CKSUM/LCELLS,NR_CKSUM/LCELLS,TR_CKSUM/LCELLS
               CALL M3EXIT( PNAME, jdate, jtime,'NaN or Infinity detected in '//SCIPROC, 1 )
          END IF

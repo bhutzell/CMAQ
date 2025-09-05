@@ -17,9 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/PARIO/src/pshut3.f,v 1.2 2011/03/30 18:13:05 sjr Exp $ 
-
         LOGICAL FUNCTION  PSHUT3 ( )
 
 C***********************************************************************
@@ -45,6 +42,7 @@ C***********************************************************************
 
       USE M3UTILIO              ! i/o api
       USE PIOMAPS_MODULE
+      USE MPI
 
       IMPLICIT NONE
 
@@ -52,7 +50,6 @@ C...........   INCLUDES:
 
         INCLUDE 'STATE3.EXT'
         INCLUDE 'PIOVARS.EXT'
-        INCLUDE "mpif.h"
 
 C...........   SCRATCH LOCAL VARIABLES and their descriptions:
 

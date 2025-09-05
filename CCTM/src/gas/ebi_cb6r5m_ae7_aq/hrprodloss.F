@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Nov 22, 2024
+C  REVISION HISTORY: Created by EBI solver program, Jul 25, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 
@@ -1693,6 +1693,12 @@ C***********************************************************************
 
       PROD(  MIC          ) =   0.0D0
       LOSS(  MIC          ) =                 RXRAT(   434 )      ! MIC=I+CL+FORM
+
+      PROD(  ANO3I        ) =   0.0D0
+      LOSS(  ANO3I        ) =                 RXRAT(   454 )      ! ANO3I=0.6700D+00*HONO+...
+
+      PROD(  ANO3J        ) =   0.0D0
+      LOSS(  ANO3J        ) =                 RXRAT(   455 )      ! ANO3J=0.6700D+00*HONO+...
 
       PNEG( PAR ) =    2.5000D+00 * RXRAT(   128 )      ! KET=-0.2500D+01*PAR+...
      &            +    2.7000D+00 * RXRAT(   133 )      ! ROR=-0.2700D+01*PAR+...

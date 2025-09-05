@@ -1,3 +1,61 @@
+### Photolysis of aerosol nitrate in CB6R5M
+
+[Golam Sarwar](sarwar.golam.email@epa.gov), U.S. Environmental Protection Agency    
+
+**Type of update**: Science update  
+
+**Release Version/Date**: CMAQv6.0
+
+**Description**:  
+This pull request adds photolysis of aerosol nitrate to CB6R5M following the procedure described in Sarwar et al., 2024. A new Euler Backward Iterative (EBI) solver is developed.
+
+**Significance and Impact**: 
+
+Model ozone (O3) concentrations without the photolysis of aerosol nitrate are shown in Figure 1a. Higher values are predicted over the land than over seawater. Model O3 enhancements with the photolysis of aerosol nitrate are shown Figure 1b. Consistent with the results shown in Sarwar et al. (2024), aerosol nitrate photolysis enhances O3 over seawater and land by large margins. Larger enhancement occur over the western U.S. than over the eastern U.S.
+
+<img width="900" height="360" alt="image" src="https://github.com/user-attachments/assets/43e82739-7fb5-4205-9fbd-6f81d199faca" />
+
+Figure 1: (a) CMAQ predicted monthly mean O3 with CB6R5M (without the aerosol nitrate photolysis) in May of 2022 (b) Impact of the aerosol nitrate photolysis on O3 compared to those without the aerosol nitrate photolysis in May of 2022
+
+
+Monthly Mean Bias was calculated by using model predicted daily maximum 8-hour average (DMA8) O3 and observed data from the AQS monitoring network over the western and eastern U.S. [Figure 2(a-b)]. Over the western U.S., model without the aerosol nitrate photolysis underpredicts observed data in all months while model with the aerosol nitrate photolysis increases O3 and eliminates the negative bias in all months except January and February. Model with the aerosol nitrate photolysis produces additional O3 and improves the bias in January and February. However, additional O3 is needed to remove the model underprediction in January and February. Over the eastern U.S., model without the aerosol nitrate photolysis has mixed impacts on model performance producing negative bias in January-May and October-December, and positive bias in June-September. Model with the aerosol nitrate photolysis improves the negative bias in January-May and October-December but deteriorates the bias in June-September.
+
+<img width="900" height="355" alt="image" src="https://github.com/user-attachments/assets/61de5b57-b1a0-4e36-8b8b-b7dec33196d1" />
+
+Figure 2: (a) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the western U.S. (b) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. Western U.S. consists of Northwest, Northern Rockies, West, and Southwest climate regions while eastern U.S. consists of South, Southeast, Ohio Valley, Upper Midwest, and Northeast climate regions.
+
+Model PM2.5 concentrations without the photolysis of aerosol nitrate are shown in Figure 3a. Higher values are predicted over land than over seawater. Changes in model PM2.5 concentrations due to the photolysis of aerosol nitrate are shown Figure 3b. It only affects model PM2.5 concentrations by small margins. Reductions occur due to the loss aerosol nitrate by photolysis while the enhancements occur from the changes in secondary aerosols due to the changes in oxidant levels. 
+
+<img width="900" height="357" alt="image" src="https://github.com/user-attachments/assets/b9eafe22-7a84-4241-b04c-b761bb256b68" />
+
+
+Figure 3: (a) CMAQ predicted mean PM2.5 with CB6R5M (without the aerosol nitrate photolysis) in May of 2022 (b) Impact of the aerosol nitrate photolysis on PM2.5 compared to those without the aerosol nitrate photolysis in May of 2022
+
+Monthly Mean Bias was calculated by using predicted daily mean PM2.5 and observed data from the AQS monitoring network over the western and eastern U.S [Figure 4(a-b)]. Bias without and with the aerosol nitrate photolysis in each month is similar over the western and eastern U.S. Thus, the aerosol nitrate photolysis has low impacts on model performance for PM2.5.
+
+
+
+<img width="900" height="360" alt="image" src="https://github.com/user-attachments/assets/342090d8-690f-4cff-8ff5-7721f8c32527" />
+
+Figure 4: (a) Monthly Mean Bias of daily mean PM2.5  without and with aerosol nitrate photolysis at AQS sites over the western U.S. in 2022 (b) Monthly Mean Bias of daily mean PM2.5  without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. in 2022
+
+
+
+
+
+
+
+
+
+**References**:  
+Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A., B., Lee, J., Carpenter, L. J.: Examining the Impact of the photolysis of aerosol nitrate over Northern Hemisphere, Science of the Total Environment, 917, 170406, 2024. 
+
+Sarwar, G., Sidi, F., Simon, H., Henderson, B., Willison, J., Gilliam, R., Hogrefe, C., Foley, K., Mathur, R., Appel, W., 2025: Representing particulate nitrate photolysis over seawater improves CMAQ ozone predictions over the contiguous United States, Science of the Total Env., 970, 178968.
+
+**Internal PRs**: 
+[PR#1381](https://github.com/USEPA/CMAQ_Dev/pull/1381)  
+
+
 ### Correction to Species Tables for cb6r5m_ae7_aq
 **Type of update**: Documentation update  
 **Release Version/Date**: CMAQ version 5.5   
@@ -77,17 +135,17 @@ The first update:
 Model simulations were completed with the existing and updated CB6r3m over the Northern Hemisphere for the year of 2016 (annual simulation). The update increases seasonal mean ozone over seawater and land areas compared to the previous chemistry (Figure 1). The impacts are higher in cooler months than those in warmer months. It affects Model Bias both at AQS (Figure 2) and CASTNET sites (Figure 3).
 
 
-![image](https://user-images.githubusercontent.com/17162838/172228107-48e829aa-67bf-4662-9b8c-297a0ca3ad8b.png)
+![image](./images/chemistry/cmaqv6.0_impact_halogen_chemistry_update_on_seasonal_mean_ozone_figure_1.png)
 
 Figure 1: Impact of the halogen chemistry update on seasonal mean ozone.
 
 
-![image](https://user-images.githubusercontent.com/17162838/172228347-ab452cfe-b4dd-4598-898a-d9473997ca9e.png)
+![image](./images/chemistry/cmaqv6.0_comparison_of_daily_max_8hr_ozone_and_monthly_mean_bias_AQS_figure_2.png)
 
 Figure 2: A comparison of model predicted daily maximum 8-hr ozone with observed data (left) and monthly mean Model Bias (right) at AQS sites.
 
 
-![image](https://user-images.githubusercontent.com/17162838/172228394-cfc82f81-3bd4-40ef-bb15-43a8aab2545f.png)
+![image](./images/chemistry/cmaqv6.0_comparison_of_daily_max_8hr_ozone_and_monthly_mean_bias_CASTNET_figure_3.png)
 
 Figure 3: A comparison of model predicted daily maximum 8-hr ozone with observed data (left) and monthly mean Model Bias (right) at CASTNET sites.
 
@@ -96,11 +154,11 @@ The second update:
 
 Two separate annual simulations were performed for 2016. One simulation used CB6r3m_ae7_aq and the other simulation used CB6r5m_ae7_aq. The update changes mean ozone in each season (Figure 1). It increases ozone in some areas while decreasing ozone over other areas. The update affects Model Bias both at AQS and CASTNET sites (Figure 2) by small margins.
 
-![image](https://user-images.githubusercontent.com/17162838/172229418-c5350f8b-c5af-49d4-80d9-dc1e3c086159.png)
+![image](./images/chemistry/cmaqv6.0_impact_of_CB6r5m_on_seasonal_mean_ozone_figure_1.png)
 
 Figure 1: Impact of CB6r5m on seasonal mean ozone
 
-![image](https://user-images.githubusercontent.com/17162838/172229459-9bda879d-8203-449b-a0ac-3e6f9ee828d9.png)
+![image](./images/chemistry/cmaqv6.0_impact_of_CB6r5m_on_mean_model_bias_at_AQS_and_CASTNET_sites_figure_2.png)
 
 Figure 2: Impact of CB6r5m on mean Model Bias at AQS and CASTNET sites
 

@@ -97,7 +97,11 @@
    'EVERYWHERE', 'ALL'         ,'GLYD'   ,'GLYD'        ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a', 
 
-      ! Marine Halogen Chemistry
+   ! For biogenics:
+   ! Used for MEGAN only
+   'EVERYWHERE', 'ALL'        ,'CH3I'      ,'CH3I'       ,'GAS'  ,0   ,'UNIT','a',
+
+   ! Marine Halogen Chemistry
    'EVERYWHERE', 'MGEM'        ,'HYPOIODUSACID'   ,'HOI'     ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'MGEM'        ,'MOLECULARIODINE' ,'I2'      ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'MGEM'        ,'DIMETHYLSULFIDE' ,'DMS'     ,'GAS'  ,1.  ,'UNIT','a',
@@ -193,6 +197,7 @@
    'EVERYWHERE', 'ALL'    ,'PMFINE_H2O'  ,'AH2O'        ,'FINE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMFINE_OTHR' ,'AOTHR'       ,'FINE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMFINE_BR'   ,'ABR'         ,'FINE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMFINE_SEAST','ASEAST'      ,'FINE',1.   ,'UNIT','a',
 
    ! Wind-Blown Dust and Sea Spray Scaling
    ! Coarse Components                                               
@@ -497,11 +502,11 @@ CMPST =
                 
 'PMF_OTHWNC'  , 'Unspeciated PM including non-carbon organic mass',
                 'ug m-3', 'FINE', 
-                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OC -1.0*PMF_RCSOIL',
+                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*ABR -1.0*PMF_OC -1.0*PMF_RCSOIL',
 
 'PMF_OTH'     , 'Unspeciated PM excluding non-carbon organic mass',
                 'ug m-3', 'FINE', 
-                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OA -1.0*PMF_RCSOIL',
+                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*ABR -1.0*PMF_OA -1.0*PMF_RCSOIL',
 
 'PMF_HP'      , 'Fine-Mode H+ Ion',
                 'umol m-3', 'FINE', 
@@ -617,13 +622,17 @@ CMPST =
                 'ug m-3', 'PM1', 
                 'AAL',
 
+'PM1_BR'      , 'PM1 Bromine',
+                'ug m-3', 'PM1', 
+                'ABR',
+
 'PM1_RCSOIL'  ,'PM1 Reconstructed Soil <1 um (Malm et al., 1994; Eqn 5)',
                 'ug m-3', 'PM1', 
                 'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
 
 'PM1_OTHWNC'  , 'PM1 Unspeciated Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM1', 
-                'PM1 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM1_OC - PM1_RCSOIL',
+                'PM1 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - ABR - PM1_OC - PM1_RCSOIL',
 
 'PM1_UNSPCRS' , 'PM1 Unspeciated Coarse-Mode Mass',
                 'ug m-3', 'PM1', 
@@ -704,7 +713,7 @@ CMPST =
 
 'PM25_OTHWNC'  ,'PM2.5 Unspeciated Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM25', 
-                'PM25 - PM25_SO4 - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_OC - PM25_RCSOIL',
+                'PM25 - PM25_SO4 - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_BR - PM25_OC - PM25_RCSOIL',
 
 'PM25_UNSPCRS', 'PM2.5 Unspeciated Coarse Mass',
                 'ug m-3', 'PM25', 
