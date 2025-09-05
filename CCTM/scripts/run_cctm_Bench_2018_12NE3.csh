@@ -60,7 +60,7 @@ echo 'Start Model Run At ' `date`
 #> Set Working, Input, and Output Directories
  setenv WORKDIR ${CMAQ_HOME}/CCTM/scripts          #> Working Directory. Where the runscript is.
  setenv OUTDIR  ${CMAQ_DATA}/output_CCTM_${RUNID}  #> Output Directory
- setenv INPDIR  ${CMAQ_DATA}/2018_12NE3            #> Input Directory
+ setenv INPDIR  ${CMAQ_DATA}/CMAQv5.5_2018_12NE3_Benchmark_cracmm2_stage_2Day_Input/2018_12NE3            #> Input Directory
  setenv LOGDIR  ${OUTDIR}/LOGS     #> Log Directory Location
  setenv NMLpath ${BLD}             #> Location of Namelists. Common places are: 
                                    #>   ${WORKDIR} | ${CCTM_SRC}/MECHS/${MECH} | ${BLD}
@@ -339,7 +339,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   endif
 
   #> Boundary conditions
-  set BCFILE = CCTM_BCON_${ICBC_LAB}_12NE3_${YYYYMMDD}.nc
+  set BCFILE = BCON_${ICBC_LAB}_2018_12NE3_${YYYYMMDD}.nc
 
   #> Off-line photolysis rates 
   #set JVALfile  = JTABLE_${YYYYJJJ}
@@ -810,7 +810,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Executable call for multi PE, configure for your system 
   # set MPI = /usr/local/intel/impi/3.2.2.006/bin64
   # set MPIRUN = $MPI/mpirun
-  ( /usr/bin/time -p mpirun -np $NPROCS $BLD/$EXEC ) |& tee buff_${EXECUTION_ID}.txt
+  ( time mpirun -np $NPROCS $BLD/$EXEC ) |& tee buff_${EXECUTION_ID}.txt
   
   #> Harvest Timing Output so that it may be reported below
   set rtarray = "${rtarray} `tail -3 buff_${EXECUTION_ID}.txt | grep -Eo '[+-]?[0-9]+([.][0-9]+)?' | head -1` "
