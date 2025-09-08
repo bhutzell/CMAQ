@@ -6,10 +6,10 @@
 **Release Version/Date**:  CMAQv6.0
 
 **Description**:
-Allows user to output PA output file in true parallel fashion
+Allows users to output PA output files in true parallel fashion
 
 **Significance and Impact**:
-No impact on results  but allow the code to output in parallel
+No impact on results, but allows the code to output in parallel
 
 |Merge Commit | Internal record|
 |:------:|:-------:|

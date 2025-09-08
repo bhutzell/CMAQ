@@ -201,7 +201,7 @@ C..try to open existing file for update
                IF ( .NOT. OPEN3( OUTFNAME, FSREAD3, PNAME ) ) THEN
                   XMSG = 'Could not open ' // TRIM( OUTFNAME )
      &                 // ' file for read'
-                  CALL M3MESG( XMSG )
+                  CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
                END IF
             END IF
 
@@ -286,7 +286,7 @@ C..try to open existing file for update
                IF ( .NOT. OPEN3( OUTFNAME, FSREAD3, PNAME ) ) THEN
                   XMSG = 'Could not open ' // TRIM( OUTFNAME )
      &                 // ' file for read'
-                  CALL M3MESG( XMSG )
+                  CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
                END IF
             END IF
 
