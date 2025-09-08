@@ -18,12 +18,10 @@
 !------------------------------------------------------------------------!
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      MODULE SAGE_MOD
+      MODULE SEGA_MOD
 C-----------------------------------------------------------------------
 C Description:
-C    This module estimates soil NO and HONO emissions using a BDSNP type
-C Approch. 
-C References:
+C    This module estimates soil NO and HONO emissions using a BDSNP type approach.
 
       USE RUNTIME_VARS
       USE HGRD_DEFN
@@ -86,14 +84,14 @@ C References:
       CONTAINS
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-         FUNCTION SAGE_INIT( JDATE, JTIME, TSTEP ) RESULT ( SUCCESS )
+         FUNCTION SEGA_INIT( JDATE, JTIME, TSTEP ) RESULT ( SUCCESS )
 C Revision History:
-C   03 Nov 15: B. Gantt and G. Sarwar: created the initial version for marine gas emissions
+C   May 2025: J. Bash adapted from MGEMS_INIT in MGEMS.F
 
             USE UTILIO_DEFN
             USE HGRD_DEFN
             USE MOSAIC_MOD,   ONLY : Init_Mosaic, Tile_Data
-            USE RUNTIME_VARS, ONLY : USE_SAGE_N
+            USE RUNTIME_VARS, ONLY : USE_SEGA_N
             USE ASX_DATA_MOD, ONLY : Grid_Data
 
             IMPLICIT NONE
@@ -105,7 +103,7 @@ C Arguments:
 
 C Local Variables:
 
-            CHARACTER( 16 ), SAVE :: PNAME = 'SAGE_INIT'
+            CHARACTER( 16 ), SAVE :: PNAME = 'SEGA_INIT'
             CHARACTER( 96 )  :: XMSG = ' '
             INTEGER STATUS
             INTEGER l, spc
@@ -114,10 +112,10 @@ C-----------------------------------------------------------------------
 
             SUCCESS = .TRUE.
 
-C flag for marine gas emissions; this flag is set in the subroutine EM_FILE_INIT 
-            IF ( .NOT. USE_SAGE_N ) RETURN
+C flag for using SEGA soil NOx emissions
+            IF ( .NOT. USE_SEGA_N ) RETURN
 
-C Allocate MG arrays using NMGSPC value
+C Allocate emission arrays using NSGSPC value
             DESID_EMVAR( ISGSRM )%LEN = NSGSPC
             ALLOCATE( DESID_EMVAR( ISGSRM )%ARRY ( NSGSPC ) )
             ALLOCATE( DESID_EMVAR( ISGSRM )%UNITS( NSGSPC ) )
@@ -143,10 +141,10 @@ C Allocate MG arrays using NMGSPC value
                End If
             END DO
             
-         END FUNCTION SAGE_INIT
+         END FUNCTION SEGA_INIT
 
 
-         SUBROUTINE GET_SAGE_EMIS ( JDATE, JTIME, TSTEP, L_DESID_DIAG )
+         SUBROUTINE GET_SEGA_EMIS ( JDATE, JTIME, TSTEP, L_DESID_DIAG )
 C Key Subroutines/Functions Called:  F_PULSE, F_TS, F_SW, F_FERT
 
 C Revision History:
@@ -177,9 +175,8 @@ C Arguments:
                                                      ! is in diagnostic mode   
             INTEGER          SOILCAT                 ! soil category           
             INTEGER          R, C, L, NSpc, N_LU     ! counters
-            LOGICAL          OK, DBUG
 
-            CHARACTER( 16 ), SAVE :: SOILOUT = 'SAGE_SOILOUT' ! logical name for output NO and HONO soil data
+            CHARACTER( 16 ), SAVE :: SOILOUT = 'SEGA_SOILOUT' ! logical name for output NO and HONO soil data
             CHARACTER( 16 ) :: VAR        ! variable name
 
             INTEGER, SAVE :: EDATE     ! end scenario date
@@ -204,7 +201,7 @@ C Arguments:
             LOGICAL, SAVE :: FIRSTIME = .TRUE.
             LOGICAL, SAVE :: WRSOIL   = .TRUE.
             CHARACTER( 256 ) :: MESG            ! message buffer
-            CHARACTER( 16 )  :: PNAME = 'HRNO'  ! procedure name
+            CHARACTER( 16 )  :: PNAME = 'GET_SEGA_EMIS'  ! procedure name
             REAL             :: UNIT_CONV          ! converts emissions to mol/s
 
             INTEGER      GXOFF, GYOFF           ! global origin offset from file
@@ -248,7 +245,6 @@ C If initial run, initialize some variables, otherwise get them from file
 
             CALL GET_STAGE_MET ( JDATE, JTIME, TSTEP( 2 ) ) 
 
-            DBUG = .TRUE.
             DO R = 1, NROWS
                DO C = 1, NCOLS 
 C Calculate NO emissions by going thru temperature cases
@@ -278,7 +274,7 @@ C Generalized Poisson density function from Stark 1996 https://doi.org/10.1007/B
 C 0 available water content and a maximum at 0.3. The Shape factors c = 1 and d = 4 were developed to match the 
 C observations of Oikawa et al. 2015 DOI: 10.1038/ncomms9753 Fig 1b and match the limits of Oswald et al 2013 
 C https://doi.org/10.1126/science.1242266 figure 4. 
-                           if ( BIOGEMIS_BEIS .and. USE_SAGE_N_EF ) Then
+                           if ( BIOGEMIS_BEIS .and. USE_SEGA_N_EF ) Then
                               F_BIOG    = NONAGNO( c,r )
                               F_AG      = GROWAGNO( c,r ) * FERT_ADJ( JDATE, LATI, TSOI2 ) +  NGROWAGNO( c,r )
                               UNIT_CONV = 1.0 / (SG_MW(NSPC) * 3600.0)
@@ -422,7 +418,7 @@ C Write soil NO rain data file
 
             RETURN
 
-         END SUBROUTINE GET_SAGE_EMIS
+         END SUBROUTINE GET_SEGA_EMIS
 
          REAL FUNCTION PULSING( L_DESID_DIAG, THETA, TSTEP, THETAPREV, PFACTOR, 
      &                          DRYPERIOD, FREEZEPERIOD, zsoil1, WSAT, TS )!_____
@@ -715,4 +711,4 @@ C-----------------------------------------------------------------------
          END FUNCTION EF_AG
 
 
-      END MODULE SAGE_MOD
+      END MODULE SEGA_MOD
