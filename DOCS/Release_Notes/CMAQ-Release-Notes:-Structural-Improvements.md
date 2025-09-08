@@ -1,5 +1,21 @@
 # Structural Improvements
 
+### parallel I/O implementation for pa_init.F
+**David Wong**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
+**Type of update**: Code Update
+**Release Version/Date**:  CMAQv6.0
+
+**Description**:
+Allows users to output PA output files in true parallel fashion
+
+**Significance and Impact**:
+No impact on results, but allows the code to output in parallel
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1383](https://github.com/USEPA/CMAQ/commit/77ee525cd7d4402da4f0690b535877a9ad6868f0) | [PR#1383](https://github.com/USEPA/CMAQ_Dev/pull/1383)  |   
+
+
 ### Reorganize Aero Module  
 **Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
 **Type of update**: Restructure  
