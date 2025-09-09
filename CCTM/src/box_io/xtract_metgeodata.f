@@ -1,6 +1,7 @@
         LOGICAL FUNCTION XTRACT_METGEODATA( VNAME,VNAME_VALUE )
 
            USE SCENE_DATA
+           USE RUNTIME_VARS, ONLY : LOGDEV, OUTDEV
 
            IMPLICIT NONE
 
@@ -168,14 +169,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
    
             IF (  VNAME .EQ. 'ZH'  ) THEN
                   VNAME_VALUE  = BXM_ZH
-                  print*,'XTRACT_METGEODATA: BXM_ZH,ZH = ',BXM_ZH,VNAME_VALUE
+                  WRITE( LOGDEV, '(A,F,2X,F)'),'XTRACT_METGEODATA: BXM_ZH,ZH = ',BXM_ZH,VNAME_VALUE
                   XTRACT_METGEODATA = .TRUE.
                   RETURN
             ENDIF
 
             IF (  VNAME .EQ. 'ZF'  ) THEN
                   VNAME_VALUE  = BXM_ZF
-                  print*,'XTRACT_METGEODATA: BXM_ZF,ZF = ',BXM_ZF,VNAME_VALUE
+                  WRITE( LOGDEV, '(A,F,2X,F)'),'XTRACT_METGEODATA: BXM_ZF,ZF = ',BXM_ZF,VNAME_VALUE
                   XTRACT_METGEODATA = .TRUE.
                   RETURN
             ENDIF
@@ -254,7 +255,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IF ( VNAME(1:7) .EQ. 'LUFRAC_' ) THEN
               IF ( TRIM(VNAME) .EQ. TRIM(BXM_LU) ) THEN
                  VNAME_VALUE = 1.0
-                 print*,'XTRACT_METGEODATA: ',TRIM(VNAME),' = ', VNAME_VALUE
+                 WRITE( LOGDEV, '(A,A,A3,F)'),'XTRACT_METGEODATA: ',TRIM(VNAME),' = ', VNAME_VALUE
               ELSE
                  VNAME_VALUE = 0.0
               END IF
