@@ -169,14 +169,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
    
             IF (  VNAME .EQ. 'ZH'  ) THEN
                   VNAME_VALUE  = BXM_ZH
-                  WRITE( LOGDEV, '(A,F,2X,F)'),'XTRACT_METGEODATA: BXM_ZH,ZH = ',BXM_ZH,VNAME_VALUE
                   XTRACT_METGEODATA = .TRUE.
                   RETURN
             ENDIF
 
             IF (  VNAME .EQ. 'ZF'  ) THEN
                   VNAME_VALUE  = BXM_ZF
-                  WRITE( LOGDEV, '(A,F,2X,F)'),'XTRACT_METGEODATA: BXM_ZF,ZF = ',BXM_ZF,VNAME_VALUE
                   XTRACT_METGEODATA = .TRUE.
                   RETURN
             ENDIF
@@ -251,16 +249,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                RETURN
             ENDIF
 
-! Assuming NLCD40 is set LANDUSE scheme in centralized_io_module   
-            IF ( VNAME(1:7) .EQ. 'LUFRAC_' ) THEN
-              IF ( TRIM(VNAME) .EQ. TRIM(BXM_LU) ) THEN
-                 VNAME_VALUE = 1.0
-                 WRITE( LOGDEV, '(A,A,A3,F)'),'XTRACT_METGEODATA: ',TRIM(VNAME),' = ', VNAME_VALUE
-              ELSE
-                 VNAME_VALUE = 0.0
+! Assuming NLCD40 is set LANDUSE scheme in centralized_io_module 
+            IF ( LEN( VNAME ) .GE. 7 ) THEN
+              IF ( VNAME(1:7) .EQ. 'LUFRAC_' ) THEN
+                IF ( TRIM(VNAME) .EQ. TRIM(BXM_LU) ) THEN
+                   VNAME_VALUE = 1.0
+                ELSE
+                   VNAME_VALUE = 0.0
+                END IF
+                XTRACT_METGEODATA = .TRUE.
+                RETURN
               END IF
-              XTRACT_METGEODATA = .TRUE.
-              RETURN
             END IF
 
             RETURN

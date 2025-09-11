@@ -934,7 +934,6 @@ C-------------------------------- MET_CRO_3D --------------------------------
 
 C-------------------------------- MET_CRO_2D --------------------------------
 C Vegetation and surface vars
-#ifndef m3box
          call interpolate_var ('LAI', jdate, jtime, Met_Data%LAI)
 
          call interpolate_var ('VEG', jdate, jtime, Met_Data%VEG)
@@ -958,16 +957,13 @@ C Soil vars
          If ( BIOGEMIS_BEIS ) Then
             call interpolate_var ('SOIT2', jdate, jtime, Met_Data%SOIT2)
          End If
-#endif
          
          call interpolate_var ('SEAICE', jdate, jtime, Met_Data%SEAICE)
 
 C met vars
 
          call interpolate_var ('PRSFC', jdate, jtime, Met_Data%PRSFC)
-#ifndef m3box
          call interpolate_var ('RGRND', jdate, jtime, Met_Data%RGRND)
-#endif
          call interpolate_var ('SNOCOV', jdate, jtime, Met_Data%SNOCOV)
 
          Where( Met_Data%SNOCOV .Lt. 0.0 )
@@ -978,7 +974,6 @@ C met vars
 
          call interpolate_var ('TEMPG', jdate, jtime, Met_Data%TEMPG)
 
-#ifndef m3box
          call interpolate_var ('USTAR', jdate, jtime, Met_Data%USTAR)
 
          call interpolate_var ('WSPD10', jdate, jtime, Met_Data%WSPD10)
@@ -992,7 +987,6 @@ C met vars
          End If
 
          call interpolate_var ('PBL', jdate, jtime, Met_Data%PBL)
-#endif
 
         ! Update for WRFV4.1+ PX LSM runs that have soil texture in output for
         !  CMAQ dust scheme. These are initialized to 0 if not present in MCIP.
@@ -1025,7 +1019,6 @@ C Met_cro_2D variables that have recently changed due to MCIP or WRF/CMAQ
             Met_Data%TSEASFC = Met_Data%TEMPG
          End If
 
-#ifndef m3box
          If ( .not. RA_RS_AVAIL ) Then
             call interpolate_var ('RADYNI', jdate, jtime, Met_Data%RA)
 
@@ -1050,7 +1043,6 @@ C Met_cro_2D variables that have recently changed due to MCIP or WRF/CMAQ
             call interpolate_var ('RS', jdate, jtime, Met_Data%RS)
 
          End If
-#endif
 
          If ( Q2_AVAIL ) Then  ! Q2 in METCRO2D
             call interpolate_var ('Q2', jdate, jtime, Met_Data%Q2)
@@ -1086,7 +1078,6 @@ C Met_cro_2D variables that have recently changed due to MCIP or WRF/CMAQ
          MET_DATA%RH = MIN( 0.9999, MAX( 0.001, MET_DATA%RH ) )
  
 
-#ifndef m3box
 #ifndef mpas
 C-------------------------------- MET_DOT_3D --------------------------------
          call interpolate_var (vname_uc, jdate, jtime, Met_Data%UWIND)
@@ -1096,7 +1087,6 @@ C-------------------------------- MET_DOT_3D --------------------------------
 C get ghost values for wind fields in case of free trop.
          CALL SUBST_COMM ( Met_Data%UWIND, DSPL_N0_E1_S0_W0, DRCN_E )
          CALL SUBST_COMM ( Met_Data%VWIND, DSPL_N1_E0_S0_W0, DRCN_N )
-#endif
 #endif
 
 C-------------------------------- Calculated Variables --------------------------------
