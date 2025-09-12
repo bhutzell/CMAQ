@@ -604,11 +604,11 @@
              if (cio_LTNG_NO) then
                 call retrieve_ltng_param_data 
              end if
+!close m3box
+#endif
              if (BIOGEMIS_BEIS .or. BIOGEMIS_MEGAN .or. USE_SEGA_N) then
                 call soilinp_setup
              end if
-!close m3box
-#endif
 
           end if
 
@@ -7576,7 +7576,7 @@ c search box initial conditions
          END IF
 
          IF( PRESENT( FNAME ) )THEN
-             PRINT*,'CIO_INTERP3D: FNAME,VNAME = ',TRIM(FNAME),', ',TRIM(VNAME),INDEX(VNAME,'ZF'),INDEX(VNAME,'ZH')
+             WRITE( LOGDEV, '(4A)')'CIO_INTERP3D: FNAME,VNAME = ',TRIM(FNAME),', ',TRIM(VNAME)
          END IF
 
          IF( XTRACT_METGEODATA( VNAME,CONC ) )THEN
@@ -7587,11 +7587,11 @@ c search box initial conditions
       
             BUFFER = 1.0E-30
             IF( PRESENT( FNAME ) )THEN
-              PRINT*,"Interpolate_Var_3DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
+              WRITE( LOGDEV, '(4A)')"Interpolate_Var_3DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
             ELSE
-              PRINT*,"Interpolate_Var_3DGRID: Variable, ",TRIM(VNAME)
+              WRITE( LOGDEV, '(2A)')"Interpolate_Var_3DGRID: Variable, ",TRIM(VNAME)
             END IF
-            PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
+            WRITE( LOGDEV, '(3A)')"Setting ", TRIM(VNAME),' to 1.0E-30'
             RETURN
 
         END SUBROUTINE R_INTERPOLATE_VAR_3DGRID
@@ -7640,11 +7640,11 @@ c search box initial conditions
 
         BUFFER = 1.0E-30
         IF( PRESENT( FNAME ) )THEN
-           PRINT*,"Interpolate_Var_2DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
+           WRITE( LOGDEV, '(4A)')"Interpolate_Var_2DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
         ELSE
-           PRINT*,"Interpolate_Var_2DGRID: Unknown Variable, ",TRIM(VNAME)
+           WRITE( LOGDEV, '(2A)')"Interpolate_Var_2DGRID: Unknown Variable, ",TRIM(VNAME)
         END IF
-        PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
+        WRITE( LOGDEV, '(3A)')"Setting ", TRIM(VNAME),' to 1.0E-30'
             
         RETURN
 
