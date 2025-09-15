@@ -19,7 +19,7 @@
       MODULE ELMO_INIT_DEFN
 
       USE ELMO_DATA
-      USE RUNTIME_VARS, ONLY : LOGDEV,LOG_MESSAGE,LOG_HEADING,LOG_SUBHEADING
+      USE RUNTIME_VARS, ONLY : LOGDEV,LOG_MESSAGE,LOG_HEADING,LOG_SUBHEADING, OUTDEV
       
       CONTAINS
 !-------------------------------------------------------------------------
@@ -228,8 +228,12 @@
       CHARACTER(32), ALLOCATABLE :: FILE_VARS(:,:)
       CHARACTER(32), ALLOCATABLE :: KEYWD_NAME( : )
       CHARACTER(32), ALLOCATABLE :: KEYWD(:,:)
-                       
+
+#ifdef m3box
+      CHARACTER( 200 ) :: SUFFIX = '.csv'
+#else
       CHARACTER( 200 ) :: SUFFIX = '.nc'
+#endif
       CHARACTER( 16 ), SAVE :: PNAME = 'READ_ELMO_NML'
       CHARACTER( 200 )   :: XMSG
       CHARACTER( 200 )   :: TMPLINE
@@ -377,19 +381,11 @@
             ELMO_FILE( IFL )%FILENAME = TRIM( OUTDIR ) // '/' // 
      &                                  TRIM( ELMO_FILE( IFL )%FILENAME )
         END IF
-#ifdef m3box
-!shut off ELMO for boxmodel untit version of IOAPI setenvvar is developed
-      N_ELMO_FILES = 0
-!close m3box
-#endif
 #ifndef mpas
-#ifndef m3box
         IF ( .NOT. SETENVVAR( ELMO_FILE( IFL )%FLOGICAL, ELMO_FILE( IFL )%FILENAME ) ) THEN
             WRITE( XMSG, '(A,I3)' ) 'ERROR: Could not set environment variable for ELMO file # ', IFL
             CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
         END IF
-!close m3box
-#endif
 #endif
 
         ! Output Time Step
@@ -1396,13 +1392,13 @@
      &                        TRIM( AEROSPC(IAER)%NAME(IM) )
                         ELSE IF ( ORG_OP .EQ. OT_OC .OR. ORG_OP .EQ. OT_DD_OC .OR. 
      &                            ORG_OP .EQ. OT_WD_OC ) THEN
-                           WRITE( FORMULA, '(A,A,A1,ES8.2)' ) TRIM(FORMULA),
+                           WRITE( FORMULA, '(A,A,A1,ES9.2)' ) TRIM(FORMULA),
      &                        TRIM( AEROSPC(IAER)%NAME(IM) ),'/',OASPC(IOA)%OMtoOC
                         ELSE IF ( ORG_OP .EQ. OT_OMOC ) THEN
-                           WRITE( FORMULA, '(A,ES8.2,A1,A)' ) TRIM(FORMULA),
+                           WRITE( FORMULA, '(A,ES9.2,A1,A)' ) TRIM(FORMULA),
      &                        OASPC(IOA)%OMtoOC,'*',TRIM(AEROSPC(IAER)%NAME(IM) )
                         ELSE IF ( ORG_OP .EQ. OT_OTOC ) THEN
-                           WRITE( FORMULA, '(A,ES8.2,A1,A)' ) TRIM(FORMULA),
+                           WRITE( FORMULA, '(A,ES9.2,A1,A)' ) TRIM(FORMULA),
      &                        OASPC(IOA)%OtoC,'*',TRIM( AEROSPC(IAER)%NAME(IM) )
                         END IF
 

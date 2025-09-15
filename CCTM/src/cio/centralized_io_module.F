@@ -7587,11 +7587,19 @@ c search box initial conditions
       
             BUFFER = 1.0E-30
             IF( PRESENT( FNAME ) )THEN
+<<<<<<< HEAD
               WRITE( LOGDEV, '(4A)')"Interpolate_Var_3DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
             ELSE
               WRITE( LOGDEV, '(2A)')"Interpolate_Var_3DGRID: Variable, ",TRIM(VNAME)
             END IF
             WRITE( LOGDEV, '(3A)')"Setting ", TRIM(VNAME),' to 1.0E-30'
+=======
+              WRITE( LOGDEV, '(4A)'),"Interpolate_Var_3DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
+            ELSE
+              WRITE( LOGDEV, '(2A)'),"Interpolate_Var_3DGRID: Variable, ",TRIM(VNAME)
+            END IF
+            WRITE( LOGDEV, '(3A)'),"Setting ", TRIM(VNAME),' to 1.0E-30'
+>>>>>>> bmurphy_public_boxmodel_FixSETENVVAR
             RETURN
 
         END SUBROUTINE R_INTERPOLATE_VAR_3DGRID

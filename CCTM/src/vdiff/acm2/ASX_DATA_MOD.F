@@ -957,15 +957,13 @@ C Soil vars
          If ( BIOGEMIS_BEIS ) Then
             call interpolate_var ('SOIT2', jdate, jtime, Met_Data%SOIT2)
          End If
-
+         
          call interpolate_var ('SEAICE', jdate, jtime, Met_Data%SEAICE)
 
 C met vars
 
          call interpolate_var ('PRSFC', jdate, jtime, Met_Data%PRSFC)
-
          call interpolate_var ('RGRND', jdate, jtime, Met_Data%RGRND)
-
          call interpolate_var ('SNOCOV', jdate, jtime, Met_Data%SNOCOV)
 
          Where( Met_Data%SNOCOV .Lt. 0.0 )
