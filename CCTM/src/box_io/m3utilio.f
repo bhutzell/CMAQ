@@ -438,7 +438,7 @@ C   begin body of function  DT2STR
         DATBUF = ''
         DATBUF = MMDDYY( J )
         
-        DT2STR = TIMBUF // DATBUF
+        DT2STR = TRIM( TIMBUF ) // TRIM( DATBUF )
 
         RETURN
 
@@ -1333,7 +1333,6 @@ C   begin body of function  TRIMLEN
 
             ! check to make sure no blank string is passed & call c function
             ! mio_setenvvarc
-            print *,'Setting ENVVAR ',trim(env_name),' to ',trim(env_value) 
 
             if ( ( env_name_len .eq. 0 ) .or. (env_value_len .eq. 0 ) ) then
               setenvvar = .false.
