@@ -7587,11 +7587,11 @@ c search box initial conditions
       
             BUFFER = 1.0E-30
             IF( PRESENT( FNAME ) )THEN
-              PRINT*,"Interpolate_Var_3DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
+              WRITE( LOGDEV, '(4A)'),"Interpolate_Var_3DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
             ELSE
-              PRINT*,"Interpolate_Var_3DGRID: Variable, ",TRIM(VNAME)
+              WRITE( LOGDEV, '(2A)'),"Interpolate_Var_3DGRID: Variable, ",TRIM(VNAME)
             END IF
-            PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
+            WRITE( LOGDEV, '(3A)'),"Setting ", TRIM(VNAME),' to 1.0E-30'
             RETURN
 
         END SUBROUTINE R_INTERPOLATE_VAR_3DGRID
@@ -7640,11 +7640,11 @@ c search box initial conditions
 
         BUFFER = 1.0E-30
         IF( PRESENT( FNAME ) )THEN
-           PRINT*,"Interpolate_Var_2DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
+           WRITE( LOGDEV, '(4A)'),"Interpolate_Var_2DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
         ELSE
-           PRINT*,"Interpolate_Var_2DGRID: Unknown Variable, ",TRIM(VNAME)
+           WRITE( LOGDEV, '(2A)'),"Interpolate_Var_2DGRID: Unknown Variable, ",TRIM(VNAME)
         END IF
-        PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
+        WRITE( LOGDEV, '(3A)'),"Setting ", TRIM(VNAME),' to 1.0E-30'
             
         RETURN
 

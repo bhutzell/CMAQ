@@ -46,7 +46,7 @@
 #define SETENVVARC  setenvvarc_
 #endif
 
-#elif 
+#else 
 
 #ifndef SETENVVARC 
 #define SETENVVARC  setenvvarc
@@ -72,7 +72,7 @@ int SETENVVARC( const char * ename,  int *strlen1,
         memcpy(putstr+*strlen1+1, evalue, *strlen2);  
         putstr[*strlen1+*strlen2+1] = '\0';
         ierr = putenv(putstr);
-        printf("setenvvarc result: '%s'\n",getenv(ename));
+        /** printf("setenvvarc result: '%s'\n",getenv(ename)); **/
       }
       else { /** malloc error **/ 
         ierr = -1; 
