@@ -258,8 +258,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
               ELSE
                  VNAME_VALUE = 0.0
               END IF
+              XTRACT_METGEODATA = .TRUE.
             END IF
-            XTRACT_METGEODATA = .TRUE.
+
             RETURN
 
         END FUNCTION XTRACT_METGEODATA

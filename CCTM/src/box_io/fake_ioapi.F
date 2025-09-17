@@ -188,7 +188,6 @@ C   begin body of subroutine  UPCASE
         RETURN
 
         END SUBROUTINE  UPCASE
-C @(#)hhmmss.f	1.1 /pub/storage/edss/aqm/src/ioapi/util/SCCS/s.hhmmss.f 08 Jun 1994 11:04:25
         CHARACTER(10) FUNCTION  HHMMSS ( JTIME )
 
 C***********************************************************************
@@ -224,8 +223,6 @@ C...........   NOTE:  the ANSI standard requires the use of SAVE statements
 C...........   for variables which must retain their values from call to call.
         CHARACTER( 1 ), PARAMETER :: DIGITS( 0:9 ) = 
      &                             (/ '0','1','2','3','4','5','6','7','8','9' /)
-!        DATA    	DIGITS
-!     &  
 
 
 C...........   SCRATCH LOCAL VARIABLES and their descriptions:
@@ -757,25 +754,38 @@ C           ENVREAL = -2
            CHARACTER*(*), INTENT(  IN ) :: VAR_DESC
            CHARACTER*(*), INTENT(  IN ) :: VAR_DEFAULT
            CHARACTER*(*), INTENT( OUT ) :: VAR_VALUE
-           INTEGER,       INTENT( OUT ) :: STATUS 
+           INTEGER,       INTENT( OUT ) :: STATUS
 !local
            CHARACTER( 1000 )    :: MSG         ! Message text
            INTEGER, PARAMETER  :: LOGDEV = 6
+           INTEGER             :: BAD_VALUE
 
-           CALL GET_ENVIRONMENT_VARIABLE( NAME=VAR_NAME, VALUE= VAR_VALUE, STATUS=STATUS, TRIM_NAME=.TRUE.)
+           CHARACTER(LEN=LEN(VAR_VALUE)) :: LOC_STR
 
-           IF( STATUS .LT. 0 ) THEN
-              MSG = 'ERROR in environment value for ' // TRIM( VAR_NAME )
+           VAR_VALUE = VAR_NAME
+
+           CALL GETENV( VAR_NAME, LOC_STR )
+           IF( LEN_TRIM( LOC_STR ) .GT. 0 )THEN
+               VAR_VALUE = TRIM(LOC_STR)
+               BAD_VALUE = 0
+           ELSE
+               BAD_VALUE = 1
+           END IF
+
+           STATUS = 0
+
+           IF( BAD_VALUE .LT. 0 ) THEN
+              MSG = 'ENVSTR: ERROR in environment value for ' // TRIM( VAR_NAME )
               WRITE(LOGDEV,'(a)')TRIM( MSG )
            ELSE IF( STATUS .EQ. 1 )THEN
 !              STATUS  = 0
-              VAR_VALUE = TRIM( VAR_DEFAULT ) 
-              MSG = 'ERROR in environment value ' // TRIM( VAR_NAME )
+              VAR_VALUE = TRIM( VAR_DEFAULT )
+              MSG = 'ENVSTR: ERROR in environment value ' // TRIM( VAR_NAME )
      &           // ' not set so using default value. '
               WRITE(LOGDEV,'(a)')TRIM( MSG )
            ELSE IF( STATUS .GT. 1 )THEN
               STATUS  = 1
-              MSG = 'ERROR in environment value for ' // TRIM( VAR_NAME )
+              MSG = 'ENVSTR: ERROR in environment value for ' // TRIM( VAR_NAME )
               WRITE(LOGDEV,'(a)')TRIM( MSG )
               MSG = 'ERROR Processor does not support environment variables '
               WRITE(LOGDEV,'(a)')
