@@ -6,7 +6,7 @@
 **Description**:   
 - Cosmetic code changes to use more meaningful names for environmental variables and variables in the code.
 - Removed the external lightning NOx emissions file in the online lightning NOx module, because this option can be now easily achieved using DESID's capability.
-- Added more options for using satellite GLM flashes/energy and the synergized methodology with WWLLN data. These options are to be further developed and tested when the CMAQv6.0 platform is ready. As right now, the default option is the same as before and using it will not impact mode results.
+- Added more options for using satellite GLM flashes/energy and the synergized methodology with WWLLN data. These options have been tested with the CMAQv6.0 platform and the preliminary evaluation resutls are available in AMET. The default option is the same as before and using it will not impact mode results.
 
 **Significance and Impact**:   
 The default option will not impact model concentrations.  Consistent and meaningful names for environmental variables and code variables are beneficial for users and developers. Removing redundant statements or duplicated codes makes the scripts/code easy to understand and less error-prone. Other lightning NOx production options involves GLM data are implemented as place holder and will be fully developed and tested when the 2022/2023 simulation platform is available, though the standalone code for these options have been tested.
