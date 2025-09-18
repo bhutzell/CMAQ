@@ -762,7 +762,7 @@ C           ENVREAL = -2
 
            CHARACTER(LEN=LEN(VAR_VALUE)) :: LOC_STR
 
-           VAR_VALUE = VAR_NAME
+           VAR_VALUE = TRIM( VAR_DEFAULT )
 
            CALL GETENV( VAR_NAME, LOC_STR )
            IF( LEN_TRIM( LOC_STR ) .GT. 0 )THEN
@@ -772,13 +772,12 @@ C           ENVREAL = -2
                BAD_VALUE = 1
            END IF
 
-           STATUS = 0
+           STATUS = BAD_VALUE
 
-           IF( BAD_VALUE .LT. 0 ) THEN
+           IF( STATUS .LT. 0 ) THEN
               MSG = 'ENVSTR: ERROR in environment value for ' // TRIM( VAR_NAME )
               WRITE(LOGDEV,'(a)')TRIM( MSG )
            ELSE IF( STATUS .EQ. 1 )THEN
-!              STATUS  = 0
               VAR_VALUE = TRIM( VAR_DEFAULT )
               MSG = 'ENVSTR: ERROR in environment value ' // TRIM( VAR_NAME )
      &           // ' not set so using default value. '
