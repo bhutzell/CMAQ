@@ -604,11 +604,11 @@
              if (cio_LTNG_NO) then
                 call retrieve_ltng_param_data 
              end if
+!close m3box
+#endif
              if (BIOGEMIS_BEIS .or. BIOGEMIS_MEGAN .or. USE_SEGA_N) then
                 call soilinp_setup
              end if
-!close m3box
-#endif
 
           end if
 
@@ -4736,19 +4736,19 @@ C   mminlu and num_land_cat are WRF global variables
                    
                    if ( (ratio1 .lt. 0) .or. (ratio2 .lt. 0) 
      &             .or. (ratio1 .gt. 1) .or. (ratio2 .gt. 1)) then
-                      write(logdev,'(5X,a,a)'),
+                      write(logdev,'(5X,a,a)')
      &               'ERROR: Incorrect Interpolation in 1-D Stack Interpolation for variable: ',
      &                trim(vname)
                      
-                     write(logdev,'(5X,a,i7,a,i6)'), 
+                     write(logdev,'(5X,a,i7,a,i6)')
      &               'Requested TIME & DATE: ',date,':',time
                      
-                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)'),
+                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)')
      &               'Interpolation Bounds ',cio_stack_emis_data_tstamp(1,0,var_loc,pt),
      &               ':',cio_stack_emis_data_tstamp(2,0,var_loc,pt),' to ',
      &                cio_stack_emis_data_tstamp(1,1,var_loc,pt),':',cio_stack_emis_data_tstamp(2,1,var_loc,pt)
                      call M3EXIT( 'Centralized I/O',date,time,'',1 )
-                      write(logdev,'(5X,a)'),
+                      write(logdev,'(5X,a)')
      &                'ERROR: Program EXIT in subroutine r_interpolate_var_1ds in module centralized io'
                    end if 
                 else
@@ -6711,19 +6711,19 @@ C Read the various categories of normalized emissions
 #ifdef verbose_cio
                    if ( (ratio1 .lt. 0) .or. (ratio2 .lt. 0) 
      &             .or. (ratio1 .gt. 1) .or. (ratio2 .gt. 1)) then
-                      write(logdev,'(5X,a,a)'),
+                      write(logdev,'(5X,a,a)')
      &               'ERROR: Incorrect Interpolation in 1-D Stack Interpolation for variable: ',
      &                trim(vname)
                      
-                     write(logdev,'(5X,a,i7,a,i6)'), 
+                     write(logdev,'(5X,a,i7,a,i6)')
      &               'Requested TIME & DATE: ',date,':',time
                      
-                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)'),
+                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)')
      &               'Interpolation Bounds ',cio_stack_emis_data_tstamp(1,0,var_loc,pt),
      &               ':',cio_stack_emis_data_tstamp(2,0,var_loc,pt),' to ',
      &                cio_stack_emis_data_tstamp(1,1,var_loc,pt),':',cio_stack_emis_data_tstamp(2,1,var_loc,pt)
                       call m3exit( 'Centralized I/O',date,time,'',1 )
-                      write(logdev,'(5X,a)'),
+                      write(logdev,'(5X,a)')
      &                'ERROR: Program EXIT in subroutine r_interpolate_var_1ds in module centralized io'
                    end if 
 #endif
@@ -6855,19 +6855,19 @@ C Read the various categories of normalized emissions
 #ifdef verbose_cio
                    if ( (ratio1 .lt. 0) .or. (ratio2 .lt. 0) 
      &             .or. (ratio1 .gt. 1) .or. (ratio2 .gt. 1)) then
-                      write(logdev,'(5X,a,a)'),
+                      write(logdev,'(5X,a,a)')
      &               'ERROR: Incorrect Interpolation in 2-D Generic Real Interpolation for variable: ', 
      &                trim(vname) 
 
-                     write(logdev,'(5X,a,i7,a,i6)'), 
+                     write(logdev,'(5X,a,i7,a,i6)')
      &               'Requested TIME & DATE: ',date,':',time
                      
-                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)'),
+                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)')
      &               'Interpolation Bounds ',cio_grid_data_tstamp(1,0,var_loc),
      &               ':',cio_grid_data_tstamp(2,0,var_loc),' to ',
      &                cio_grid_data_tstamp(1,1,var_loc),':',cio_grid_data_tstamp(2,1,var_loc)
 
-                      write(logdev,'(5X,a)'),
+                      write(logdev,'(5X,a)')
      &                'ERROR: Program EXIT in subroutine r_interpolate_var_2d in module centralized io'
                      
                      call m3exit( 'Centralized I/O',date,time,'',1 )
@@ -7029,20 +7029,20 @@ C Read the various categories of normalized emissions
 #ifdef verbose_cio
                    if ( (ratio1 .lt. 0) .or. (ratio2 .lt. 0) 
      &             .or. (ratio1 .gt. 1) .or. (ratio2 .gt. 1)) then
-                      write(logdev,'(5X,a,a)'),
+                      write(logdev,'(5X,a,a)')
      &               'ERROR: Incorrect Interpolation in 2-D Generic Integer Interpolation for variable: ',
      &                trim(vname) 
                      
-                     write(logdev,'(5X,a,i7,a,i6)'), 
+                     write(logdev,'(5X,a,i7,a,i6)')
      &               'Requested TIME & DATE: ',date,':',time
                      
-                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)'),
+                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)')
      &               'Interpolation Bounds ',cio_grid_data_tstamp(1,0,var_loc),
      &               ':',cio_grid_data_tstamp(2,0,var_loc),' to ',
      &                cio_grid_data_tstamp(1,1,var_loc),':',cio_grid_data_tstamp(2,1,var_loc)
                      
                       call m3exit( 'Centralized I/O',date,time,'',1 )
-                      write(logdev,'(5X,a)'),
+                      write(logdev,'(5X,a)')
      &                'ERROR: Program EXIT in subroutine i_interpolate_var_2d in module centralized io'
                   
                   end if 
@@ -7202,21 +7202,21 @@ C Read the various categories of normalized emissions
 #ifdef verbose_cio
                    if ( (ratio1 .lt. 0) .or. (ratio2 .lt. 0) 
      &             .or. (ratio1 .gt. 1) .or. (ratio2 .gt. 1)) then
-                      write(logdev,'(5X,a)'),
+                      write(logdev,'(5X,a)')
      &               'ERROR: Incorrect Interpolation in 2-D Boundary Interpolation for variable: ',
      &                trim(vname) 
                      
-                     write(logdev,'(5X,a,i7,a,i6)'), 
+                     write(logdev,'(5X,a,i7,a,i6)')
      &               'Requested TIME & DATE: ',date,':',time
                      
-                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)'),
+                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)')
      &               'Interpolation Bounds ',cio_bndy_data_tstamp(1,0,var_loc),
      &               ':',cio_bndy_data_tstamp(2,0,var_loc),' to ',
      &                cio_bndy_data_tstamp(1,1,var_loc),':',cio_bndy_data_tstamp(2,1,var_loc)
 
                      call m3exit( 'Centralized I/O',date,time,'',1 )
 
-                      write(logdev,'(5X,a)'),
+                      write(logdev,'(5X,a)')
      &                'ERROR: Program EXIT in subroutine r_interpolate_var_2db in module centralized io'
            
                    end if 
@@ -7396,20 +7396,20 @@ C Read the various categories of normalized emissions
 #ifdef verbose_cio
                       if ( (ratio1 .lt. 0) .or. (ratio2 .lt. 0) 
      &                .or. (ratio1 .gt. 1) .or. (ratio2 .gt. 1)) then
-                        write(logdev,'(5X,a)'),
+                        write(logdev,'(5X,a)')
      &                  'ERROR: Incorrect Interpolation in 3-D Generic Interpolation for variable: ',
      &                   trim(vname) 
                      
-                        write(logdev,'(5X,a,i7,a,i6)'), 
+                        write(logdev,'(5X,a,i7,a,i6)')
      &                  'Requested TIME & DATE: ',date,':',time
                      
-                        write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)'),
+                        write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)')
      &                  'Interpolation Bounds ',cio_grid_data_tstamp(1,0,var_loc),
      &                  ':',cio_grid_data_tstamp(2,0,var_loc),' to ',
      &                   cio_grid_data_tstamp(1,1,var_loc),':',cio_grid_data_tstamp(2,1,var_loc)
 
                         call m3exit( 'Centralized I/O',date,time,'',1 )
-                         write(logdev,'(5X,a)'),
+                         write(logdev,'(5X,a)')
      &                   'ERROR: Program EXIT in subroutine r_interpolate_var_3d in module centralized io'
                     
                        end if 
@@ -7576,7 +7576,7 @@ c search box initial conditions
          END IF
 
          IF( PRESENT( FNAME ) )THEN
-             PRINT*,'CIO_INTERP3D: FNAME,VNAME = ',TRIM(FNAME),', ',TRIM(VNAME),INDEX(VNAME,'ZF'),INDEX(VNAME,'ZH')
+             WRITE( LOGDEV, '(4A)')'CIO_INTERP3D: FNAME,VNAME = ',TRIM(FNAME),', ',TRIM(VNAME)
          END IF
 
          IF( XTRACT_METGEODATA( VNAME,CONC ) )THEN
@@ -7587,11 +7587,11 @@ c search box initial conditions
       
             BUFFER = 1.0E-30
             IF( PRESENT( FNAME ) )THEN
-              PRINT*,"Interpolate_Var_3DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
+              WRITE( LOGDEV, '(4A)')"Interpolate_Var_3DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
             ELSE
-              PRINT*,"Interpolate_Var_3DGRID: Variable, ",TRIM(VNAME)
+              WRITE( LOGDEV, '(2A)')"Interpolate_Var_3DGRID: Variable, ",TRIM(VNAME)
             END IF
-            PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
+            WRITE( LOGDEV, '(3A)')"Setting ", TRIM(VNAME),' to 1.0E-30'
             RETURN
 
         END SUBROUTINE R_INTERPOLATE_VAR_3DGRID
@@ -7626,7 +7626,7 @@ c search box initial conditions
             DO L = 1,NUMB_INIT_CONC
                CONC = BOX_IC_VALUE( VNAME )
                IF ( CONC .GT. 0.0 ) THEN
-!                 write(6,'(2(I7,1X),3(A),ES12.4)')JDATE,JTIME,'INTERP_2D: ',TRIM( VNAME ),' = ',CONC
+!                 WRITE(LOGDEV,'(2(I7,1X),3(A),ES12.4)')JDATE,JTIME,'INTERP_2D: ',TRIM( VNAME ),' = ',CONC
                   BUFFER = CONC
                   RETURN
                END IF
@@ -7640,11 +7640,11 @@ c search box initial conditions
 
         BUFFER = 1.0E-30
         IF( PRESENT( FNAME ) )THEN
-           PRINT*,"Interpolate_Var_2DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
+           WRITE( LOGDEV, '(4A)')"Interpolate_Var_2DGRID: Unknown file and Variable, ",TRIM(FNAME)," and ",TRIM(VNAME)
         ELSE
-           PRINT*,"Interpolate_Var_2DGRID: Unknown Variable, ",TRIM(VNAME)
+           WRITE( LOGDEV, '(2A)')"Interpolate_Var_2DGRID: Unknown Variable, ",TRIM(VNAME)
         END IF
-        PRINT*,"Setting ", TRIM(VNAME),' to 1.0E-30'
+        WRITE( LOGDEV, '(3A)')"Setting ", TRIM(VNAME),' to 1.0E-30'
             
         RETURN
 

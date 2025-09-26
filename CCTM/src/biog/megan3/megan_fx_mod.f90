@@ -3198,7 +3198,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
                      LAIc, LAT, PRECADJ,                 &
                      CFNO, CFNOG )
         IF( USE_SEGA_N) THEN
-           GAMNO = 0.0           
+          GAMNO = 0.0           
         ELSE
         DO I = 1,NCOLS
           DO J = 1,NROWS
