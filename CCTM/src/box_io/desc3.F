@@ -31,6 +31,8 @@ C...........   ARGUMENTS and their descriptions:
         CHARACTER*(*), INTENT( IN ) ::  FNAME   !  logical name of file to be described.
 C...........   Local:
         INTEGER :: IVAR
+        INTEGER :: NVAR
+        INTEGER :: FILE_ID
         LOGICAL :: FOUND
         
 
@@ -211,6 +213,23 @@ C...........   Local:
            VNAME3D = ''
            UNITS3D = ''
            NVARS3D = 0
+           FILE_ID = 0
+           DO NVAR = 1,N_OUTPUT_FILES
+              IF ( TRIM(OUTPUT_FILES(NVAR)%FILENAME) .EQ. TRIM(FNAME) ) THEN
+                FILE_ID = NVAR
+                EXIT
+              END IF
+           END DO
+           IF( FILE_ID .LT. 1 )THEN
+             WRITE(6,'(A)')'DESC3: ' // TRIM(FNAME) // ' is not opened.'
+           ELSE
+             NVARS3D = OUTPUT_FILES(FILE_ID)%NVARS
+             DO NVAR = 1,NVARS3D
+                VNAME3D( NVAR ) = OUTPUT_FILES(FILE_ID)%VARNAMES(NVAR)
+                UNITS3D( NVAR ) = OUTPUT_FILES(FILE_ID)%UNITS(NVAR)
+             END DO
+             FOUND = .TRUE.
+           END IF
       END IF
 
       WRITE( 6,'(a)')TRIM( FNAME )
