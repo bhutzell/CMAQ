@@ -8,8 +8,30 @@
 #             http://www.cmascenter.org                               #
 # =================================================================== #
 
+set echo
+
+  
 #> Recompile BLDMAKE from source if requested or if it does not exist
-  if ( $?CompileBLDMAKE || ! -f $BLDER ) then
+  if ( $?CompileBLDMAKE || ! $?BLDER ) then
+
+#>set compiler if no environment variable
+     if ( ! $?compiler ) then
+       if ( $#argv == 1 ) then
+          setenv compiler $argv[1]
+          setenv compilerVrsn Empty
+       else if ( $#argv == 2 ) then
+          #> Compiler Name and Version have been provided
+          setenv compiler $1
+          setenv compilerVrsn $2
+       else
+          echo "usage: $0 <compiler>"
+          echo " setting compiler to intel"
+          setenv compiler intel
+       endif
+       cd ../../..
+       source ./config_cmaq.csh
+       cd -
+     endif 
 
      if (${compiler} == pgi) then
         # this addition flag is for handling backslash in quoted string properly
@@ -17,6 +39,27 @@
      else
         set add_flags = 
      endif
+
+#> explicitly use Fortan and C compilers; instead of MPI versions set in config.cmaq
+     switch ( $compiler ) 
+      case  "intel":
+#        set FC = "ifx"
+         set FC = "ifort"
+         set CC = "icx"
+         breaksw
+      case "gcc":
+         set FC = "gfortran"
+         set CC = "gcc"
+         breaksw
+      case "pgi":
+         set FC = "pgf90"
+         set CC = "pgcc"
+         breaksw
+      default:
+         breaksw
+     endsw
+     setenv myFC $FC
+     setenv myCC $CC
 
      #> Set BLDER to Default Path
      set BLDEXE = "bldmake_${compilerString}.exe"
@@ -33,7 +76,7 @@
           bldmake\
           parser\
           utils )
-  
+
      #> Clean Destination BLDMAKE directory
      cd $BLDDIR
      rm *.o *.mod $BLDER

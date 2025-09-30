@@ -204,6 +204,8 @@ set make_options = "-j"                #> additional options for make command if
    default:
       breaksw
   endsw
+  setenv myFC $FC
+  setenv myCC $CC
 
  set    FP = $FC                       #> path of Fortan preprocessor; set in config.cmaq
  setenv BLDER ${CMAQ_HOME}/UTIL/bldmake/bldmake_${compilerString}.exe   #> name of model builder executable
@@ -751,11 +753,18 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
 # ============================================================================
  unalias mv rm
 
+set echo
 #> Recompile BLDMAKE from source if requested or if it does not exist
  if ( $?CompileBLDMAKE || ! -f $BLDER ) then
-   cd ${CMAQ_REPO}/UTIL/bldmake/scripts
-   ./bldit_bldmake.csh
+   cp -f -r ${CMAQ_REPO}/UTIL/bldmake $CMAQ_HOME/UTIL/bldmake 
+   cd $CMAQ_HOME/UTIL/bldmake/scripts
+   ./bldit_bldmake.csh $compiler
+   if ( ! ( -e $BLDER ) ) then
+     ls $BLDER
+     exit()
+   endif
  endif
+
 
 #> Relocate to the BLD_* directory 
  cd $Bld
@@ -818,7 +827,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  set make_it = "make.it"
  echo "#! /bin/csh -f" >! ${make_it}
  echo " "              >> ${make_it}
- echo "source ../../../../config_cmaq.csh "${compiler}" "${compilerVrsn}  >> ${make_it}
+ echo "source ${CMAQ_HOME}/config_cmaq.csh "${compiler}" "${compilerVrsn}  >> ${make_it}
  echo "#setenv debug true"                                         >> ${make_it}
  echo 'if ( $#argv == 1 )then'                                     >> ${make_it}
  echo '   if ( $1  == "clean" )make clean'                         >> ${make_it}
