@@ -4,7 +4,7 @@ Gas (G) and particle (P) species from the namelists. SMILES link to representati
 
 Note that for each particulate species in CMAQ, a letter will be appended to the name to designate the size, or mode, of the aerosol being represented: I = Aitken mode, J = Accumulation mode, K = Coarse mode. Prepending of a species with a V or A in CMAQ or the chemical mechanism files indicates the species resides in the gas or particulate phase. 
 
-Note special handling for aerosol nitrate and chlorine ions (ANO3, ACL) to avoid overlap with radials in the gas-phase. CRACMM2 also has special handling for glyoxal aerosol (AGLY), and CRACMM3 has special handling for bromine aerosol (ABR) due to name overlaps.
+Note special handling for aerosol nitrate and chlorine ions (ANO3, ACL) to avoid overlap with radicals (NO3, CL) in the gas-phase. CRACMM2 also has special handling for glyoxal aerosol (AGLY) which is a different structure than GLY, and CRACMM3M has special handling for bromine aerosol (ABR) due to name overlap with bromine radicals (BR).
 
  <sub>Species</sub> | <sub>Description</sub> | <sub>Phase</sub> | <sub>Molecular Weight (g/mol)</sub> | <sub>Explicit/ Lumped</sub> | <sub>Representative Structure</sub> | <sub>SMILES</sub> 
  ----- | ----- | ----- | ----- | ----- | ----- | ----- 
