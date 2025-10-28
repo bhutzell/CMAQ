@@ -10,6 +10,7 @@
 ! U.S. Environmental Protection Agency (USEPA)                                 !
 !                                                                              !
 ! This namelist is consistent with CMAQv6.0                                    !
+! This namelist was generated for use with EPA's 2020 CRACMM1 emissions        !
 !                                                                              !
 ! For DESID,                                                                   !
 ! see CMAQ User's Guide Appendix B (https://github.com/USEPA/CMAQ/blob/main/   !
@@ -183,8 +184,11 @@
    'EVERYWHERE', 'ALL' ,'CARBSULFIDE','CARBSULFIDE',        'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'CHLOROPRENE','CHLOROPRENE',        'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'BENZOAPYRNE','BENAPY',             'GAS'  ,1.  ,'UNIT','a',
+
+   ! HCN is not in the input files for this platform, add it for wildfires
 !  'EVERYWHERE', 'ALL' ,'HCN','HCN',                        'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CO', 'HCN',                        'GAS'  ,0.00301,'UNIT','a',
+   'EVERYWHERE', 'PT_FIRES ,'CO', 'HCN',                 'GAS'  ,0.00301,'UNIT','a',
+
 ! Inert Tracers of PAH congeners for simple exposure assessments
    'EVERYWHERE', 'ALL' , 'PAH_000E0', 'PAH_000E0',          'GAS',1.0  ,'UNIT','a',
    'EVERYWHERE', 'ALL' , 'PAH_176E5', 'PAH_176E5',          'GAS',1.0  ,'UNIT','a',
@@ -2073,25 +2077,17 @@ CMPST =
                 'DD_TSP_NA + WD_TSP_NA',
 
 !-- Chloride --!
-'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
-                'kg ha-1', 'DEP_FINE', 
-                'DD_ACL',
-
-'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride', 
-                'kg ha-1', 'DEP_COARSE', 
-                'DD_ACL',
-
-'DD_TSP_CL'     , 'Dry Dep of Particulate Chloride', 
-                'kg ha-1', 'DEP', 
-                'DD_PMF_CL + DD_PMC_CL',
-
-'WD_PMF_CL'   , 'Wet Dep of Fine-Mode Chloride',
+'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride',
                 'kg ha-1', 'DEP_FINE',
-                'WD_ACL - WD_ACLI',
+                'DD_ACL',
 
-'WD_PMC_CL'   , 'Wet Dep of Coarse-Mode Chloride',
+'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride',
                 'kg ha-1', 'DEP_COARSE',
-                'WD_ACL',
+                'DD_ACL',
+
+'DD_TSP_CL'   , 'Dry Dep of Particulate Chloride',
+                'kg ha-1', 'DEP',
+                'DD_PMF_CL + DD_PMC_CL',
 
 'WD_TSP_CL'   , 'Wet Dep of Particulate Chloride',
                 'kg ha-1', 'DEP',
@@ -2106,7 +2102,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',                 
                 '0.032*DD_ASEACAT + 0.0838*DD_ASOIL + 0.0562*DD_ACORS',
 
-'DD_TSP_CA'    , 'Dry Dep of Particulate Calcium', 
+'DD_TSP_CA'   , 'Dry Dep of Particulate Calcium', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_CA + DD_PMC_CA',
 

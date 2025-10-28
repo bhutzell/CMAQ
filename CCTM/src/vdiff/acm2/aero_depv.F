@@ -564,11 +564,12 @@ C Calculate characteristic parameters
 !           if(c.eq.1.and.r.eq.1) Write(Logdev,*) 
 !     >         ' Aleaf,Ahair,fveg,fnv,fneedle=',Aleaf,Ahair,fveg,fnv,fneedle
 
+! Init SST 
+            SST = Met_Data%TSEASFC(C,R) - 273.15   ! C
 ! For water include effects of whitecaps - Hummelshoj et al. (1992)
           IF ( NINT(GRID_DATA%LWMASK( c,r )) .EQ. 0 .AND. MET_DATA%SEAICE(c,r) 
      &           .LE. 0.5 ) Then
             U10 = Met_Data%WSPD10(C,R)
-            SST = Met_Data%TSEASFC(C,R) - 273.15   ! C
             awc = 8.46e-5 + 1.63e-6 * SST - 3.35e-8 * SST**2
             bwc = 3.354 - 0.062 * SST
             alfbob = awc*(u10+bwc)**2        ! Albert 2016 with SST deg-C

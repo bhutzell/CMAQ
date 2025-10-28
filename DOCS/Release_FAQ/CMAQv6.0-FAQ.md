@@ -191,7 +191,7 @@ The KZMIN option, first introduced in CMAQv4.5, is a parameterization to allow t
 
 ### Emissions
 - **Introducing new soil emissions module**   
-Introduces the Soil – Atmosphere Gaseous Emissions (SAGE) module for estimating soil NO and HONO emissions generally following the BDSNP parameterization (Hudman et al. 2012). SAGE  provides a simple, meteorological dependent method to calculate soil NO and HONO emissions for regional to global applications. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Soil-Atmospheric-Gaseous-Emissions-(SAGE)-Emissions.md#introducing-new-soil-emissions-module)
+Introduces the Soil Emissions of Gases to the Atmosphere (SEGA) module for estimating soil NO and HONO emissions generally following the BDSNP parameterization (Hudman et al. 2012). SEGA provides a simple, meteorological dependent method to calculate soil NO and HONO emissions for regional to global applications. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Soil-Emissions-of-Gases-to-the-Atmosphere-(SEGA).md#introducing-new-soil-emissions-module)
 
 - **New global vegetation dataset improves windblown dust emissions**    
 Introduces a new satellite-based global vegetation dataset to modulate windblown dust emissions. The vegetation dataset accounts for the effect of non-photosynthetic vegetation (or brown vegetation) by updating vegetation fraction, the vegetation height, and the vegetation roughness following the method outlined in [Huang and Foroutan (2022, HF22)](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2021JD035243). The overall impact is to reduce windblown dust emissions. [Release Note](../Release_Notes/CMAQ-Release-Notes:-Emissions-Updates:-Wind-Blown-Dust-Emissions.md)
