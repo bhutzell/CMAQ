@@ -89,7 +89,7 @@
      setenv AERO_19 "EC_88380,ug/m3,AECIJ,ug/m3,EC_88380"            # EC Mass
      setenv AERO_20 "OC_88370+EC_88380,ug/m3,AOCIJ+AECIJ,,TC_88370"  # Total Carbon
      setenv AERO_21 "OC_88320,ug/m3,AOCIJ,ug/m3,OC_88320"            # OC blank adjusted Mass
-     setenv AERO_22 "EC_88321,ug/m3,AECIJ,ug/m3,EC_88320"            # EC Mass
+     setenv AERO_22 "EC_88321,ug/m3,AECIJ,ug/m3,EC_88321"            # EC Mass
      setenv AERO_23 "OC_88320+EC_88321,ug/m3,AOCIJ+AECIJ,,TC_88320"  # Total Carbon 
      setenv AERO_24 "Na,ug/m3, ANAIJ,,Na"                      # sodium
      setenv AERO_25 "Cl,ug/m3, ACLIJ,,Cl"                      # chlorine
