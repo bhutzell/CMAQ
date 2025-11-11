@@ -1321,7 +1321,7 @@
                   IF ( IMODE .NE. 0 ) L_MODE = ELMO_COMP( J )%L_MODE( IMODE )
 
                   IF ( L_MODE ) THEN
-                     WRITE( FORMULA, '(A,A1,SPES9.2,A1,A)' ) TRIM(FORMULA),
+                     WRITE( FORMULA, '(A,A1,ES9.2,A1,A)' ) TRIM(FORMULA),
      &                  ' ',ELMO_COMP( J )%COEFF(ICOMP),'*',
      &                  TRIM( ELMO_TABLE( TABID )%OUT_NAME )
 
