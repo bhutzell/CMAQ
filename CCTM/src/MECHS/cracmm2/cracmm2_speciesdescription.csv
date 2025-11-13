@@ -183,35 +183,35 @@ XYL,Xylenes and other volatile aromatics
 XYLP,Peroxy radicals formed from XYL
 HCL,Hydrochloric acid
 NH3,Ammonia
-ASO4,Total sulfur IV as sulfate
-ANH4,Ammonium ion
-ANO3,Nitrate ion
-ASOAT,An empirical SOA
-AGLY,SOA from reactive uptake of glyoxal on particles
-AORGC,SOA from cloud processing of GLY and MGLY
-AEC,Elemental carbon
-AOTHR,Primary unspeciated fine PM
-AFE,Iron ion
-AAL,Aluminum ion
-ASI,Silicon
-ATI,Titanium
-ACA,Calcium ion
-AMG,Magnesium ion
-AK,Potassium ion
-AMN,Manganese ion
-ACORS,Primary unspeciated coarse PM
-ASOIL,Lumped crustal species
-AORGH2O,Water associated with particulate organic compounds
-AH2O,Water associated with particulate inorganic compounds
-AH3OP,Hydronium ion tracer
-ANA,Sodium ion
-ACL,Chloride ion
-ASEACAT,Sea spray cations
-APOC,Primary organic carbon (legacy)
-APNCOM,Primary non-carbon organic matter (legacy)
-AISO3NOS,Non-sulfated SOA from IEPOX uptake
-AISO3OS,Organosulfate SOA from IEPOX uptake
-AISO4,Multifunctional product from heterogeneous uptake of IPX
-AISO5,Multifunctional product from heterogeneous uptake of INALD
+SO4,Total sulfur IV as sulfate
+NH4,Ammonium ion
+ASpecialNO3,Nitrate ion
+SOAT,An empirical SOA
+ASpecialGLY,SOA from reactive uptake of glyoxal on particles
+ORGC,SOA from cloud processing of GLY and MGLY
+EC,Elemental carbon
+OTHR,Primary unspeciated fine PM
+FE,Iron ion
+AL,Aluminum ion
+SI,Silicon
+TI,Titanium
+CA,Calcium ion
+MG,Magnesium ion
+K,Potassium ion
+MN,Manganese ion
+CORS,Primary unspeciated coarse PM
+SOIL,Lumped crustal species
+ORGH2O,Water associated with particulate organic compounds
+H2O,Water associated with particulate inorganic compounds
+H3OP,Hydronium ion tracer
+NA,Sodium ion
+CL,Chloride ion
+SEACAT,Sea spray cations
+POC,Primary organic carbon (legacy)
+PNCOM,Primary non-carbon organic matter (legacy)
+ISO3NOS,Non-sulfated SOA from IEPOX uptake
+ISO3OS,Organosulfate SOA from IEPOX uptake
+ISO4,Multifunctional product from heterogeneous uptake of IPX
+ISO5,Multifunctional product from heterogeneous uptake of INALD
 NUM,Number of particles
 SRF,Surface area of particles
