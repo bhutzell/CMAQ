@@ -14,6 +14,7 @@ C***********************************************************************
       USE DRIVER_INPUTS
       USE CGRID_SPCS
       USE ASCII_UTILITIES ! , Only : ICDATA_ASCII, GET_ASCII_DATA
+      USE RUNTIME_VARS, Only: OUTDEV, LOGDEV
 
       IMPLICIT NONE
       
@@ -56,8 +57,8 @@ C***********************************************************************
       IF ( LEXIST )THEN
            LASCII = .TRUE.
       ELSE
-           WRITE(6,*)'ASCII_IC ', ASCII_IC,' not found'
-           STOP
+           WRITE(OUTDEV,*)'ASCII_IC ', ASCII_IC,' not found'
+           CALL M3EXIT(PNAME, 0, 0, 'Fatal Error', 1)
       ENDIF
 
       DEFNAM = BLANKS
@@ -75,7 +76,8 @@ C***********************************************************************
 
        IF ( STATUS .NE. 0 ) THEN
           XMSG = TRIM( PNAME ) // 'Error allocating INIT_CONC_SPCS and INIT_CONC_VALUES '
-          WRITE(6,'(A)')TRIM( XMSG )
+          WRITE(OUTDEV,'(A)')TRIM( XMSG )
+          CALL M3EXIT(PNAME, 0, 0, 'Fatal Error', 1)
        END IF
 
        INIT_CONC_SPCS = CGRID_NAME
@@ -86,10 +88,34 @@ C***********************************************************************
        IF ( .NOT. LASCII ) THEN
          XMSG = TRIM( PNAME ) 
      &        // ': No Initial Box Concentration file specified...species setting to 1.0E-30'
-         WRITE(6,'(A)')TRIM( XMSG )
+         WRITE(OUTDEV,'(A)')TRIM( XMSG )
        ELSE
          CALL ICDATA_ASCII ( ASCII_FNAM )
        END IF
+
+       INQUIRE ( FILE = ASCII_MET , EXIST = LEXIST )
+       IF ( LEXIST )THEN
+         IF ( .NOT. GET_ASCII_DATA ( ASCII_MET, NUMB_MET_DATA, MET_DATA_SPCS, MET_DATA_VALUES ) )THEN
+            CALL M3EXIT(PNAME, 0, 0, 'Error setting input MET data ', 1)
+         END IF
+         print*,'GET_ASCII_DATA sets NUMB_MET_DATA = ',NUMB_MET_DATA
+! search in MET_DATA for LUFRAC_xy values
+         DO N = 1,NUMB_MET_DATA
+           IF ( INDEX( MET_DATA_SPCS( N ),"LUFRAC_" ) .GT. 0 ) THEN
+             LASCII = .TRUE.
+           END IF  
+           WRITE(OUTDEV,'(I4,1X,A16,1X,ES12.4)')N,MET_DATA_SPCS( N ),MET_DATA_VALUES( N )
+         END DO
+         IF ( .NOT. LASCII ) THEN
+            WRITE(OUTDEV,*)"ERROR: MET_DATA file does not include LU_FRAC_xy values such as LUFRAC_04."
+            WRITE(OUTDEV,*)"File must include at least one value."
+            WRITE(OUTDEV,*)"Note that box model uses the NLCD40 Landuse Scheme."
+            CALL M3EXIT(PNAME, 0, 0, 'Fatal Error', 1)
+         END IF
+       ELSE
+           WRITE(OUTDEV,*)'ASCII_MET ', ASCII_MET,' not found'
+           CALL M3EXIT(PNAME, 0, 0, 'Fatal Error', 1)
+       ENDIF
 
        RETURN
       END SUBROUTINE LOAD_BOX_ICS
