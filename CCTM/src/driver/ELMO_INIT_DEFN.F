@@ -1240,6 +1240,7 @@
 
       IMPLICIT NONE
 
+      REAL    COEFF
       INTEGER IFL, IVAR, ICOMP, J, TABID, IFILE, AERO_ID, 
      &        IMODE, INLET, IOA, IM, K, IAER
       CHARACTER( 3000 ) :: FORMULA
@@ -1321,9 +1322,22 @@
                   IF ( IMODE .NE. 0 ) L_MODE = ELMO_COMP( J )%L_MODE( IMODE )
 
                   IF ( L_MODE ) THEN
-                     WRITE( FORMULA, '(A,A1,ES9.2,A1,A)' ) TRIM(FORMULA),
-     &                  ' ',ELMO_COMP( J )%COEFF(ICOMP),'*',
-     &                  TRIM( ELMO_TABLE( TABID )%OUT_NAME )
+                     COEFF = ELMO_COMP( J )%COEFF(ICOMP)
+                     IF ( SIGN(COEFF,1.0) .LT. 0.0 ) THEN
+                        WRITE( FORMULA, '(A,A3,ES8.2,A1,A)' ) TRIM(FORMULA),
+     &                     ' - ',ABS(ELMO_COMP( J )%COEFF(ICOMP)),'*',
+     &                     TRIM( ELMO_TABLE( TABID )%OUT_NAME )
+                     ELSE
+                        IF ( ICOMP .EQ. 1 ) THEN
+                           WRITE( FORMULA, '(A,A3,ES8.2,A1,A)' ) TRIM(FORMULA),
+     &                        '   ',ABS(ELMO_COMP( J )%COEFF(ICOMP)),'*',
+     &                        TRIM( ELMO_TABLE( TABID )%OUT_NAME )
+                        ELSE
+                           WRITE( FORMULA, '(A,A3,ES8.2,A1,A)' ) TRIM(FORMULA),
+     &                        ' + ',ABS(ELMO_COMP( J )%COEFF(ICOMP)),'*',
+     &                        TRIM( ELMO_TABLE( TABID )%OUT_NAME )
+                        END IF
+                     END IF
 
                      ! If this is an aerosol with a size cutoff, make sure
                      ! to add the FPM[dp]_[mode] to the formula
