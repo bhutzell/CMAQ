@@ -84,11 +84,11 @@ These environment variables, with the full path to the files, must be defined in
 The variables 'GRIDDEDEMIS' and 'PT_EGU' are comma-delimited in the control file and are both defined in the runscript. The list of species is also comma-delimited in the control file.
 
 Example 3
-It is also possible to calculate sensitivity to inline emissions streams. The following example calculates sensitivity to inline BEIS emissions of isprene:
+It is also possible to calculate sensitivity to inline emissions streams. The following example calculates sensitivity to inline BEIS emissions of isoprene:
 
     EBI     
      EMIS
-      BEIS
+      BIOG
      SPECIES
       ISOP
 
@@ -213,3 +213,4 @@ Dunker, A. 1984: The decoupled direct method for calculating sensitivity coeffic
 CMAQv5.5 User's Guide <br>
 
 <!-- END COMMENT -->
+

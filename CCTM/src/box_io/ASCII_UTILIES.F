@@ -173,7 +173,7 @@ c..Report the ICs set
 
       END SUBROUTINE ICDATA_ASCII
 
-      SUBROUTINE GET_ASCII_DATA ( ASCII_FNAM , SPC, CGRID )
+      LOGICAL FUNCTION GET_ASCII_DATA ( ASCII_FNAM, N_SPC, SPC, CGRID )
 
 C***********************************************************************
 C
@@ -194,8 +194,9 @@ C..INCLUDES:
 C..ARGUMENTS: 
 
       CHARACTER*(*), INTENT( IN )    :: ASCII_FNAM   ! ASCII file name 
-      CHARACTER(16), INTENT( IN )    :: SPC   ( : )  ! species or variable names
-      REAL,          INTENT(   OUT ) :: CGRID ( : )  ! value array  
+      INTEGER,       INTENT(   OUT ) :: N_SPC
+      CHARACTER*(*), INTENT( INOUT ), ALLOCATABLE :: SPC   ( : )  ! species or variable names
+      REAL,          INTENT( INOUT ), ALLOCATABLE :: CGRID ( : )  ! value array  
 C..PARAMETERS:                  
       CHARACTER( 16 ), PARAMETER :: PNAME = 'GET_ASCII_DATA' 
 C..EXTERNAL FUNCTIONS: None
@@ -209,38 +210,65 @@ C..SCRATCH LOCAL VARIABLES:
       INTEGER :: EOL          ! Last non-blank character on line
       INTEGER :: FILDEV       ! Unit number for ASCII file
       INTEGER :: IND          ! Species index
-      INTEGER :: LINNUM       ! Current line number read in ASCII file
+      INTEGER :: LINNUM       ! Current lines number read in ASCII file
+      INTEGER :: COMMNUM      ! Comment lines number read in ASCII file
       INTEGER :: LPOS         ! Read position on input line
       INTEGER :: N            ! Loop index
 
       REAL    :: REAL_VALUE   ! Number read
       
 C..SAVED LOCAL VARIABLES: None
-      INTEGER,                     SAVE :: N_SPC
-      INTEGER,                     SAVE :: LOGDEV          !  FORTRAN unit number for log file
-      LOGICAL,                     SAVE :: LFIRST = .TRUE. ! Flag for first time
-      LOGICAL,       ALLOCATABLE,  SAVE :: LFOUND ( : )    ! Flag for non-zero IC for a species
+      INTEGER :: LOGDEV          !  FORTRAN unit number for log file
+      LOGICAL :: LFIRST = .TRUE. ! Flag for first time
+      LOGICAL, ALLOCATABLE :: LFOUND( : ) ! Flag for non-zero IC for a species
 
 
 C***********************************************************************
 
 c..open the ascii file and initialize
       LOGDEV = 6
+      GET_ASCII_DATA = .TRUE.
 
-!     FILDEV = 112
       OPEN ( NEWUNIT = FILDEV, FILE = ASCII_FNAM , FORM ='FORMATTED', STATUS='OLD',
      &       ERR = 1000 )
 
-      LINNUM = 0
+      LINNUM  = 0
+      COMMNUM = 0
 
-      N_SPC = SIZE( SPC )
+      DO
+c..read one line of ascii file
+        READ( FILDEV , '(A)' , END = 500 ) INBUF
+c..skip comment lines and blank lines
+        IF ( INBUF (1:1) .EQ. '!' ) THEN
+           COMMNUM = COMMNUM + 1
+        END IF
+        IF ( LEN_TRIM(INBUF) .EQ. 1 .AND. INBUF (1:1) .EQ. ' ') THEN
+           COMMNUM = COMMNUM + 1
+        END IF
+        LINNUM = LINNUM + 1
+      END DO
   
-      ALLOCATE( LFOUND( N_SPC ) )
+500   REWIND(FILDEV)
+      N_SPC = MAX( LINNUM-COMMNUM,0 )
+      IF( N_SPC .LE. 0 )THEN
+          WRITE(6,*)TRIM(PNAME) // ", ASCII Input: "
+          WRITE(6,*)TRIM( ASCII_FNAM ) // " "
+          WRITE(6,*)"has no variables and values defined."
+          GET_ASCII_DATA = .FALSE.
+          RETURN
+      END IF
+
+      ALLOCATE( SPC   ( N_SPC ),
+     &          LFOUND( N_SPC ),
+     &          CGRID ( N_SPC ) )
       DO N = 1 , N_SPC
          CGRID  ( N ) = 0.0
+         SPC    ( N ) = 'VOID'
          LFOUND ( N ) = .FALSE.
-      ENDDO
+      EN DDO
       
+      IND = 0
+      LINNUM  = 0
       DO 
 c..read one line of ascii file
 20       READ( FILDEV , '(A)' , END = 100 ) INBUF
@@ -249,13 +277,12 @@ c..read one line of ascii file
 c..skip comment lines and blank lines
          IF ( INBUF (1:1) .EQ. '!' ) THEN 
             CYCLE
-!            GO TO 20
+            COMMNUM = COMMNUM + 1
          ELSE
             EOL = LEN_TRIM( INBUF )
          ENDIF
-         print*,TRIM(INBUF)
-         IF ( EOL .EQ. 1 .AND. INBUF (1:1) .EQ. ' ') CYCLE ! GO TO 20
 
+         IF ( EOL .EQ. 1 .AND. INBUF (1:1) .EQ. ' ') CYCLE ! GO TO 20
 c..find the first word on a line
          REAL_VALUE = 0.0
          LPOS = 0
@@ -263,30 +290,21 @@ c..find the first word on a line
         
          CALL GET_WORD ( FILDEV , INBUF , LPOS, EOL , LINNUM, CHR, WORD )
 
-         IF ( LPOS .GE. EOL ) CYCLE ! GO TO 20
+         IF ( LPOS .GE. EOL ) CYCLE 
 
          CALL GET_CHR  ( FILDEV , INBUF , LPOS, EOL , CHR )
 
-c..If the name matches a species, get the IC
-         IND = 0
-         LOOP_FIND: DO N = 1 , N_SPC
-            IF( TRIM( WORD ) .EQ. TRIM( SPC( N ) ) )THEN
-               IND = N
-               EXIT LOOP_FIND
-            END IF   
-         END DO LOOP_FIND
+c..If the name matches a species, get species and its value
+         IND = IND + 1
+         SPC( IND ) = WORD
 
-         IF ( IND .NE. 0 ) THEN
-            CALL FETCH_REAL ( FILDEV, INBUF , LPOS, EOL, LINNUM, CHR, REAL_VALUE )
-            IF ( REAL_VALUE .GT. 0.0 ) THEN
-               CGRID ( IND ) = REAL_VALUE
-               LFOUND ( IND ) = .TRUE.
-            ELSE
-               WRITE ( LOGDEV , 93000) WORD , LINNUM
-            ENDIF
-         ELSE 
-            CYCLE ! GO TO 20        
-         ENDIF
+         CALL FETCH_REAL ( FILDEV, INBUF , LPOS, EOL, LINNUM, CHR, REAL_VALUE )
+         IF ( REAL_VALUE .GT. 0.0 ) THEN
+            CGRID ( IND ) = REAL_VALUE
+            LFOUND ( IND ) = .TRUE.
+         ELSE
+            WRITE ( LOGDEV , 93000) WORD , LINNUM
+         END IF
 
       END DO 
 
@@ -313,17 +331,21 @@ c..Report the ICs set
       ENDDO
 
       IF ( LFIRST ) THEN
-         XMSG = TRIM(PNAME) // ': ERROR, NO ICs have been set ... stopping '
+         XMSG = TRIM(PNAME) // ': ERROR, SPC array not set from input file:'
          WRITE(LOGDEV,'(A)')TRIM(XMSG)
-         STOP
+         XMSG = TRIM(ASCII_FNAM)
+         WRITE(LOGDEV,'(A)')TRIM(XMSG)
+         GET_ASCII_DATA  = .FALSE.
+         RETURN
       ENDIF
+      DEALLOCATE( LFOUND )
       CLOSE( FILDEV )
       RETURN
 
-
 1000  XMSG = TRIM(PNAME) // ': Error opening ASCII initial concentration file'
       WRITE(LOGDEV,'(A)')TRIM(XMSG)
-      STOP
+      GET_ASCII_DATA  = .FALSE.
+      RETURN
 
 92000 FORMAT(//1X , 'The following species in the IC file do not match',
      &            ' a model species:')
@@ -336,7 +358,7 @@ c..Report the ICs set
 93000 FORMAT(//1X, 'WARNING: Bad IC for species ', A ,' at Line no: ',I4,
      &      ' ... IC set to zero')
 
-      END SUBROUTINE GET_ASCII_DATA
+      END FUNCTION GET_ASCII_DATA
       SUBROUTINE GET_CHR ( FILDEV, INBUF , LPOS , EOL , CHR )
 C***********************************************************************
 C

@@ -1,0 +1,60 @@
+! Temperature (deg K)           
+TEMPG 300.0      
+TEMP2 300.0      
+TEMP 300.0      
+TSEASFC 300.0      
+TA   300.0      
+! Pressure (Pa) 1 atm           
+PRES 101325.0    
+PRSFC 101325.0    
+! Nonconvective Rainfall (cm)
+RN   0.000       
+! inverse of Monin-Obukhov length(1/m)
+MOLI 6.0         
+! Water vapor mixing ratio (Kg/Kg air)
+QV   0.01244     
+! Nonconvective Cloud Liquid Water mixing ratio (Kg/Kg air)
+QC   0.0000000   
+! Nonconvective Rain Water mixing ratio (Kg/Kg air)
+QR   0.00000000  
+! Air density (Kg/m^3)          
+DENS 1.225       
+! Latitude (deg)                
+LAT  0.0         
+! Longitude (deg)               
+LON  0           
+! Height for J values (Km)      
+HT   0.000       
+! Mid-Layer Height  (m)      
+ZH   50.00       
+! Full-Height (m)      
+ZF   100.0       
+! Cloud liq. H2O content (gm/m^3)
+WBAR 0.0 
+! Cloud tops (Km)               
+CLDT 3.0         
+! Cloud bottoms (Km)            
+CLDB 2.0         
+! Cloud fraction                
+CFRAC 0.0        
+! Fraction Open Ocean
+OPEN 0.0
+! Fraction Surf Zone
+SURF 0.0
+! Water Chlorophyll Concentration (ng/m3)
+CHLO 0.0         
+! fraction sea ice
+SEAICE 0.0      
+! fraction cell cover by snow
+SNOCOV 0.0       
+! landuse catagories (NLCD 40 scheme)
+LUFRAC_04 1.0
+! Soil Type (Loam based on WRF 3.8.1 PX categories)
+SLTYP 5.0        
+! Mapscale Factor squared (boxmodel use simple XY coordinate system) 
+MSFX2 1.0
+! Set Jacobian scaled by map scaled factor for geometric height coordinated
+JACOBF 1.0
+JACOBM 1.0
+! 'J-weighted air Density (Kg/m2)', DENSA_J = BXM_DENS * JACOBM
+DENSA_J 1.225

@@ -393,8 +393,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Optics file
   set OPTfile = PHOT_OPTICS.dat
 
-  #>Box Met and Geo data
+  #>Miscellaneous Box Parameters and Defaults
   setenv BOX_DATA ${BLD}/gc_chem_inputs.dat
+  # metgeo input data
+  setenv BOX_METGEO_FILE ${BLD}/metgeo_data.txt
+
 
   #> MCIP meteorology files 
   setenv GRID_BDY_2D $METpath/GRIDBDY2D_12NE3_${YYYYMMDD}.nc  # GRID files are static, not day-specific

@@ -148,9 +148,11 @@ C for input and output files
 
       LOGICAL  UNIX_OS   ! .TRUE. ! flag whether unix system
 
-      CHARACTER(LEN=656)  INDIR    ! input file directory
-      CHARACTER(LEN=656)  INFILE   ! name for input file
-      CHARACTER(LEN=656)  ASCII_IC ! full name for input file
+      CHARACTER(LEN=656)  INDIR     ! input file directory
+      CHARACTER(LEN=656)  INFILE    ! name for input file
+      CHARACTER(LEN=656)  METFILE   ! name for input file
+      CHARACTER(LEN=656)  ASCII_IC  ! full name for input file
+      CHARACTER(LEN=656)  ASCII_MET ! full name for input file
 
       CHARACTER(LEN=656)  JTABDIR   ! JTABLE file directory
       CHARACTER(LEN=656)  JTABLE    ! name for JTABLE file
@@ -170,6 +172,8 @@ C for input and output files
         END FUNCTION XTRACT_METGEODATA
       END INTERFACE        
         
+      INTEGER, PRIVATE :: OUTDEV = 6
+
       CONTAINS
 
       SUBROUTINE SET_BOX_INPUTS()
@@ -283,8 +287,8 @@ C for input and output files
 
           INQUIRE( FILE = TRIM( INPUT_FILE ), EXIST = EXIST_STATUS )
           IF ( .NOT. EXIST_STATUS ) THEN
-            WRITE(6,'(A)')'The input file, BOX_DATA, not found at:'
-            WRITE(6,'(A)')TRIM( INPUT_FILE )
+            WRITE(OUTDEV,'(A)')'The input file, BOX_DATA, not found at:'
+            WRITE(OUTDEV,'(A)')TRIM( INPUT_FILE )
             STOP
           END IF 
           OPEN(NEWUNIT = IN_UNIT,FILE = INPUT_FILE, FORM ='FORMATTED')
@@ -298,13 +302,13 @@ C for input and output files
           READ(IN_UNIT, NML=AEROSOLS)
 
 
-          WRITE(6, NML=CONTROL_LIST)
+          WRITE(OUTDEV, NML=CONTROL_LIST)
 
-          WRITE(6, NML=ATMOSPHERE)
+          WRITE(OUTDEV, NML=ATMOSPHERE)
 
-          WRITE(6, NML=GASES)
+          WRITE(OUTDEV, NML=GASES)
 
-          WRITE(6, NML=AEROSOLS)
+          WRITE(OUTDEV, NML=AEROSOLS)
            
           CLOSE(IN_UNIT)
 
@@ -361,9 +365,9 @@ C for input and output files
           CALL NAMEVAL( BOX_DATA, INPUT_FILE)
 
           INQUIRE( FILE = TRIM( INPUT_FILE ), EXIST = EXIST_STATUS )
-          WRITE(6,'(A)')TRIM( INPUT_FILE )
+          WRITE(OUTDEV,'(A)')TRIM( INPUT_FILE )
           IF ( .NOT. EXIST_STATUS ) THEN
-            WRITE(6,'(A)')'The input file, BOX_DATA, not found:'
+            WRITE(OUTDEV,'(A)')'The input file, BOX_DATA, not found:'
             STOP
           END IF 
 
@@ -429,6 +433,7 @@ C for input and output files
            BXM_SAS      = 'NO'
            BXM_MACTAB   = 'NO'
            INFILE       = 'BOX_IC_FILE'
+           METFILE      = 'BOX_METGEO_FILE'
            EMIS_FILE    = 'EMIS_DATA'
 
            FILE_LINE    = ''
@@ -440,50 +445,49 @@ C for input and output files
             I = I + 1
             Read(IN_UNIT,*,IOSTAT=IOST)FILE_LINE
             If( IOST .NE. 0 )Exit
-            Write(6,'(a)')Trim(FILE_LINE)
+            WRITE(OUTDEV,'(a)')Trim(FILE_LINE)
           End Do
 
           REWIND(IN_UNIT)
 
           READ(IN_UNIT, NML=TIME_CONTROLS,IOSTAT=IOST)
           If( IOST .NE. 0 )Then
-            Write(6,'(a)')'Error Reading TIME_CONTROLS namelist'
-            Write(6,'(a)')'Using Below Default Values'
+            WRITE(OUTDEV,'(a)')'Error Reading TIME_CONTROLS namelist'
+            WRITE(OUTDEV,'(a)')'Using Below Default Values'
           End If
 
-          WRITE(6, NML=TIME_CONTROLS)
+          WRITE(OUTDEV, NML=TIME_CONTROLS)
 
           READ(IN_UNIT, NML=AIR_CONTROLS,IOSTAT=IOST)
           If( IOST .NE. 0 )Then
-            Write(6,'(a)')'Error Reading AIR_CONTROLS namelist'
-            Write(6,'(a)')'Using Below Default Values'
+            WRITE(OUTDEV,'(a)')'Error Reading AIR_CONTROLS namelist'
+            WRITE(OUTDEV,'(a)')'Using Below Default Values'
           End If
 
-          WRITE(6, NML=AIR_CONTROLS)
+          WRITE(OUTDEV, NML=AIR_CONTROLS)
 
           READ(IN_UNIT, NML=PHOT_CONTROLS,IOSTAT=IOST)
           If( IOST .NE. 0 )Then
-            Write(6,'(a)')'Error Reading PHOT_CONTROLS namelist'
-            Write(6,'(a)')'Using Below Default Values'
+            WRITE(OUTDEV,'(a)')'Error Reading PHOT_CONTROLS namelist'
+            WRITE(OUTDEV,'(a)')'Using Below Default Values'
           End If
 
-          WRITE(6, NML=PHOT_CONTROLS,IOSTAT=IOST)
+          WRITE(OUTDEV, NML=PHOT_CONTROLS,IOSTAT=IOST)
 
           READ(IN_UNIT, NML=FILE_CONTROLS,IOSTAT=IOST)
           If( IOST .NE. 0 )Then
-            Write(6,'(a)')'Error Reading FILE_CONTROLS namelist'
-            Write(6,'(a)')'Using Below Default Values'
+            WRITE(OUTDEV,'(a)')'Error Reading FILE_CONTROLS namelist'
+            WRITE(OUTDEV,'(a)')'Using Below Default Values'
           End If
 
-          WRITE(6, NML=FILE_CONTROLS,IOSTAT=IOST)
+          WRITE(OUTDEV, NML=FILE_CONTROLS,IOSTAT=IOST)
 
           READ(IN_UNIT, NML=SURFACE_CONTROLS,IOSTAT=IOST)
           If( IOST .NE. 0 )Then
-            Write(6,'(a)')'Error Reading SURFACE_CONTROLS namelist'
-            Write(6,'(a)')'Using Below Default Values'
+            WRITE(OUTDEV,'(a)')'Error Reading SURFACE_CONTROLS namelist'
+            WRITE(OUTDEV,'(a)')'Using Below Default Values'
           End If
-          WRITE(6, NML=SURFACE_CONTROLS)
-          print*,'DRIVER_INPUTS: BXM_LU = ',TRIM(BXM_LU)
+          WRITE(OUTDEV, NML=SURFACE_CONTROLS)
 
           IF(UNIX_OS)THEN
              J = BSLASH
@@ -555,6 +559,9 @@ C for input and output files
           HT  = BXM_HT
 
           CALL NAMEVAL( INFILE,  ASCII_IC )
+          WRITE(OUTDEV,'(a)')TRIM( INFILE ) // " = " // TRIM( ASCII_IC )
+          CALL NAMEVAL( METFILE,  ASCII_MET )
+          WRITE(OUTDEV,'(a)')TRIM( METFILE ) // " = " // TRIM( ASCII_MET )
 !         CALL NAMEVAL( JTABLE,  XJ_DATA )
           CALL NAMEVAL( OUTFILE, MACTAB_FILE )
 
