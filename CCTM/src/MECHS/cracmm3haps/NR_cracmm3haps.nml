@@ -24,7 +24,7 @@ NR_SPECIES_DATA =
 'HEXMETH_DIS'    ,168.20  ,''     ,-1      ,''     ,-1     ,'VD_HEXMETH_DIIS' , 1   ,'HEXAMETHYLE_DIIS', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hexamethylene 16-Diisocyanate,E,DTXSID4024143,O=C=NCCCCCCN=C=O
 'HYDRAZINE'      , 32.00  ,''     ,-1      ,''     ,-1     ,'VD_HYDRAZINE'    , 1   ,'HYDRAZINE'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrazine,E,DTXSID3020702,NN
 'MAL_ANHYDRID'   , 98.00  ,''     ,-1      ,''     ,-1     ,'VD_MAL_ANHYDRIDE', 1   ,'MALEIC_ANHYDRIDE', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Maleic Anhydride,E,DTXSID7024166,O=C1OC(=O)C=C1
-'TOL_DIIS'       ,174.20  ,''     ,-1      ,''     ,-1     ,'VD_TOLUENE_DIIS' , 1   ,'24-TOLUENE_DIIS' , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!24-Toluene Diisocyanate,DTXSID7026156,CC1=CC=C(C=C1N=C=O)N=C=O
+'TOL_DIIS'       ,174.20  ,''     ,-1      ,''     ,-1     ,'VD_TOLUENE_DIIS' , 1   ,'24-TOLUENE_DIIS' , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!24-Toluene Diisocyanate,E,DTXSID7026156,CC1=CC=C(C=C1N=C=O)N=C=O
 'TRIETHYLAMIN'   ,101.20  ,''     ,-1      ,''     ,-1     ,'VD_TRIETHYLAMINE', 1   ,'TRIETHYLAMINE'   , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Triethylamine,E,DTXSID3024366,CCN(CC)CC
 'DICL_BENZENE'   ,147.00  ,''     ,-1      ,''     ,-1     ,'VD_BENZ'         , 1   ,'P_DICHLOROBENZEN', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!14-Dichlorobenzene,E,DTXSID1020431,ClC1=CC=C(Cl)C=C1
 'ACET_NITRILE'   , 41.05  ,''     ,-1      ,''     ,-1     ,'VD_ACETONITRILE' , 1   ,'ACETONITRILE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Acetonitrile,E,DTXSID0020868,CC#N
