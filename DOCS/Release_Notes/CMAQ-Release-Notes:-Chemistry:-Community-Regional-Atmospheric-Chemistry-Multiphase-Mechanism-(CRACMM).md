@@ -11,6 +11,26 @@ CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version buil
 **Significance and Impact**:   
 CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enable a wider range of applications of CRACMM.
 
+### CRACMM Species Documentation and Propagation of Information Outside CMAQ
+ [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
+
+**Type of update**: Documentation  
+
+**Release Version/Date**:  CMAQv6.0
+
+**Description**:  Several minor typos were corrected in documentation of species and reactions for CRACMM. The workflow for how CRACMM species information is propagated to synthesis tables (e.g., in https://github.com/USEPA/CRACMM) was updated. In CMAQv6.0, CRACMM more rigorously follows the convention that a species that exists in two phases should have the same name in each phase. A prepended A (for aerosol) and V (for vapor) are used in the AE and GC nml as well as mech.def to refer to the species in a given phase. In CRACMM2, a legacy AGLY persists but in CRACMM3, that species has been renamed AGLYOLIG to avoid overlap with gas-phase glyoxal (GLY) (see [other Release Note](/DOCS/Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-cracmm-species-names)). Three exceptions remain in CRACMM3: 
+- ANO3 (aerosol nitrate ion), NO3 (nitrate radical in gas phase)
+- ACL (aerosol chlorine ion), CL (chlorine radical in gas phase)
+- ABR (aerosol bromine ion), BR (bromine radical) (CRACMM3M only)
+
+The above aerosol species have special handling in the species description files (stored in the CCTM/src/MECHS folders). "ASpecial" is used in the species name in the species description file to retain the prepended A on the ionic version of the species and avoid matching with the gas-phase radical version. In all other cases, the species description files do not contain a phase identifier (e.g., ASO4 is SO4) and the phase is identified by the presence in a given namelist. This allows for species across phases to be automatically detected when additional CRACMM documentation is generated for the CRACMM repository.
+
+**Significance and Impact**: Updates CRACMM documentation
+
+**Internal PRs**: (Replace xxx with your PR number.)
+[PR#1392](https://github.com/USEPA/CMAQ_Dev/pull/1392)  
+
+
 ### Heterogeneous chemistry of sulfur species
 [Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
@@ -506,14 +526,13 @@ Errors in conservation of nitrogen for select reactions ported from RACM2 into C
 |[Merge for PR#1205](https://github.com/USEPA/CMAQ/commit/a0f806bd2666d217ff25c4a2b3b04d2347c1d607) | [PR#1205](https://github.com/USEPA/CMAQ_Dev/pull/1205)  |
 
 
-
 ### CRACMM Reaction Metadata File  
 [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Documentation    
 **Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
-A Metadata file has been added to document updates to CRACMM chemistry at the reaction level. The file is named MECH_rxn_metadata.csv and resides in the mechanism_information folder for the MECH. This has only been implemented for CRACMM2 and CRACMM3. CRACMM3 information is not yet complete. The file is a csv file with the following columns:
+A Metadata file has been added to document updates to CRACMM chemistry at the reaction level. The file is named MECH_rxn_metadata.csv and resides in the mechanism_information folder for the MECH. This has only been implemented for CRACMM mechanisms. The file is a csv file with the following columns:
 - reaction_id: letter/number combination from mech.def file that labels reaction        
 - reactants: reactants from mech.def file
 - products: products from from mech.def file         
@@ -525,6 +544,8 @@ A Metadata file has been added to document updates to CRACMM chemistry at the re
 - underlying_data_publication_string: “Author et al., year” citation that provides a critical piece of data upon which the CRACMM reaction was built. This could be an experimental paper, another mechanism (e.g., MCM), or other work that helps document the underlying basis
 - underlying_data_publication_doi: link to article in above field      
 - Notes: information on how reaction was developed such as if coefficients represent a weighted mixture of compounds or if a specific simplification technique was used. This field allows for several sentences.
+
+The rxn metadata files are most easily updated by starting with the reaction csv files output by CHEMMECH to obtaine the reaction id, reactants, and products. To minimize differences, remove all spaces in those columns. The rate at 298 K can be obtained from the reaction markdown files.
 
 **Significance and Impact**:   
 This file provides information on CRACMM updates at the reaction level. This file will be posted on github.com/USEPA/CRACMM upon public release of CRACMM in CMAQ. This file will feed efforts to link chemical reactions across EPA such as the Chemical Transformations Database (CheT, https://ccte-cced-chet.epa.gov/).
