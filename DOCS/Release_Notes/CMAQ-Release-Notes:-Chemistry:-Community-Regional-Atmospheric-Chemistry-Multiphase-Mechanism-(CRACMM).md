@@ -358,7 +358,7 @@ The process is updated to include one additional pathway and update the product 
 
 The photolysis frequencies of BALD are also updated to use absorption cross-section and quantum yield data from Calvert et al. (2011).
 
-CRACMM3 does not include any photolytic reaction for PPN (peroxypropionyl nitrate). Two photolytic reactions of PPN are added. Photolysis frequencies are calculated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al.(2008).
+CRACMM2 does not include any photolytic reaction for PPN (peroxypropionyl nitrate). Two photolytic reactions of PPN are added in CRACMM3. Photolysis frequencies are calculated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al.(2008).
 <R033a> PPN = RCO3      + NO2          # 1.0/<PPN1_JPL19>;
 <R033b> PPN = HC3P      + NO3          # 1.0/<PPN2_JPL19>;
 
