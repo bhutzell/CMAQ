@@ -534,18 +534,25 @@ Errors in conservation of nitrogen for select reactions ported from RACM2 into C
 **Description**:   
 A Metadata file has been added to document updates to CRACMM chemistry at the reaction level. The file is named MECH_rxn_metadata.csv and resides in the mechanism_information folder for the MECH. This has only been implemented for CRACMM mechanisms. The file is a csv file with the following columns:
 - reaction_id: letter/number combination from mech.def file that labels reaction        
-- reactants: reactants from mech.def file
-- products: products from from mech.def file         
-- rate_constant: from mechanism markdown file (at 298 K)  
-- reaction_family: this describes where the reaction originated, current values are RACM2, CRACMM1, CRACMM2, CRACMM3          
+- reactants: reactants 
+- products: products          
+- rate_constant: rate constant   
+- reaction_family: this describes when the reaction was last updated, current values are RACM2, CRACMM1, CRACMM2, CRACMM3, CRACMM3M          
 - reaction_phase: gas, mixed, particle options        
-- publication_string: “Author et al., year” citation for where the reaction came from/was first documented for CRACMM            
+- publication_string: “Author et al. year” citation for where the reaction came from/was documented for CRACMM.            
 - publication_doi: link to article in above field         
-- underlying_data_publication_string: “Author et al., year” citation that provides a critical piece of data upon which the CRACMM reaction was built. This could be an experimental paper, another mechanism (e.g., MCM), or other work that helps document the underlying basis
+- underlying_data_publication_string: “Author et al. year” citation that provides a data upon which the CRACMM reaction was built. This could be an experimental paper, another mechanism (e.g., MCM or previous CMAQ implementation), or other work that helps document the underlying basis
 - underlying_data_publication_doi: link to article in above field      
 - Notes: information on how reaction was developed such as if coefficients represent a weighted mixture of compounds or if a specific simplification technique was used. This field allows for several sentences.
 
-The rxn metadata files are most easily updated by starting with the reaction csv files output by CHEMMECH to obtaine the reaction id, reactants, and products. To minimize differences, remove all spaces in those columns. The rate at 298 K can be obtained from the reaction markdown files.
+The rxn metadata files are most easily updated by starting with the reaction csv files output by CHEMMECH to obtaine the reaction id, reactants, products, and rate constants. To minimize differences, remove all spaces, ----, <, and > in those columns. For more information on complex rate constants, see the the reaction markdown file in the same folder.
+
+Additional guidance for updating this file:
+
+Reaction_family is not updated for species name changes that mean the same thing in each version (e.g., OP3 to VOP3; INO2 to ISONP in CRACMM2 to CRACMM3) although a note may be added about name changes in the last column. Adding CO2 or changing the rate are considered updates and labeled with the version where the last updated occurred. Changes to reaction_family should include information in the Notes about the update.
+
+References (publication and underlying_data_publication) are two levels of documentation. The publication column is ideally a CRACMM-specific publication that contains the reaction implementation or most recent MAJOR update to the reaction. This is the reference to cite if that reaction is highly relevant to a particular study. The underlying_data_publication may be a laboratory parameterization, reaction from another model/mechanism (e.g., MOZART), original CMAQ implementation that has been further modified, or other relevant reference that was used to inform the reaction. If there are multiple (or limited) references available to document a reaction, choose reference(s) that best indicate the implementation and scientific basis in two levels. This could mean the main publication is not CRACMM specific and/or the uderlying_data_publication is a CMAQ reference. Additional detail can be added in the Notes column and/or CMAQ Release Notes.
+
 
 **Significance and Impact**:   
 This file provides information on CRACMM updates at the reaction level. This file will be posted on github.com/USEPA/CRACMM upon public release of CRACMM in CMAQ. This file will feed efforts to link chemical reactions across EPA such as the Chemical Transformations Database (CheT, https://ccte-cced-chet.epa.gov/).
