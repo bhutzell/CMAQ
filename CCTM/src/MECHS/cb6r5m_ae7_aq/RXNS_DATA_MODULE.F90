@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /work/MOD3DEV/sgq/manage_git/research/cb6r5m_pno3_photolysis/BASE/UTIL/chemmech/input/cb6r5m_ae7_aq/mech_cb6r5m_ae7_aq.d
+! Source file: /work/MOD3DEV/tskipper/cmaq_testing/20251208_cb6r5m_mechdef_typo_fix/UTIL/chemmech/input/cb6r5m_ae7_aq/mech_cb6r5m_ae7_a
 ! for Mechanism Name: CB6R5M_AE7_AQ                   
 
 ! This file is used to create mechanism data and functions
@@ -455,7 +455,7 @@
       & MEMBER("DMS             ",  141, "GC",   62.00D0, F), &
       & MEMBER("MSA             ",  142, "GC",   96.00D0, F), &
       & MEMBER("BRCL            ",  143, "GC",  115.40D0, F), &
-      & MEMBER("ABRJ            ",  247, "AE",   79.90D0, T), &
+      & MEMBER("ABRJ            ",  248, "AE",   79.90D0, T), &
       & MEMBER("I               ",  144, "GC",  126.90D0, F), &
       & MEMBER("IO              ",  145, "GC",  142.90D0, F), &
       & MEMBER("HI              ",  146, "GC",  127.90D0, F), &
@@ -826,7 +826,7 @@
       DATA CGRID_INDEX( 161 ), SPECIES_TYPE( 161 ), CONVERT_CONC( 161 ) /  141, 'GC', F /  ! DMS
       DATA CGRID_INDEX( 162 ), SPECIES_TYPE( 162 ), CONVERT_CONC( 162 ) /  142, 'GC', F /  ! MSA
       DATA CGRID_INDEX( 163 ), SPECIES_TYPE( 163 ), CONVERT_CONC( 163 ) /  143, 'GC', F /  ! BRCL
-      DATA CGRID_INDEX( 164 ), SPECIES_TYPE( 164 ), CONVERT_CONC( 164 ) /  247, 'AE', T /  ! ABRJ
+      DATA CGRID_INDEX( 164 ), SPECIES_TYPE( 164 ), CONVERT_CONC( 164 ) /  248, 'AE', T /  ! ABRJ
       DATA CGRID_INDEX( 165 ), SPECIES_TYPE( 165 ), CONVERT_CONC( 165 ) /  144, 'GC', F /  ! I
       DATA CGRID_INDEX( 166 ), SPECIES_TYPE( 166 ), CONVERT_CONC( 166 ) /  145, 'GC', F /  ! IO
       DATA CGRID_INDEX( 167 ), SPECIES_TYPE( 167 ), CONVERT_CONC( 167 ) /  146, 'GC', F /  ! HI

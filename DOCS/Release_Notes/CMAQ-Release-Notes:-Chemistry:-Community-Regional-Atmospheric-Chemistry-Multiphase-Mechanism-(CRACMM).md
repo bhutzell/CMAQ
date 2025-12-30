@@ -47,6 +47,21 @@ Chlorine chemistry increases nitryl chloride (ClNO2) in winter which subsequentl
 |:------:|:-------:|
 |[Merge for PR#1252](https://github.com/USEPA/CMAQ/commit/686bde3e7b2a335d8769b8ff14368d068ba95583) | [PR#1252](https://github.com/USEPA/CMAQ_Dev/pull/1252)  |
 
+### Correct the molecular weight of HCL for CRACMM
+[Havala Pye](mailto:pye.havala@epa.gov),  U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix  
+**Release Version/Date**: CMAQv6.0  
+
+**Description**:  
+The molecular weight of HCL used in CRACMM has been corrected from 36 g/mol to 36.5 g/mol. Updating the molecular weight of this species can affect partioning from HCL to aerosol chlorine (model species ACL), and these changes lead to differences in other model species concentrations.  
+ 
+**Significance and Impact**:   
+This bug fix does not significantly change results for monthly to annual averages. Differences may be more notable for daily averages. In an annual simulation for the year 2022 over the northern hemisphere using CRACMM3M, the largest differences (i.e., largest change in any grid cell for any day) in maximum daily 8 hour average ozone ranged from -1.1 to 0.7 ppb. The largest differences in daily average PM2.5 ranged from -1.1 to 3.2 ug/m3. The largest impacts for PM2.5 tended to occur over eastern China in this test.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+| | [PR#1400](https://github.com/USEPA/CMAQ_Dev/pull/1400)  |
+
 ### Photolysis of aerosol nitrate in CRACMM3  
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
@@ -73,7 +88,6 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1185](https://github.com/USEPA/CMAQ/commit/189dc7f9b7e60b87efe76f5ff9af53088c2b469a) | [PR#1185](https://github.com/USEPA/CMAQ_Dev/pull/1185)  |
-
 
 ### Updates to semi- and intermediate volatility ROCOXY system yields and products
 [Havala Pye](mailto:pye.havala@epa.gov) and Ben Murphy, U.S. Environmental Protection Agency  
