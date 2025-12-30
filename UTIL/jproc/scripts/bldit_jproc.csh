@@ -55,7 +55,7 @@
 #set Mechanism = saprc07tic_ae7i_aq                          #> chemical mechanism (see $CMAQ_REPO/CCTM/MECHS)
  set Tracer    = trac0                                       #> tracer configuration directory under $CMAQ_REPO/CCTM/MECHS [ default: no tracer species 
  set APPL      = ${VSRN}_${Mechanism}
- set EXEC      = JPROC_${APPL}_${compiler}${compilerVrsn}    #> executable name
+ set EXEC      = JPROC_${APPL}_${compilerString}    #> executable name
  set CFG       = cfg.$EXEC                                   #> configuration file name
 
  echo $CFG 
@@ -64,11 +64,27 @@
 #>    Most of these settings are done in config.cmaq
 #======================================#>
 
- set FC = ${myFC}                      #> path of Fortan compiler; set in config.cmaq
- set FP = $FC                          #> path of Fortan preprocessor; set in config.cmaq
-
+  switch ( $compiler ) #> path of Fortan and C compilers; instead of values set in config.cmaq
+   case  "intel":
+      set FC = "ifort"
+      set CC = "icx"
+      breaksw
+   case "gcc":
+      set FC = "gfortran"
+      set CC = "gcc"
+      breaksw
+   case "pgi":
+      set FC = "pgf90"
+      set CC = "pgcc"
+      breaksw
+   default:
+      breaksw
+  endsw
+  setenv myFC $FC
+  setenv myCC $CC
+  set    FP = $FC
  
- set Blder = "${CMAQ_HOME}/../../bldmake/bldmake_${compiler}${compilerVrsn}.exe "  #> location of model builder executable
+ set Blder = "${CMAQ_HOME}/../../bldmake/bldmake_${compilerString}.exe "  #> location of model builder executable
  setenv BLDER ${Blder}
 
 #> Set compiler flags
@@ -102,7 +118,7 @@
  endif
 
 #> The "BLD" directory for checking out and compiling source code
- set Bld = $Base/BLD_${VSRN}_${Mechanism}_${compiler}${compilerVrsn}
+ set Bld = $Base/BLD_${VSRN}_${Mechanism}_${compilerString}
  if ( ! -e "$Bld" ) then
     mkdir $Bld
  else
@@ -184,13 +200,18 @@
     echo                                                           >> $Cfile
  endif
 
-set Blder = "${CMAQ_HOME}/UTIL/bldmake/bldmake_${compiler}${compilerVrsn}.exe "  #> location of model builder executable
+set Blder = "${CMAQ_HOME}/UTIL/bldmake/bldmake_${compilerString}.exe "  #> location of model builder executable
 #> Recompile BLDMAKE from source if requested or if it does not exist
 if ( $?CompileBLDMAKE || ! ( -f $Blder ) ) then 
-
-     cd ${CMAQ_REPO}/UTIL/bldmake/scripts
-     ./bldit_bldmake.csh
-
+#    cd ${CMAQ_REPO}/UTIL/bldmake/scripts
+#    ./bldit_bldmake.csh
+   cp -f -r ${CMAQ_REPO}/UTIL/bldmake $CMAQ_HOME/UTIL/bldmake
+   cd $CMAQ_HOME/UTIL/bldmake/scripts
+   ./bldit_bldmake.csh $compiler
+   if ( ! ( -e $Blder ) ) then
+     ls $Blder
+     exit()
+   endif
 endif
 
 cd $Bld
@@ -231,6 +252,7 @@ cd $Bld
  echo "#! /bin/csh -f" >! ${make_it}
  echo " "              >> ${make_it}
  echo "source ../../../../config_cmaq.csh "${compiler}" "${compilerVrsn}  >> ${make_it}
+ echo "#setenv debug true"                                         >> ${make_it}
  echo 'if ( $#argv == 1 )then'                                     >> ${make_it}
  echo '   if ( $1  == "clean" )make clean'                         >> ${make_it}
  echo "endif"                                                      >> ${make_it}
