@@ -563,7 +563,7 @@
       & MEMBER("CLNO2           ",  192, "GC",   81.50D0, F), &
       & MEMBER("CLNO3           ",  193, "GC",   97.50D0, F), &
       & MEMBER("HCOCL           ",  194, "GC",   64.50D0, F), &
-      & MEMBER("HCL             ",  195, "GC",   36.00D0, F), &
+      & MEMBER("HCL             ",  195, "GC",   36.50D0, F), &
       & MEMBER("BR2             ",  197, "GC",  159.80D0, F), &
       & MEMBER("BR              ",  198, "GC",   79.90D0, F), &
       & MEMBER("BRO             ",  199, "GC",   95.90D0, F), &
@@ -812,7 +812,7 @@
       DATA CHEMISTRY_SPC( 202 ), SPECIES_MOLWT( 202 ) / 'CLNO2           ',   81.50D0 /
       DATA CHEMISTRY_SPC( 203 ), SPECIES_MOLWT( 203 ) / 'CLNO3           ',   97.50D0 /
       DATA CHEMISTRY_SPC( 204 ), SPECIES_MOLWT( 204 ) / 'HCOCL           ',   64.50D0 /
-      DATA CHEMISTRY_SPC( 205 ), SPECIES_MOLWT( 205 ) / 'HCL             ',   36.00D0 /
+      DATA CHEMISTRY_SPC( 205 ), SPECIES_MOLWT( 205 ) / 'HCL             ',   36.50D0 /
       DATA CHEMISTRY_SPC( 206 ), SPECIES_MOLWT( 206 ) / 'BR2             ',  159.80D0 /
       DATA CHEMISTRY_SPC( 207 ), SPECIES_MOLWT( 207 ) / 'BR              ',   79.90D0 /
       DATA CHEMISTRY_SPC( 208 ), SPECIES_MOLWT( 208 ) / 'BRO             ',   95.90D0 /

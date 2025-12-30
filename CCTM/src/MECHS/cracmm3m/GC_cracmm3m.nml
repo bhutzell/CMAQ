@@ -197,7 +197,7 @@ GC_SPECIES_DATA =
 'CLNO2'         , 81.5  ,''      ,-1     ,''     ,-1     ,'VD_CLNO2'          , 1   ,'NITRYL_CHLORIDE', 1  ,'CLNO2'        ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nitryl chloride,E,DTXSID601317066,ClN(=O)=O
 'CLNO3'         , 97.5  ,''      ,-1     ,''     ,-1     ,'VD_CLNO3'          , 1   ,'CLNO3'          , 1  ,'CLNO3'        ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Chlorine nitrate,E,DTXSID00163043,[O-][N+](=O)OCl
 'HCOCL'         , 64.5  ,''      ,-1     ,''     ,-1     ,'VD_FMCL'           , 1   ,'FMCL'           , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Formyl chloride,E,DTXSID30180344,ClC=O
-'HCL'           , 36.0   ,''     ,-1     ,''     ,-1     ,'VD_HCL'            , 1   ,'HCL'            , 1  ,'HCL'          ,'HCL'    ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrochloric acid,E,DTXSID2020711,Cl
+'HCL'           , 36.5   ,''     ,-1     ,''     ,-1     ,'VD_HCL'            , 1   ,'HCL'            , 1  ,'HCL'          ,'HCL'    ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrochloric acid,E,DTXSID2020711,Cl
 'CLOO'          , 67.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,''    ,''    ,''    ,'Yes',!Chlorine dioxide,E,DTXSID5023958,O=Cl[O]
 'BR2'           ,159.8   ,''     ,-1     ,''     ,-1     ,'VD_BR2'            , 1   ,'BR2'            , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Bromine,E,DTXSID1035238,BrBr
 'BR'            , 79.9   ,''     ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''        ,''    ,''    ,''   ,'Yes',!Bromine atom,E,DTXSID201014232,[Br]
