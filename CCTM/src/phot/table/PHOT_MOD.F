@@ -48,6 +48,13 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER :: LHNO3           = 0
       INTEGER :: LACETONE_CO     = 0 
       INTEGER :: LACETONE_CH3CO  = 0
+      INTEGER :: LGLYH2          = 0
+      INTEGER :: LGLYF           = 0
+      
+      LOGICAL            :: ACETONE_CHANNELS = .FALSE.
+      INTEGER, PARAMETER :: NWL_ACETONE_FJX  = 7
+      INTEGER            :: NUMB_WAVELENGTH  = 0
+      
       
       ! Variables passed to the PM diagnostic output module, ELMO
       REAL, ALLOCATABLE, SAVE :: ELMO_AOD_550( :,: )   ! total aerosol optical depth at 550 nm (Angstrom Interpolation)
@@ -109,29 +116,35 @@ C...........PARAMETERS and their descriptions
           DO JP = 1, NPHOTAB
              SELECT CASE ( PHOTAB( JP ) )
 !***check to see if this photolysis reaction is a special case.
-                CASE( 'O3O3P', 'O3O3P_SAPRC99', 'O3O3P_06', 'O3_O3P_IUPAC04', 'O3O3P_NASA06', 'O3_O3P_IUPAC10' )
+              CASE( 'O3O3P', 'O3O3P_SAPRC99', 'O3O3P_06', 'O3_O3P_IUPAC04', 'O3O3P_NASA06', 'O3_O3P_IUPAC10' )
                     LO3O3P = JP
-                CASE( 'NO2', 'NO2_SAPRC99', 'NO2_06', 'NO2_RACM2', 'NO2_IUPAC10' )
+              CASE( 'NO2', 'NO2_SAPRC99', 'NO2_06', 'NO2_RACM2', 'NO2_IUPAC10' )
                     LNO2 = JP
-                CASE( 'O3O1D',  'O3O1D_SAPRC99' , 'O3O1D_06', 'O3_O1D_IUPAC04', 'O3O1D_NASA06', 'O3_O1D_IUPAC10' )
+              CASE( 'O3O1D',  'O3O1D_SAPRC99' , 'O3O1D_06', 'O3_O1D_IUPAC04', 'O3O1D_NASA06', 'O3_O1D_IUPAC10' )
                     LO3O1D = JP
-                CASE( 'KETONE', 'KET_RACM2' )
+              CASE( 'KETONE', 'KET_RACM2', 'KET_JGR19' )
                     LKETONE   = JP
-                CASE( 'MGLY_ADJ' )
+              CASE( 'MGLY_ADJ' )
                     LMGLY_ADJ = JP
-                CASE(  'MGLY_ABS' )
+              CASE(  'MGLY_ABS' )
                     LMGLY_ABS = JP
-                CASE( 'ACETONE', 'CH3COCH3_RACM2', 'ACET_IUPAC10' )
-                    LACETONE  = JP
-                CASE( 'HCHOR_06', 'HCHO_R_SAPRC99', 'HCHO_RAD_RACM2', 'FORM_R_IUPAC10', 'HCHO_R_MCMv32' )
+              CASE( 'ACETONE', 'CH3COCH3_RACM2', 'ACET_IUPAC10' )
+                    IF( NUMB_WAVELENGTH .EQ. NWL_ACETONE_FJX ) LACETONE  = JP
+              CASE( 'HCHOR_06', 'HCHO_R_SAPRC99', 'HCHO_RAD_RACM2', 'FORM_R_IUPAC10',
+     &              'FORM_R_IUPAC13', 'HCHO_R_MCMv32', 'HCHO_RAD_JPL19' )
                     LHCHOR_06 = JP
-                CASE( 'ACET_CH3CO_CRI' )
+              CASE( 'ACET_CH3CO_CRI', 'CH3COCH3A_JPL19' )
                     LACETONE_CH3CO   = JP
-                CASE( 'H2O2', 'H2O2_SAPRC99', 'H2O2_RACM2', 'H2O2_IUPAC10' )
+                    ACETONE_CHANNELS = .TRUE.
+              CASE( 'H2O2', 'H2O2_SAPRC99', 'H2O2_RACM2', 'H2O2_IUPAC10' )
                    LH2O2 = JP
-                CASE( 'HNO3', 'HNO3_IUPAC04', 'HNO3_IUPAC10', 'HNO3_RACM2' )
+              CASE( 'HNO3', 'HNO3_IUPAC04', 'HNO3_IUPAC10', 'HNO3_RACM2' )
                    LHNO3 = JP
-              END SELECT
+              CASE( 'GLYH2_JPL19' )
+                    LGLYH2 = JP
+              CASE( 'GLYF_JPL19' )
+                    LGLYF = JP
+        END SELECT
           END DO
            
 !           IF ( LNO2   .EQ. 0 ) THEN
@@ -670,6 +683,7 @@ C...  and to yyyymmdd format
 C...read the extra terrestrial radiation data
 
           CALL READET ( NWL, STWL, MIDWL, ENDWL, F )
+          NUMB_WAVELENGTH = NWL
 
 C...read the absorption cross section and quantum yield data
 
@@ -976,6 +990,319 @@ C...formats
 
       END SUBROUTINE GET_JTABLE
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      SUBROUTINE GET_JVALUES( JDATE, JTIME ) 
+C*********************************************************************
+C
+C  This program calculates photolytic rate constants for
+C     atmospheric molecules specified by the chemical mechanism
+C     reader.  J-values are output in a TABLE format, dimensioned
+C     by hour angle, latitudinal band, and vertical height.  The
+C     contents of the table have been modulated by climatological
+C     profiles of temperture, pressure, and ozone.  In addition,
+C     if Total Ozone Column Measurements are available, the ozone
+C     profile is scaled to the measured TOC value.
+C
+C*********************************************************************
+C
+
+#ifdef m3box
+      USE GET_ENV_VARS
+#else
+      USE UTILIO_DEFN
+#endif
+      USE RXNS_DATA
+      USE JVAL_PARMS
+      USE CONST
+
+      IMPLICIT NONE
+      
+C arguments:
+      INTEGER, INTENT( IN  ) :: JDATE           ! current Julian date (YYYYDDD)
+      INTEGER, INTENT( IN  ) :: JTIME           ! Greenwich mean time (HHMMSS)
+
+
+      REAL,    PARAMETER :: MASS_TO_NUMBER = 1.0E-3 * AVO * MWAIR
+
+C...........LOCAL VARIABLES and their descriptions:
+
+      CHARACTER(16) :: PNAME  = 'GET_JTABLE'   !  driver program name
+      CHARACTER(16) :: JVFILE = 'XJ_DATA' ! environment logic name of table file with photolysis frequencies
+      CHARACTER(80) :: MSG    = '    '    ! buffer for messages to output
+      CHARACTER(567) EQNAME               ! actual name of table file
+      
+      LOGICAL, SAVE :: TOMS_EXIST         = .FALSE.   ! TOMS data existence flag
+      LOGICAL, SAVE :: USE_ATMOS_PROFILES = .FALSE.   ! get temperature, density, etc. from observed global profiles
+
+      INTEGER      DAY                ! julian day of year
+      INTEGER      IBASE              ! cloud base index
+      INTEGER      IDATE              ! date (yyyymmdd)
+      INTEGER      YEAR               ! year (yyyy)
+      INTEGER      ILAT               ! latitude index
+      INTEGER      ITIME              ! hour index
+      INTEGER      ITOP               ! cloud top index
+      INTEGER      JVUNIT             ! unit number for j-value output 
+      INTEGER      JDT                ! julian date
+      INTEGER      IWL                ! wavelength index
+      INTEGER      ILEV               ! level index
+      INTEGER      MONTH              ! month counter
+      INTEGER      IHT                ! height index
+      INTEGER      NLAYS              ! total # of atm layers
+      INTEGER      NLEVS              ! number of levels
+      INTEGER      IPHOT              ! reaction index
+      INTEGER      NSUBKM             ! cloud sublayers/km
+      INTEGER      NSURF              ! ground elev above sea level
+      INTEGER      NWL                ! number of wavelength bands
+      INTEGER      IOST               ! io status
+      INTEGER      STATUS             ! status
+      
+! indices in latitude array to print rates to standard output 
+      INTEGER, PARAMETER :: NLAT_PRINT    = 7
+      INTEGER :: ILAT_PRINT( NLAT_PRINT ) = (/ 4, 6, 8, 10, 12, 14, 16 /)
+      
+      REAL         COSZEN             ! cosine zenith angle
+      REAL         DF                 ! actinic flux
+      REAL         DJ                 ! jvalue for one wl,lev,react
+      REAL         DLAT               ! latitude
+      REAL         DLONG              ! longitude for Pittsburgh
+      REAL         GAER               ! aerosol asymetry factor
+      REAL         GCLD               ! cloud asymetry factor
+      REAL         GRAY               ! asymetry fact for Rayleigh scat
+      REAL         HAER               ! aerosol scale ht at atm top
+      REAL         HAIR               ! air scale height
+      REAL         HO3                ! ozone scale height
+      REAL         OMAER              ! aerosol single scat albedo
+      REAL         OMCLD              ! cloud single scat cross sect
+      REAL         OMRAY              ! single scat albedo, Rayleigh
+      REAL         UT                 ! time
+      REAL         UT0                ! local high noon
+      REAL         UTNOON             ! local high noon
+      REAL         TEMP_ADJUST        ! factor used to adjust temperature 
+      REAL         DENS_ADJUST        ! factor used to adjust number density
+
+      REAL         DOBNEW( JVLAT )    ! total vertical ozone column
+      REAL         CLOUD( 48 )        ! cloud optical depth profile
+      REAL         O3 ( MXLEV )       ! ozone profile
+      REAL         T  ( MXLEV )       ! interpolated temp profile
+      REAL         AIR( MXLEV )       ! interpolated air profile
+      REAL         AER( MXLEV )       ! aerosol attenuation profile
+      REAL         VAER( NJ )         ! aerosol column in layer
+      REAL         VAIR( NJ )         ! air column in layer
+      REAL         VCLD( NJ )         ! cloud column in layer
+      REAL         VO3 ( NJ )         ! ozone column in layer
+      REAL         VT  ( NJ )         ! average temp of column
+      REAL         ZMID( NJ )         ! altitude of midpoint of layer
+      REAL         Z   ( NJ )         ! altitude of each level
+      REAL         CVO2( NJ )         ! vertical column O2
+      REAL         MIDWL ( MXWL )     ! wavelength band midpoints
+      REAL         STWL  ( MXWL )     ! wavelength band starting point
+      REAL         ENDWL ( MXWL )     ! wavelength band ending point
+      REAL         AAER  ( MXWL )     ! aerosol total vert opt depth
+      REAL         ALBEDO( MXWL )     ! ground albedo
+      REAL         ARAYL ( MXWL )     ! Rayleigh scat cross section
+      REAL         F     ( MXWL )     ! extra-terrestrial radiation
+      REAL         O2ABS ( MXWL )     ! O2 absorption cross section
+      REAL         O3ABS ( MXWL )     ! O3 absorption cross section
+      REAL         XDOBS( 19, 12 )    ! lat-season ozone values
+      REAL         ENDIR( NJ, MXWL )  ! direct flux
+      REAL         ENDN ( NJ, MXWL )  ! diffuse down-flux
+      REAL         ENUP ( NJ, MXWL )  ! diffuse up-flux
+      REAL         AO2  ( NJ, MXWL )  ! O2 cross section
+      REAL         AO3  ( NJ, MXWL )  ! average O3 cross sect in layer
+      REAL         D( NPHOTAB, NJ )    ! j-values
+      REAL         QY( MXWL, NPHOTAB ) ! quantum yields
+      REAL         CS( MXWL, NPHOTAB ) ! cross sections
+      REAL         XT  ( 12, 19, MXLEV ) ! season-lat-vert temp profile (K)
+      REAL         XO3 ( 12, 19, MXLEV ) ! season-lat-vert ozone profile (molecules/cm3)
+      REAL         XAIR( 12, 19, MXLEV ) ! air concentration (molecules/cm3)
+      REAL         QYZ( 100, MXWL, NPHOTAB )! quantum yields T&P corrected
+      REAL         CSZ( 100, MXWL, NPHOTAB )! cross section at each level
+
+!     REAL         ZENITH                 ! zenith angle
+      REAL, ALLOCATABLE :: ZENITH( :,: ) ! solar zenith angles
+
+      CHARACTER( 3 ) :: MONTHS(1:12) = (/ 
+     &      'Jan','Feb','Mar','Apr','May','Jun',
+     &      'Jul','Aug','Sep','Oct','Nov','Dec' /)
+      CHARACTER(LEN = :), ALLOCATABLE :: SDATE
+
+
+      LOGICAL, SAVE :: INITIALIZE = .TRUE.
+
+C*********************************************************************
+C     begin body of program JPROC
+
+       
+      JDT = JDATE
+
+C...check for the existence of TOMS data
+
+      TOMS_EXIST = .FALSE.
+
+
+C...convert julian date to year, month, and day
+C...  and to yyyymmdd format
+
+#ifdef m3box
+      CALL JULIAN_YEAR_MONTH_DAY (JDT,YEAR,MONTH,DAY)
+#else
+      YEAR = INT( JDT/1000 )
+      CALL DAYMON( JDT,MONTH,DAY )
+#endif
+      IDATE = YEAR * 10000 + MONTH * 100 + DAY
+
+      WRITE( 6, 2005 ) TRIM( MONTHS( MONTH ) ), DAY, YEAR
+
+      IF ( INITIALIZE ) THEN
+          
+          NLEVS = 1
+          
+C...read the extra terrestrial radiation data
+
+          CALL READAT ( NWL, STWL, MIDWL, ENDWL, F )
+          NUMB_WAVELENGTH = 0
+          NUMB_WAVELENGTH = NWL
+          WRITE(6,'(A,I4)')'GET_JVALUES values of Actinic Flux: NWL = ',NWL
+          WRITE(6,'(3(A8,1X),A12)')"STWL(IWL)","MIDWL(IWL)","ENDWL(IWL)","F(IWL)"
+          Do IWL = 1,NWL
+             WRITE(6,'(3(F8.2,1X),ES12.4)')STWL(IWL),MIDWL(IWL),ENDWL(IWL),F(IWL)
+          END DO
+          
+C...read the absorption cross section and quantum yield data
+
+         CALL READCSQY ( NWL, STWL, ENDWL, CS, QY )
+         DO ILEV = 1,NLEVS
+            CSZ( ILEV,:,: ) = CS( :,: )
+            QYZ( ILEV,:,: ) = QY( :,: )
+         END DO
+
+      END IF
+
+      NSURF = 1
+
+      DLONG = 80.0
+
+
+C...loop for latitude
+
+      ILAT = 1
+        DLAT = 0.0
+
+        UTNOON = 12.0 + DLONG * 24.0 / 360.0
+        UT0 = UTNOON
+        ITIME = 1
+          UT = UT0
+
+C...initialize J-values
+
+            D = 0.0
+            DO IWL = 1, NWL
+               ILEV = 1
+C...compute the actinic flux
+                DF = F( IWL )
+                IF ( ILEV .LT. NSURF ) DF = 0.0
+C...compute rate of photolysis (j-values) for each reaction
+                DO IPHOT = 1, NPHOTAB
+                  DJ = DF * CSZ( ILEV, IWL, IPHOT )
+     &                    * QYZ( ILEV, IWL, IPHOT )
+                  D( IPHOT, ILEV ) = D( IPHOT, ILEV ) + DJ                  
+!                 IF( DJ .GT. 10.0 )THEN
+!                     WRITE(6,'(A,A,10(ES12.4,1X))')PHOTAB(IPHOT),': MIDWL,CSZ,QYZ,DF,DJ,D( IPHOT, ILEV ) = ',
+!    &                MIDWL(IWL),CSZ( ILEV, IWL, IPHOT ),QYZ( ILEV, IWL, IPHOT ),
+!    &                DF,DJ,D( IPHOT, ILEV )
+!                 END IF
+                END DO
+            END DO  
+
+C...load output array and convert from 1/sec to 1/min
+
+         ILEV = 1
+
+            IHT = 1
+                DO IPHOT = 1, NPHOTAB
+                  DO IWL = 1, NWL
+                    WRITE(6,'("GET_JVALUES: PHOTAB, IWL,MIDWL,CSY,QYX = ",A16,I4,1X,3(1X,ES12.4))')PHOTAB(IPHOT),IWL,
+     &              MIDWL(IWL),CSZ( ILEV, IWL, IPHOT ),QYZ( ILEV, IWL, IPHOT )
+                  END DO
+                  XJVAL( IPHOT,:,:,: ) = D( IPHOT, ILEV )
+     &                                 * 60.0
+                  WRITE(6,'("GET_JVALUES: PHOTAB, JVALUE = ",A16,1X,ES12.4)')PHOTAB(IPHOT),60.0*D( IPHOT, ILEV )
+                END DO
+
+C...write output file with file header
+
+#ifdef m3box
+!     CALL VALUE_NAME ( JVFILE, EQNAME )
+#else
+!     CALL NAMEVAL ( JVFILE, EQNAME )
+#endif
+
+!     OPEN ( NEWUNIT = JVUNIT,
+!    &       FILE = EQNAME,
+!    &       FORM = 'FORMATTED',
+!    &       STATUS = 'UNKNOWN',
+!    &       IOSTAT = IOST )
+
+C...check for open errors
+
+!     IF ( IOST .NE. 0) THEN
+!       MSG = 'Could not open the JVALUE data file'
+!       WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
+!       CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
+!     END IF
+
+!     WRITE( 6, 2011 ) JVUNIT, EQNAME
+
+C...Write Julian Date to output ***
+
+!     WRITE ( JVUNIT, 2013 ) JDT
+
+!     WRITE( JVUNIT, 2027) NPHOTAB
+
+!     DO IPHOT = 1, NPHOTAB
+!       ACLD( IPHOT ) = 1.0
+!       WRITE( JVUNIT, 2029 ) PHOTAB(IPHOT), ACLD( IPHOT )
+!     END DO
+
+!     DO IHT = 1, 1
+!       DO ILAT = 1, 1
+!         DO IPHOT = 1, NPHOTAB
+
+!           WRITE( JVUNIT, 2031 ) IHT, ILAT, IPHOT, PHOTAB( IPHOT )
+!           WRITE( JVUNIT, 2033 ) ( XJVAL( IPHOT, ITIME, ILAT, IHT ),
+!    &                               ITIME = 1, 1 )
+
+!         END DO
+!       END DO
+!     END DO
+!     CLOSE( JVUNIT )
+
+      print*,'calculated JVALUES '
+C...formats
+
+2001  FORMAT( 5X, A )
+2005  FORMAT( 1X, '...Date to be processed: ', A3, 1X, I2, 
+     &       ', ', I4, ' starting at 0:00 UT ' )
+2009  FORMAT( 1X, '...No TOMS data specified for this run.', /,
+     &        '   Climatological O3 column data will be used...', / )
+2011  FORMAT( 1X, '...Opening File on UNIT ', I2, /, 1X, A255, / )
+2013  FORMAT( 3X, I7, 2X, '(yyyyddd) Julian Date for the file' )
+2015  FORMAT( 3X, I2, 2X, 'LEVELS (m)' )
+2017  FORMAT( 3X, 30( F7.1, 1X ) )
+2019  FORMAT( 3X, I2, 2X, 'LATITUDES (deg)' )
+2021  FORMAT( 3X, 30( F5.1, 1X ) )
+2023  FORMAT( 3X, I2, 2X, 'HOUR ANGLES (from noon)' )
+2025  FORMAT( 3X, 30( F5.1, 1X ) )
+2027  FORMAT( 3X, I2, 2X, 'PHOTOLYTIC REACTIONS' )
+2029  FORMAT( 6X, '''', A16, ''',', 5X, F3.1 )
+2031  FORMAT( 1X, 3( I3, 1X ), A16, " ZENITH = ", 100(1X,F9.4) )
+2033  FORMAT( 1X, 1P, 5( E16.7, 2X ) )
+2034  FORMAT('At Z = ', F6.2, A )     
+2035  FORMAT(A16,10(1X,F12.2))
+2036  FORMAT(A16,10(1X,ES12.4))
+
+
+      END SUBROUTINE GET_JVALUES      
+C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER FUNCTION INDEX2 (NAME1, N, NAME2)     
 
 C***********************************************************************
@@ -1028,7 +1355,7 @@ C...Assume NAME1 is not in list NAME2
 
       RETURN
       END FUNCTION INDEX2
-      SUBROUTINE INTAVG ( WLIN, CQIN, NWLIN, TYPE,
+      SUBROUTINE INTAVG ( WLIN, CQIN, NWLIN, BRACKET,
      &                    WLOUT1, WLOUT2, CQOUT, NWLOUT )
      
 C*********************************************************************
@@ -1051,7 +1378,7 @@ C*********************************************************************
 
 C...........ARGUMENTS and their descriptions
 
-      CHARACTER(1) :: TYPE             ! spectra type
+      CHARACTER(1) :: BRACKET             ! spectra type
 
       INTEGER, INTENT( IN ) :: NWLOUT              ! number of intervals ETin
       INTEGER, INTENT( IN ) :: NWLIN               ! number of intervals CQin
@@ -1083,7 +1410,7 @@ C...begin body of subroutine INTAVG
 
 C...process point data
 
-      IF ( TYPE .EQ. 'P' ) THEN
+      IF ( BRACKET .EQ. 'P' ) THEN
 
 C...transform the data to the same wavelength intervals as
 C...  the irradiance data.
@@ -1178,7 +1505,7 @@ C...process interval data
 
 C...determine wl intervals for CENTERED WLBAND data
 
-        IF ( TYPE .EQ. 'C' ) THEN
+        IF ( BRACKET .EQ. 'C' ) THEN
 
           WLIN1( 1 ) = 0.5 * (( 3.0 * WLIN( 1 ) ) -  WLIN( 2 ))
           WLIN2( 1 ) = 0.5 * (WLIN( 1 ) + WLIN( 2 ))
@@ -1190,7 +1517,7 @@ C...determine wl intervals for CENTERED WLBAND data
 
 C...determine wl intervals for BEGINNING WLBAND data
 
-        ELSE IF ( TYPE .EQ. 'B' ) THEN
+        ELSE IF ( BRACKET .EQ. 'B' ) THEN
 
           DO J = 1, NWLIN-1
             WLIN1( J ) = WLIN( J )
@@ -1199,7 +1526,7 @@ C...determine wl intervals for BEGINNING WLBAND data
 
 C...determine wl intervals for ENDING WLBAND data
 
-        ELSE IF ( TYPE .EQ. 'E' ) THEN
+        ELSE IF ( BRACKET .EQ. 'E' ) THEN
 
           DO J = 2, NWLIN
             WLIN1( J-1 ) = WLIN( J-1 )
@@ -1852,7 +2179,7 @@ C...........ARGUMENTS and their descriptions
 
 C...........LOCAL VARIABLES and their descriptions:
 
-      CHARACTER(1)   :: TYPE               ! cs/qy spectra type
+      CHARACTER(1)   :: BRACKET               ! cs/qy spectra type
       CHARACTER(16)  :: PNAME = 'READCSQY' ! program name
       CHARACTER(16)  :: CQDIR = 'CSQY'     ! directory for CSQY data
       CHARACTER(16)  :: PHOTID             ! reaction id's
@@ -1924,18 +2251,18 @@ C...get type of data (e.g. centered, beginning, ending, or point wavelen
 
 101     CONTINUE
 
-        READ( CQUNIT, 1003, IOSTAT = IOST ) TYPE
+        READ( CQUNIT, 1003, IOSTAT = IOST ) BRACKET
 
 C...check for read errors
 
         IF ( IOST .NE. 0) THEN
-          MSG = 'Errors occurred while reading TYPE for ' //
+          MSG = 'Errors occurred while reading BRACKET for ' //
      &           PHOTAB( IPHOT )
           WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
           CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
         END IF
 
-        IF ( TYPE .EQ. '!' ) GO TO 101
+        IF ( BRACKET .EQ. '!' ) GO TO 101
 
 C...read the factor to multiply cross sectionS by
 
@@ -1991,13 +2318,13 @@ C...adjust loop counter index index and close file
 C...transform the cs data to the same wavelength intervals as
 C...  the irradiance data.
 
-        CALL INTAVG ( WLIN, XCSIN, NWLIN, TYPE,
+        CALL INTAVG ( WLIN, XCSIN, NWLIN, BRACKET,
      &                STWL, ENDWL, CSOUT, NWL )
 
 C...transform the qy data to the same wavelength intervals as
 C...  the irradiance data.
 
-        CALL INTAVG ( WLIN, QYIN, NWLIN, TYPE,
+        CALL INTAVG ( WLIN, QYIN, NWLIN, BRACKET,
      &                STWL, ENDWL, QYOUT, NWL )
 
 C...load output arrays with integrated data
@@ -2057,7 +2384,7 @@ C...........ARGUMENTS and their descriptions
 
 C...........LOCAL VARIABLES and their descriptions:
 
-      CHARACTER(1)   :: TYPE                ! cs/qy spectra type
+      CHARACTER(1)   :: BRACKET                ! cs/qy spectra type
       CHARACTER(16)  :: ETFILE = 'ET'       ! ET i/o logical name
       CHARACTER(16)  :: PNAME  = 'READET'   ! program name
       CHARACTER(80)  :: MSG    = '    '     ! message
@@ -2103,17 +2430,17 @@ C...get type of data (e.g. centered, beginning, ending wavelength
 
 101   CONTINUE
 
-      READ( ETUNIT, 1003, IOSTAT = IOST ) TYPE
+      READ( ETUNIT, 1003, IOSTAT = IOST ) BRACKET
 
 C...check for read errors
 
       IF ( IOST .NE. 0 ) THEN
-        MSG = 'Errors occurred while reading TYPE from ET file'
+        MSG = 'Errors occurred while reading BRACKET from ET file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
         CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
-      IF ( TYPE .EQ. '!' ) GO TO 101
+      IF ( BRACKET .EQ. '!' ) GO TO 101
 
 C...read the factor to multiply irradiance by
 
@@ -2166,7 +2493,7 @@ C...adjust loop counter index index and close file
 
 C...determine wl intervals for CENTERED WLBAND data
 
-      IF ( TYPE .EQ. 'C' ) THEN
+      IF ( BRACKET .EQ. 'C' ) THEN
 
         NWL = NWLIN
         MIDWL( 1 ) = WLIN( 1 )
@@ -2186,7 +2513,7 @@ C...determine wl intervals for CENTERED WLBAND data
 
 C...determine wl intervals for BEGINNING WLBAND data
 
-      ELSE IF ( TYPE .EQ. 'B' ) THEN
+      ELSE IF ( BRACKET .EQ. 'B' ) THEN
 
         NWL = NWLIN - 1
 
@@ -2198,7 +2525,7 @@ C...determine wl intervals for BEGINNING WLBAND data
 
 C...determine wl intervals for ENDING WLBAND data
 
-      ELSE IF ( TYPE .EQ. 'E' ) THEN
+      ELSE IF ( BRACKET .EQ. 'E' ) THEN
 
         NWL = NWLIN - 1
 
@@ -2230,6 +2557,227 @@ C...formats
 
       RETURN
       END SUBROUTINE READET
+      SUBROUTINE READAT ( NWL, STWL, MIDWL, ENDWL, F )
+         
+C*********************************************************************
+C
+C  the subroutine readet reads the actinic flux spectrum file.
+C    The input data are:
+C
+C     NWL                   - number of wavelength bands
+C     STWL(mxwl)            - array of nominal starting wavelengths of
+C                             spectral interval
+C     MIDWL(mxwl)           - array of nominal center wavelengths of
+C                             spectral interval
+C     ENDWL(mxwl)           - array of nominal ending wavelengths of
+C                             spectral interval
+C     F(mxwl)               - actinic flux
+C
+C*********************************************************************
+
+#ifdef m3box
+      USE GET_ENV_VARS
+#endif
+      USE  JVAL_PARMS
+
+
+      IMPLICIT NONE
+
+C...........ARGUMENTS and their descriptions
+      
+      REAL         ENDWL( MXWL )       ! wavelength band upper limit
+      REAL         F    ( MXWL )       ! extra-terrestrial radiation
+      REAL         MIDWL( MXWL )       ! wavelength midpoints
+      REAL         STWL ( MXWL )       ! wavelength band lower limit
+
+C...........LOCAL VARIABLES and their descriptions:
+
+      CHARACTER(1)   :: BRACKET                ! cs/qy spectra type
+      CHARACTER(16)  :: ATFILE = 'AT'       ! ET i/o logical name
+      CHARACTER(16)  :: PNAME  = 'READAT'   ! program name
+      CHARACTER(80)  :: MSG    = '    '     ! message
+      CHARACTER(655) :: EQNAME              ! full name of AT file
+      CHARACTER(655) :: FILE_LINE           ! Line read in AT file
+
+      INTEGER      ATUNIT              ! extraterrestrial rad io unit
+      INTEGER      IOST                ! io status
+      INTEGER      IWL                 ! wavelength index
+      INTEGER      NWL                 ! # of wlbands (infile)
+      INTEGER      NWLIN               ! # of wlbands (infile)
+
+      REAL         FACTOR              ! multiplying factor for F
+      REAL         WLIN( MXWLIN )      ! wl for input ET data
+
+C*********************************************************************
+C     begin body of subroutine READAT
+
+C...open and read the wavelength bands and extraterrestrial radiation
+
+#ifdef m3box
+      CALL VALUE_NAME ( ATFILE, EQNAME )
+#else
+      CALL NAMEVAL ( ATFILE, EQNAME )
+#endif
+
+
+      OPEN( NEWUNIT = ATUNIT,
+     &      FILE = EQNAME,
+     &      STATUS = 'OLD',
+     &      IOSTAT = IOST )
+
+C...check for open errors
+
+      IF ( IOST .NE. 0 ) THEN
+        MSG = 'Could not open the AT data file'
+        WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
+      END IF
+
+      WRITE( 6, 2001 ) ATUNIT, EQNAME
+
+C...get type of data (e.g. centered, beginning, ending wavelength
+
+101   CONTINUE
+
+      READ( ATUNIT, 1003, IOSTAT = IOST ) BRACKET
+
+C...check for read errors
+
+      IF ( IOST .NE. 0 ) THEN
+        MSG = 'Errors occurred while reading BRACKET from AT file'
+        WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
+      END IF
+
+      IF ( BRACKET .EQ. '!' ) GO TO 101
+
+C...read the factor to multiply irradiance by
+
+      READ( ATUNIT, 1005, IOSTAT = IOST ) FACTOR
+
+C...check for read errors
+
+      IF ( IOST .NE. 0 ) THEN
+        MSG = 'Errors occurred while reading FACTOR from AT file'
+        WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
+      END IF
+
+C...initialize arrays
+
+      DO IWL = 1, MXWL
+        WLIN( IWL ) = 0.0
+        F   ( IWL ) = 0.0
+      END DO
+
+C...loop over the number of wavelengths and continue reading
+
+      IWL = 0
+201   CONTINUE
+
+C...read the wavelength band data
+
+        IWL = IWL + 1
+        
+        READ( ATUNIT, *, IOSTAT = IOST ) FILE_LINE
+        WRITE(6,'("READAT FILE_LINE: ",A)')TRIM(FILE_LINE)
+        FILE_LINE = ADJUSTL( TRIM( FILE_LINE ) )
+        IF( FILE_LINE(1:1) .EQ. '!' )GO TO 201
+        BACKSPACE ATUNIT
+
+        READ( ATUNIT, *, IOSTAT = IOST ) WLIN( IWL ), F( IWL )
+        F( IWL ) = F( IWL ) * FACTOR
+
+C...check for read errors
+
+        IF ( IOST .GT. 0 ) THEN
+          MSG = 'Errors occurred while reading WL,F from ET file'
+          WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
+          CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
+        END IF
+
+C...end loop if we reach EOF, otherwise continue looping
+
+      IF ( IOST .EQ. 0 ) GO TO 201
+
+C...adjust loop counter index index and close file
+
+      NWLIN = IWL - 1
+      CLOSE( ATUNIT )
+
+      WRITE( 6, 2003 ) NWLIN
+
+C...determine wl intervals for CENTERED WLBAND data
+
+      IF ( BRACKET .EQ. 'C' ) THEN
+
+        NWL = NWLIN
+        MIDWL( 1 ) = WLIN( 1 )
+        STWL ( 1 ) = 0.5 * ( ( 3.0 * WLIN( 1 ) ) -  WLIN( 2 ) )
+        ENDWL( 1 ) = 0.5 * ( WLIN( 1 ) + WLIN( 2 ) )
+          
+        DO IWL = 2, NWLIN-1
+          MIDWL( IWL ) = WLIN( IWL )
+          STWL ( IWL ) = 0.5 * ( WLIN( IWL ) + WLIN ( IWL - 1 ) )
+          ENDWL( IWL ) = 0.5 * ( WLIN( IWL ) + WLIN ( IWL + 1 ) )
+        END DO
+
+        MIDWL( NWL ) = WLIN( NWLIN )
+        STWL ( NWL ) = 0.5 * ( WLIN( NWLIN - 1 ) + WLIN( NWLIN ) )
+        ENDWL( NWL ) = 0.5 * ( ( 3.0 * WLIN( NWLIN ) )
+     &               - WLIN( NWLIN - 1 ) )
+
+C...determine wl intervals for BEGINNING WLBAND data
+
+      ELSE IF ( BRACKET .EQ. 'B' ) THEN
+
+        NWL = NWLIN - 1
+
+        DO IWL = 1, NWLIN - 1
+          STWL ( IWL ) = WLIN( IWL )
+          MIDWL( IWL ) = 0.5 * ( WLIN( IWL ) + WLIN( IWL + 1 ) )
+          ENDWL( IWL ) = WLIN( IWL + 1 )
+        END DO
+
+C...determine wl intervals for ENDING WLBAND data
+
+      ELSE IF ( BRACKET .EQ. 'E' ) THEN
+
+        NWL = NWLIN - 1
+
+        DO IWL = 2, NWLIN
+          STWL ( IWL - 1 ) = WLIN( IWL - 1 )
+          MIDWL( IWL - 1 ) = 0.5 * ( WLIN( IWL - 1 ) + WLIN( IWL ) )
+          ENDWL( IWL - 1 ) = WLIN( IWL )
+        END DO
+
+C...stop program if wavelength data type not found
+
+      ELSE
+
+        MSG = 'Unrecognized spectra type in ' // TRIM( EQNAME )
+        WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
+        CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
+
+      END IF
+
+      WRITE(6,'(A,I4)')'READAT values of Actinic Flux: NWL = ',NWL
+      WRITE(6,'(3(A8,1X),A12)')"STWL(IWL)","MIDWL(IWL)","ENDWL(IWL)","F(IWL)"
+      Do IWL = 1,NWL
+         WRITE(6,'(3(F8.2,1X),ES12.4)')STWL(IWL),MIDWL(IWL),ENDWL(IWL),F(IWL)
+      END DO
+C...formats
+
+1001  FORMAT( A16 )
+1003  FORMAT( A1 )
+1005  FORMAT( /, 4X, F10.1 )
+
+2001  FORMAT( 1X, '...Opening File on UNIT ', I2, /, 1X, A255, / )
+2003  FORMAT( 1X, '...Data for ', I4, ' wavelengths read from file',
+     &        // )
+
+      RETURN
+      END SUBROUTINE READAT
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE READO2 ( NWL, STWL, ENDWL, O2ABS )
          
@@ -2259,7 +2807,7 @@ C...........ARGUMENTS and their descriptions
 
 C...........LOCAL VARIABLES and their descriptions:
 
-      CHARACTER(1)   :: TYPE              ! cs spectra type
+      CHARACTER(1)   :: BRACKET              ! cs spectra type
       CHARACTER(16)  :: O2FILE = 'O2ABS'  ! input filename buffer
       CHARACTER(16)  :: PHOTID            ! reaction id's
       CHARACTER(16)  :: PNAME  = 'READO2' ! program name
@@ -2320,17 +2868,17 @@ C...get type of data (e.g. centered, beginning, ending, or point wavelen
 
 101   CONTINUE
 
-      READ( O2UNIT, 1003, IOSTAT = IOST ) TYPE
+      READ( O2UNIT, 1003, IOSTAT = IOST ) BRACKET
 
 C...check for read errors
 
       IF ( IOST .NE. 0 ) THEN
-        MSG = 'Errors occurred while reading TYPE from O2ABS file'
+        MSG = 'Errors occurred while reading BRACKET from O2ABS file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
         CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
-      IF ( TYPE .EQ. '!' ) GO TO 101
+      IF ( BRACKET .EQ. '!' ) GO TO 101
 
 C...read the factor to multiply cross sectionS by
 
@@ -2382,7 +2930,7 @@ C...adjust loop counter index index and close file
 C...transform the cs data to the same wavelength intervals as
 C...  the irradiance data.
 
-      CALL INTAVG ( WLIN, XCSIN, NWLIN, TYPE,
+      CALL INTAVG ( WLIN, XCSIN, NWLIN, BRACKET,
      &              STWL, ENDWL, CSOUT, NWL )
 
 C...load output arrays with integrated data
@@ -2430,7 +2978,7 @@ C...........ARGUMENTS and their descriptions
 
 C...........LOCAL VARIABLES and their descriptions:
 
-      CHARACTER(1)   :: TYPE               ! cs/qy spectra type
+      CHARACTER(1)   :: BRACKET               ! cs/qy spectra type
       CHARACTER(16)  :: O3FILE = 'O3ABS'   ! input filename buffer
       CHARACTER(16)  :: PHOTID             ! reaction id's
       CHARACTER(16)  :: PNAME  = 'READO3'  ! program name
@@ -2493,17 +3041,17 @@ C...get type of data (e.g. centered, beginning, ending, or point wavelen
 
 101   CONTINUE
 
-      READ( O3UNIT, 1003, IOSTAT = IOST ) TYPE
+      READ( O3UNIT, 1003, IOSTAT = IOST ) BRACKET
 
 C...check for read errors
 
       IF ( IOST .NE. 0) THEN
-        MSG = 'Errors occurred while reading TYPE from O3ABS file'
+        MSG = 'Errors occurred while reading BRACKET from O3ABS file'
         WRITE(6,'(A)')TRIM( PNAME ) // ': ', TRIM( MSG )
         CALL M3EXIT( PNAME, 0, 0, ":Fatal Error", 0 )
       END IF
 
-      IF ( TYPE .EQ. '!' ) GO TO 101
+      IF ( BRACKET .EQ. '!' ) GO TO 101
 
 C...read the factor to multiply cross sectionS by
 
@@ -2555,7 +3103,7 @@ C...adjust loop counter index index and close file
 C...transform the cs data to the same wavelength intervals as
 C...  the irradiance data.
 
-        CALL INTAVG ( WLIN, XCSIN, NWLIN, TYPE,
+        CALL INTAVG ( WLIN, XCSIN, NWLIN, BRACKET,
      &                STWL, ENDWL, CSOUT, NWL )
 
 C...load output arrays with integrated data
@@ -3246,7 +3794,7 @@ C...........ARGUMENTS and their descriptions
 
 C...........LOCAL VARIABLES and their descriptions:
 
-      CHARACTER(1), SAVE :: TYPE = 'B' ! cs spectra type (B=beginning wl)
+      CHARACTER(1), SAVE :: BRACKET = 'B' ! cs spectra type (B=beginning wl)
 
       INTEGER      IWL                ! wavelength index
       INTEGER      IWLO2              ! wavelength index for ref O2 data
@@ -3441,7 +3989,7 @@ C...now transfrom the computed O2 data from their
 C...  reference wavelength bands to the same wavelength bands
 C...  as the extraterrestrial irradiance data
 
-        CALL INTAVG ( WLO2L, AO2W1, NWLO2+1, TYPE,
+        CALL INTAVG ( WLO2L, AO2W1, NWLO2+1, BRACKET,
      &                STWL,  ENDWL, AO2W2, NWL )
 
         DO IWL = 1, NWL
@@ -3538,7 +4086,7 @@ C...........ARGUMENTS and their descriptions
 C...........LOCAL VARIABLES and their descriptions:
 
       CHARACTER(8), SAVE :: SRO1D = '        ' ! source for o1d data
-      CHARACTER(1), SAVE :: TYPE = 'B' ! cs spectra type (B=beginning wl)
+      CHARACTER(1), SAVE :: BRACKET = 'B' ! cs spectra type (B=beginning wl)
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE. ! Flag for first call to SUBGRID
 
@@ -3798,7 +4346,7 @@ C...now transfrom the computed O3 cross sections from their
 C...  reference wavelength bands to the same wavelength bands
 C...  as the extraterrestrial irradiance data
 
-          CALL INTAVG ( WLO3L, CSO3W1, NWLO3+1, TYPE,
+          CALL INTAVG ( WLO3L, CSO3W1, NWLO3+1, BRACKET,
      &                  STWL, ENDWL, CSO3W2, NWL )
 
 C...replace the O3 cross sections data only within the wavelengths
@@ -4153,7 +4701,7 @@ C...now transfrom the computed O3 cross sections from their
 C...  reference wavelength bands to the same wavelength bands
 C...  as the extraterrestrial irradiance data
 
-        CALL INTAVG ( WLO3L, CSO3W1, NWLO3+1, TYPE,
+        CALL INTAVG ( WLO3L, CSO3W1, NWLO3+1, BRACKET,
      &                STWL, ENDWL, CSO3W2, NWL )
 
 C...replace the O3 cross sections data only within the wavelengths
