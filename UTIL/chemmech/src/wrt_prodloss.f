@@ -223,6 +223,9 @@ C..Check whether reaction has a species as both reactant and product
      &             NRK, 'RXN_LABEL : ',TRIM( STR_RXN( NRK ) )
              END SELECT
          END DO
+         IF( N_TERMS .EQ. 0 )THEN
+           WRITE(IOUT, 95039)
+         END IF
       END DO
       
       WRITE(IOUT, 97911)
@@ -238,11 +241,12 @@ C..Check whether reaction has a species as both reactant and product
 95026 FORMAT(5X,'&',17X,'        + ', 1PD10.4,' * RXRAT(  ', I4 ,' ) ! ', A, A)
 95036 FORMAT(5X,'&',17X,'        - ', 1PD10.4,' * RXRAT(  ', I4 ,' ) ! ', A, A)
 95037 FORMAT(5X,'&',17X,'        + RXRAT(  ', I4,' ) ! ', 13X, A, A)
+95039 FORMAT(5X,'&',17X,'        +  0.0D0 ! reactions do not affect species')
 !95025 FORMAT(5X,'&',17X,'        - RXRAT(  ', I4,' ) ! ', 13X, A,I4)
 !95026 FORMAT(5X,'&',17X,'        + ', 1PD10.4,' * RXRAT(  ', I4 ,' ) ! ', A, I4)
 !95036 FORMAT(5X,'&',17X,'        - ', 1PD10.4,' * RXRAT(  ', I4 ,' ) ! ', A, I4)
 !95037 FORMAT(5X,'&',17X,'        + RXRAT(  ', I4,' ) ! ', 13X, A, I4)
-95550 FORMAT(7X,'SUBROUTINE EVALUATE_DYDT( RKI, YIN, YDOT )'
+95550 FORMAT(7X,'SUBROUTINE EVALUATE_DYDT( RKI, YIN, TAIR, DENS, YDOT )'
      &  /'C***********************************************************************' 
      &  /'C'
      &  /'C  Function:  Compute YDOT = dc/dt for each species. YDOT is the'
@@ -255,22 +259,32 @@ C..Check whether reaction has a species as both reactant and product
      &  /'C'
      &  /'C'
      &  /'C***********************************************************************' 
+     &  /7X,'USE RXNS_DATA ' 
+     &  /7X,'USE RXNS_FUNCTION ' //
      &  /7X,'IMPLICIT NONE'/
-     &  /'C..Includes:'
-     &  /7X,'USE RXNS_DATA ' //
      &  /'C... arguments'
-     &  /7X,'REAL( 8 ), INTENT(  IN )  ::   YIN(  : )       ! Species concs, ppm'
-     &  /7X,'REAL( 8 ), INTENT(  IN )  ::   RKI(  : )       ! Reaction Rate Constant so YDOTs are in ppm/min'
-     &  /7X,'REAL( 8 ), INTENT( OUT )  ::   YDOT( : )       ! Species rates of change, ppm/min'
-     &  /'C... local'
-     &  /7X,'INTEGER   ISP'/
-     &  /7X,'REAL( 8 ) RXRAT( NRXNS )' /
+     &  /7X,'REAL( 8 ), INTENT( IN    )  ::   YIN(  : )  ! Species concs, ppm'
+     &  /7X,'REAL( 8 ), INTENT( INOUT )  ::   RKI(  : )  ! Reaction Rate Constant so YDOTs are in ppm/min'
+     &  /7X,'REAL( 8 ), INTENT( IN    )  ::   TAIR(  : ) ! air temperature, K'
+     &  /7X,'REAL( 8 ), INTENT( IN    )  ::   DENS( : )  ! air density, Kg/m3'
+     &  /7X,'REAL( 8 ), INTENT(   OUT )  ::   YDOT( : )  ! Species rates of change, ppm/min'
+     &  /'C..Includes:'
+     &  /'C..Local:'
+     &  /7X,'INTEGER   ISP'
+     &  /7X,'REAL( 8 ) RXRAT( NRXNS )            ! reaction rates, depends on number of reactants',
+     &  /7X,'REAL( 8 ) Y( 1,NUMB_MECH_SPC )      ! species concs',
+     &  /7X,'REAL( 8 ) RATE_CONSTANTS( 1,NRXNS ) ! reaction rate constant, ppm/min ' /
      &  /'C... Parameters: ')
 95551  FORMAT(////'c  Initialize reaction rates and dc/dt to zero'
      &  /7X,'RXRAT = 0.0D+0 '
      &  /7X,'YDOT  = 0.0D+0 '
-     &  //7X,'IF ( NSPECIAL_RXN .GT. 0 ) CALL SPECIAL_RATES( YIN, RKI )',
-     &    4X,'! calculate special rate coefficients '/ )
+     &  //7X,'IF ( NSPECIAL_RXN .GT. 0 ) THEN',
+     &    4X,'! calculate special rate coefficients ',
+     &  /10X,'Y( 1,1:NUMB_MECH_SPC ) = YIN( 1:NUMB_MECH_SPC)',
+     &  /10X,'RATE_CONSTANTS(1,1:NRXNS) = RKI(1:NRXNS)',
+     &  /10X,'CALL SPECIAL_RATES( NUMCELLS=1, Y=Y, TAIR=TAIR, DENS=DENS, RKI=RATE_CONSTANTS )',
+     &  /10X,'RKI(1:NRXNS) = RATE_CONSTANTS(1,1:NRXNS)',
+     &  /7X,'END IF'/)
      
 
 97911   FORMAT(// 7X
