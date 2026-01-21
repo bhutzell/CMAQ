@@ -138,6 +138,8 @@ set make_options = "-j"                #> additional options for make command if
                                             #>     (see $CMAQ_MODEL/CCTM/src/spcs)
  set ModPhot   = phot/inline                #> photolysis calculation module 
 #set ModPhot   = phot/table                #> photolysis calculation module 
+#set ModPhot   = phot/chamber               #> photolysis calculation module 
+
                                             #>     (see $CMAQ_MODEL/CCTM/src/phot)
 
  set ModMech   = MECHS/${Mechanism}
