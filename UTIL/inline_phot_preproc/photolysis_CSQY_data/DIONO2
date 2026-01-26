@@ -1,0 +1,32 @@
+DION02
+!Absorption cross sections to use for all dinitrates
+! Averages of absorption cross sections for 1,2-Propandiol dinitrate,
+! 1,2-Butandiol dinitrate, 2,3-Butandiol dinitrate, 3,4-dinitrooxy-l-butene,
+! and 1,4-dinitrooxy-2-butene.
+! From Barnes et al, J. Atm. Chem 17: 353-2373, 1993.
+! Assume unit quantum yields based on discussions in Barnes et al (1993).
+!
+Points (the mechanism evaluated with this format)                                
+! With FAC, units are (cm^2/molecule)                                            
+FAC=1.0                                                                          
+245.0 1.033E-19 1.000 
+250.0 8.852E-20 1.000
+255.0 8.028E-20 1.000
+260.0 7.434E-20 1.000
+265.0 6.778E-20 1.000
+270.0 6.024E-20 1.000
+275.0 5.208E-20 1.000
+280.0 4.222E-20 1.000
+285.0 3.270E-20 1.000
+290.0 2.434E-20 1.000
+295.0 1.746E-20 1.000
+300.0 1.250E-20 1.000
+305.0 9.220E-21 1.000
+310.0 6.300E-21 1.000
+315.0 4.220E-21 1.000
+320.0 3.320E-21 1.000
+325.0 2.220E-21 1.000
+330.0 1.560E-21 1.000
+335.0 1.140E-21 1.000
+340.0 6.800E-22 1.000
+345.0 0.000E+00 1.000

@@ -1,0 +1,31 @@
+CRBNIT
+!Absorption cross sections to use for lumped carbonyl nitrates
+! Absorption cross sections for various carbonyl nitrates from
+! Barnes et al, J. Atm. Chem 17: 353-2373, 1993,
+! with primary and secondary nitrates weighed equally.
+! Assume unit quantum yields based on discussions in Barnes et al (1993).
+!
+Points (the mechanism evaluated with this format)                                
+! With FAC, units are (cm^2/molecule)                                            
+FAC=1.0                                                                          
+245.0 2.880E-19 1.00
+250.0 2.072E-19 1.00
+255.0 1.597E-19 1.00
+260.0 1.339E-19 1.00
+265.0 1.195E-19 1.00
+270.0 1.119E-19 1.00
+275.0 1.099E-19 1.00
+280.0 1.035E-19 1.00
+285.0 9.498E-20 1.00
+290.0 8.433E-20 1.00
+295.0 7.243E-20 1.00
+300.0 5.900E-20 1.00
+305.0 4.608E-20 1.00
+310.0 3.288E-20 1.00
+315.0 2.180E-20 1.00
+320.0 1.458E-20 1.00
+325.0 8.200E-21 1.00
+330.0 5.225E-21 1.00
+335.0 3.300E-21 1.00
+340.0 2.775E-21 1.00
+345.0 0.000E+00 1.00

@@ -1,0 +1,49 @@
+ACROL_16
+! ACROL-16.PHF
+! Acrolein photolysis
+! NASA (2011, 2015) recommendation
+! The quantum yields were derived using the pressure and wavelength-dependent expression given by IUPAC (2005) for MVK,
+! with the parameter representing total pressure adjusted to yields the best fits to acrolein - NOx chamber experiments
+!
+Points (the mechanism evaluated with this format)                                
+! With FAC, units are (cm^2/molecule)                                            
+FAC=1.0                                                                          
+282.0 8.400E-21 0.148
+284.0 9.700E-21 0.133
+286.0 1.080E-20 0.119
+288.0 1.230E-20 0.107
+290.0 1.460E-20 0.096
+292.0 1.620E-20 0.086
+294.0 1.800E-20 0.077
+296.0 1.970E-20 0.069
+298.0 2.180E-20 0.062
+300.0 2.470E-20 0.055
+302.0 2.700E-20 0.049
+304.0 2.850E-20 0.044
+306.0 3.090E-20 0.040
+308.0 3.290E-20 0.036
+310.0 3.590E-20 0.032
+312.0 3.920E-20 0.028
+314.0 4.150E-20 0.026
+316.0 4.210E-20 0.023
+318.0 4.470E-20 0.020
+320.0 4.650E-20 0.018
+322.0 5.080E-20 0.016
+324.0 5.170E-20 0.015
+326.0 5.340E-20 0.013
+328.0 5.200E-20 0.012
+330.0 5.310E-20 0.011
+332.0 5.440E-20 0.009
+334.0 5.800E-20 0.008
+336.0 6.240E-20 0.008
+338.0 5.460E-20 0.007
+340.0 5.310E-20 0.006
+342.0 5.100E-20 0.005
+344.0 5.120E-20 0.005
+346.0 5.300E-20 0.004
+348.0 5.170E-20 0.004
+350.0 5.940E-20 0.004
+352.0 5.790E-20 0.003
+354.0 4.180E-20 0.003
+356.0 3.630E-20 0.003
+358.0 3.280E-20 0.002
