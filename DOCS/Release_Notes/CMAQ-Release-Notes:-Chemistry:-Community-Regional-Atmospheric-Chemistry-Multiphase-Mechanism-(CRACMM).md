@@ -100,6 +100,7 @@ Semi- and intermediate volatility species (S/IVOCs) are emitted from sources suc
 - Unsaturated dicarbonyl products (DCB1) have been replaced by a generic ketone (KET). During development of CRACMM1, both representative structures and chemistry were being developed at the same time. Now that representative structures are available for all species, the suitability of them as oxidation products is being revisited. As ROCOXY species are initially oxidized and multigenerational chemistry only continues to oxidize and fragment compounds, DCB1 (with a double bond) was considered less suitable than a generic ketone as a representative oxidation product.
 - Acetaldehyde yields have been reduced and corresponding carbon mass split evenly between formaldehyde (HCHO) and acetaldehyde (ACD) (2 moles HCHO for 1 mole ACD). HCHO was previously overlooked as a potential oxidation product. In addition, ACD was overpredicted downwind of fires using CRACMM2 chemistry (Pye et al., 2026).
 - ROCOXY product yields for other ROCOXY species have been recalculated. O:C predicted for scenarios like the WINTER campaign (Jan-March 2015) indicate potential low bias. Adjusting parameters for the oxygen addition to fragments may be able to reduce fragmentation and increase probability of forming low volatility, high O:C species. The probability of adding 1, 2, or 3 oxygens is adjusted as detailed in the following table:
+
 |  | CRACMM1 | CRACMM3 |
 | --- | --- | --- |
 | 0 Oxygens | 0   | 0   |
