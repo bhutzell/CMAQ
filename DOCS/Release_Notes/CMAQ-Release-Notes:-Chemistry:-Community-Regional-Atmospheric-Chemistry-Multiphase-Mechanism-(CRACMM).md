@@ -95,15 +95,26 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 **Release Version/Date**: CMAQv6.0  
 
 **Description**: 
-Semi- and intermediate volatility species (S/IVOCs) are emitted from sources such as wood burning as well as formed in the atmosphere from chemical reaction. The ROCOXY system (A/VROCN_OXY_, A/VROCP_OXY_ species) describe these emissions and secondary species. In CRACMM1, their chemistry, including product yields, was informed by the 2-D VBS framework. In CRACMM3, the parameters have been updated. The following updates were made in the ROCOXY system:
-- Reactions with the hydroxyl radical (HO) sequester HO.
-- Unsaturated dicarbonyl products (DCB1) have been replaced by a generic ketone (KET).
-- Acetaldehyde yields have been reduced and corresponding carbon mass split evenly between formaldehyde (HCHO) and acetaldehyde (ACD) (2 moles HCHO for 1 mole ACD).
-- ROCOXY product yields for other ROCOXY species have been recalculated.
-  
-**Significance and Impact**:  
-Reactions of S/IVOC ROCOXY sequester more HO than in CRACMM2. HOx can still be released from further reaction of products. Sources with large ROCOXY emissions (wildland fires) produce less secondary acetaldehyde and more secondary formaldehyde.
+Semi- and intermediate volatility species (S/IVOCs) are emitted from sources such as wood burning as well as formed in the atmosphere from chemical reaction. The ROCOXY system (A/VROCN_OXY_, A/VROCP_OXY_ species) describe these emissions and secondary species (Pye et al., 2023). In CRACMM1, their chemistry, including product yields, was informed by the 2-D VBS framework. In CRACMM3, ROCOXY system reactions have been updaed in the following ways:
+- Reactions with the hydroxyl radical (HO) sequester HO. Known atmospheric reactions (e.g., alkane + HO) can sequester HOx radicals in products when peroxides and other species form. The amount of HOx sequestered vs regenerated is not known for many ROCOXY species since the compound identities of many emitted species are not known (e.g., their mass is part of an unresolved complex mixture) and the oxidation products of identified species are generally not represented on an individual structure level. Thus, an estimate of how much HOx is sequestered must be made considering the limits of no regeneration (CRACMM1-2 assumption) or large sequestration. In CRACMM3, each HO reaction was assumed to sequester 1 HOx.
+- Unsaturated dicarbonyl products (DCB1) have been replaced by a generic ketone (KET). During development of CRACMM1, both representative structures and chemistry were being developed at the same time. Now that representative structures are available for all species, the suitability of them as oxidation products is being revisited. As ROCOXY species are initially oxidized and multigenerational chemistry only continues to oxidize and fragment compounds, DCB1 (with a double bond) was considered less suitable than a generic ketone as a representative oxidation product.
+- Acetaldehyde yields have been reduced and corresponding carbon mass split evenly between formaldehyde (HCHO) and acetaldehyde (ACD) (2 moles HCHO for 1 mole ACD). HCHO was previously overlooked as a potential oxidation product. In addition, ACD was overpredicted downwind of fires using CRACMM2 chemistry (Pye et al., 2026).
+- ROCOXY product yields for other ROCOXY species have been recalculated. O:C predicted for scenarios like the WINTER campaign (Jan-March 2015) indicate potential low bias. Adjusting parameters for the oxygen addition to fragments may be able to reduce fragmentation and increase probability of forming low volatility, high O:C species. The probability of adding 1, 2, or 3 oxygens is adjusted as detailed in the following table:
+|  | CRACMM1 | CRACMM3 |
+| --- | --- | --- |
+| 0 Oxygens | 0   | 0   |
+| 1 Oxygen  | 30% | 72% |
+| 2 Oxygens | 50% | 12% |
+| 3 Oxygens | 20% | 16% |
 
+**Significance and Impact**:  
+Reactions of S/IVOC ROCOXY sequester more HO than in CRACMM2. The true amount of regeneration remains unknown. Sources with large ROCOXY emissions (wildland fires) produce less secondary acetaldehyde and more secondary formaldehyde in CRACMM3 which should improve biases downwind of wildfires. The impacts of uptdates to the ROCOXY system will be most pronouced where ROCOXY emissions are highest (such as in wildland fire smoke).
+
+**References**:    
+Pye, H. O. T., Hutzell, W. T., Fann, N. L., Skipper, T. N., Pye, M., Beidler, J., Allen, C., Murphy, B. N., D’Ambro, E. L., Lin, S., Talgo, K., Reynolds, L., Kang, D., Bash, J., Seltzer, K. M., Farrell, S. L., Appel, K. W., Brehme, K., Gilliam, R. C., Henderson, B. H. and Chan, A. W. H.: The risks to human health of air toxics, PM2.5, and ozone from the 2023 Canadian wildfires, Environ. Sci. Technolo. Lett. https://doi.org/10.1021/acs.estlett.5c01181, 2026.
+
+Pye, H. O. T.; Place, B. K.; Murphy, B. N.; Seltzer, K. M.; D’Ambro, E. L.; Allen, C.; Piletic, I. R.; Farrell, S.; Schwantes, R. H.; Coggon, M. M.; Saunders, E.; Xu, L.; Sarwar, G.; Hutzell, W. T.; Foley, K. M.; Pouliot, G.; Bash, J.; and Stockwell, W. R., Linking gas, particulate, and toxic endpoints to air emissions in the Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM), Atmos Chem Phys, 23, 5043–5099, https://doi.org/10.5194/acp-23-5043-2023, 2023.
+  
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269)  | 
