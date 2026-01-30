@@ -69,16 +69,16 @@ set CopySrc                            #> copy the source files into the build d
                                        #>   comment out for a single processor (serial) executable (MPI only)
 #set build_parallel_io                 #> uncomment to build with parallel I/O (pnetcdf); 
                                        #>   comment out to use standard netCDF I/O
-#set Debug_CCTM                        #> uncomment to compile CCTM with debug option equal to TRUE
+#set Debug_CBOX                        #> uncomment to compile CBOX with debug option equal to TRUE
                                        #>   comment out to use standard, optimized compile process
 set make_options = "-j"                #> additional options for make command if MakeFileOnly is not set
                                        #>   comment out if no additional options are wanted.
 
 #> Integrated Source Apportionment Method (ISAM)
-#set ISAM_CCTM                         #> uncomment to compile CCTM with ISAM activated
+#set ISAM_CBOX                         #> uncomment to compile CBOX with ISAM activated
                                        #>   comment out to use standard process
 
-#set DDM3D_CCTM                        #> uncomment to compile CCTM with DDM-3D activated
+#set DDM3D_CBOX                        #> uncomment to compile CBOX with DDM-3D activated
                                        #>   comment out to use standard process
 #> WRF-CMAQ coupled model 
 #set build_wrf_cmaq                    #> uncomment to build WRF-CMAQ coupled model; 
@@ -88,24 +88,27 @@ set make_options = "-j"                #> additional options for make command if
 #set build_mpas_cmaq                   #> uncomment to build MPAS-CMAQ coupled model; 
 
 
- setenv Mechanism cb6r5_ae7_aq              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
- setenv Mechanism cracmm3haps              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
+#setenv Mechanism cb6r5_ae7_aq              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
  setenv Mechanism cracmm3              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
 #> Working directory and Version IDs
- if ( $?ISAM_CCTM ) then
-     set VRSN  = v60B_ISAM_${Mechanism}             #> model configuration ID for CMAQ_ISAM
- else if ( $?DDM3D_CCTM ) then
-     set VRSN = v60B_DDM3D_${Mechanism}            #> model configuration ID for CMAQ_DDM
+ if( ${Mechanism} == cb6r5_ae7_aqkmt2 ) then
+     set MECH = cb6r5_ae7_aq
  else
-#    set VRSN = v60B_serial_${Mechanism}                   #> model configuration ID for CMAQ
-     set VRSN = v60B_PHOTINLINE_serial_${Mechanism}                   #> model configuration ID for CMAQ
+     set MECH = ${Mechanism}
+ endif
+ if ( $?ISAM_CBOX ) then
+     set VRSN  = v60_ISAM_${MECH}             #> model configuration ID for CMAQ_ISAM
+ else if ( $?DDM3D_CBOX ) then
+     set VRSN = v60_DDM3D_${MECH}            #> model configuration ID for CMAQ_DDM
+ else
+     set VRSN = v60_${MECH}                   #> model configuration ID for CMAQ
  endif
  
- set EXEC  = CCTM_${VRSN}.exe          #> executable name
- set CFG   = box_${VRSN}.cfg          #> configuration file name
+ set EXEC  = CBOX_${VRSN}.exe          #> executable name
+ set CFG   = cbox_${VRSN}.cfg          #> configuration file name
 
- if ( $?build_wrf_cmaq && $?build_mpas_cmaq ) then
-    echo " options build_wrf_cmaq and build_mpas_cmaq cannot be used at the same time"
+ if ( $?build_wrf_cmaq || $?build_mpas_cmaq ) then
+    echo " options build_wrf_cmaq and build_mpas_cmaq not support in boxmodel"
     exit 1
  endif
 
@@ -114,7 +117,7 @@ set make_options = "-j"                #> additional options for make command if
  endif   
 
 #========================================================================
-#> CCTM Science Modules
+#> CBOX Science Modules
 #========================================================================
 #> NOTE: For the modules with multiple options, a note is 
 #>   provided on where to look in the CCTM source code 
@@ -138,8 +141,6 @@ set make_options = "-j"                #> additional options for make command if
                                             #>     (see $CMAQ_MODEL/CCTM/src/spcs)
  set ModPhot   = phot/inline                #> photolysis calculation module 
 #set ModPhot   = phot/table                #> photolysis calculation module 
-#set ModPhot   = phot/chamber               #> photolysis calculation module 
-
                                             #>     (see $CMAQ_MODEL/CCTM/src/phot)
 
  set ModMech   = MECHS/${Mechanism}
@@ -162,7 +163,7 @@ set make_options = "-j"                #> additional options for make command if
 
  # Gas chem solver
  setenv ChemSolver ros3                   #> [ default for boxmodeling, ebi and smvgear other options]
- if ( ! ( $?ISAM_CCTM ) ) then           # check whether best solver is best for mechanism
+ if ( ! ( $?ISAM_CBOX ) ) then           # check whether best solver is best for mechanism
     if ( ${Mechanism} == cb6r5m_ae7_aq || ${Mechanism} == cracmm3m ) then #> Gas-phase chemistry solver options ($CMAQ_MODEL/CCTM/src/gas)
        setenv ChemSolver ros3                                             #> ros3 (or smvgear) are system independent
     endif
@@ -341,7 +342,7 @@ set make_options = "-j"                #> additional options for make command if
  endif 
 
 #> if DDM-3D is set, add the pre-processor flag for it.
- if ( $?DDM3D_CCTM ) then
+ if ( $?DDM3D_CBOX ) then
     set SENS = ( -Dsens )
  else
     set SENS = ""
@@ -388,10 +389,10 @@ set make_options = "-j"                #> additional options for make command if
 
 #> Set and create the "BLD" directory for checking out and compiling 
 #> source code. Move current directory to that build directory.
- if ( $?Debug_CCTM ) then
-     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_BOX_${VRSN}_${compilerString}_debug
+ if ( $?Debug_CBOX ) then
+     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CBOX_${VRSN}_${compilerString}_debug
  else
-     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_BOX_${VRSN}_${compilerString}
+     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CBOX_${VRSN}_${compilerString}
  endif
 
 
@@ -713,7 +714,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "Module ${ModISAM};"                                         >> $Cfile
  echo                                                              >> $Cfile
 
- if ( $?DDM3D_CCTM ) then
+ if ( $?DDM3D_CBOX ) then
    set text = "// compile for decoupled direct method in 3d"
    echo $text                                                        >> $Cfile
    echo "Module ${ModDDM3D};"                                        >> $Cfile
@@ -794,11 +795,11 @@ set echo
                                               # $Cfile = ${CFG}.bld
  endif
 
- if ( $?Debug_CCTM ) then
+ if ( $?Debug_CBOX ) then
     set bld_flags = "${bld_flags} -debug_cctm"
  endif
 
- if ( $?ISAM_CCTM ) then
+ if ( $?ISAM_CBOX ) then
     set bld_flags = "${bld_flags} -isam_cctm"
  endif
 
