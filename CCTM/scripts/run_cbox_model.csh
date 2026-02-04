@@ -637,7 +637,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
         #echo "Deleting output file: $file"
         /bin/rm -f $file  
      end
-     /bin/rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM*ELMO*${CTM_APPL}.nc
+     /bin/rm -f ${OUTDIR}/C*DESID*${CTM_APPL}.csv ${OUTDIR}/C*ELMO*${CTM_APPL}.csv
 
   else
      #> error if previous log files exist
@@ -762,7 +762,7 @@ endif
   rm -rf buff_${EXECUTION_ID}.txt
 
   #> Abort script if abnormal termination
-  if ( ! -e $OUTDIR/CBOX_CGRID_${CTM_APPL}.nc ) then
+  if ( ! -e $OUTDIR/CBOX_CGRID_${CTM_APPL}.csv ) then
     echo ""
     echo "**************************************************************"
     echo "** Runscript Detected an Error: CGRID file was not written. **"

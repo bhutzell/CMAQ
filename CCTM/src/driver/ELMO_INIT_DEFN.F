@@ -374,7 +374,11 @@
         WRITE( CFIL, '(I0)' ) IFL
         ELMO_FILE( IFL )%SHORTNAME = 'ELMO' // TRIM(CFIL) // '_' //
      &                              TRIM( FLABEL(IFL) ) 
+#ifdef m3box
+        ELMO_FILE( IFL )%FILENAME = 'CBOX_ELMO' // TRIM(CFIL) // '_' //
+#else
         ELMO_FILE( IFL )%FILENAME = 'CCTM_ELMO' // TRIM(CFIL) // '_' //
+#endif
      &                              TRIM( FLABEL(IFL) ) // TRIM( SUFFIX )
         WRITE( ELMO_FILE( IFL )%FLOGICAL, '( "ELMO_",I3.3 )' ) IFL
         IF ( OUTDIR .NE. '' ) THEN
