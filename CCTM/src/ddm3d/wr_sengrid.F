@@ -88,7 +88,10 @@ c     CHARACTER( 8 )  :: SPCNAME
       REAL, SAVE, ALLOCATABLE :: WRBUFF(:,:,:,:)
       INTEGER :: c, r, s, d, i
 
+#ifndef m3box
       LOGICAL, EXTERNAL :: FLUSH3
+!close m3box
+#endif
 
 C-----------------------------------------------------------------------
 

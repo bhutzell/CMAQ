@@ -625,13 +625,32 @@ C   begin body of subroutine CRLF
             INTEGER      , INTENT(  OUT) :: STAT
 
 C             forces routine to use the default value
+            STAT    = 0
             ENVREAL = GET_ENV_REAL( LNAME, DESC, DEFAULT, STAT )
-C           STAT    = -2
-C           ENVREAL = -2
             RETURN
 
          END FUNCTION ENVREAL
 	
+         INTEGER FUNCTION ENVINT( LNAME, DESC, DEFAULT, STAT )
+
+            USE GET_ENV_VARS, ONLY: GET_ENV_INT
+
+            IMPLICIT NONE
+
+            CHARACTER*(*), INTENT(IN   ) :: LNAME
+            CHARACTER*(*), INTENT(IN   ) :: DESC
+            INTEGER      , INTENT(IN   ) :: DEFAULT
+            INTEGER      , INTENT(  OUT) :: STAT
+
+C             forces routine to use the default value
+            STAT   = 6
+            ENVINT = GET_ENV_INT( LNAME, DESC, DEFAULT, STAT )
+            STAT   = 0
+            print*,TRIM( LNAME ) // ",STAT = ",ENVINT,STAT
+            RETURN
+
+         END FUNCTION ENVINT
+
          LOGICAL FUNCTION ENVYN( LNAME, DESC, DEFAULT, STATUS )
            IMPLICIT NONE
 !arguments

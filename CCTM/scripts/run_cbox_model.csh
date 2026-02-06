@@ -51,9 +51,9 @@ echo 'Start Model Run At ' `date`
 #> Choose compiler and set up CMAQ environment with correct 
 #> libraries using config.cmaq. Options: intel | gcc | pgi
  if ( ! $?compiler ) then
-   setenv compiler intel
+#  setenv compiler intel
 #  setenv compiler pgi
-#  setenv compiler gcc
+   setenv compiler gcc
  endif
  if ( ! $?compilerVrsn ) then
    setenv compilerVrsn Empty
@@ -69,6 +69,8 @@ echo 'Start Model Run At ' `date`
  setenv MECH     cracmm3           #> Mechanism ID
 #setenv MECH     cb6r5_ae7_aq      #> Mechanism ID
  set VRSN      = v60_${MECH}       #> Code Version
+#set VRSN      = v60_ISAM_${MECH}       #> Code Version
+#set VRSN      = v60_DDM3D_${MECH}       #> Code Version
  set APPL      = Test              #> Application Name (e.g. Gridname)
 
 #> Check that mechanism is cb6 or cracmm
@@ -469,50 +471,43 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv PACM_REPORT $OUTDIR/"PA_REPORT".${YYYYMMDD}
 
 #> Integrated Source Apportionment Method (ISAM) Options
- setenv CTM_ISAM N
- if ( $?CTM_ISAM ) then
-    if ( $CTM_ISAM == 'Y' || $CTM_ISAM == 'T' ) then
-       setenv SA_IOLIST ${WORKDIR}/isam_control.2018_12NE3.txt
-       setenv ISAM_BLEV_ELEV " 1 1"
-       setenv AISAM_BLEV_ELEV " 1 1"
+  setenv SA_IOLIST ${WORKDIR}/isam_control.cbox.txt
+  setenv ISAM_BLEV_ELEV " 1 1"
+  setenv AISAM_BLEV_ELEV " 1 1"
 
-       #> Set Up ISAM Initial Condition Flags
-       if ($NEW_START == true || $NEW_START == TRUE ) then
-          setenv ISAM_NEW_START Y
-          setenv ISAM_PREVDAY
-       else
-          setenv ISAM_NEW_START N
-          setenv ISAM_PREVDAY "$OUTDIR/CBOX_SA_CGRID_${RUNID}_${YESTERDAY}.nc"
-       endif
+  #> Set Up ISAM Initial Condition Flags
+  if ($NEW_START == true || $NEW_START == TRUE ) then
+     setenv ISAM_NEW_START Y
+     setenv ISAM_PREVDAY
+  else
+     setenv ISAM_NEW_START N
+     setenv ISAM_PREVDAY "$OUTDIR/CBOX_SA_CGRID_${RUNID}_${YESTERDAY}.nc"
+  endif
 
-       #> Set Up ISAM Output Filenames
-       setenv SA_ACONC_1      "$OUTDIR/CBOX_SA_ACONC_${CTM_APPL}.csv"
-       setenv SA_CONC_1       "$OUTDIR/CBOX_SA_CONC_${CTM_APPL}.csv"
-       setenv SA_DD_1         "$OUTDIR/CBOX_SA_DRYDEP_${CTM_APPL}.csv"
-       setenv SA_WD_1         "$OUTDIR/CBOX_SA_WETDEP_${CTM_APPL}.csv"
-       setenv SA_CGRID_1      "$OUTDIR/CBOX_SA_CGRID_${CTM_APPL}.csv"
+  #> Set Up ISAM Output Filenames
+  setenv SA_ACONC_1      "$OUTDIR/CBOX_SA_ACONC_${CTM_APPL}.csv"
+  setenv SA_CONC_1       "$OUTDIR/CBOX_SA_CONC_${CTM_APPL}.csv"
+  setenv SA_DD_1         "$OUTDIR/CBOX_SA_DRYDEP_${CTM_APPL}.csv"
+  setenv SA_WD_1         "$OUTDIR/CBOX_SA_WETDEP_${CTM_APPL}.csv"
+  setenv SA_CGRID_1      "$OUTDIR/CBOX_SA_CGRID_${CTM_APPL}.csv"
 
-       #> Set optional ISAM regions files
-       setenv ISAM_REGIONS $INPDIR/surface/GRIDMASK_STATES_12NE3.nc
+  #> Set optional ISAM regions files
+  setenv ISAM_REGIONS $INPDIR/surface/GRIDMASK_STATES_12NE3.nc
 
-       #> Options used to favor tracked species in reaction for Ozone-NOx chemistry
-       setenv ISAM_O3_WEIGHTS 5   # weights for tracked species Default is 5
-                                  #     OPTIONS
-                                  # 1 does not weight any species
-                                  # 2 weights NOx and subset of NOz species
-                                  # 3 uses with from option 2 plus weight OVOC species, organic radicals and operators
-                                  # 4 weight OVOC species, organic radicals and operators
-                                  # 5 toggles between two weighting set based on VOC and NOx limited ozone production
-       # Below options only used if ISAM_O3_WEIGHTS set to 5
-       setenv ISAM_NOX_CASE  2    # weights for tracked species when ozone production is NOx limited. Default is 2
-       setenv ISAM_VOC_CASE  4    # weights for tracked species when ozone production is VOC limited. Default is 4
-       setenv VOC_NOX_TRANS  0.35 # value of Prod H2O2 over Prod HNO3 less than where
+  #> Options used to favor tracked species in reaction for Ozone-NOx chemistry
+  setenv ISAM_O3_WEIGHTS 5   # weights for tracked species Default is 5
+                             #     OPTIONS
+                             # 1 does not weight any species
+                             # 2 weights NOx and subset of NOz species
+                             # 3 uses with from option 2 plus weight OVOC species, organic radicals and operators
+                             # 4 weight OVOC species, organic radicals and operators
+                             # 5 toggles between two weighting set based on VOC and NOx limited ozone production
+  # Below options only used if ISAM_O3_WEIGHTS set to 5
+  setenv ISAM_NOX_CASE  2    # weights for tracked species when ozone production is NOx limited. Default is 2
+  setenv ISAM_VOC_CASE  4    # weights for tracked species when ozone production is VOC limited. Default is 4
+  setenv VOC_NOX_TRANS  0.35 # value of Prod H2O2 over Prod HNO3 less than where
                                   # ISAM_VOC_CASE weights are used. Otherwise, ISAM_NOX_CASE
                                   # weights are used. Default is 0.35
-
-    endif
- endif
-
 
 #> Sulfur Tracking Model (STM)
  setenv STM_SO4TRACK Y        #> sulfur tracking [ default: N ]
@@ -526,11 +521,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  endif
 
 #> Decoupled Direct Method in 3D (DDM-3D) Options
- setenv CTM_DDM3D N    # Sets up requisite script settings for DDM-3D (default is N/F)
+ setenv CTM_DDM3D Y    # Sets up requisite script settings for DDM-3D (default is N/F)
                        # Additionally requires for CCTM to be compiled for DDM-3D simulations
 
- set NPMAX    = 2      # Number of sensitivity parameters defined in SEN_INPUT
- setenv SEN_INPUT ${WORKDIR}/sensinput.2018_12NE3.dat
+ setenv NPMAX 1      # Number of sensitivity parameters defined in SEN_INPUT
+ setenv SEN_INPUT ${WORKDIR}/sensinput.cbox_cracmm.dat
 
  setenv DDM3D_HIGH N   # allow higher-order sensitivity parameters in SEN_INPUT [ T | Y | F | N ] (default is N/F)
 
@@ -545,6 +540,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  endif
 
  setenv CTM_NPMAX       $NPMAX
+ echo "CTM_NPMAX = "${CTM_NPMAX}
+
  setenv CTM_SENS_1      "$OUTDIR/CBOX_SENGRID_${CTM_APPL}.nc"
  setenv A_SENS_1        "$OUTDIR/CBOX_ASENS_${CTM_APPL}.nc"
  setenv CTM_SWETDEP_1   "$OUTDIR/CBOX_SENWDEP_${CTM_APPL}.nc"

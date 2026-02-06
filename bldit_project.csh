@@ -102,8 +102,10 @@
     cp CCTM/scripts/lonlat.csv $CMAQ_HOME/CCTM/scripts/lonlat.csv
     cp CCTM/scripts/isam_control.2018_12NE3.txt $CMAQ_HOME/CCTM/scripts/isam_control.2018_12NE3.txt
     cp CCTM/scripts/isam_control.2016_12SE1.txt $CMAQ_HOME/CCTM/scripts/isam_control.2016_12SE1.txt
-    cp CCTM/scripts/sensinput.2018_12NE3.dat $CMAQ_HOME/CCTM/scripts/sensinput.2018_12NE3.dat
-    cp CCTM/scripts/sensinput.2016_12SE1.dat $CMAQ_HOME/CCTM/scripts/sensinput.2016_12SE1.dat
+    cp CCTM/scripts/isam_control.cbox.txt       $CMAQ_HOME/CCTM/scripts/isam_control.cbox.txt
+    cp CCTM/scripts/sensinput.2018_12NE3.dat  $CMAQ_HOME/CCTM/scripts/sensinput.2018_12NE3.dat
+    cp CCTM/scripts/sensinput.2016_12SE1.dat  $CMAQ_HOME/CCTM/scripts/sensinput.2016_12SE1.dat
+    cp CCTM/scripts/sensinput.cbox_cracmm.dat $CMAQ_HOME/CCTM/scripts/sensinput.cbox_cracmm.dat
     cp CCTM/scripts/run_cctm_*.csh $CMAQ_HOME/CCTM/scripts/
     cp CCTM/scripts/run_cbox_*.csh $CMAQ_HOME/CCTM/scripts/
  endif

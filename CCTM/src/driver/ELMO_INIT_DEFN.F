@@ -488,7 +488,7 @@
       CHARACTER(200):: XMSG
 
       N = 0
-      N_TABLE = 2000
+      N_TABLE = 10000
 
 #ifdef isam 
       N_TABLE = N_TABLE * NTAG_SA
