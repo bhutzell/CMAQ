@@ -3007,13 +3007,12 @@
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT3 )
           end if
 
-          if (BIOGEMIS_BEIS .and. .not. USE_SEGA_N) then
-             ALLOCATE( PTYPE( NCOLS,NROWS ),
-     &                 PULSEDATE( NCOLS,NROWS ),
-     &                 PULSETIME( NCOLS,NROWS ),
-     &                 RAINFALL( NCOLS,NROWS, mxhrs ),
-     &                 DDTTM( mxhrs ),
-     &                 STAT=STAT )
+          ALLOCATE( PTYPE( NCOLS,NROWS ),
+     &              PULSEDATE( NCOLS,NROWS ),
+     &              PULSETIME( NCOLS,NROWS ),
+     &              RAINFALL( NCOLS,NROWS, mxhrs ),
+     &              DDTTM( mxhrs ),
+     &              STAT=STAT )
              if (stat .ne. 0) then
                 MESG = 'Failure BIOGEMIS_BEIS soil arrays'
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT3 )
@@ -3021,21 +3020,15 @@
 
              RAINFALL = 0.0
              DDTTM    = ' '   ! array
-          end if
 
           if (BIOGEMIS_MEGAN) then
-             ALLOCATE (PTYPE( NCOLS,NROWS ),
-     &                 PULSEDATE( NCOLS,NROWS ),
-     &                 PULSETIME( NCOLS,NROWS ),
-     &                 RAINFALL( NCOLS,NROWS, mxhrs ),
-     &                 t24y     ( ncols,nrows        ),
+             ALLOCATE (t24y     ( ncols,nrows        ),
      &                 sw24y    ( ncols,nrows        ),
      &                 lai_y    ( ncols,nrows        ),
      &                 HRNO_SW  ( NCOLS,NROWS, mxhrs ),
      &                 HRNO_T2M ( NCOLS,NROWS, mxhrs ),
      &                 t24sum   ( ncols,nrows        ),
      &                 sw24sum  ( ncols,nrows        ),
-     &                 DDTTM    ( mxhrs ),
      &                 stat=stat)
      
              IF ( STAT .NE. 0 ) THEN
