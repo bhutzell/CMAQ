@@ -488,7 +488,8 @@
       CHARACTER(200):: XMSG
 
       N = 0
-      N_TABLE = 10000
+!      N_TABLE = 10000
+      N_TABLE = CALCULATE_N_TABLE()
 
 #ifdef isam 
       N_TABLE = N_TABLE * NTAG_SA
@@ -1071,6 +1072,7 @@
       ! their L_COMP attribute will be set to True.
       ELMO_TABLE(:)%L_COMP = .FALSE.
       ALLOCATE( ELMO_COMP( N_ELMO_TABLE ) )
+      
 
       END SUBROUTINE BUILD_ELMO_TABLE
 
@@ -1472,5 +1474,193 @@
       WRITE( LOGDEV, * )
 
       END SUBROUTINE ELMO_WRITE_LOG
+!-------------------------------------------------------------------------
+      INTEGER FUNCTION CALCULATE_N_TABLE()
+!     Function calculate number of lines in ELMO Table for LOGDEV files
+!-------------------------------------------------------------------------
+
+      USE AERO_DATA, ONLY: N_MODE, AEROMODE, N_AEROSPC, AEROSPC
+      USE CGRID_SPCS, ONLY : N_CGRID_SPC, CGRID_NAME,
+     &                       WDEP_SPC, N_SPC_WDEP, 
+     &                       N_SPC_DDEP
+      USE VDIFF_MAP, ONLY : DDEP_SPC
+      USE ELMO_COMPOSITES, ONLY : N_COMPOSITES, CMPST
+      USE GRID_CONF, ONLY : MYPE
+      USE UTILIO_DEFN
+
+#ifdef isam
+      USE SA_DEFN, ONLY : TAGNAME, NSPC_SA, NTAG_SA, ISAM_SPEC
+#endif
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NPMAX, SEN_PAR, N_ASENS_VARS
+#endif
+
+      IMPLICIT NONE
+
+      INTEGER       :: ILIST, IUNIT, IFAM, S, IM, ICGRID,
+     &                 IWDEP, IDDEP, ICMPST, IMODE, ISPC
+      INTEGER       :: VAR_TYPE
+      INTEGER       :: N, IAERO, IOS, ITAG, ISPEC, NP, INDX,
+     &                 N_TABLE
+      CHARACTER(32) :: PNAME = 'CALCULATE_N_TABLE'
+      CHARACTER(200):: XMSG
+
+      N = 0
+      N_TABLE = 10000
+
+#ifdef isam 
+      N_TABLE = N_TABLE * NTAG_SA
+#elif defined( sens )
+      N_TABLE = N_TABLE * NPMAX
+#endif
+
+      ! Load the ELMO Derived Variables into the ELMO_Table
+      DO ILIST = 1,N_ELMO_LIST
+         N = N + 1
+         IF ( ELMO_LIST( ILIST )%L_MODE ) THEN
+           ! Define ELMO Variables for all remaining modes
+           DO IM = 2,N_MODE
+             N = N + 1
+           END DO
+         END IF
+      END DO
+
+#ifdef isam                     
+      ! Load the source-resolvable Derived variables into the ELMO Table
+      ! to enable ISAM output.
+      DO ILIST = 1,N_ELMO_LIST
+        IF ( ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD .OR.
+     &       ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD_DDEP .OR.
+     &       ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD_WDEP ) THEN
+           ! Define ELMO Variables for all ISAM sources
+           DO ITAG = 1,NTAG_SA
+             N = N + 1
+           END DO
+        END IF
+      END DO
+#endif         
+
+#ifdef sens
+      ! Load the source-resolvable Derived variables into the ELMO Table
+      ! to enable ISAM output.
+      DO ILIST = 1,N_ELMO_LIST
+        IF ( ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD .OR.
+     &       ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD_DDEP .OR.
+     &       ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD_WDEP ) THEN           
+           ! Define ELMO Variables for all remaining DDM3D sources
+           DO NP = 1,NPMAX
+             N = N + 1
+           END DO
+         END IF
+      END DO
+#endif         
+ 
+      ! Load CGRID Species into ELMO_Table
+      DO ICGRID = 1,N_CGRID_SPC
+         IF ( CGRID_NAME( ICGRID ) .NE. 'RHOJ' ) THEN
+            N = N + 1
+         END IF
+      END DO    
+
+      ! Load Deposition Variables into ELMO_Table
+      ! Load Wet Deposition Fluxes
+      DO IWDEP = 1,N_SPC_WDEP
+        N = N + 1
+      END DO
+
+      ! Load Dry Deposition Fluxes
+      DO IDDEP = 1,N_SPC_DDEP
+        N = N + 1
+      END DO
+ 
+#ifdef isam
+      ! Load ISAM CGRID Variables into ELMO Table
+      DO ISPEC = 1,NSPC_SA
+        DO ITAG = 1,NTAG_SA
+           N = N + 1
+      END DO
+
+
+      ! Load ISAM Wet Deposition Fluxes into ELMO Table
+      DO IWDEP = 1,N_SPC_WDEP
+        DO ISPEC = 1,NSPC_SA
+          IF ( ISAM_SPEC( ISPEC,1 ) .EQ. WDEP_SPC( IWDEP ) ) THEN
+          DO ITAG = 1,NTAG_SA
+             N = N + 1
+          END DO           
+          N = N + 1
+          END IF
+        END DO
+      END DO
+
+      ! Load ISAM Dry Deposition Fluxes into ELMO Table
+      DO IDDEP = 1,N_SPC_DDEP
+        DO ISPEC = 1,NSPC_SA 
+          IF ( ISAM_SPEC( ISPEC,1 ) .EQ. DDEP_SPC( IDDEP ) ) THEN
+          DO ITAG = 1,NTAG_SA
+             N = N + 1
+          END DO
+          N = N + 1
+          END IF
+        END DO
+      END DO
+#endif 
+
+#ifdef sens
+      ! Load DDM Variables into ELMO Table
+      DO ICGRID = 1,N_CGRID_SPC
+        IF ( CGRID_NAME( ICGRID ) .NE. 'RHOJ' ) THEN
+           DO NP = 1,NPMAX
+              N = N + 1
+           END DO
+        END IF
+      END DO
+
+      ! Load DDM3D Wet Deposition Fluxes into ELMO Table
+      DO IWDEP = 1,N_SPC_WDEP
+        DO NP = 1,NPMAX
+           N = N + 1
+        END DO
+      END DO
+
+      ! Load DDM3D Dry Deposition Fluxes into ELMO Table
+      DO IDDEP = 1,N_SPC_DDEP
+        DO NP = 1,NPMAX
+           N = N + 1
+        END DO
+      END DO
+#endif
+ 
+      ! Load The Composite List into the ELMO Table
+      DO ICMPST = 1,N_COMPOSITES
+         N = N + 1
+      END DO
+ 
+#ifdef isam
+      ! Apply Composites to ISAM source resolution and add to ELMO Table
+      DO ICMPST = 1,N_COMPOSITES
+         ! Define ELMO Variables for all ISAM sources
+         DO ITAG = 1,NTAG_SA
+           N = N + 1
+         END DO          
+         ! Set Source-Dependent Properties for the sum of sources
+         N = N + 1
+      END DO
+#endif         
+
+#ifdef sens
+      ! Apply Composites to DDM3D source resolution and add to ELMO Table
+      DO ICMPST = 1,N_COMPOSITES
+         ! Define ELMO Variables for all remaining DDM3D sources
+         DO NP = 1,NPMAX
+           N = N + 1
+         END DO
+      END DO
+#endif         
+
+      CALCULATE_N_TABLE = N
+      
+      END FUNCTION CALCULATE_N_TABLE
 
       END MODULE ELMO_INIT_DEFN
