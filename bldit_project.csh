@@ -106,6 +106,7 @@
     cp CCTM/scripts/sensinput.2018_12NE3.dat  $CMAQ_HOME/CCTM/scripts/sensinput.2018_12NE3.dat
     cp CCTM/scripts/sensinput.2016_12SE1.dat  $CMAQ_HOME/CCTM/scripts/sensinput.2016_12SE1.dat
     cp CCTM/scripts/sensinput.cbox_cracmm.dat $CMAQ_HOME/CCTM/scripts/sensinput.cbox_cracmm.dat
+    cp CCTM/scripts/sensinput.cbox_cb6.dat $CMAQ_HOME/CCTM/scripts/sensinput.cbox_cb6.dat
     cp CCTM/scripts/run_cctm_*.csh $CMAQ_HOME/CCTM/scripts/
     cp CCTM/scripts/run_cbox_*.csh $CMAQ_HOME/CCTM/scripts/
  endif

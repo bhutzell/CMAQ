@@ -525,7 +525,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
                        # Additionally requires for CCTM to be compiled for DDM-3D simulations
 
  setenv NPMAX 1      # Number of sensitivity parameters defined in SEN_INPUT
- setenv SEN_INPUT ${WORKDIR}/sensinput.cbox_cracmm.dat
+ if ( ${MECH} =~ *cracmm* ) then
+     setenv SEN_INPUT ${WORKDIR}/sensinput.cbox_cracmm.dat
+ else if ( ${MECH} =~ *cb6* ) then
+     setenv SEN_INPUT ${WORKDIR}/sensinput.cbox_cb6.dat
+ endif
 
  setenv DDM3D_HIGH N   # allow higher-order sensitivity parameters in SEN_INPUT [ T | Y | F | N ] (default is N/F)
 
