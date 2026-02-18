@@ -546,10 +546,10 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  setenv CTM_NPMAX       $NPMAX
  echo "CTM_NPMAX = "${CTM_NPMAX}
 
- setenv CTM_SENS_1      "$OUTDIR/CBOX_SENGRID_${CTM_APPL}.nc"
- setenv A_SENS_1        "$OUTDIR/CBOX_ASENS_${CTM_APPL}.nc"
- setenv CTM_SWETDEP_1   "$OUTDIR/CBOX_SENWDEP_${CTM_APPL}.nc"
- setenv CTM_SDRYDEP_1   "$OUTDIR/CBOX_SENDDEP_${CTM_APPL}.nc"
+ setenv CTM_SENS_1      "$OUTDIR/CBOX_SENGRID_${CTM_APPL}.csv"
+ setenv A_SENS_1        "$OUTDIR/CBOX_ASENS_${CTM_APPL}.csv"
+ setenv CTM_SWETDEP_1   "$OUTDIR/CBOX_SENWDEP_${CTM_APPL}.csv"
+ setenv CTM_SDRYDEP_1   "$OUTDIR/CBOX_SENDDEP_${CTM_APPL}.csv"
  setenv INIT_SENS_1     $S_ICpath/$S_ICfile
  
  
