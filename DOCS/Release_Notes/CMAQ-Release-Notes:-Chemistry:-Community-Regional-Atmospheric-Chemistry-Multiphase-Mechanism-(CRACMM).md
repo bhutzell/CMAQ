@@ -347,18 +347,18 @@ Representative structures are provided for all CRACMM species to communicate inf
 **Description**:   
 CRACMM3 include multiple photolytic reactions. Many of these photolytic reactions were retained from RACM2 which was developed more than 10 years ago. Photolysis frequencies are calculated using absorption cross-sections and quantum yields. Some of the absorption cross-sections and quantum yields data in CRACMM3 are out of date. Here, absorption cross-sections and quantum yields are updated for several chemical species. In addition, two new photolytic reactions of PPN are added. 
 
-Photolytic reactions of MVK (methyl vinyl ketone), GLY (glyoxal), PAN1 (peroxyacetyl nitrate), ONIT (organic nitrate) are not updated but their photolysis frequencies are updated. For MVK and GLY, absorption cross-section and quantum yield data are taken from the NASA JPL-19 (Burkholder et al., 2019). Photolysis frequencies of PAN1 are updated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al. (2008). For ONIT, NASA JPL-19 provides more recent data than Calvert et al. (2008) who gives data for more organic nitrate compounds. The used cross-section is an average between these organic nitrate compounds. Quantum yields from the NASA JPL-19 are used. CRACMM3 includes two terpene nitrate species (TRPN and HONIT) which currently use photolysis data for ONIT. A recent study by Wang et al. (2023) provides absorption cross-section and average quantum yield data for three terpene nitrates. Data for α-pinene nitrate from the article are now used for TRPN and HONIT.
+Photolytic reactions of MVK (methyl vinyl ketone), GLY (glyoxal), PAN (peroxyacetyl nitrate), ONIT (organic nitrate) are not updated but their photolysis frequencies are updated. For MVK and GLY, absorption cross-section and quantum yield data are taken from the NASA JPL-19 (Burkholder et al., 2019). Photolysis frequencies of PAN are updated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al. (2008). For ONIT, cross-section data is from Calvert et al. (2008) based on several organic nitrate compounds and quantum yields are from the NASA JPL-19. CRACMM2 included two terpene nitrate species (TRPN and HONIT) which used photolysis data for ONIT. A recent study by Wang et al. (2023) provides updated absorption cross-section and average quantum yield data for three terpene nitrates. Data for α-pinene nitrate from the article are now used for TRPN and HONIT.
 
-In CRACMM3, photolysis of BALD (benzaldehyde), only proceeds with one pathway:
-<R027> BALD  = BEN  + CO                        # 1.0/<BALD_RACM2>;
+In CRACMM2, photolysis of BALD (benzaldehyde), only proceeded with one pathway:
+<R027> BALD  = CHO + HO2 + CO                    # 1.0/<BALD_RACM2>;
 
-The process is updated to include 2 different pathways as follows:
+The process is updated to include one additional pathway and update the product structure for the original reaction as follows:
 <R027a> BALD  = BEN  + CO                        # 1.0/<BALD1_CALVERT11>;
 <R027b> BALD  = BAL1 + CO + HO2                  # 1.0/<BALD2_CALVERT11>;
 
 The photolysis frequencies of BALD are also updated to use absorption cross-section and quantum yield data from Calvert et al. (2011).
 
-CRACMM3 does not include any photolytic reaction for PPN (peroxypropionyl nitrate). Two photolytic reactions of PPN are added. Photolysis frequencies are calculated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al.(2008).
+CRACMM2 does not include any photolytic reaction for PPN (peroxypropionyl nitrate). Two photolytic reactions of PPN are added in CRACMM3. Photolysis frequencies are calculated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al.(2008).
 <R033a> PPN = RCO3      + NO2          # 1.0/<PPN1_JPL19>;
 <R033b> PPN = HC3P      + NO3          # 1.0/<PPN2_JPL19>;
 
