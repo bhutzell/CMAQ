@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CB6R5_AE7_AQ mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Aug  1, 2025
+C  REVISION HISTORY: Created by EBI solver program, Jan 26, 2026
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables for solution
 C*************************************************************************
@@ -262,5 +262,8 @@ c..Species indices
       INTEGER, PARAMETER :: MSA              =  149
       INTEGER, PARAMETER :: ANO3I            =  150
       INTEGER, PARAMETER :: ANO3J            =  151
+      INTEGER, PARAMETER :: AFEJ             =  152
+      INTEGER, PARAMETER :: AMNJ             =  153
+      INTEGER, PARAMETER :: AHMSJ            =  154
 
       END MODULE HRDATA

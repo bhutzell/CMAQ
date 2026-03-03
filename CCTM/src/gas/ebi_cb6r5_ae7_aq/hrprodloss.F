@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Aug  1, 2025
+C  REVISION HISTORY: Created by EBI solver program, Jan 26, 2026
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 
@@ -69,6 +69,7 @@ C***********************************************************************
       LOSS(  H2O2         ) =                 RXRAT(    21 )      ! H2O2=0.2000D+01*OH
      &                      +                 RXRAT(    22 )      ! H2O2+OH=HO2
      &                      +                 RXRAT(    23 )      ! H2O2+O=OH+HO2
+     &                      +                 RXRAT(   352 )      ! H2O2+SO2=ASO4J
 
       PROD(  HNO3         ) =    2.0000D+00 * RXRAT(    39 )      ! N2O5=0.2000D+01*HNO3
      &                      +                 RXRAT(    45 )      ! NO2+OH=HNO3
@@ -101,7 +102,17 @@ C***********************************************************************
      &                      +    7.5000D-01 * RXRAT(   347 )      ! DMS+OH=0.7500D+00*SO2+...
      &                      +                 RXRAT(   348 )      ! DMS+NO3=SO2+HNO3+MEO2+FORM
      &                      +    8.6000D-01 * RXRAT(   349 )      ! DMS+CL=0.8600D+00*SO2+MEO2+...
+     &                      +                 RXRAT(   360 )      ! AHMSJ+OH=SO2+HO2+FACD
+     &                      +                 RXRAT(   361 )      ! AHMSJ=SO2+FORM
       LOSS(  SO2          ) =                 RXRAT(    52 )      ! SO2+OH=SULF+HO2+SULRXN
+     &                      +                 RXRAT(   352 )      ! SO2+H2O2=ASO4J
+     &                      +                 RXRAT(   353 )      ! SO2+O3=ASO4J
+     &                      +                 RXRAT(   354 )      ! SO2+MEPX=ASO4J+MEOH
+     &                      +                 RXRAT(   355 )      ! SO2+PACD=ASO4J+AACD
+     &                      +                 RXRAT(   356 )      ! SO2+NO2=ASO4J+HONO
+     &                      +                 RXRAT(   357 )      ! SO2+AFEJ+AMNJ=ASO4J+AFEJ+AMNJ
+     &                      +                 RXRAT(   358 )      ! SO2+FORM=AHMSJ
+     &                      +                 RXRAT(   359 )      ! SO2+PNA=ASO4J+ANO3J
 
       PROD(  SULF         ) =                 RXRAT(    52 )      ! SO2+OH=SULF+HO2+SULRXN
       LOSS(  SULF         ) =   0.0D0
@@ -248,6 +259,7 @@ C***********************************************************************
      &                      +    3.7000D-01 * RXRAT(    65 )      ! CXO3+HO2=0.3700D+00*PACD+...
      &                      +    3.7000D-01 * RXRAT(   215 )      ! OPO3+HO2=0.3700D+00*PACD+...
       LOSS(  PACD         ) =                 RXRAT(    95 )      ! PACD+OH=C2O3
+     &                      +                 RXRAT(   355 )      ! PACD+SO2=ASO4J+AACD
 
       PROD(  AACD         ) =    1.3000D-01 * RXRAT(    57 )      ! C2O3+HO2=0.1300D+00*AACD+...
      &                      +    1.3000D-01 * RXRAT(    65 )      ! CXO3+HO2=0.1300D+00*AACD+...
@@ -261,6 +273,7 @@ C***********************************************************************
      &                      +    2.0000D-01 * RXRAT(   168 )      ! EPX2+C2O3=0.2000D+00*AACD+...
      &                      +    1.3000D-01 * RXRAT(   215 )      ! OPO3+HO2=0.1300D+00*AACD+...
      &                      +    2.0000D-01 * RXRAT(   217 )      ! OPO3+RO2=0.2000D+00*AACD+...
+     &                      +                 RXRAT(   355 )      ! SO2+PACD=AACD+ASO4J
       LOSS(  AACD         ) =                 RXRAT(    94 )      ! AACD+OH=MEO2+RO2
 
       PROD(  CXO3         ) =                 RXRAT(    63 )      ! PANX=CXO3+NO2
@@ -421,6 +434,7 @@ C***********************************************************************
      &                      +                 RXRAT(   346 )      ! DMS+OH=FORM+MEO2+SO2
      &                      +                 RXRAT(   348 )      ! DMS+NO3=FORM+HNO3+MEO2+SO2
      &                      +    4.5000D-01 * RXRAT(   349 )      ! DMS+CL=0.4500D+00*FORM+...
+     &                      +                 RXRAT(   361 )      ! AHMSJ=FORM+SO2
       LOSS(  FORM         ) =                 RXRAT(    96 )      ! FORM+OH=HO2+CO
      &                      +                 RXRAT(    97 )      ! FORM=0.2000D+01*HO2+CO
      &                      +                 RXRAT(    98 )      ! FORM=CO
@@ -428,14 +442,17 @@ C***********************************************************************
      &                      +                 RXRAT(   100 )      ! FORM+NO3=HNO3+HO2+CO
      &                      +                 RXRAT(   101 )      ! FORM+HO2=HCO3
      &                      +                 RXRAT(   243 )      ! FORM+CL=HCL+HO2+CO
+     &                      +                 RXRAT(   358 )      ! FORM+SO2=AHMSJ
 
       PROD(  MEPX         ) =    9.0000D-01 * RXRAT(    72 )      ! MEO2+HO2=0.9000D+00*MEPX+...
      &                      +    5.0000D-01 * RXRAT(   104 )      ! HCO3+HO2=0.5000D+00*MEPX+...
       LOSS(  MEPX         ) =                 RXRAT(    87 )      ! MEPX+OH=0.6000D+00*MEO2+...
      &                      +                 RXRAT(    88 )      ! MEPX=MEO2+RO2+OH
+     &                      +                 RXRAT(   354 )      ! MEPX+SO2=ASO4J+MEOH
 
       PROD(  MEOH         ) =    3.1500D-01 * RXRAT(    74 )      ! MEO2+RO2=0.3150D+00*MEOH+...
      &                      +    1.5000D-01 * RXRAT(   114 )      ! GLYD=0.1500D+00*MEOH+...
+     &                      +                 RXRAT(   354 )      ! SO2+MEPX=MEOH+ASO4J
       LOSS(  MEOH         ) =                 RXRAT(   126 )      ! MEOH+OH=FORM+HO2
      &                      +                 RXRAT(   246 )      ! MEOH+CL=HCL+HO2+FORM
 
@@ -538,6 +555,7 @@ C***********************************************************************
      &                      +    1.5000D-01 * RXRAT(   159 )      ! ISPD+O3=0.1500D+00*FACD+...
      &                      +    7.4000D-02 * RXRAT(   166 )      ! EPX2+HO2=0.7400D-01*FACD+...
      &                      +    1.8500D-01 * RXRAT(   170 )      ! INTR+OH=0.1850D+00*FACD+...
+     &                      +                 RXRAT(   360 )      ! AHMSJ+OH=FACD+SO2+HO2
       LOSS(  FACD         ) =                 RXRAT(    93 )      ! FACD+OH=HO2
 
       PROD(  CO           ) =                 RXRAT(    96 )      ! FORM+OH=CO+HO2
@@ -1146,7 +1164,13 @@ C***********************************************************************
       LOSS(  IEPOXP       ) =                 RXRAT(   281 )      ! IEPOXP+ASO4J=AISO3J
      &                      +                 RXRAT(   282 )      ! IEPOXP=AISO3J
 
-      PROD(  ASO4J        ) =   0.0D0
+      PROD(  ASO4J        ) =                 RXRAT(   352 )      ! SO2+H2O2=ASO4J
+     &                      +                 RXRAT(   353 )      ! SO2+O3=ASO4J
+     &                      +                 RXRAT(   354 )      ! SO2+MEPX=ASO4J+MEOH
+     &                      +                 RXRAT(   355 )      ! SO2+PACD=ASO4J+AACD
+     &                      +                 RXRAT(   356 )      ! SO2+NO2=ASO4J+HONO
+     &                      +                 RXRAT(   357 )      ! SO2+AFEJ+AMNJ=ASO4J+AFEJ+AMNJ
+     &                      +                 RXRAT(   359 )      ! SO2+PNA=ASO4J+ANO3J
       LOSS(  ASO4J        ) =                 RXRAT(   281 )      ! ASO4J+IEPOXP=AISO3J
 
       PROD(  AISO3J       ) =                 RXRAT(   281 )      ! IEPOXP+ASO4J=AISO3J
@@ -1358,8 +1382,18 @@ C***********************************************************************
       PROD(  ANO3I        ) =   0.0D0
       LOSS(  ANO3I        ) =                 RXRAT(   350 )      ! ANO3I=0.6700D+00*HONO+...
 
-      PROD(  ANO3J        ) =   0.0D0
+      PROD(  ANO3J        ) =                 RXRAT(   359 )      ! SO2+PNA=ANO3J+ASO4J
       LOSS(  ANO3J        ) =                 RXRAT(   351 )      ! ANO3J=0.6700D+00*HONO+...
+
+      PROD(  AFEJ         ) =   0.0D0
+      LOSS(  AFEJ         ) =   0.0D0
+
+      PROD(  AMNJ         ) =   0.0D0
+      LOSS(  AMNJ         ) =   0.0D0
+
+      PROD(  AHMSJ        ) =                 RXRAT(   358 )      ! SO2+FORM=AHMSJ
+      LOSS(  AHMSJ        ) =                 RXRAT(   360 )      ! AHMSJ+OH=HO2+SO2+FACD
+     &                      +                 RXRAT(   361 )      ! AHMSJ=SO2+FORM
 
       PNEG( PAR ) =    2.5000D+00 * RXRAT(   128 )      ! KET=-0.2500D+01*PAR+...
      &            +    2.7000D+00 * RXRAT(   133 )      ! ROR=-0.2700D+01*PAR+...

@@ -3322,7 +3322,7 @@ C FEMNprec = limit soluble Fe and Mn by solid precipitation (less Fe available t
       INTEGER, PARAMETER :: IONEFF = 1     ! 1 = Use ionic strength enhancement factors for Henry's Law coefs for SO2 and H2O2, 
                                            ! SO2 dissoc coefs, and kO3 and kh2o2 rate coefficients; 0 = no addnl ionic EFs
       INTEGER, PARAMETER :: HMSlo = 0      ! 0 for high HMS prod rate, 1 for low HMS prod rate, 2 for avg
-      INTEGER, PARAMETER :: TVOL = 3       ! 1 = just inorg water, 2 = total water, 3 = total J mode volume
+      INTEGER, PARAMETER :: TVOL = 3       ! 1 = just inorg water, 2 = total water, 3 = total J mode volume, 4 = just inorg spcs considered in isorropia
       INTEGER, PARAMETER :: FEMNprec = 1   ! 1 = limit Fe and Mn by solid precipitation 
 
 C *** Parameters for SO2        
@@ -3381,9 +3381,41 @@ C *** Partial pressure of SO2
 C *** Volume assumption for rate/concentration calculations
 C *** TVOL = 1 - Use inorganic water
 C *** TVOL = 2 - Use inorganic + organic water 
-C *** TVOL = 3 - Use total J mode volume    
+C *** TVOL = 3 - Use total J mode volume
+C *** TVOL = 4 - Calculate volume using only transported species considered
+C ***            in ISORROPIA, including (inorganic) water    
 
-       IF( TVOL .EQ. 3 ) THEN
+
+       IF( TVOL .EQ. 4 ) THEN
+      
+C *** J-mode particle volume [L/m**3 air]
+         volume = 0.0d0
+         Do i = 1, n_aerospc 
+            If ( aerospc( i )%tracer ) Cycle
+            If ( aerospc( i )%om ) Cycle
+            If ( aerospc( i )%bulkname .EQ. 'AHMS    ') Cycle
+            If ( aerospc( i )%bulkname .EQ. 'ABR     ') Cycle
+            If ( aerospc( i )%charge == 0) Cycle
+            If ( aero_missing( i,2 ) ) Cycle
+               volume = volume + (Real( aerospc_conc( i, 2 ) / 
+     &                aerospc(i)%density, 8 ) * 1.0d-6)
+         End Do
+ 
+ 
+         Do i = 1, n_aerospc 
+            If ( aerospc( i )%bulkname .EQ. 'AH2O    ') Then
+               volume = volume + (Real( aerospc_conc( i, 2 ) / 
+     &                aerospc(i)%density, 8 ) * 1.0d-6)
+            End If
+         End Do
+
+         inv_volume = 1.d0 / volume  
+
+         TOTWATER = REAL( aerospc_conc( ah2o_idx, 2 ),8) ! Just inorg H2O here
+     
+         INORGWAT = REAL( aerospc_conc( ah2o_idx, 2 ),8)
+ 
+       ELSE IF( TVOL .EQ. 3 ) THEN
       
 C *** J-mode particle volume [L/m**3 air]
          volume = 0.0d0
@@ -3394,6 +3426,7 @@ C *** J-mode particle volume [L/m**3 air]
                volume = volume + (Real( aerospc_conc( i, 2 ) / 
      &                aerospc(i)%density, 8 ) * 1.0d-6)
          End Do
+
          inv_volume = 1.d0 / volume  
 
          TOTWATER = REAL( aerospc_conc( ah2o_idx, 2 ) + 
@@ -3414,7 +3447,7 @@ C *** J-mode particle volume [L/m**3 air]
        
        ELSE
        
-         TOTWATER = REAL( aerospc_conc( ah2o_idx, 2 ),8)
+         TOTWATER = REAL( aerospc_conc( ah2o_idx, 2 ),8) ! Just inorg H2O here
      
          INORGWAT = REAL( aerospc_conc( ah2o_idx, 2 ),8)
        
@@ -3482,7 +3515,7 @@ C *** Calculate total sulfate concentration in ALW and calculate SO42- and HSO4-
        SO42M = TS6 / ( 1.0D0 + ( HPLUS / K2) )     ! sulfate M 
        HSO4M = TS6 - SO42M                         ! bisulfate M
 
-! *** Determine ionic strength [M of m]
+! *** Determine ionic strength [M or m]
     
        IONIC = 0.50 * HPLUS *1.0D0
      &          + 0.50 * REAL(aerospc_conc( ana_idx, 2 )/aerospc_mw( ana_idx),8) * inv_volume / 1.d6 *1.0D0  

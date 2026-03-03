@@ -28,7 +28,7 @@ C  PRECONDITIONS: For the CB6R5_AE7_AQ mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Aug  1, 2025
+C  REVISION HISTORY: Created by EBI solver program, Jan 26, 2026
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -162,6 +162,7 @@ c..Production of HO2 from OH ( r5,4 terms )
      &     +    1.5500D-01 * RKI(   190 ) * YC ( NAPH         )   ! OH+NAPH=0.1550D+...
      &     +                 RKI(   195 ) * YC ( CRES         )   ! OH+CRES=HO2+...
      &     +    2.0000D-01 * RKI(   210 ) * YC ( CAT1         )   ! OH+CAT1=0.2000D+...
+     &     +                 RKI(   360 ) * YC ( AHMSJ        )   ! OH+AHMSJ=HO2+SO2+...
 
       R5_4  = R5_4 * DTC
 
@@ -246,6 +247,7 @@ c..Remaining HONO production terms
      &    +    5.0000D-01 * RXRAT(   278 )      ! NO2=0.5000D+00*HONO+...
      &    +    6.7000D-01 * RXRAT(   350 )      ! ANO3I=0.6700D+00*HONO+...
      &    +    6.7000D-01 * RXRAT(   351 )      ! ANO3J=0.6700D+00*HONO+...
+     &    +                 RXRAT(   356 )      ! SO2+NO2=HONO+ASO4J
 
       P19 = YC0( HONO ) + P19 * DTC
 
@@ -337,6 +339,7 @@ c..HONO loss terms not included in R4_19
 c..PNA loss terms not included in R5_21
       L21 =    4.1000D-01 * RKI(    50 )                         ! PNA=0.5900D+...
      &    +                 RKI(    51 ) * YC ( OH           )   ! PNA+OH=NO2
+     &    +                 RKI(   359 ) * YC ( SO2          )   ! PNA+SO2=ASO4J+ANO3J
 
       L21   = 1.0D0 + L21 * DTC + R5_21
 

@@ -299,7 +299,7 @@ CONTAINS
 
 ! Solubility of Fe and Mn
 
-      FE_SOL = 0.1D0               
+      FE_SOL = 0.1D0              
       MN_SOL = 0.5D0    
 
 ! Set initial dynamic concentrations based on input gas and 
@@ -386,6 +386,7 @@ CONTAINS
       END IF
          
       VAR( ind_L_SO4MIN2 ) = VAR( ind_L_SO4MIN2 ) + GAS( LH2SO4 )
+      VAR( ind_L_HMSMIN )  = AEROSOL( LHMS, IACC )
 
 ! Coarse crustal species from SOILICOR, ANTHICOR, SEASICOR
  
@@ -464,7 +465,7 @@ CONTAINS
              + VAR( ind_L_NAPLUS ) + &
                VAR( ind_L_KPLUS ) + VAR( ind_L_NH4PLUS )
       SUMNEG = 2.D0 * ( VAR( ind_L_SO4MIN2 ) + VAR(ind_L_OXLACMIN2) ) + VAR( ind_L_NO3MIN ) &
-             + VAR( ind_L_CLMIN )
+             + VAR( ind_L_CLMIN ) + VAR( ind_L_HMSMIN )
     
       SUMPOS = SUMPOS * PHI2
       SUMNEG = SUMNEG * PHI2

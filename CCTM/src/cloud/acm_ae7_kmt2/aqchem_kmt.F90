@@ -731,6 +731,8 @@ kron: DO WHILE (T < TEND)
          AEROSOL( LISO3, IACC )  = ( VAR( ind_L_ISO3 ) ) * INVCFAC
       END IF
       
+      AEROSOL( LHMS, IACC )  = VAR( ind_L_HMSMIN ) * INVCFAC
+      
       FECOR   = SOIL_FE_FAC * AEROSOL( LSOIL, ICOR ) + CORS_FE_FAC * AEROSOL( LANTH, ICOR )
       MNCOR   = SOIL_MN_FAC * AEROSOL( LSOIL, ICOR ) + CORS_MN_FAC * AEROSOL( LANTH, ICOR )
       NACOR   = SEAS_NA_FAC * AEROSOL( LSEAS, ICOR ) + SOIL_NA_FAC * AEROSOL( LSOIL, ICOR )  &
@@ -769,7 +771,7 @@ kron: DO WHILE (T < TEND)
 !...Gas phase species
 
       GAS(LSO2)   = ( VAR( ind_G_SO2 ) + VAR( ind_L_SO2 ) + VAR( ind_L_HSO3MIN ) + &
-                    VAR( ind_L_SO3MIN2 ) + VAR( ind_L_HMSMIN ) + VAR( ind_L_SO3MIN ) + &
+                    VAR( ind_L_SO3MIN2 ) + VAR( ind_L_SO3MIN ) + &
                     VAR( ind_L_SO5MIN ) + VAR( ind_L_HSO5MIN ) + VAR( ind_L_SO4MIN )) * INVCFAC
       GAS(LN2O5)  = 0.0D0
       GAS(LCO2)   = ( VAR( ind_G_CO2 ) + VAR( ind_L_H2CO3 ) + VAR( ind_L_HCO3MIN ) + & 
@@ -804,10 +806,10 @@ kron: DO WHILE (T < TEND)
       GAS(LNO3RAD) = ( VAR( ind_G_NO3 ) + VAR( ind_L_NO3 ) ) * INVCFAC 
       GAS(LCH3O2)  = ( VAR( ind_G_CH3O2 ) + VAR( ind_L_CH3O2 ) ) * INVCFAC     
       GAS(LCCOOH)  = ( VAR(ind_G_CCOOH) + VAR(ind_L_CCOOH) + VAR(ind_L_CCOOHMIN) )*INVCFAC
-      GAS(LHCHO)   = (VAR(ind_G_HCHO) + VAR(ind_L_CH2OHYD) + VAR(ind_L_HCHO) + VAR(ind_L_HMSMIN) )*INVCFAC
+      GAS(LHCHO)   = (VAR(ind_G_HCHO) + VAR(ind_L_CH2OHYD) + VAR(ind_L_HCHO))*INVCFAC
       GAS(LGCOL)   = (VAR(ind_G_GCOL) + VAR(ind_L_GCOL) )*INVCFAC
 
-      GAS(LHCHOP)  = (VAR(ind_G_HCHOP) + VAR(ind_L_CH2OHYDP) + VAR(ind_L_HCHOP) + VAR(ind_L_HMSMINP) )*INVCFAC 
+      GAS(LHCHOP)  = (VAR(ind_G_HCHOP) + VAR(ind_L_CH2OHYDP) + VAR(ind_L_HCHOP) )*INVCFAC 
 
 !...Gas phase species deposition amounts
 

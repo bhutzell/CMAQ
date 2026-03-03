@@ -104,6 +104,10 @@ DDEP_TCL           ,kg ha-1     ,DD_TCL[1]
 WDEP_TCL           ,kg ha-1     ,WD_TCL[1]
 TDEP_CL            ,kg ha-1     ,TD_TCL[1]
 
+!! Hydroxymethanesulfonate
+DDEP_AHMSJ	       ,kg ha-1     ,DD_PMF_HMS[1]
+WDEP_AHMSJ	       ,kg ha-1     ,WD_PMF_HMS[1]
+
 !! Calcium
 DDEP_CAJ           ,kg ha-1     ,DD_PMF_CA[1]
 WDEP_CAJ	       ,kg ha-1     ,WD_PMF_CA[1]
