@@ -5,8 +5,8 @@
 ifndef compiler
 #compiler = intel
 #compiler = intelx
-#compiler = gcc
- compiler = pgi
+ compiler = gcc
+#compiler = pgi
 #compiler = nvhpc
 endif
 
@@ -98,7 +98,8 @@ OBJECTS =\
     wrspecial_ext_fortran90.o \
     wrexts_fortran90.o \
     wrt_rates.o \
-    wrss_ext_fortran90.o
+    wrss_ext_fortran90.o \
+    wrt_prodloss.o
         
 #   wrhdr1.o \
 #   wrbf6.o \

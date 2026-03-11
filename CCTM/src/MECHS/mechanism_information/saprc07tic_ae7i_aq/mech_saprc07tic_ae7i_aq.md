@@ -87,7 +87,7 @@ Information is based on the mech.def file.
 | BR25   | MECO3 + RO2C ----> MEO2 + CO2  |   4.40E-13e<sup>  1070.00/T</sup> |   1.5924E-11 |
 | BR26   | MECO3 + RO2XC ----> MEO2 + CO2  |   BR25 |   1.5924E-11<sup>7</sup>| 
 | BR27   | MECO3 + MECO3 ---->   2.0000\*MEO2 +    2.0000\*CO2  |   2.90E-12e<sup>   500.00/T</sup> |   1.5514E-11 |
-| BR28   | RCO3 + NO2 ----> PAN2  |   1.21E-11e<sup>     0.00/T</sup>(T/300)<sup> -1.07 </sup> |   1.2180E-11 |
+| BR28   | RCO3 + NO2 ----> PAN2  |   1.21E-11e<sup>    -0.00/T</sup>(T/300)<sup> -1.07 </sup> |   1.2180E-11 |
 | BR29   | PAN2 ----> RCO3 + NO2  |   8.30E+16e<sup>-13940.00/T</sup> |   4.1081E-04 |
 | BR30   | PAN2 ---->   0.6000\*RCO3 +    0.6000\*NO2 +    0.4000\*RO2C +    0.4000\*xHO2 +    0.4000\*yROOH +    0.4000\*xCCHO +    0.4000\*CO2 +    0.4000\*NO3  | PAN | Not Available<sup>1</sup> | 
 | BR31   | RCO3 + NO ----> NO2 + RO2C + xHO2 + yROOH + xCCHO + CO2  |   6.70E-12e<sup>   340.00/T</sup> |   2.0957E-11 |
@@ -928,7 +928,7 @@ Information is based on the mech.def file.
 | RPOAGEPI   | APOCI + OH ---->   1.2500\*APNCOMI + APOCI + OH  |   2.5000E-12 |   2.5000E-12 |
 | RPOAGELI   | APNCOMI + OH ----> OH  | HETERO_PNCOMLI | Not Available<sup>2</sup> | 
 | RPOAGEPJ   | APOCJ + OH ---->   1.2500\*APNCOMJ + APOCJ + OH  |   2.5000E-12 |   2.5000E-12 |
-| RPOAGELJ   | APNCOMJ + OH ----> OH  | HETERO_PNCOMLI | Not Available<sup>2</sup> | 
+| RPOAGELJ   | APNCOMJ + OH ----> OH  | HETERO_PNCOMLJ | Not Available<sup>2</sup> | 
 | PCSOA   | PCVOC + OH ----> OH + PCSOARXN  |   1.2500E-11 |   1.2500E-11 |
 | POA_AGE1   | VLVPO1 + OH ----> OH +    0.4857\*VLVPO1 +    0.0062\*VSVPO1 +    0.0025\*VSVPO2 +    0.0026\*VSVPO3 +    0.0023\*VIVPO1 +    0.2944\*VLVOO1 +    0.2021\*VLVOO2 +    0.0019\*VSVOO2 +    0.0023\*VSVOO3  |   4.0000E-11 |   4.0000E-11 |
 | POA_AGE2   | VSVPO1 + OH ----> OH +    0.3003\*VLVPO1 +    0.2862\*VSVPO1 +    0.0041\*VSVPO2 +    0.0035\*VSVPO3 +    0.2239\*VLVOO1 +    0.1820\*VLVOO2  |   4.0000E-11 |   4.0000E-11 |
@@ -942,8 +942,8 @@ Information is based on the mech.def file.
 | POA_AGE10   | VSVOO3 + OH ----> OH +    0.3886\*VLVOO1 +    0.2421\*VLVOO2 +    0.0640\*VSVOO1 +    0.0385\*VSVOO2 +    0.2667\*VSVOO3  |   4.0000E-11 |   4.0000E-11 |
 | HYD_MT   | AMTNO3J ----> HNO3 + AMTHYDJ  |   9.2590E-05 |   9.2590E-05 |
 | HYD_ISOP   | AISOPNNJ ---->   2.0000\*HNO3 +    0.5000\*AMTHYDJ  |   9.2590E-05 |   9.2590E-05 |
-| HET_GLY   | GLY ----> AGLYJ  | HETERO_PNCOMLI | Not Available<sup>2</sup> | 
-| HET_MGLY   | MGLY ----> AGLYJ  | HETERO_PNCOMLI | Not Available<sup>2</sup> | 
+| HET_GLY   | GLY ----> AGLYJ  | HETERO_GLY | Not Available<sup>2</sup> | 
+| HET_MGLY   | MGLY ----> AGLYJ  | HETERO_MGLY | Not Available<sup>2</sup> | 
 
 <sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     
 <sup>1</sup>Photolysis Reaction;depends on radiation and predicted concentrations     

@@ -18,15 +18,14 @@
 # UNC Dataverse, V1.
 #
 # Methods: additional documentation for this platform is available at
-# H. O. T. Pye, W. T. Hutzell, N. L. Fann, T. N. Skipper, M. Pye, 
-# J. Beidler, C. Allen, B. N. Murphy, E. L. D’Ambro, S. Lin, K. Talgo, 
-# L. Reynolds, D. Kang, J. Bash, K. M. Seltzer, S. L. Farrell, 
-# K. W. Appel, K. Brehme, R. C. Gilliam, B. H. Henderson, and 
-# A. W. H. Chan: The risks to human health of air toxics, PM2.5, and 
-# ozone from the 2023 Canadian wildfires, ChemRxiv, 
-# https://doi.org/10.26434/chemrxiv-2025-fx8f1, 2025. 
-# This content is a preprint and has not been peer-reviewed. 
-# Please update to the final journal article when available.
+# Pye, H. O. T., Hutzell, W. T., Fann, N. L., Skipper, T. N., Pye, M. J., 
+# Beidler, J., Allen, C., Murphy, B. N., D’Ambro, E. L., Lin, S., 
+# Talgo, K., Reynolds, L., Kang, D., Bash, J., Seltzer, K. M., 
+# Farrell, S. L., Appel, K. W., Brehme, K., Gilliam, R. C., 
+# Henderson, B. H., and Chan, A. W. H.: The Risks to Human Health of 
+# Air Toxics, PM2.5, and Ozone from the 2023 Canadian Wildfires, 
+# Environ. Sci. Tech. Lett., 
+# https://doi.org/10.1021/acs.estlett.5c01181, 2026. 
 #
 # Notes
 # CTM_BROWN_VEG = N.

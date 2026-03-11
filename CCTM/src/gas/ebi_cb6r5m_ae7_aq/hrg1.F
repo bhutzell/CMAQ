@@ -29,7 +29,7 @@ C  PRECONDITIONS: For the CB6R5M_AE7_AQ mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Jul 25, 2025
+C  REVISION HISTORY: Created by EBI solver program, Jan 28, 2026
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C   01 Jun 18 B.Hutzell: replaced steady solution for O1D with backward Euler
@@ -226,6 +226,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &   +                 RKI(   357 ) * YC ( BR           )   ! NO2+BR=BRNO2
      &   +                 RKI(   415 ) * YC ( I            )   ! NO2+I=INO2
      &   +                 RKI(   416 ) * YC ( IO           )   ! NO2+IO=INO3
+     &   +                 RKI(   460 ) * YC ( SO2          )   ! NO2+SO2=ASO4J+HONO
       L2     = 1.0D0 + L2 * DTC
 
 
@@ -259,6 +260,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &   +                 RKI(   228 ) * YC ( CL           )   ! O3+CL=CLO
      &   +                 RKI(   345 ) * YC ( BR           )   ! O3+BR=BRO
      &   +                 RKI(   391 ) * YC ( I            )   ! O3+I=IO
+     &   +                 RKI(   457 ) * YC ( SO2          )   ! O3+SO2=ASO4J
       L3    = 1.0D0 + L3 * DTC
 
 

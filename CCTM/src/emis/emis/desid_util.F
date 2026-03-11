@@ -124,6 +124,8 @@
       USE UTIL_FAMILY_MODULE
       USE VDIFF_MAP, ONLY : DIFF_SPC, N_SPC_DIFF, DIFF_MASK_GAS, 
      &                      DIFF_MASK_NUM, DIFF_MASK_SRF
+      USE VDIFF_MAP, ONLY : DIFF_SPC, N_SPC_DIFF, DIFF_MASK_GAS, 
+     &                      DIFF_MASK_NUM, DIFF_MASK_SRF, DIFF_MASK_TRAC,DIFF_MASK_NR
 
       IMPLICIT NONE
 
@@ -188,7 +190,7 @@
                    NPAIRS = NPAIRS + 1
                    MAP_toDIFF( NPAIRS ) = J
                    MAP_toDIAG( NPAIRS ) = NSPEC
-                   IF ( DIFF_MASK_GAS( J ) ) THEN
+                   IF ( DIFF_MASK_GAS( J ) .or. DIFF_MASK_NR(J) .or. DIFF_MASK_TRAC(J)) THEN
                        ! GAS SPECIES
                        UNITS( NSPEC ) = 'mol s-1'
                    ELSE IF ( DIFF_MASK_NUM( J ) ) THEN
@@ -215,7 +217,7 @@
                    NPAIRS = NPAIRS + 1
                    MAP_toDIFF( NPAIRS ) = J
                    MAP_toDIAG( NPAIRS ) = NSPEC
-                   IF ( DIFF_MASK_GAS( J ) ) THEN
+                   IF ( DIFF_MASK_GAS( J ) .or. DIFF_MASK_NR(J) .or. DIFF_MASK_TRAC(J)) THEN
                        ! GAS SPECIES
                        UNITS( NSPEC ) = 'mol s-1'
                    ELSE IF ( DIFF_MASK_NUM( J ) ) THEN

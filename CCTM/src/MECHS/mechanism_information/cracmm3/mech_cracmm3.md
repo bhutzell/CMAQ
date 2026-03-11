@@ -627,7 +627,7 @@ Information is based on the mech.def file.
 | HET_SO2_TMI   | SO2 + AFEJ + AMNJ ----> ASO4J + AFEJ + AMNJ  | HETERO_SO2T | Not Available<sup>2</sup> | 
 | HET_SO2_HCHO   | SO2 + HCHO ----> AHMSJ  | HETERO_HMSP | Not Available<sup>2</sup> | 
 | HET_SO2_HNO4   | SO2 + HNO4 ----> ASO4J + ANO3J  | HETERO_HNO4 | Not Available<sup>2</sup> | 
-| HET_HMS_L1   | AHMSJ + HO ----> HO2 + SO2 + ORA1  | HETERO_HHMSL1 | Not Available<sup>2</sup> | 
+| HET_HMS_L1   | AHMSJ + HO ----> HO2 + SO2 + ORA1  | HETERO_HMSL1 | Not Available<sup>2</sup> | 
 | HET_HMS_L2   | AHMSJ ----> SO2 + HCHO  | HETERO_HMSL2 | Not Available<sup>2</sup> | 
 
 <sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     

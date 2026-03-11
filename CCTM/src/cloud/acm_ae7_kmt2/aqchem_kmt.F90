@@ -191,7 +191,8 @@
       USE HLCONST_MOD
    
       USE aqchem_Model
-      USE aqchem_Initialize, ONLY: Initialize  
+      USE aqchem_Initialize, ONLY: Initialize
+      
 
       IMPLICIT NONE
 
@@ -221,6 +222,7 @@
       
 !      LOGICAL,   INTENT( IN )  :: DARK                      ! DARK = TRUE is night,  DARK = FALSE is day
 
+
       REAL( 8 ), INTENT( INOUT ) :: GAS    ( : )            ! gas phase concentrations (mol/molV)
       REAL( 8 ), INTENT( INOUT ) :: AEROSOL( :, : )         ! aerosol concentrations (mol/molV)
       REAL( 8 ), INTENT( INOUT ) :: GASWDEP( : )            ! gas phase wet deposition array (mm mol/liter)
@@ -246,8 +248,6 @@
 !...........Local Variables (scalars):
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE. ! flag for first pass thru
-      LOGICAL, SAVE :: AEI = .TRUE.      ! flag for AE6I and AE7I mechanisms
-      LOGICAL, SAVE :: STIC = .FALSE.    ! flag for SAPRC07TIC mechanisms
       
       LOGICAL       :: DARK                      ! DARK = TRUE is night,  DARK = FALSE is day
 
@@ -272,15 +272,12 @@
       
       REAL( 8 ) :: STARTM(4), ENDM(4), MBAL(4)
       
-      REAL( 8 ) :: OLIGGLY, OLIGMGLY                        ! If considering oligomerization, fraction of GLY/MGLY that remains in aerosol 
-                                                            ! upon droplet evaporation
-							    
-      REAL( 8 ) :: POAIinit, PRIIinit, TRACIinit, POAJinit, SOAIinit 
+      REAL( 8 ) :: POAIinit, PRIIinit, TRACIinit, POAJinit, SOAIinit    
 
       REAL(kind=dp) :: T, DVAL(NSPEC)                       ! KPP integrator variables
       REAL(kind=dp) :: RSTATE(20)                           ! KPP integrator variables
 
-      INTEGER :: I, IGAS, IAER, IMOD, count, J, OLIG
+      INTEGER :: I, IGAS, IAER, IMOD, count, J
 
 !*********************************************************************
 
@@ -290,24 +287,11 @@
 
          FIRSTIME = .FALSE.
 
-!...Is an AE7I version of the mechanism is being used?  
-!...This will include IETET, IMGA, etc. (rather than ISO3) and the IEPOX, 
-!...IMAE, etc., precursors (rather than just EPOX)
-
-        IF ( INDEX ( MECHNAME, 'AE7I' ) .LE. 0 ) THEN
-           AEI = .FALSE.
-        END IF
-
-!...Is a SAPRC07TIC or CB6 mechanism is being used?
+!...Is a CB6 mechanism is being used?
  
-         IF ( INDEX ( MECHNAME, 'CB6' ) .LE. 0  .AND. &
-            ( INDEX ( MECHNAME, 'SAPRC07TIC' ) .LE. 0 ) ) THEN
-            XMSG = 'This version of AQCHEM requires SAPRC07TIC or a CB6 gas mech'
+         IF ( INDEX ( MECHNAME, 'CB6' ) .LE. 0 ) THEN
+            XMSG = 'This version of AQCHEM requires a CB6 gas mech'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
-         END IF 
- 
-         IF ( INDEX ( MECHNAME, 'SAPRC07TIC' ) .GT. 0 ) THEN
-            STIC = .TRUE.
          END IF 
 
 !...Make sure STM option is not set
@@ -316,6 +300,7 @@
             XMSG = 'STM option not implemented in KMT AQCHEM'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
          END IF
+
 
 #ifdef isam
         XMSG = 'Source Apportionment is not implemented in KMT AQCHEM'
@@ -365,6 +350,7 @@
   
       END IF    ! FIRSTIME
       
+
 !...Set Henry's Law coefficients and other options
 
       SO2H   = HLCONST( HLC_SO2       , TEMP2, .FALSE., 0.0 )
@@ -398,25 +384,6 @@
       ONE_OVER_TEMP = 1.0D0 / TEMP2
       
       JH2O2 = jh2o2_hydrometeors    ! H2O2 photolysis rate calculated for gas phase chemistry
-
-!...AE6I and AE7I includes AIETETJ, AIEOSJ, ADIMJ, AIMGAJ, and AIMOSJ species. AE6/7 uses AISO3J to represent IEPOX SOA.
-     
-      ISPC8 = 0
-      IF(AEI) ISPC8 = 1 
-
-!...SAPRC07TIC includes pyruvic acid in the gas phase mech.  For that mech, allow pyruvic acid to transfer between phases
-     
-      MTPYRAC = 0
-      IF(STIC) MTPYRAC = 1
-      
-!...Flag to keep a fraction of aqueous glyoxal and methylglyoxal in aerosol phase upon droplet evaporation.       
-       
-      OLIG = 0 !OLIGOMERIZATION OF GLY/MGLY UPON DROPLET EVAPORATION 
-               !1= ON, 0 = OFF -- Default = 0
-               !Could consider if SOA species were explicitly tracked
-
-      OLIGGLY =  OLIG * 3.3D-1  !(De Haan et al., 2009; Liu et al., 2012)
-      OLIGMGLY = OLIG * 1.9D-1
       
 !...Flag to consider a simply estimated photolysis rate for those rates not previously calculated for gas phase chemistry
 
@@ -496,12 +463,14 @@
            STARTM(2) = STARTM(2) + AEROSOL(LNO3, I)*14.007
            STARTM(3) = STARTM(3) + AEROSOL(LNH4, I)*14.007
            STARTM(4) = STARTM(4) + AEROSOL(LCL, I)*35.5
-        ENDDO   
-	
-	POAIinit = AEROSOL(LPOA, IAIT)	
-	PRIIinit = AEROSOL(LPRI, IAIT)	
+        ENDDO 
+
+        STARTM(1) = STARTM(1) + AEROSOL( LHMS, IACC )*32.06  
+
+        POAIinit = AEROSOL(LPOA, IAIT)
+        PRIIinit = AEROSOL(LPRI, IAIT)
         TRACIinit = AEROSOL(LTRACER, IAIT)
-	SOAIinit = AEROSOL(LSOA, IAIT)
+        SOAIinit = AEROSOL(LSOA, IAIT)
      
 !...Initialize dynamic species, rel/abs tolerances, and other specifications before calling integrator
 
@@ -567,9 +536,9 @@ kron: DO WHILE (T < TEND)
                                     AEROSOL( LTRACER, IAIT ) * (1.d0-EXP(-ALFA3 * TAUCLD))  
       AEROSOL( LPHG, IACC )    = AEROSOL( LPHG, IACC ) + &
                                     AEROSOL( LPHG, IAIT ) * (1.d0-EXP(-ALFA3 * TAUCLD))
-				    
+    
       AEROSOL( LTRACER, IAIT ) = AEROSOL( LTRACER, IAIT ) * EXP(-ALFA3 * TAUCLD)  
-      AEROSOL( LPHG, IAIT )    = AEROSOL( LPHG, IAIT ) * EXP(-ALFA3 * TAUCLD)				       
+      AEROSOL( LPHG, IAIT )    = AEROSOL( LPHG, IAIT ) * EXP(-ALFA3 * TAUCLD)       
       AERWDEP( LTRACER, IACC ) = AEROSOL( LTRACER,IACC ) * ( 1.d0 - EXPWET ) * CFACTOR 
       AERWDEP( LPHG, IACC )    = AEROSOL( LPHG,IACC ) * ( 1.d0 - EXPWET ) * CFACTOR  
       AERWDEP( LTRACER, ICOR ) = AEROSOL( LTRACER,ICOR ) * ( 1.d0 - EXPWET ) * CFACTOR 
@@ -614,13 +583,7 @@ kron: DO WHILE (T < TEND)
       AEROSOL( LSO4, ICOR )   = AEROSOL( LSO4, ICOR ) * EXPWET
       AEROSOL( LNH4, ICOR )   = AEROSOL( LNH4, ICOR ) * EXPWET
       AEROSOL( LNO3, ICOR )   = AEROSOL( LNO3, ICOR ) * EXPWET
-      AEROSOL( LCL, ICOR )    = AEROSOL( LCL, ICOR ) * EXPWET   
-
-!...AERWDEP species, accumulation mode 
-
-!      AERWDEP( LSOA, IACC ) = AEROSOL( LSOA, IACC ) * ( 1 - EXPWET) * CFACTOR ! SOA is only impacted by wet dep process 
-!                                                                            ! and not included in the list of dynamic 
-!                                                                            ! species, VAR      
+      AEROSOL( LCL, ICOR )    = AEROSOL( LCL, ICOR ) * EXPWET       
       
       WDFECOR   = SOIL_FE_FAC * AERWDEP( LSOIL, ICOR ) + CORS_FE_FAC * AERWDEP( LANTH, ICOR )
       WDMNCOR   = SOIL_MN_FAC * AERWDEP( LSOIL, ICOR ) + CORS_MN_FAC * AERWDEP( LANTH, ICOR )     
@@ -655,15 +618,9 @@ kron: DO WHILE (T < TEND)
       AERWDEP( LORGC, IACC )  = VAR( ind_WD_ORGC )
       AERWDEP( LPOA, IACC )   = VAR( ind_WD_POAACC ) 
       
-      IF(ISPC8 .gt. 0) THEN        
-         AERWDEP( LIETET, IACC ) = VAR( ind_WD_IETET )
-         AERWDEP( LIEOS, IACC )  = VAR( ind_WD_IEOS )
-         AERWDEP( LDIMER, IACC ) = VAR( ind_WD_DIMER )
-         AERWDEP( LIMGA, IACC )  = VAR( ind_WD_IMGA )
-         AERWDEP( LIMOS, IACC )  = VAR( ind_WD_IMOS )
-      ELSE   
-         AERWDEP( LISO3, IACC )  = VAR( ind_WD_IETET )
-      END IF
+      AERWDEP( LHMS, IACC )   = VAR( ind_WD_HMSMIN ) 
+         
+      AERWDEP( LISO3, IACC )  = VAR( ind_WD_IETET )
            
 !     For volatile species represented in the coarse mode -- make sure you are 
 !     not depositing more mass from the coarse mode than was calculated for the total
@@ -688,48 +645,38 @@ kron: DO WHILE (T < TEND)
           AEROSOL( LCL, ICOR) = ( 1.0d0 - FCLACC ) * VAR( ind_L_CLMIN ) * INVCFAC
       END IF      
         
-!...AEROSOL species, IACCumulation mode
+!...AEROSOL species, accumulation mode
            
       AEROSOL( LPRI, IACC )  = VAR( ind_L_PRIACC ) * INVCFAC
       AEROSOL( LEC, IACC )   = VAR( ind_L_PECACC ) * INVCFAC 
       AEROSOL( LORGC, IACC ) = VAR( ind_L_ORGC ) * INVCFAC 
-      AEROSOL( LPOA, IACC )  = VAR( ind_L_POAACC ) * INVCFAC 
-!      AEROSOL( LSOA, IACC )  = AEROSOL( LSOA, IACC ) * EXPWET   ! SOA is only impacted by wet dep process 
-!                                                              ! and not included in the list of dynamic 
-!                                                              ! species, VAR             
-		       
-		     
+      AEROSOL( LPOA, IACC )  = VAR( ind_L_POAACC ) * INVCFAC               
       
 !...Store the fraction of aitken-mode associated mass in the 
 !   bulk aerosol aqueous chemistry tracer
+
       FRACAIT( : ) = 0.d0
       IF( AEROSOL(LTRACER, IACC) .GT. 0.d0 ) &
        FRACAIT( LTRACER )  = MIN(((TRACIinit - AEROSOL(LTRACER, IAIT))*EXPWET) /  &
-	 AEROSOL( LTRACER, IACC ), 1.0D0) 
+        AEROSOL( LTRACER, IACC ), 1.0D0) 
       
       IF( AEROSOL(LPOA, IACC) .GT. 0.d0 ) &
         FRACAIT( LPOA ) = MIN(((POAIinit - AEROSOL(LPOA, IAIT))*EXPWET) / &
-	 AEROSOL( LPOA, IACC ), 1.0D0) 
+         AEROSOL( LPOA, IACC ), 1.0D0) 
       
       IF( AEROSOL(LPRI, IACC) .GT. 0.d0 ) &
         FRACAIT( LPRI ) = MIN(((PRIIinit - AEROSOL(LPRI, IAIT))*EXPWET) / &
-	 AEROSOL( LPRI, IACC ), 1.0D0) 
+         AEROSOL( LPRI, IACC ), 1.0D0) 
       
       IF( AEROSOL(LSOA, IACC) .GT. 0.d0 ) &
        FRACAIT( LSOA ) = MIN(((SOAIinit - AEROSOL(LSOA, IAIT))*EXPWET) / &
-	 AEROSOL( LSOA, IACC ), 1.0D0)   
+        AEROSOL( LSOA, IACC ), 1.0D0)   
      
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        
-
-      IF(ISPC8 .gt. 0) THEN                                                                                               
-         AEROSOL( LIETET, IACC ) = VAR( ind_L_IETET ) * INVCFAC
-         AEROSOL( LIEOS, IACC )  = VAR( ind_L_IEOS ) * INVCFAC
-         AEROSOL( LDIMER, IACC ) = VAR( ind_L_DIMER ) * INVCFAC
-         AEROSOL( LIMGA, IACC )  = VAR( ind_L_IMGA ) * INVCFAC
-         AEROSOL( LIMOS, IACC )  = VAR( ind_L_IMOS ) * INVCFAC 
-      ELSE
-         AEROSOL( LISO3, IACC )  = ( VAR( ind_L_ISO3 ) ) * INVCFAC
-      END IF
+      AEROSOL( LISO3, IACC )  = ( VAR( ind_L_ISO3 ) ) * INVCFAC
+      
+      AEROSOL( LHMS, IACC )  = VAR( ind_L_HMSMIN ) * INVCFAC
+      
+      AEROSOL( LHMS, IACC )  = VAR( ind_L_HMSMIN ) * INVCFAC
       
       FECOR   = SOIL_FE_FAC * AEROSOL( LSOIL, ICOR ) + CORS_FE_FAC * AEROSOL( LANTH, ICOR )
       MNCOR   = SOIL_MN_FAC * AEROSOL( LSOIL, ICOR ) + CORS_MN_FAC * AEROSOL( LANTH, ICOR )
@@ -769,7 +716,7 @@ kron: DO WHILE (T < TEND)
 !...Gas phase species
 
       GAS(LSO2)   = ( VAR( ind_G_SO2 ) + VAR( ind_L_SO2 ) + VAR( ind_L_HSO3MIN ) + &
-                    VAR( ind_L_SO3MIN2 ) + VAR( ind_L_HMSMIN ) + VAR( ind_L_SO3MIN ) + &
+                    VAR( ind_L_SO3MIN2 ) + VAR( ind_L_SO3MIN ) + &
                     VAR( ind_L_SO5MIN ) + VAR( ind_L_HSO5MIN ) + VAR( ind_L_SO4MIN )) * INVCFAC
       GAS(LN2O5)  = 0.0D0
       GAS(LCO2)   = ( VAR( ind_G_CO2 ) + VAR( ind_L_H2CO3 ) + VAR( ind_L_HCO3MIN ) + & 
@@ -781,20 +728,15 @@ kron: DO WHILE (T < TEND)
       GAS(LPAA)   = ( VAR( ind_G_PAA ) + VAR( ind_L_PAA ) ) * INVCFAC 
       GAS(LH2SO4) = 0.0D0
       GAS(LHCL)   = ( VAR( ind_G_HCL ) + VAR( ind_L_HCL ) ) * INVCFAC 
-      GAS(LGLY)   = ( VAR( ind_G_GLY ) + VAR( ind_L_GLY )*(1.d0-OLIGGLY) ) * INVCFAC
-      GAS(LMGLY)  = ( VAR( ind_G_MGLY ) + VAR( ind_L_MGLY ) *(1.d0-OLIGMGLY)) * INVCFAC
+      GAS(LGLY)   = ( VAR( ind_G_GLY ) + VAR( ind_L_GLY ) ) * INVCFAC
+      GAS(LMGLY)  = ( VAR( ind_G_MGLY ) + VAR( ind_L_MGLY ) ) * INVCFAC
       GAS(LHNO3)  = ( FHNO3 * TOTNIT ) * INVCFAC
       GAS(LNH3)   = ( FNH3 * TOTAMM ) * INVCFAC  
 ! Fixed OHg vs variable       
-      GAS(LHO)    = ( FIX( indf_G_HO ) ) * INVCFAC    
-!      GAS(LHO)    = ( VAR( ind_G_HO ) + VAR( ind_L_HO ) ) * INVCFAC 
+      GAS(LHO)    = ( FIX( indf_G_HO ) ) * INVCFAC    !comment for dynoh
+!dynoh      GAS(LHO)    = ( VAR( ind_G_HO ) + VAR( ind_L_HO ) ) * INVCFAC 
 
       GAS( LIEPOX ) = ( VAR( ind_G_IEPOX ) + VAR( ind_L_IEPOX ) ) * INVCFAC
-      
-      IF( ISPC8 .GT. 0 ) THEN  
-      GAS( LIMAE )  = ( VAR( ind_G_IMAE ) + VAR( ind_L_IMAE ) ) * INVCFAC 
-      GAS( LIHMML ) = ( VAR( ind_G_IHMML ) + VAR( ind_L_IHMML ) ) * INVCFAC 
-      END IF
       
       GAS(LHO2)   = ( VAR( ind_G_HO2 ) + VAR( ind_L_HO2 ) + VAR( ind_L_O2MIN ) ) * INVCFAC   
       GAS(LNO2)   = ( VAR( ind_G_NO2 ) + VAR( ind_L_NO2 ) ) * INVCFAC 
@@ -803,11 +745,10 @@ kron: DO WHILE (T < TEND)
       
       GAS(LNO3RAD) = ( VAR( ind_G_NO3 ) + VAR( ind_L_NO3 ) ) * INVCFAC 
       GAS(LCH3O2)  = ( VAR( ind_G_CH3O2 ) + VAR( ind_L_CH3O2 ) ) * INVCFAC     
-      GAS(LCCOOH)  = ( VAR(ind_G_CCOOH) + VAR(ind_L_CCOOH) + VAR(ind_L_CCOOHMIN) )*INVCFAC
-      GAS(LHCHO)   = (VAR(ind_G_HCHO) + VAR(ind_L_CH2OHYD) + VAR(ind_L_HCHO) + VAR(ind_L_HMSMIN) )*INVCFAC
+      GAS(LCCOOH)  = ( VAR(ind_G_CCOOH) + VAR(ind_L_CCOOH) + VAR(ind_L_CCOOHMIN) )*INVCFAC  
+      GAS(LHCHO)   = ( VAR(ind_G_HCHO) + VAR(ind_L_CH2OHYD) + VAR(ind_L_HCHO) )*INVCFAC
       GAS(LGCOL)   = (VAR(ind_G_GCOL) + VAR(ind_L_GCOL) )*INVCFAC
-
-      GAS(LHCHOP)  = (VAR(ind_G_HCHOP) + VAR(ind_L_CH2OHYDP) + VAR(ind_L_HCHOP) + VAR(ind_L_HMSMINP) )*INVCFAC 
+      GAS(LHCHOP)  = (VAR(ind_G_HCHOP) + VAR(ind_L_CH2OHYDP) + VAR(ind_L_HCHOP) )*INVCFAC 
 
 !...Gas phase species deposition amounts
 
@@ -823,16 +764,11 @@ kron: DO WHILE (T < TEND)
       GASWDEP( LPAA )   = VAR( ind_WD_PAA )
       GASWDEP( LH2SO4 ) = 0.0D0                 ! already transferred to SO4
       GASWDEP( LHCL )   = VAR( ind_WD_HCL )
-      GASWDEP( LGLY )   = VAR( ind_WD_GLY ) * (1.d0-OLIGGLY)
-      GASWDEP( LMGLY )  = VAR( ind_WD_MGLY ) * (1.d0-OLIGMGLY)
+      GASWDEP( LGLY )   = VAR( ind_WD_GLY )
+      GASWDEP( LMGLY )  = VAR( ind_WD_MGLY )
       GASWDEP( LHO )    = VAR( ind_WD_HO )
       
-      GASWDEP( LIEPOX ) = VAR( ind_WD_IEPOX )
-      
-      IF( ISPC8 .GT. 0 ) THEN 
-         GASWDEP( LIMAE )  = VAR( ind_WD_IMAE )
-         GASWDEP( LIHMML ) = VAR( ind_WD_IHMML ) 
-      END IF     
+      GASWDEP( LIEPOX ) = VAR( ind_WD_IEPOX )   
       
       GASWDEP( LNO2 )   = VAR( ind_WD_NO2 )
       GASWDEP( LHONO )  = VAR( ind_WD_HONO )
@@ -846,34 +782,18 @@ kron: DO WHILE (T < TEND)
       GASWDEP( LHO2 ) = VAR( ind_WD_HO2 )
       GASWDEP( LHCHOP ) = VAR( ind_WD_CH2OHYDP )
       
-      APYRAC = 0.d0 
-      WDPYRAC = 0.d0
-      
-      IF( MTPYRAC .GT. 0 ) THEN
-         GAS( LPYRUV ) = ( VAR( ind_G_PYRAC ) + VAR( ind_L_PYRAC ) )*INVCFAC  ! returning G_PYRAC and L_PYRAC
-                                                                              ! to the gas phase when gas phase
-                                                                              ! pyruvic acid species exists in 
-                                                                              ! gas phase mechanism
-         GASWDEP( LPYRUV ) = VAR( ind_WD_PYRAC )
-         WDPYRAC = 0
-         APYRAC = VAR( ind_L_PYRACMIN )
-      ELSE
          WDPYRAC = VAR(ind_WD_PYRAC) 
          APYRAC = VAR( ind_L_PYRAC ) + VAR( ind_L_PYRACMIN ) 
-      END IF
-      
-
+            
       AEROSOL(LORGC, IACC) = (VAR(ind_L_ORGC) + ((74.04/177.)*VAR(ind_L_GLYAC)) + ((90.03/177.)*VAR(ind_L_OXLAC)) &
       + ((90.03/177.)*VAR(ind_L_OXLACMIN)) + ((90.03/177.)*VAR(ind_L_OXLACMIN2)) + ((88.06/177.)* APYRAC ) & 
       + ((76.05/177.)*VAR(ind_L_GCOLAC)) + ((74.04/177.)*VAR(ind_L_GLYACMIN)) &
-      + ((76.05/177.)*VAR(ind_L_GCOLACMIN)) &
-      + (58.04/177.)*OLIGGLY*VAR(ind_L_GLY) + (72.06/177.)*OLIGMGLY*VAR(ind_L_MGLY))*INVCFAC
+      + ((76.05/177.)*VAR(ind_L_GCOLACMIN)))*INVCFAC
   
       AERWDEP(LORGC, IACC) = VAR(ind_WD_ORGC) + ((74.04/177.)*VAR(ind_WD_GLYAC)) + &
                           ((90.03/177.)*VAR(ind_WD_OXLAC))  + & 
                           ((88.06/177.)* WDPYRAC) + &
-                          ((76.05/177.)*VAR(ind_WD_GCOLAC)) + &
-                           (58.04/177.)*OLIGGLY*VAR(ind_WD_GLY) + (72.06/177.)*OLIGMGLY*VAR(ind_WD_MGLY)
+                          ((76.05/177.)*VAR(ind_WD_GCOLAC))
   
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!         
 !...Convert to appropriate units (mol / m2)
@@ -930,7 +850,9 @@ kron: DO WHILE (T < TEND)
            ENDM(2) = ENDM(2) + AEROSOL(LNO3, I)*14.007
            ENDM(3) = ENDM(3) + AEROSOL(LNH4, I)*14.007
            ENDM(4) = ENDM(4) + AEROSOL(LCL, I)*35.5
-        ENDDO 
+        ENDDO
+
+        ENDM(1) = ENDM(1) + AEROSOL(LHMS, IACC)*32.06 
    
         DO I = 1, n_mode
            ENDM(1) = ENDM(1) + (AERWDEP(LSO4,I)/WFACTOR/CFACTOR)*32.06
@@ -938,6 +860,8 @@ kron: DO WHILE (T < TEND)
            ENDM(3) = ENDM(3) + (AERWDEP(LNH4,I)/WFACTOR/CFACTOR)*14.007
            ENDM(4) = ENDM(4) + (AERWDEP(LCL,I)/WFACTOR/CFACTOR)*35.5
         ENDDO
+
+        ENDM(1) = ENDM(1) + (AERWDEP(LHMS, IACC)/WFACTOR/CFACTOR)*32.06
                   
         DO I = 1,4
                         

@@ -76,4 +76,5 @@ AE_SPECIES_DATA =
 'AAS'     , 74.92  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 'ABENAPY' ,252.30  ,T      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 'ASEAST'  , 31.30  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'PRI'         , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
+'AHMS'    ,111.10  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'ORG'         , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 /

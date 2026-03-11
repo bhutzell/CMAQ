@@ -1,4 +1,22 @@
 # Utilities
+### [Correct CHEMMECH Documentation Outputs]
+[William T. Hutzell](hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+
+ **Primary Contact**: [William T. Hutzell](hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+
+**Type of update**: [Bug Fix, New Feature]   
+
+**Release Version/Date**:  ??version 6.0 (may be)??
+
+**Description**:  CHEMMECH  is updated to accomplish the below items.
+1. Correct the output file that contains a markdown description of the mechanism processed. The error regards rate constant used by heterogeneous reactions. The constant can be wrong because a DO loop used the incorrect upper bound. Developers had to manually edit the file to remove the wrong rate constant.
+2. Correct existing markdown files under CCTM/src/MECHS/mechanism_information if needed.
+3. Add a new output file (**_evaluate_dydt.F_**) containing a subroutine that give time derivatives of gas chemistry species based on the mechanism. The files may help developers interpret what reactions affect each species.
+
+**Significance and Impact**:  Support documenting and understanding a gas chemistry mechanism.
+
+| [Merge for PR #1401]() | [PR #1400](https://github.com/USEPA/CMAQ_Dev/pull/1401)  | 
+
 ### Increase JPROC parameters for input file size
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
  **Type of update**: Bug Fix   
