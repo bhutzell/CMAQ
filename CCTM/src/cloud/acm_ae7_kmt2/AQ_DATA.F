@@ -48,7 +48,7 @@ C-----------------------------------------------------------------------
       Implicit None
 
       Integer, Parameter :: n_aq_gas = 29   ! number of gas-phase species for AQCHEM
-      Integer, Parameter :: n_aq_aer = 32+5   ! number of aerosol surrogate species for AQCHEM
+      Integer, Parameter :: n_aq_aer = 32+6   ! number of aerosol surrogate species for AQCHEM
 
 !      Integer, Parameter :: naddaer = 2 ! number of additional aerosol surrogate species for AQCHEM
 !      Integer, Parameter :: nadd_tx = 6 ! number of surrogates for HAPS aerosol species for AQCHEM
@@ -184,6 +184,7 @@ C                    ----------  ----------  ------  -----
      & sur_aer_type('IMOS      ',   0.0,     1400.0, 200.16 ),
      & sur_aer_type('DIMER     ',   0.0,     1400.0, 248.23 ),
      & sur_aer_type('ISO3      ',   0.0,     1400.0, 168.2 ),
+     & sur_aer_type('HMS       ',   0.0,     1800.0, 111.1 ),
      & sur_aer_type('NUM       ',   0.0,        1.0,   1.0 ),
      & sur_aer_type('SRF       ',   0.0,        1.0,   1.0 )/)
 
@@ -223,9 +224,10 @@ C...Pointers for the AQCHEM array AEROSOL
       Integer, Parameter :: limga      = 32 !  
       Integer, Parameter :: limos      = 33 !  
       Integer, Parameter :: ldimer     = 34 !  
-      Integer, Parameter :: liso3      = 35 !  
-      Integer, Parameter :: lnum       = 36 !  Number
-      Integer, Parameter :: lsrf       = 37 !  Surface area
+      Integer, Parameter :: liso3      = 35 !
+      Integer, Parameter :: lhms       = 36  
+      Integer, Parameter :: lnum       = 37 !  Number
+      Integer, Parameter :: lsrf       = 38 !  Surface area
       
       Integer, Save :: n_aqsrg_gas( n_aq_gas )             ! Store Number of CGRID species pointing to each surrogate
       Integer, Save :: n_aqsrg_aer( n_aq_aer,n_mode )      ! Store Number of CGRID species pointing to each surrogate

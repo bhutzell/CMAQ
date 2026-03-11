@@ -31,6 +31,7 @@
 !        M. Damian, Villanova University, USA
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
+! 
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -171,7 +172,7 @@ CONTAINS
              
             RETURN
      
-      END FUNCTION DISB
+      END FUNCTION DISB                 
 
       REAL( kind=dp )FUNCTION KRXN ( KR, DH, RTYPE, QY, METAL )
 
@@ -199,12 +200,7 @@ CONTAINS
             END IF
        
             IF (METAL .GT. 0) KRXN = KRXN / SVIinh  !SO4 inhibition only for 
-                                                    !metal-catalyzed oxidation
-
-!           Ionic strength impact on SIV-O3 reaction rate       
-!                 IF (QY .GT. 0) THEN
-!                    KRXN = KRXN * (1.0D0 + 2.5 * STION)
-!                 END IF       
+                                                    !metal-catalyzed oxidation  
 
 !           Aqueous diffusion limitation for O3
 
@@ -219,12 +215,12 @@ CONTAINS
                kO3T = ( kO31 * VAR( ind_L_SO2 ) + kO32 &
                     * VAR( ind_L_HSO3MIN ) &
                     + kO33 * VAR( ind_L_SO3MIN2 ) ) * PHI2
-
+    
                IF(kO3T .LT. 0.d0) THEN
-	          q1 = 0.d0
-	       ELSE	
-                  q1 = DDIAM / 2.0D0 * SQRT( kO3T / DAQ )  ! diffuso-reactive parameter  
-	       END IF
+                  q1 = 0.d0
+               ELSE
+                  q1 = DDIAM / 2.0D0 * SQRT( kO3T / DAQ )  ! diffuso-reactive pa
+              END IF    
 
                IF ( q1 .GT. 1.0D-3 ) THEN
                   IF ( q1 .LE. 100.0D0 ) THEN
@@ -248,40 +244,24 @@ CONTAINS
      
       END FUNCTION KRXN
       
-REAL( kind=dp )FUNCTION KIEPOX ( KH, KHSO4, TYPE )
+REAL( kind=dp )FUNCTION KIEPOX ( KH, KHSO4 )
 
             IMPLICIT NONE
       
             REAL( kind=dp ) KH, KHSO4
             REAL( kind=dp ) K1, K2
-            REAL( kind=dp ) KIEPOXT, KMAET
+            REAL( kind=dp ) KIEPOXT
             REAL( kind=dp ) Q, q1, COTHq
-            INTEGER TYPE
-    
-            IF( ISPC8 .LE. 0 ) THEN
-               IF( TYPE .GT. 0 ) THEN
-                  KIEPOX = 0.d0
-                  RETURN
-               END IF
-            ELSE
-               IF( TYPE .LT. 1 ) THEN
-                  KIEPOX = 0.d0
-                  RETURN
-               END IF
-            END IF
         
             K1 = KH * VAR( ind_L_HPLUS ) * PHI2
             K2 = KHSO4 * VAR( ind_L_HSO4MIN ) * PHI2
         
             KIEPOX = K1 + K2 
 !
-! Aqueous diffusion limitation for IEPOX and MAE
-!
+! Aqueous diffusion limitation for IEPOX
 !
             q1 = 0.0D0
             Q = 1.0D0
-
-            IF( TYPE .le. 1 ) THEN   ! FOR IEPOX
 
                K1 = 9.0D-4 * VAR( ind_L_HPLUS ) * PHI2
                K2 = 1.31D-5 * VAR( ind_L_HSO4MIN ) * PHI2        
@@ -295,20 +275,13 @@ REAL( kind=dp )FUNCTION KIEPOX ( KH, KHSO4, TYPE )
                K1 = 2.0D-4 * VAR( ind_L_HPLUS ) * PHI2
                K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2  
                              
-               IF( ISPC8 .LE. 0 ) THEN
-                  KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_NO3MIN ) * PHI2    
+               KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_NO3MIN ) * PHI2    ! I
+
+               IF(KIEPOXT .LT. 0.d0) THEN
+                  q1 = 0.d0
                ELSE
-                  KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_IETET ) &
-                          * PHI2    ! IEPOX + IETET
-                  KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_IEOS ) &
-                          * PHI2     ! IEPOX + IEOS
-               ENDIF
-	       
-	       IF(KIEPOXT .LT. 0.d0) THEN
-	          q1 = 0.d0
-	       ELSE	
-                  q1 = DDIAM/2.0D0 * SQRT( KIEPOXT / DAQ )  ! diffuso-reactive parameter  
-	       END IF
+                  q1 = DDIAM/2.0D0 * SQRT( KIEPOXT / DAQ )  ! diffuso-reactive p
+               END IF
        
                IF ( q1 .GT. 1.0D-3 ) THEN
                   IF ( q1 .LE. 100.0D0 ) THEN
@@ -322,39 +295,7 @@ REAL( kind=dp )FUNCTION KIEPOX ( KH, KHSO4, TYPE )
                   Q = 1.0D0
                END IF             
      
-            ELSE   ! FOR MAE OR HMML
-
-               K1 = 9.0D-4 * VAR( ind_L_HPLUS ) * PHI2
-               K2 = 1.31D-5 * VAR( ind_L_HSO4MIN ) * PHI2        
-               KMAET = (K1 + K2) * FIX( indf_L_H2O ) &
-                     * PHI2  ! MAE/HMML + H2O
-    
-               K1 = 2.0D-4 * VAR( ind_L_HPLUS ) * PHI2
-               K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2        
-               KMAET = KMAET + (K1 + K2) * VAR( ind_L_SO4MIN2 ) &
-                     * PHI2  ! MAE/HMML + SO4
-	       
-	       IF(KMAET .LT. 0.d0) THEN
-	          q1 = 0.d0
-	       ELSE	
-                  q1 = DDIAM/2.0D0 * SQRT( KMAET / DAQ )  ! diffuso-reactive parameter  
-	       END IF
-
-               IF ( q1 .GT. 1.0D-3 ) THEN
-                  IF ( q1 .LE. 100.0D0 ) THEN
-                     COTHq = ( EXP( 2 * q1 ) + 1 ) / ( EXP( 2 * q1 ) - 1 )
-                     Q = 3 * ( ( COTHq / q1 ) - ( 1 / ( q1 * q1 ) ) )
-                     IF ( Q .GT. 1.0D0 ) Q = 1.0D0
-                  ELSE
-                     Q = 3.d0/q1
-                  END IF
-               ELSE
-                  Q = 1.0D0
-               END IF       
-            END IF
-     
-            KIEPOX = KIEPOX * Q     
-       
+            KIEPOX = KIEPOX * Q           
             KIEPOX = KIEPOX * PHI2  
        
             RETURN
@@ -507,75 +448,66 @@ SUBROUTINE Update_RCONST ( )
   RCONST(93) = ((KRXN(5.D5,-7000.D0,0,0,0)))
   RCONST(94) = ((KRXN(1.D10,0.D0,0,0,0)))
   RCONST(95) = ((KRXN(1.D10,0.D0,0,0,0)))
-  RCONST(147) = ((KIEPOX(9.0D-4,1.31D-5,1)))
-  RCONST(148) = ((KIEPOX(8.83D-3,2.92D-6,1)))
-  RCONST(149) = ((KIEPOX(2.0D-4,2.92D-6,1)))
-  RCONST(150) = ((KIEPOX(2.0D-4,2.92D-6,1)))
-  RCONST(151) = ((KIEPOX(9.0D-4,1.31D-5,0)))
-  RCONST(152) = ((KIEPOX(8.83D-3,2.92D-6,0)))
-  RCONST(153) = ((KIEPOX(2.0D-4,2.92D-6,0)))
-  RCONST(154) = ((KIEPOX(9.0D-4,1.31D-5,2)))
-  RCONST(155) = ((KIEPOX(2.0D-4,2.92D-6,2)))
-  RCONST(156) = ((KIEPOX(9.0D-4,1.31D-5,2)))
-  RCONST(157) = ((KIEPOX(2.0D-4,2.92D-6,2)))
-  RCONST(177) = ((DISF(3.47D-4,-2.67D+2,2.D+10,0)))
-  RCONST(178) = ((DISF(5.6D-2,-4.53D+2,5.D+10,0)))
-  RCONST(179) = ((DISF(5.42D-5,-8.05D+2,5.D+10,1)))
-  RCONST(180) = ((DISF(3.2D-3,0.d0,2.D+10,0)))
-  RCONST(181) = ((DISF(1.48D-4,-8.05D+1,2.D+10,0)))
-  RCONST(182) = ((DISF(1.75D-5,4.6D+1,5.D+10,0)))
-  RCONST(183) = ((DISB(2.D10,2)))
-  RCONST(184) = ((DISB(5.D10,2)))
-  RCONST(185) = ((DISB(5.D10,1)))
-  RCONST(186) = ((DISB(2.D10,2)))
-  RCONST(187) = ((DISB(2.D10,2)))
-  RCONST(188) = ((DISB(5.D10,2)))
-  RCONST(194) = ((KRXN(5.0D+8,0.D0,0,0,0)))
-  RCONST(195) = ((KRXN(1.0D+9,0.D0,0,0,0)))
-  RCONST(196) = ((KRXN(6.0D+8,0.D0,0,0,0)))
-  RCONST(197) = ((KRXN(8.6D+8,0.D0,0,0,0)))
-  RCONST(198) = ((KRXN(1.1D+9,-1516.D0,0,0,0)))
-  RCONST(199) = ((KRXN(3.62D+8,0.D0,0,0,0)))
-  RCONST(200) = ((KRXN(2.9D+9,0.D0,0,0,0)))
-  RCONST(201) = ((KRXN(1.4D+6,0.D0,0,0,0)))
-  RCONST(202) = ((KRXN(4.7D+7,0.D0,0,0,0)))
-  RCONST(203) = ((KRXN(7.7D+6,0.D0,0,0,0)))
-  RCONST(204) = ((KRXN(7.0D+8,0.D0,0,0,0)))
-  RCONST(205) = ((KRXN(6.0D+7,0.D0,0,0,0)))
-  RCONST(206) = ((KRXN(6.0D+7,0.D0,0,0,0)))
-  RCONST(207) = ((KRXN(1.6D+7,0.D0,0,0,0)))
-  RCONST(208) = ((KRXN(8.5D+7,0.D0,0,0,0)))
-  RCONST(209) = ((KRXN(1.1D+9,-1020.D0,0,0,0)))
-  RCONST(210) = ((KRXN(1.2D+8,-990.D0,0,0,0)))
-  RCONST(211) = ((KRXN(1.1D+9,-1020.D0,0,0,0)))
-  RCONST(233) = ((KRXN(3.6D+9,-930.D0,0,0,0)))
-  RCONST(234) = ((KRXN(2.8D+10,0.D0,0,0,0)))
-  RCONST(235) = ((KRXN(3.5D+10,-720.D0,0,0,0)))
-  RCONST(236) = ((KRXN(3.2D+7,-1700.D0,0,0,0)))
-  RCONST(237) = ((KRXN(2.7D+9,0.D0,0,0,0)))
-  RCONST(238) = ((KRXN(1.8D+9,0.D0,0,0,0)))
-  RCONST(239) = ((KRXN(4.5D+9,0.D0,0,0,0)))
-  RCONST(240) = ((KRXN(2.6D-2,0.D0,4,0,0)))
-  RCONST(241) = ((KRXN(1.0D+5,0.D0,0,0,0)))
-  RCONST(242) = ((KRXN(1.3D+9,-2200.D0,0,0,0)))
-  RCONST(243) = ((KRXN(1.1D+9,0.D0,0,0,0)))
-  RCONST(244) = ((KRXN(1.7D+9,0.D0,0,0,0)))
-  RCONST(245) = ((KRXN(2.2D+8,-2600.D0,0,0,0)))
-  RCONST(246) = ((KRXN(7.1D+6,0.D0,3,0,0)))
-  RCONST(247) = ((KRXN(4.6D+2,-1100.D0,0,0,0)))
-  RCONST(248) = ((KRXN(1.7D+8,-2200.D0,0,0,0)))
-  RCONST(249) = ((KRXN(5.0D+5,0.D0,0,0,0)))
-  RCONST(250) = ((KRXN(3.4D+9,-1200.D0,0,0,0)))
-  RCONST(251) = ((KRXN(7.9D+2,-2900.D0,0,0,0)))
-  RCONST(252) = ((KRXN(2.5D+7,-2450.D0,0,0,0)))
-  RCONST(253) = ((KRXN(1.2D-7,0.D0,4,0,0)))
-  RCONST(254) = ((KRXN(3.7D3,0.D0,0,0,0)))
-  RCONST(255) = ((KRXN(3.0D8,0.D0,0,0,0)))
-  RCONST(256) = ((KRXN(7.9D+2,-2900.D0,0,0,0)))
-  RCONST(257) = ((KRXN(2.5D+7,-2450.D0,0,0,0)))
-  RCONST(258) = ((KRXN(1.2D-7,0.D0,4,0,0)))
-  RCONST(259) = ((KRXN(3.7D3,0.D0,0,0,0)))
-  RCONST(260) = ((KRXN(3.0D8,0.D0,0,0,0)))
+  RCONST(143) = ((KIEPOX(9.0D-4,1.31D-5)))
+  RCONST(144) = ((KIEPOX(8.83D-3,2.92D-6)))
+  RCONST(155) = ((DISF(3.47D-4,-2.67D+2,2.D+10,0)))
+  RCONST(156) = ((DISF(5.6D-2,-4.53D+2,5.D+10,0)))
+  RCONST(157) = ((DISF(5.42D-5,-8.05D+2,5.D+10,1)))
+  RCONST(158) = ((DISF(3.2D-3,0.d0,2.D+10,0)))
+  RCONST(159) = ((DISF(1.48D-4,-8.05D+1,2.D+10,0)))
+  RCONST(160) = ((DISF(1.75D-5,4.6D+1,5.D+10,0)))
+  RCONST(161) = ((DISB(2.D10,2)))
+  RCONST(162) = ((DISB(5.D10,2)))
+  RCONST(163) = ((DISB(5.D10,1)))
+  RCONST(164) = ((DISB(2.D10,2)))
+  RCONST(165) = ((DISB(2.D10,2)))
+  RCONST(166) = ((DISB(5.D10,2)))
+  RCONST(172) = ((KRXN(5.0D+8,0.D0,0,0,0)))
+  RCONST(173) = ((KRXN(1.0D+9,0.D0,0,0,0)))
+  RCONST(174) = ((KRXN(6.0D+8,0.D0,0,0,0)))
+  RCONST(175) = ((KRXN(8.6D+8,0.D0,0,0,0)))
+  RCONST(176) = ((KRXN(1.1D+9,-1516.D0,0,0,0)))
+  RCONST(177) = ((KRXN(3.62D+8,0.D0,0,0,0)))
+  RCONST(178) = ((KRXN(2.9D+9,0.D0,0,0,0)))
+  RCONST(179) = ((KRXN(1.4D+6,0.D0,0,0,0)))
+  RCONST(180) = ((KRXN(4.7D+7,0.D0,0,0,0)))
+  RCONST(181) = ((KRXN(7.7D+6,0.D0,0,0,0)))
+  RCONST(182) = ((KRXN(7.0D+8,0.D0,0,0,0)))
+  RCONST(183) = ((KRXN(6.0D+7,0.D0,0,0,0)))
+  RCONST(184) = ((KRXN(6.0D+7,0.D0,0,0,0)))
+  RCONST(185) = ((KRXN(1.6D+7,0.D0,0,0,0)))
+  RCONST(186) = ((KRXN(8.5D+7,0.D0,0,0,0)))
+  RCONST(187) = ((KRXN(1.1D+9,-1020.D0,0,0,0)))
+  RCONST(188) = ((KRXN(1.2D+8,-990.D0,0,0,0)))
+  RCONST(189) = ((KRXN(1.1D+9,-1020.D0,0,0,0)))
+  RCONST(211) = ((KRXN(3.6D+9,-930.D0,0,0,0)))
+  RCONST(212) = ((KRXN(2.8D+10,0.D0,0,0,0)))
+  RCONST(213) = ((KRXN(3.5D+10,-720.D0,0,0,0)))
+  RCONST(214) = ((KRXN(3.2D+7,-1700.D0,0,0,0)))
+  RCONST(215) = ((KRXN(2.7D+9,0.D0,0,0,0)))
+  RCONST(216) = ((KRXN(1.8D+9,0.D0,0,0,0)))
+  RCONST(217) = ((KRXN(4.5D+9,0.D0,0,0,0)))
+  RCONST(218) = ((KRXN(2.6D-2,0.D0,4,0,0)))
+  RCONST(219) = ((KRXN(1.0D+5,0.D0,0,0,0)))
+  RCONST(220) = ((KRXN(1.3D+9,-2200.D0,0,0,0)))
+  RCONST(221) = ((KRXN(1.1D+9,0.D0,0,0,0)))
+  RCONST(222) = ((KRXN(1.7D+9,0.D0,0,0,0)))
+  RCONST(223) = ((KRXN(2.2D+8,-2600.D0,0,0,0)))
+  RCONST(224) = ((KRXN(7.1D+6,0.D0,3,0,0)))
+  RCONST(225) = ((KRXN(4.6D+2,-1100.D0,0,0,0)))
+  RCONST(226) = ((KRXN(1.7D+8,-2200.D0,0,0,0)))
+  RCONST(227) = ((KRXN(5.0D+5,0.D0,0,0,0)))
+  RCONST(228) = ((KRXN(3.4D+9,-1200.D0,0,0,0)))
+  RCONST(229) = ((KRXN(7.9D+2,-2900.D0,0,0,0)))
+  RCONST(230) = ((KRXN(2.5D+7,-2450.D0,0,0,0)))
+  RCONST(231) = ((KRXN(1.2D-7,0.D0,4,0,0)))
+  RCONST(232) = ((KRXN(3.7D3,0.D0,0,0,0)))
+  RCONST(233) = ((KRXN(3.0D8,0.D0,0,0,0)))
+  RCONST(234) = ((KRXN(7.9D+2,-2900.D0,0,0,0)))
+  RCONST(235) = ((KRXN(2.5D+7,-2450.D0,0,0,0)))
+  RCONST(236) = ((KRXN(1.2D-7,0.D0,4,0,0)))
+  RCONST(237) = ((KRXN(3.7D3,0.D0,0,0,0)))
+  RCONST(238) = ((KRXN(3.0D8,0.D0,0,0,0)))
       
 END SUBROUTINE Update_RCONST
 
