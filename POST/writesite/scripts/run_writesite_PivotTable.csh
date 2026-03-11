@@ -94,7 +94,7 @@ set echo
 #>write put table that pivot variables and date-time to rows and columns, respectively
 #>PIVOT_TABLE more supports create initial concentrations file for box model (CBOX)
 #>only available if SITE_FILE does not equal ALL. (Default is N)
-#setenv PIVOT_TABLE Y 
+ setenv PIVOT_TABLE Y 
 
 #> define time window
  set START_DATE = "2018-07-03"     #> first date to process (default is starting date of input file)
@@ -120,7 +120,11 @@ set echo
 #setenv INFILE  /work/MOD3DEV/hwo/cmaq_testbed/boxmodel_Feb-17-2026_parallel/data/output_CCTM_v60_cb6r5m_ae7_aq_intel23.2_Bench_2018_12NE3/CCTM_CGRID_v60_cb6r5m_ae7_aq_intel23.2_Bench_2018_12NE3_20180702.nc
         #[Add location of input file, e.g. COMBINE_ACONC file.]
  setenv OUTFILE    ${POSTDIR}/cgrid_${RUNID}_${YYYYMMDD}.txt
-#setenv PIVOT_FILE ${POSTDIR}/cgrid_${RUNID}_${YYYYMMDD}_pivot.txt
+ setenv PIVOT_FILE ${POSTDIR}/cgrid_${RUNID}_${YYYYMMDD}_pivot.txt
+ echo $APPL
+ echo $RUNID
+ echo $YYYYMMDD
+ echo ${PIVOT_FILE}
 
 #> Executable call:
  ${BINDIR}/${EXEC}

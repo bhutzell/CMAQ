@@ -52,7 +52,8 @@ C..SCRATCH LOCAL VARIABLES:
       LOGICAL, ALLOCATABLE       :: LFOUND ( : )  ! Flag for non-zero IC for a species
 
       REAL NUMBER          ! Number found
-      LOGICAL :: LFIRST = .TRUE.               ! Flag for first time
+      LOGICAL :: TRUNCATE = .FALSE. ! Flag to subset input buffer string
+      LOGICAL :: LFIRST   = .TRUE.  ! Flag for first time
 
 C***********************************************************************
 
@@ -82,10 +83,19 @@ c..read one line of ascii file
    20 READ( FILDEV , '(A)' , END = 100 ) INBUF
       LINNUM = LINNUM + 1
 
+      INBUF = ADJUSTL( INBUF )
 c..skip comment lines and blank lines
       IF ( INBUF (1:1) .EQ. '!' ) THEN 
          GO TO 20
       ELSE
+         TRUNCATE = .FALSE.
+         DO N = 1,TRIMLEN ( INBUF )
+            IF ( INBUF(N:N) .EQ. "!" ) THEN
+               TRUNCATE = .TRUE.
+               EXIT 
+            END IF
+         END DO
+         IF ( TRUNCATE ) INBUF = INBUF(1:(N-1))
          EOL = TRIMLEN ( INBUF )
       ENDIF
 
@@ -218,8 +228,9 @@ C..SCRATCH LOCAL VARIABLES:
       REAL    :: REAL_VALUE   ! Number read
       
 C..SAVED LOCAL VARIABLES: None
-      INTEGER :: LOGDEV          !  FORTRAN unit number for log file
-      LOGICAL :: LFIRST = .TRUE. ! Flag for first time
+      INTEGER :: LOGDEV             !  FORTRAN unit number for log file
+      LOGICAL :: TRUNCATE = .FALSE. ! Flag to subset input buffer string
+      LOGICAL :: LFIRST   = .TRUE.  ! Flag for first time
       LOGICAL, ALLOCATABLE :: LFOUND( : ) ! Flag for non-zero IC for a species
 
 
@@ -275,10 +286,19 @@ c..read one line of ascii file
 
          LINNUM = LINNUM + 1
 c..skip comment lines and blank lines
+         INBUF = ADJUSTL( INBUF )
          IF ( INBUF (1:1) .EQ. '!' ) THEN 
             CYCLE
             COMMNUM = COMMNUM + 1
          ELSE
+            TRUNCATE = .FALSE.
+            DO N = 1,LEN_TRIM( INBUF )
+               IF ( INBUF(N:N) .EQ. "!" ) THEN
+                  TRUNCATE = .TRUE.
+                  EXIT
+               END IF
+            END DO
+            IF ( TRUNCATE ) INBUF = INBUF(1:(N-1))
             EOL = LEN_TRIM( INBUF )
          ENDIF
 
@@ -299,10 +319,10 @@ c..If the name matches a species, get species and its value
          SPC( IND ) = WORD
 
          CALL FETCH_REAL ( FILDEV, INBUF , LPOS, EOL, LINNUM, CHR, REAL_VALUE )
-         IF ( REAL_VALUE .GT. 0.0 ) THEN
-            CGRID ( IND ) = REAL_VALUE
-            LFOUND ( IND ) = .TRUE.
-         ELSE
+         CGRID ( IND ) = REAL_VALUE
+         LFOUND ( IND ) = .TRUE.
+
+         IF ( REAL_VALUE .LT. 0.0 ) THEN
             WRITE ( LOGDEV , 93000) WORD , LINNUM
          END IF
 
@@ -313,9 +333,9 @@ c..Report the ICs set
 100   LFIRST = .TRUE.
 
       DO  N = 1 , N_SPC
-         IF ( .NOT. LFOUND ( N ) .OR. CGRID ( N) .LE. 0.0 ) THEN
+         IF ( CGRID ( N) .LT. 0.0 ) THEN
             IF ( LFIRST ) WRITE ( LOGDEV , 92100 ) 
-            WRITE ( LOGDEV , 92020 ) N, SPC ( N )
+            WRITE ( LOGDEV , 92020 ) N, SPC ( N ), CGRID ( N )
             LFIRST = .FALSE.
          ENDIF
       ENDDO
@@ -323,7 +343,7 @@ c..Report the ICs set
       LFIRST = .TRUE.
 
       DO  N = 1 , N_SPC
-        IF ( LFOUND ( N ) .AND. CGRID ( N ) .GT. 0.0 ) THEN
+        IF ( CGRID ( N ) .GT. 0.0 ) THEN
             IF ( LFIRST ) WRITE ( LOGDEV , 92200 ) 
             WRITE ( LOGDEV , 92020 )N,  SPC ( N ) , CGRID ( N )
             LFIRST = .FALSE.
@@ -351,12 +371,12 @@ c..Report the ICs set
      &            ' a model species:')
 92020 FORMAT(5X , I3, 2X, A , 2X , 1PE12.4)
 
-92100 FORMAT(//1X , 'ICs for the following species have been set to zero:')
+92100 FORMAT(//1X , 'Data for the following species have negative values:')
 
-92200 FORMAT(//1X , 'ICs for the following species are non-zero:')
+92200 FORMAT(//1X , 'Data for the following species are non-zero:')
 
-93000 FORMAT(//1X, 'WARNING: Bad IC for species ', A ,' at Line no: ',I4,
-     &      ' ... IC set to zero')
+93000 FORMAT(//1X, 'WARNING: Data for species ', A ,' at Line no: ',I4,
+     &      ' ... negative value')
 
       END FUNCTION GET_ASCII_DATA
       SUBROUTINE GET_CHR ( FILDEV, INBUF , LPOS , EOL , CHR )
@@ -586,7 +606,7 @@ C..EXTERNAL FUNCTIONS: None
 C..SAVED LOCAL VARIABLES: None 
 
 C..SCRATCH LOCAL VARIABLES:
-      CHARACTER(20) :: NUMSTRING  ! String holding number
+      CHARACTER(100) :: NUMSTRING  ! String holding number
       CHARACTER(80) :: XMSG       ! Log message
 
       INTEGER ICHR      ! ASCII code number of character

@@ -27,8 +27,12 @@ This Fortran program generates a csv file from an IOAPI data file for a set of s
  PRT_XY         switch to output map projection coordinates (default is Y) 
  STARTDATE      first date to process (default is starting date of input file)
  ENDDATE        last date to process (default is ending date of input file)
+ START_TIME     first date to process (default is starting date of input file)
+ END_TIME       last date to process (default is 240000)
  SPECIES_#      list of species to output (e.g. setenv SPECIES_1 O3).  
                 To extract all species use: setenv SPECIES_1 ALL
+ PIVOT_TABLE    create output table that displays each species concentration on one row (default is N)
+ PIVOT_FILE     file name containing pivot table
 ```
 ## Format of SITE_FILE:
 

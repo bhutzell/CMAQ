@@ -340,9 +340,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
      setenv ICFILE Empty
      if ( ${MECH} =~ *cracmm* ) then
-       setenv BOX_IC_FILE ${BLD}/cracmm1haps_NorthCarolina_Summer.txt
+#      setenv BOX_IC_FILE ${BLD}/cracmm1haps_NorthCarolina_Summer.txt
+       setenv BOX_IC_FILE ${BLD}/cgrid_v55_cracmm3m_12NE3_NewYork_2018-07-02.txt
      else if ( ${MECH} =~ *cb6* ) then
-       setenv BOX_IC_FILE ${BLD}/cb6r5hap_NorthCarolina_Summer.txt
+#      setenv BOX_IC_FILE ${BLD}/cb6r5hap_NorthCarolina_Summer.txt
+       setenv BOX_IC_FILE ${BLD}/cgrid_v55_cb6r5m_ae7_aq_12NE3_NewYork_2018-07-02.txt
      endif 
      setenv INIT_MEDC_1 notused
 
@@ -361,7 +363,9 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #>Miscellaneous Box Parameters and Defaults
   setenv BOX_DATA ${BLD}/gc_chem_inputs.dat
   # metgeo input data
-  setenv BOX_METGEO_FILE ${BLD}/metgeo_data.txt
+# setenv BOX_METGEO_FILE ${BLD}/metgeo_data.txt
+  setenv BOX_METGEO_FILE ${BLD}/metgeo_data_12NE3_NewYork_2018-07-02.txt
+
 
 
   #> MCIP meteorology files 

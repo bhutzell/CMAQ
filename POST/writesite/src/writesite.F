@@ -17,7 +17,7 @@
 !------------------------------------------------------------------------!
 
 C****************************************************************************************
-c      PROGRAM writeSite 
+      PROGRAM WRITESITE
 c
 C*****************************************************************************************
       USE SITES
@@ -40,9 +40,11 @@ C local variables
       logical prtXY
       logical uselocal
       logical prthead
+      logical pivot_table
       integer timeShift
       integer layer     
       integer startDate, endDate
+      integer startTime, endTime
       integer logdev
       integer cdate, ctime
       integer ldate, ltime, tzoff
@@ -51,17 +53,20 @@ C local variables
       character*(4096)  header2
       character*(4096)  record
       character*(16)   field
-      character*(256)  infile
-      character*(256)  outfile
+      character*(656)  infile
+      character*(656)  outfile
+      character*(656)  pivot_file
       real, allocatable :: data(:,:,:) 
       integer, allocatable :: tzoffset(:,:) 
       integer lfn
+      integer lpfn
       integer i, s, t, idx
       integer column, row
       real x, y, lon, lat
 
 
-      lfn = 10
+      lfn  = 10
+      lpfn = 20
 
 C... start program
       logdev = init3 ()
@@ -71,6 +76,9 @@ C... get print headings switch
 
 C... get print XY switch
       prtXY = ENVYN('PRT_XY',"Print Map Projected XY switch", .FALSE., status)
+
+C... get print XY switch
+      pivot_table = ENVYN('PIVOT_TABLE',"Create output file that table pivots axes", .FALSE., status)
 
 C... get USELOCAL switch
       uselocal = ENVYN('USELOCAL',"Adjust to local time", .FALSE., status)
@@ -100,6 +108,11 @@ C... check for start and end dates
       startDate = ENVINT('STARTDATE','Starting Date', SDATE3D, status)
       endDate = ENVINT('ENDDATE','Ending Date', 9999366, status)
 
+C... check for start and end times
+      startTime = ENVINT('START_TIME','Starting Time', STIME3D, status)
+      endTime   = ENVINT('END_TIME','Ending Time', 240000, status)
+
+      print*,"startTime,endTime = ",startTime,endTime
 C... set map projection
       Call SETPROJ( GDTYP3D, Real(P_ALP3D),Real(P_BET3D),Real(P_GAM3D),Real(XCENT3D),Real(YCENT3D) )
 
@@ -117,6 +130,16 @@ C... get name of output file and try to open
         write(*,'(''**ERROR** Cannot open OUTFILE:'',a)') TRIM(outfile)
         Stop
         endif
+
+C... get name of pivot output file and try to open
+      IF( pivot_table .And. .Not. ALLCELLS )then
+         CALL ENVSTR( 'PIVOT_FILE', 'Name of output file', 'pivot_out.csv', pivot_file, status)
+         OPEN(unit=lpfn, file=pivot_file, iostat=status)
+         IF( status .ne. 0 ) then
+           write(*,'(''**ERROR** Cannot open PIVOT_FILE:'',a)') TRIM(outfile)
+           Stop
+         endif
+      endif
 
 C... create header record
       header1 = 'column,row,longitude,latitude'
@@ -155,13 +178,13 @@ C... create header record
 
       if( prthead ) then
         CALL ENVSTR( 'INFILE', 'Name of input file', 'INFILE', infile, status)
-        write(lfn,'(''Data read from file:'',a,'' (layer'',i3,'')'',/)') TRIM(infile),layer
+        write(lfn,'(''! Data read from file:'',a,'' (layer'',i3,'')'',/)') TRIM(infile),layer
 
         if( TSTEP3D .lt. 240000 ) then 
           if( USELOCAL ) then
-            write(lfn,'(''   Note: Times have been converted to local standard'')')
+            write(lfn,'(''!   Note: Times have been converted to local standard'')')
           else
-            write(lfn,'(''   Note: All Times are in GMT'')')
+            write(lfn,'(''!   Note: All Times are in GMT'')')
             endif
 
           if( timeShift.ne.0 ) write(lfn,'(9x,''Data shifted'',i2,'' (hours)'')') timeShift
@@ -181,7 +204,7 @@ C... start process loops for sites
         allocate( data(NCOLS3D, NROWS3D, 1) )
 
         do s = 1,NSITES
-          write(*,'(''Processing site:'',a)') TRIM(siteid(s))
+          write(*,'(''0) Processing site:'',a)') TRIM(siteid(s))
 
           ! set first date and time
           cdate = SDATE3D
@@ -197,7 +220,8 @@ C... start process loops for sites
             endif
 
           do t = 1,MXREC3D
-            if( cdate.ge.startDate .and. cdate.le.endDate ) then
+            if( ( cdate.ge.startDate .and. cdate.le.endDate )
+     &           .and. ( ctime.ge.startTime .and. ctime.le.endTime ) ) then
               record = TRIM(siteid(s))
               record = TRIM(record) // ',' // int2Str(siteCol(s), '(i5)')
               record = TRIM(record) // ',' // int2Str(siteRow(s), '(i5)')
@@ -222,6 +246,7 @@ C... start process loops for sites
                 record = TRIM(record) // ',' // time2Str(ltime)
                 endif
 
+
               do i = 1, NSPECVAR
                 if(.not.READ3( 'INFILE', SPECVARS(i), layer, cdate, ctime, data )) then
                   call M3ERR( 'writesite', cdate, ctime, 'Read Error', .TRUE. )
@@ -242,10 +267,8 @@ C... start process loops for sites
             call NEXTIME( cdate, ctime, TSTEP3D )
             enddo   ! end time record loop
           enddo   ! end site loop 
+      endif
 
-        lstatus = SHUT3 ()
-        stop
-        endif  ! sites condition
 
 C... start process loops for all cells
       if( ALLCELLS ) then
@@ -278,7 +301,8 @@ C... start process loops for all cells
 
         do t = 1,MXREC3D
 
-          if( cdate.ge.startDate .and. cdate.le.endDate ) then
+          if( cdate.ge.startDate .and. cdate.le.endDate 
+     &           .and. ( ctime.ge.startTime .and. ctime.le.endTime ) ) then
             write(*,'(''processing data for '',2i8)') cdate,ctime
 
             ! read data for record
@@ -331,14 +355,125 @@ C... start process loops for all cells
           call NEXTIME( cdate, ctime, TSTEP3D ) 
           enddo   ! end time record loop
 
-        lstatus = SHUT3 ()
-        stop
+        close(lfn)
         endif  ! all cells condition
 
-      end
+      ! add siteid if using site file
+      if( pivot_table .And. .not.ALLCELLS ) then
 
 
+! pivot table so all times of variables on single line per site
+        print*,'NSITES = ',NSITES
+      if( prthead ) then
+        CALL ENVSTR( 'INFILE', 'Name of input file', 'INFILE', infile, status)
+        write(lpfn,'(''! Data read from file:'',a,'' (layer'',i3,'')'')') TRIM(infile),layer
 
+        if( TSTEP3D .lt. 240000 ) then 
+          if( USELOCAL ) then
+            write(lpfn,'(''!   Note: Times have been converted to local standard'')')
+          else
+            write(lpfn,'(''!   Note: All Times are in GMT'')')
+            endif
+       endif
+
+C... create header record
+      header1 = ""
+      header2 = ""
+      write(header1,'(A)')
+     &  "!       Variable"
+      write(header2,'(A)')
+     & "!       Variable"
+     
+        cdate = SDATE3D
+        ctime = STIME3D
+        do t = 1,MXREC3D
+         if( cdate.ge.startDate .and. cdate.le.endDate 
+     &       .and. ( ctime.ge.startTime .and. ctime.le.endTime ) ) then
+
+            write(header1,'(A,7X,84(A16))')TRIM(header1),date2Str(cdate)
+
+            ! add time field if time step < 24 hours
+            if( TSTEP3D .lt. 240000 ) then
+              write(header2,'(A,6X,84(3X,A16))')TRIM(header2),time2Str(ctime)
+            else
+              write(header2,'(A,6X,84(3X,A16))')TRIM(header2),"             "
+            endif
+            endif
+         call NEXTIME( cdate, ctime, TSTEP3D )
+       end do
+
+        cdate = SDATE3D
+        ctime = STIME3D
+      write(header1,'(A,6X,A)')TRIM(header1),
+     &  "       units           siteid  col           row              longitude         latitude "
+      write(header2,'(A,6X,A)')TRIM(header2),
+     &  "       units           siteid  col           row                degrees          degrees  "
+        write(lpfn,'(a)') TRIM(header1)
+        write(lpfn,'(a)') TRIM(header2)
+
+        do s = 1,NSITES
+          write(*,'(''2) Processing site:'',a)') TRIM(siteid(s))
+
+          ! reset first date and time for new site
+          cdate = SDATE3D
+          ctime = STIME3D
+
+          ! compute x,y for cell
+          x = (siteCol(s)-0.5)*XCELL3D + XORIG3D
+          y = (siteRow(s)-0.5)*YCELL3D + YORIG3D
+
+          tzoff = 0
+
+         do i = 1, NSPECVAR
+              ! reset first date and time for new variable
+              cdate = SDATE3D
+              ctime = STIME3D
+              record = ""
+              write(record,'(84(A16,1X))')
+     &        TRIM(SPECVARS(i)) 
+
+
+            do t = 1,MXREC3D
+               if( cdate.ge.startDate .and. cdate.le.endDate 
+     &           .and. ( ctime.ge.startTime .and. ctime.le.endTime ) ) then
+
+                if(.not.READ3( 'INFILE', SPECVARS(i), layer, cdate, ctime, data )) then
+                  call M3ERR( 'writesite', cdate, ctime, 'Read Error', .TRUE. )
+                endif
+
+                field = 'm'
+                if( siteCol(s).gt.0 .and. siteCol(s).le.NCOLS3D .and.
+     &              siteRow(s).gt.0 .and. siteRow(s).le.NROWS3D ) then
+                  field = real2Str( data(siteCol(s),siteRow(s),1), '(ES16.6)' ) 
+                end if
+
+                write(record,'(A,1X,84(A16,1X))')TRIM(record),TRIM(field)
+                if( t .ge. MXREC3D )then
+                   write(record,'(A,1X,84(A16,1X))')TRIM(record),
+     &             "!" // TRIM(UNITS3D(i)),
+     &             TRIM(siteid(s)),
+     &             int2Str(siteCol(s), '(i16)'),
+     &             int2Str(siteRow(s), '(i16)'),
+     &             real2Str(longitude(s), '(f16.5)'),
+     &             real2Str(latitude(s), '(f16.5)')
+                end if
+              end if  ! time window 
+
+              call NEXTIME( cdate, ctime, TSTEP3D )
+            enddo   ! end time record loop
+            write(lpfn,'(a)') TRIM(record)
+           enddo   ! end species loop
+          enddo   ! end site loop 
+         end if
+ 
+         close(lpfn)
+        endif  ! pivot_table and sites condition
+
+        close(lfn)
+        lstatus = SHUT3 ()
+        stop
+
+      end PROGRAM WRITESITE
 C****************************************************************************
 C  routine to set map projection
 C****************************************************************************
@@ -560,4 +695,3 @@ C..  local variables
      &      hour,minutes,secs
       return                                                  
       End Function time2Str                                   
-  

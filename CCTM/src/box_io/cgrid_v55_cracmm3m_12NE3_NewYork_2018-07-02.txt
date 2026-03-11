@@ -1,0 +1,411 @@
+! Data read from file:/work/MOD3DEV/hwo/cmaq_testbed/boxmodel_Feb-17-2026_parallel/data/output_CCTM_v60_cracmm3m_intel23.2_Bench_2018_12NE3/CCTM_CGRID_v60_cracmm3m_intel23.2_Bench_2018_12NE3_20180702.nc (layer  1)
+!   Note: All Times are in GMT
+!       Variable       2018-07-03             units           siteid  col           row              longitude         latitude
+!       Variable         00:00:00             units           siteid  col           row                degrees          degrees
+              O3     3.931984E-02            !ppmV          NewYork 64               65               -74.01000        40.71000
+             O3P     1.000000E-30            !ppmV          NewYork 64               65               -74.01000        40.71000
+             O1D     1.000000E-30            !ppmV          NewYork 64               65               -74.01000        40.71000
+            H2O2     1.470431E-03            !ppmV          NewYork 64               65               -74.01000        40.71000
+              HO     5.250175E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+             NO2     2.049917E-02            !ppmV          NewYork 64               65               -74.01000        40.71000
+              NO     3.263948E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+             NO3     5.832419E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+            HONO     2.605265E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            HNO3     5.756252E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            HNO4     1.074623E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+             HO2     2.213373E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+            HCHO     1.863976E-03            !ppmV          NewYork 64               65               -74.01000        40.71000
+              CO     2.525239E-01            !ppmV          NewYork 64               65               -74.01000        40.71000
+             ACD     5.049412E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+             MO2     2.703328E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+             ALD     3.747849E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ETHP     5.763552E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+             ACT     3.219439E-03            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ACO3     2.197515E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+            UALD     1.515079E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+             KET     6.643455E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+             MEK     2.311020E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            HKET     1.657241E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            MACR     7.250917E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+            MACP     2.652227E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+             XO2     1.929760E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+             MVK     1.082647E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+             GLY     4.897976E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+            MGLY     3.150576E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+            DCB1     5.159045E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+            DCB2     6.892610E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+            BALD     1.595573E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+             CHO     1.161892E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+             OP1     6.252977E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+             OP2     5.368631E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+             OPB     5.793864E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+            VOP3     8.183850E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+             PAA     9.359339E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ONIT     1.452257E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+             PAN     1.113950E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            N2O5     5.988920E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+             SO2     7.463596E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            SULF     8.014466E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+          SULRXN     0.000000E+00            !ppmV          NewYork 64               65               -74.01000        40.71000
+             ETH     1.245223E-03            !ppmV          NewYork 64               65               -74.01000        40.71000
+             HC3     2.409131E-03            !ppmV          NewYork 64               65               -74.01000        40.71000
+            HC3P     3.924232E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+             HC5     2.290613E-03            !ppmV          NewYork 64               65               -74.01000        40.71000
+            HC5P     1.631773E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+            HC10     1.259322E-03            !ppmV          NewYork 64               65               -74.01000        40.71000
+           HC10P     2.007166E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+          HC10P2     9.616722E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+             ETE     6.364969E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ETEP     7.610195E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+             OLT     4.155039E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            OLTP     1.851419E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+             OLI     2.281906E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            OLIP     2.481952E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+             ACE     4.336061E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ORA1     2.875124E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+             BEN     1.644474E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            BENP     1.363548E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+            PHEN     1.473362E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+             TOL     7.053025E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+             CSL     1.839003E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+             XYL     5.574433E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+             EBZ     6.313177E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+             STY     2.762781E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+            TOLP     4.846011E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+            XYLP     1.546660E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+            EBZP     5.591369E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+            STYP     4.206874E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+             ISO     5.324816E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ISOP     5.064105E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+             API     5.718931E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+           APIP1     1.597162E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+           APIP2     1.962020E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+          APINP1     3.810804E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+          APINP2     6.841976E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+           PINAL     2.243038E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+          PINALP     3.652452E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+             LIM     1.013415E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+           LIMP1     7.037183E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+           LIMP2     1.835467E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+          LIMNP1     1.388155E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+          LIMNP2     5.621029E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+           LIMAL     1.028056E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+          LIMALP     4.304576E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+            VHOM     4.269969E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+          VELHOM     8.250557E-13            !ppmV          NewYork 64               65               -74.01000        40.71000
+            RCO3     6.413294E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ACTP     5.784802E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+            MEKP     8.948213E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+            KETP     3.380698E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+             MCP     1.635671E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+            MVKP     3.080768E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+            UALP     5.135838E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+            DCB3     2.998494E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+            BALP     6.453467E-12            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ADDC     7.472330E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+             MCT     5.370390E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+            MCTO     1.232194E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+             MOH     1.674266E-03            !ppmV          NewYork 64               65               -74.01000        40.71000
+             EOH     4.916638E-03            !ppmV          NewYork 64               65               -74.01000        40.71000
+             ROH     9.881580E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ETEG     3.725171E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ISHP     5.633472E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+           IEPOX     4.556466E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+          IEPOXP     1.405412E-21            !ppmV          NewYork 64               65               -74.01000        40.71000
+            MAHP     2.886896E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ORA2     5.872426E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ORAP     2.105903E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+             PPN     3.396127E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+            MPAN     8.230380E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+           INALD     1.029388E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+           ISONP     9.171749E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ISON     1.461482E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+             IPX     4.077954E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+           VTRPN     4.882737E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+          VHONIT     5.293599E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+            MCTP     8.451456E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+            OLNN     1.380923E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+            OLND     9.044134E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ADCN     1.161433E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+            BAL1     2.982518E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+            BAL2     1.014019E-11            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ACRO     1.652694E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+           BDE13     9.866511E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+          BDE13P     6.277524E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+            PROG     3.380409E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+           FURAN     2.039116E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+         FURANO2     8.537399E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+        FURANONE     1.264901E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+        VROCIOXY     3.780617E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+         SLOWROC     5.298074E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            SESQ     3.543777E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+         SESQRO2     3.006147E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+        SESQNRO2     1.732620E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+            NAPH     1.589156E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+           NAPHP     4.423331E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCP5ARO     1.084654E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCP6ARO     3.428927E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP5AROP     2.365938E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP6AROP     7.479463E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCN2ALK     1.665423E-13            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCN1ALK     2.614204E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCP0ALK     1.111322E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCP1ALK     6.409258E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCP2ALK     7.015062E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCP3ALK     6.019559E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCP4ALK     2.446883E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCP5ALK     1.726694E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+       VROCP6ALK     1.956798E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP1ALKP     3.535436E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP2ALKP     3.166896E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP3ALKP     2.321021E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP4ALKP     7.910745E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP5ALKP     4.194021E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP6ALKP     4.331794E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+     VROCP1ALKP2     1.663308E-11            !ppmV          NewYork 64               65               -74.01000        40.71000
+     VROCP2ALKP2     1.489954E-11            !ppmV          NewYork 64               65               -74.01000        40.71000
+     VROCP3ALKP2     1.092000E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+     VROCP4ALKP2     3.721949E-11            !ppmV          NewYork 64               65               -74.01000        40.71000
+     VROCP5ALKP2     1.973330E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+     VROCP6ALKP2     2.038180E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCN2OXY2     2.112180E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCN2OXY4     2.129361E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCN2OXY8     2.205697E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCN1OXY1     3.369625E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCN1OXY3     4.781152E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCN1OXY6     8.766036E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP0OXY2     1.602278E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP0OXY4     1.116056E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP1OXY1     1.286361E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP1OXY3     9.231580E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP2OXY2     3.580711E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP3OXY2     5.129829E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP4OXY2     1.419521E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP5OXY1     1.845290E-11            !ppmV          NewYork 64               65               -74.01000        40.71000
+      VROCP6OXY1     2.385894E-11            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ECH4     5.741794E-02            !ppmV          NewYork 64               65               -74.01000        40.71000
+             CO2     2.640936E-02            !ppmV          NewYork 64               65               -74.01000        40.71000
+           VMTN1     3.335943E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+             CL2     8.636010E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+              CL     1.310694E-13            !ppmV          NewYork 64               65               -74.01000        40.71000
+             CLO     1.573547E-12            !ppmV          NewYork 64               65               -74.01000        40.71000
+            OCLO     1.564985E-16            !ppmV          NewYork 64               65               -74.01000        40.71000
+           CL2O2     2.420462E-25            !ppmV          NewYork 64               65               -74.01000        40.71000
+            HOCL     3.682042E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+            CLNO     4.135645E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+           CLNO2     2.203856E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+           CLNO3     5.176277E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+           HCOCL     4.016363E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+             HCL     1.804120E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+            CLOO     1.317705E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+             BR2     2.673934E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+              BR     1.115179E-12            !ppmV          NewYork 64               65               -74.01000        40.71000
+             BRO     9.544920E-13            !ppmV          NewYork 64               65               -74.01000        40.71000
+            OBRO     3.317987E-14            !ppmV          NewYork 64               65               -74.01000        40.71000
+            HOBR     4.538225E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+            BRNO     1.000000E-30            !ppmV          NewYork 64               65               -74.01000        40.71000
+           BRNO2     1.407289E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+           BRNO3     3.827388E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+          CH2BR2     1.205906E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+           CHBR3     2.359603E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+             HBR     1.819552E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+           HCOBR     7.935560E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+              I2     1.940309E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+               I     4.240206E-12            !ppmV          NewYork 64               65               -74.01000        40.71000
+              IO     4.864600E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+             OIO     3.968236E-14            !ppmV          NewYork 64               65               -74.01000        40.71000
+            I2O2     9.499057E-17            !ppmV          NewYork 64               65               -74.01000        40.71000
+             HOI     7.825480E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+              HI     4.286740E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+             INO     2.101122E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+            INO2     1.178284E-12            !ppmV          NewYork 64               65               -74.01000        40.71000
+            INO3     1.135812E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+            CH3I     3.977847E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+           CH2I2     2.783616E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+            BRCL     1.816520E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+             ICL     1.110111E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+             IBR     2.787284E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+          CH2IBR     1.272355E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+          CH2ICL     8.922693E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+         CHBR2CL     2.901435E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+         CHBRCL2     2.598921E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+         CH2BRCL     2.065405E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+          NO2PIJ     6.358248E-18            !ppmV          NewYork 64               65               -74.01000        40.71000
+           NO2PK     1.637568E-18            !ppmV          NewYork 64               65               -74.01000        40.71000
+            I2O3     7.847907E-12            !ppmV          NewYork 64               65               -74.01000        40.71000
+            I2O4     1.006082E-22            !ppmV          NewYork 64               65               -74.01000        40.71000
+            RHOJ     9.908518E+03        !m kg m-3          NewYork 64               65               -74.01000        40.71000
+           ASO4I     4.080740E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           ASO4J     1.403897E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           ASO4K     2.494460E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           ANH4I     1.123448E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           ANH4J     2.289770E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           ANH4K     2.451568E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           ANO3I     1.070593E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           ANO3J     2.247509E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           ANO3K     1.043316E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          ASOATJ     2.467806E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+       AGLYOLIGJ     1.826079E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           AHOMJ     2.684214E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         AELHOMJ     7.335533E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          AORGCJ     1.844447E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            AECI     9.468344E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            AECJ     8.243846E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          AOTHRI     1.038979E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          AOTHRJ     1.030402E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            AFEJ     6.294344E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            AALJ     6.303800E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ASIJ     2.773796E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ATIJ     4.796670E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ACAJ     9.587172E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            AMGJ     4.103613E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+             AKJ     1.135065E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            AMNJ     1.654431E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           ACORS     2.084386E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           ASOIL     6.611714E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         NUMATKN     6.188775E+09             !m-3          NewYork 64               65               -74.01000        40.71000
+          NUMACC     1.071922E+09             !m-3          NewYork 64               65               -74.01000        40.71000
+          NUMCOR     1.373862E+06             !m-3          NewYork 64               65               -74.01000        40.71000
+         SRFATKN     5.893136E-05          !m2 m-3          NewYork 64               65               -74.01000        40.71000
+          SRFACC     1.164850E-04          !m2 m-3          NewYork 64               65               -74.01000        40.71000
+          SRFCOR     7.024635E-06          !m2 m-3          NewYork 64               65               -74.01000        40.71000
+        AORGH2OJ     1.369442E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           AH2OI     3.476059E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           AH2OJ     1.569057E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           AH2OK     7.449676E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          AH3OPI     1.186140E-04          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          AH3OPJ     5.354112E-04          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          AH3OPK     1.000000E-23          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ANAI     1.984330E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ANAJ     1.869237E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ACLI     1.078523E-04          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ACLJ     1.422304E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ACLK     1.477691E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         ASEACAT     1.048438E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           APOCI     8.641992E-21          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           APOCJ     1.030734E-20          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         APNCOMI     8.641992E-21          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         APNCOMJ     1.132473E-20          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           AOP3J     2.115694E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+      AROCN2ALKI     3.630043E-07          !ug m-3          NewYork 64               65               -74.01000        40.71000
+      AROCN2ALKJ     1.817993E-06          !ug m-3          NewYork 64               65               -74.01000        40.71000
+      AROCN1ALKI     4.294421E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+      AROCN1ALKJ     2.916551E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+      AROCP0ALKI     3.714607E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+      AROCP0ALKJ     1.038887E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+      AROCP1ALKI     2.870553E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+      AROCP1ALKJ     4.866417E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+      AROCP2ALKJ     6.850587E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+      AROCP3ALKJ     4.610010E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN2OXY2I     1.639132E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN2OXY2J     1.147940E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN2OXY4I     2.751748E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN2OXY4J     6.197484E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN2OXY8I     2.317491E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN2OXY8J     4.160962E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN1OXY1I     9.150753E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN1OXY1J     1.705491E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN1OXY3I     7.229502E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN1OXY3J     1.296508E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN1OXY6I     9.168680E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCN1OXY6J     1.608579E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCP0OXY2I     1.598101E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCP0OXY2J     6.068469E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCP0OXY4I     1.215011E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCP0OXY4J     2.504413E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCP1OXY1I     2.273566E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCP1OXY1J     5.563987E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCP1OXY3I     1.114076E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCP1OXY3J     2.031870E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCP2OXY2J     1.223206E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+     AROCP3OXY2J     1.550180E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+       AISO3NOSJ     9.435835E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+        AISO3OSJ     3.740491E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          AISO4J     1.875495E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          AISO5J     1.346448E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          ATRPNJ     1.274066E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         AHONITJ     5.996881E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         ASEASTJ     4.642963E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+          AMTN1J     1.864748E+00          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ABRJ     2.689088E-06          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ABRK     5.306670E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           AHMSJ     1.577367E-11          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ANII     3.014289E-05          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ANIJ     2.596702E-04          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ANIK     1.094545E-04          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         ACR_VII     7.891709E-07          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         ACR_VIJ     6.606642E-06          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         ACR_VIK     1.262682E-06          !ug m-3          NewYork 64               65               -74.01000        40.71000
+        ACR_IIII     2.042789E-21          !ug m-3          NewYork 64               65               -74.01000        40.71000
+        ACR_IIIJ     2.045158E-21          !ug m-3          NewYork 64               65               -74.01000        40.71000
+        ACR_IIIK     2.043973E-21          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ABEI     3.097197E-07          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ABEJ     2.575240E-06          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            ABEK     2.729694E-07          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            APBI     2.696652E-05          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            APBJ     2.147905E-04          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            APBK     2.722904E-05          !ug m-3          NewYork 64               65               -74.01000        40.71000
+       ADE_OTHRI     4.712151E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+       ADE_OTHRJ     3.981670E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         ADE_ECI     6.379598E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         ADE_ECJ     5.385694E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         ADE_OCI     1.596588E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+         ADE_OCJ     1.348723E-01          !ug m-3          NewYork 64               65               -74.01000        40.71000
+        ADE_NO3J     1.133939E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+        ADE_SO4J     7.471652E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+        ADE_CORS     1.339295E-02          !ug m-3          NewYork 64               65               -74.01000        40.71000
+       ACADMIUMI     4.693050E-06          !ug m-3          NewYork 64               65               -74.01000        40.71000
+       ACADMIUMJ     4.072484E-05          !ug m-3          NewYork 64               65               -74.01000        40.71000
+       ACADMIUMK     2.591706E-05          !ug m-3          NewYork 64               65               -74.01000        40.71000
+       AMN_HAPSI     1.183462E-04          !ug m-3          NewYork 64               65               -74.01000        40.71000
+       AMN_HAPSJ     1.014726E-03          !ug m-3          NewYork 64               65               -74.01000        40.71000
+       AMN_HAPSK     2.447430E-04          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           APHGI     2.916732E-07          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           APHGJ     2.443063E-06          !ug m-3          NewYork 64               65               -74.01000        40.71000
+           APHGK     1.666541E-10          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            AASI     8.672808E-06          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            AASJ     7.431333E-05          !ug m-3          NewYork 64               65               -74.01000        40.71000
+            AASK     8.739430E-06          !ug m-3          NewYork 64               65               -74.01000        40.71000
+        ABENAPYI     1.599179E-05          !ug m-3          NewYork 64               65               -74.01000        40.71000
+        ABENAPYJ     3.948515E-05          !ug m-3          NewYork 64               65               -74.01000        40.71000
+             NH3     2.672774E-03            !ppmV          NewYork 64               65               -74.01000        40.71000
+    ACRY_NITRILE     3.529084E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+       CARBONTET     9.982885E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+     PROPYL_DICL     8.238882E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+    DICL_PROPENE     4.805363E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+      CL4_ETHANE     3.958631E-09            !ppmV          NewYork 64               65               -74.01000        40.71000
+           CHCL3     5.615928E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+       BR2_C2_12     5.797109E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+       CL2_C2_12     4.711755E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+            ETOX     1.091024E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+          CL2_ME     3.215000E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+        CL4_ETHE     3.893490E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+        CL3_ETHE     2.052462E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+         CL_ETHE     2.925765E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+     NAPHTHALENE     4.978453E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+       QUINOLINE     2.329566E-13            !ppmV          NewYork 64               65               -74.01000        40.71000
+     HEXMETH_DIS     5.085122E-12            !ppmV          NewYork 64               65               -74.01000        40.71000
+       HYDRAZINE     1.332439E-12            !ppmV          NewYork 64               65               -74.01000        40.71000
+    MAL_ANHYDRID     8.466582E-11            !ppmV          NewYork 64               65               -74.01000        40.71000
+        TOL_DIIS     7.344581E-13            !ppmV          NewYork 64               65               -74.01000        40.71000
+    TRIETHYLAMIN     2.909102E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+    DICL_BENZENE     5.448610E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+    ACET_NITRILE     6.738081E-07            !ppmV          NewYork 64               65               -74.01000        40.71000
+          XYLENE     2.795104E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+         STYRENE     1.478951E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+        ACRYACID     2.550098E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+          HEXANE     1.611387E-04            !ppmV          NewYork 64               65               -74.01000        40.71000
+    METHCHLORIDE     1.456881E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+     CARBSULFIDE     2.723741E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+     CHLOROPRENE     1.995630E-10            !ppmV          NewYork 64               65               -74.01000        40.71000
+    ETHYLBENZENE     5.894990E-05            !ppmV          NewYork 64               65               -74.01000        40.71000
+          BENAPY     2.764538E-11            !ppmV          NewYork 64               65               -74.01000        40.71000
+       PAH_000E0     1.605125E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+       PAH_176E5     3.721296E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+       PAH_880E5     8.503074E-06            !ppmV          NewYork 64               65               -74.01000        40.71000
+       PAH_176E4     5.477801E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+       PAH_176E3     1.777228E-08            !ppmV          NewYork 64               65               -74.01000        40.71000
+       PAH_192E3     2.263279E-21            !ppmV          NewYork 64               65               -74.01000        40.71000
+       PAH_101E2     6.166072E-14            !ppmV          NewYork 64               65               -74.01000        40.71000
+       PAH_176E2     2.263779E-21            !ppmV          NewYork 64               65               -74.01000        40.71000
+       PAH_114E1     5.453724E-13            !ppmV          NewYork 64               65               -74.01000        40.71000

@@ -1,0 +1,196 @@
+! writesite output from the files: 
+! /work/MOD3DATA/2018_12NE3/met/mcipv5.4/GRIDBDY2D_12NE3_20180702.nc
+! /work/MOD3DATA/2018_12NE3/met/mcipv5.4/GRIDCRO2D_12NE3_20180702.nc
+! /work/MOD3DATA/2018_12NE3/met/mcipv5.4/GRIDDOT2D_12NE3_20180702.nc
+! /work/MOD3DATA/2018_12NE3/met/mcipv5.4/METBDY3D_12NE3_20180702.nc
+! /work/MOD3DATA/2018_12NE3/met/mcipv5.4/METCRO2D_12NE3_20180702.nc
+! /work/MOD3DATA/2018_12NE3/met/mcipv5.4/METCRO3D_12NE3_20180702.nc
+! /work/MOD3DATA/2018_12NE3/met/mcipv5.4/METDOT3D_12NE3_20180702.nc
+! /work/MOD3DATA/2018_12NE3/met/mcipv5.4/SOI_CRO_12NE3_20180702.nc
+! /work/MOD3DATA/2018_12NE3/met/mcipv5.4/LUFRAC_CRO_12NE3_20180702.nc
+!! Data read from file:/work/MOD3DATA/2018_12NE3/met/mcipv5.4/GRIDBDY2D_12NE3_20180702.nc (layer  1)
+!!   Note: All Times are in GMT
+!!       Variable       2018-07-02             units           siteid  col           row              longitude         latitude
+!!       Variable         00:00:00             units           siteid  col           row                degrees          degrees
+!             LAT     0.000000E+00   !degrees_north          NewYork 64               65               -74.01000        40.71000
+!             LON     0.000000E+00    !degrees_east          NewYork 64               65               -74.01000        40.71000
+!           MSFX2     0.000000E+00          !m2 m-2          NewYork 64               65               -74.01000        40.71000
+!              HT     0.000000E+00               !m          NewYork 64               65               -74.01000        40.71000
+!           DLUSE     0.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+!          LWMASK     0.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+!            PURB     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+! Data read from file:/work/MOD3DATA/2018_12NE3/met/mcipv5.4/GRIDCRO2D_12NE3_20180702.nc (layer  1)
+!   Note: All Times are in GMT
+!       Variable       2018-07-02             units           siteid  col           row              longitude         latitude
+!       Variable         00:00:00             units           siteid  col           row                degrees          degrees
+             LAT     4.069490E+01   !degrees_north          NewYork 64               65               -74.01000        40.71000
+             LON    -7.407846E+01    !degrees_east          NewYork 64               65               -74.01000        40.71000
+           MSFX2     9.898521E-01          !m2 m-2          NewYork 64               65               -74.01000        40.71000
+              HT     1.244446E+01               !m          NewYork 64               65               -74.01000        40.71000
+           DLUSE     2.600000E+01               !1          NewYork 64               65               -74.01000        40.71000
+          LWMASK     1.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+            PURB     6.859772E+01         !percent          NewYork 64               65               -74.01000        40.71000
+! Data read from file:/work/MOD3DATA/2018_12NE3/met/mcipv5.4/GRIDDOT2D_12NE3_20180702.nc (layer  1)
+!   Note: All Times are in GMT
+!       Variable       2018-07-02             units           siteid  col           row              longitude         latitude
+!       Variable         00:00:00             units           siteid  col           row                degrees          degrees
+            LATD     4.073386E+01   !degrees_north          NewYork 65               66               -74.01000        40.71000
+            LOND    -7.399128E+01    !degrees_east          NewYork 65               66               -74.01000        40.71000
+           MSFD2     9.898908E-01          !m2 m-2          NewYork 65               66               -74.01000        40.71000
+            LATU     4.078637E+01   !degrees_north          NewYork 65               66               -74.01000        40.71000
+            LONU    -7.397333E+01    !degrees_east          NewYork 65               66               -74.01000        40.71000
+           MSFU2     9.899447E-01          !m2 m-2          NewYork 65               66               -74.01000        40.71000
+            LATV     4.072025E+01   !degrees_north          NewYork 65               66               -74.01000        40.71000
+            LONV    -7.392200E+01    !degrees_east          NewYork 65               66               -74.01000        40.71000
+           MSFV2     9.898771E-01          !m2 m-2          NewYork 65               66               -74.01000        40.71000
+! Each layer from /work/MOD3DATA/2018_12NE3/met/mcipv5.4/LUFRAC_CRO_12NE3_20180702.nc
+! where LUFACC_XY gives the fraction of land category number XY 
+       LUFRAC_01     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_02     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_03     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_04     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_05     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_06     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_07     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_08     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_09     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_10     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_11     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_12     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_13     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_14     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_15     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_16     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_17     3.922659E-01         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_18     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_19     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_20     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_21     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_22     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_23     2.108344E-02         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_24     4.732275E-02         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_25     2.208447E-01         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_26     2.829682E-01         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_27     3.864382E-03         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_28     1.954785E-03         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_29     3.631180E-05         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_30     1.476680E-04         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_31     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_32     6.828636E-03         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_33     2.219054E-03         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_34     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_35     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_36     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_37     6.907312E-04         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_38     0.000000E+00         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_39     1.144951E-02         !percent          NewYork 64               65               -74.01000        40.71000
+       LUFRAC_40     8.323874E-03         !percent          NewYork 64               65               -74.01000        40.71000
+!! Data read from file:/work/MOD3DATA/2018_12NE3/met/mcipv5.4/METBDY3D_12NE3_20180702.nc (layer  1)
+!!   Note: All Times are in GMT
+!!       Variable       2018-07-03             units           siteid  col           row              longitude         latitude
+!!       Variable         00:00:00             units           siteid  col           row                degrees          degrees
+!          JACOBF     0.000000E+00               !m          NewYork 64               65               -74.01000        40.71000
+!          JACOBM     0.000000E+00               !m          NewYork 64               65               -74.01000        40.71000
+!         DENSA_J     0.000000E+00          !kg m-2          NewYork 64               65               -74.01000        40.71000
+!         WHAT_JD     0.000000E+00      !kg m-1 s-1          NewYork 64               65               -74.01000        40.71000
+!              TA     0.000000E+00               !K          NewYork 64               65               -74.01000        40.71000
+!              QV     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+!            PRES     0.000000E+00              !Pa          NewYork 64               65               -74.01000        40.71000
+!            DENS     0.000000E+00          !kg m-3          NewYork 64               65               -74.01000        40.71000
+!              ZH     0.000000E+00               !m          NewYork 64               65               -74.01000        40.71000
+!              ZF     0.000000E+00               !m          NewYork 64               65               -74.01000        40.71000
+!              PV     0.000000E+00   !m2 K mg-1 s-1          NewYork 64               65               -74.01000        40.71000
+!              QC     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+!              QR     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+!              QI     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+!              QS     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+!              QG     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+!           QC_CU     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+!           QI_CU     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+!       CLDFRA_DP     0.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+!       CLDFRA_SH     0.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+! Data read from file:/work/MOD3DATA/2018_12NE3/met/mcipv5.4/METCRO2D_12NE3_20180702.nc (layer  1)
+!   Note: All Times are in GMT
+!       Variable       2018-07-03             units           siteid  col           row              longitude         latitude
+!       Variable         00:00:00             units           siteid  col           row                degrees          degrees
+           PRSFC     1.015850E+05              !Pa          NewYork 64               65               -74.01000        40.71000
+           USTAR     6.325974E-01           !m s-1          NewYork 64               65               -74.01000        40.71000
+           WSTAR     7.848398E-01           !m s-1          NewYork 64               65               -74.01000        40.71000
+             PBL     2.799169E+02               !m          NewYork 64               65               -74.01000        40.71000
+            ZRUF     1.265232E+00               !m          NewYork 64               65               -74.01000        40.71000
+            MOLI    -2.728928E-03             !m-1          NewYork 64               65               -74.01000        40.71000
+             HFX     5.964775E+01           !W m-2          NewYork 64               65               -74.01000        40.71000
+              LH     2.393878E+01           !W m-2          NewYork 64               65               -74.01000        40.71000
+          RADYNI     1.353374E-01           !m s-1          NewYork 64               65               -74.01000        40.71000
+          RSTOMI     1.946055E-03           !m s-1          NewYork 64               65               -74.01000        40.71000
+           TEMPG     3.030124E+02               !K          NewYork 64               65               -74.01000        40.71000
+           TEMP2     3.025925E+02               !K          NewYork 64               65               -74.01000        40.71000
+              Q2     1.718367E-02         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+          WSPD10     2.983848E+00           !m s-1          NewYork 64               65               -74.01000        40.71000
+          WDIR10     1.538908E+02          !degree          NewYork 64               65               -74.01000        40.71000
+             GLW     4.124344E+02           !W m-2          NewYork 64               65               -74.01000        40.71000
+             GSW     5.979541E+01           !W m-2          NewYork 64               65               -74.01000        40.71000
+           RGRND     6.612453E+01           !W m-2          NewYork 64               65               -74.01000        40.71000
+              RN     0.000000E+00              !cm          NewYork 64               65               -74.01000        40.71000
+              RC     0.000000E+00              !cm          NewYork 64               65               -74.01000        40.71000
+           CFRAC     0.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+            CLDT     0.000000E+00               !m          NewYork 64               65               -74.01000        40.71000
+            CLDB     0.000000E+00               !m          NewYork 64               65               -74.01000        40.71000
+            WBAR     0.000000E+00           !g m-3          NewYork 64               65               -74.01000        40.71000
+          SNOCOV     0.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+             VEG     2.443073E-01               !1          NewYork 64               65               -74.01000        40.71000
+             LAI     4.446976E+00          !m2 m-2          NewYork 64               65               -74.01000        40.71000
+          SEAICE     0.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+           SNOWH     0.000000E+00               !m          NewYork 64               65               -74.01000        40.71000
+              WR     0.000000E+00               !m          NewYork 64               65               -74.01000        40.71000
+           SOIM1     4.201970E-02          !m3 m-3          NewYork 64               65               -74.01000        40.71000
+           SOIM2     1.608319E-01          !m3 m-3          NewYork 64               65               -74.01000        40.71000
+           SOIT1     3.030124E+02               !K          NewYork 64               65               -74.01000        40.71000
+           SOIT2     3.034471E+02               !K          NewYork 64               65               -74.01000        40.71000
+           SLTYP     6.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+         WSAT_PX     4.560058E-01          !m3 m-3          NewYork 64               65               -74.01000        40.71000
+          WFC_PX     2.297594E-01          !m3 m-3          NewYork 64               65               -74.01000        40.71000
+         WWLT_PX     1.440543E-01          !m3 m-3          NewYork 64               65               -74.01000        40.71000
+        CSAND_PX     2.844444E-02               !1          NewYork 64               65               -74.01000        40.71000
+       FMSAND_PX     3.261778E-01               !1          NewYork 64               65               -74.01000        40.71000
+         CLAY_PX     1.504889E-01               !1          NewYork 64               65               -74.01000        40.71000
+! Data read from file:/work/MOD3DATA/2018_12NE3/met/mcipv5.4/METCRO3D_12NE3_20180702.nc (layer  1)
+!   Note: All Times are in GMT
+!       Variable       2018-07-03             units           siteid  col           row              longitude         latitude
+!       Variable         00:00:00             units           siteid  col           row                degrees          degrees
+          JACOBF     8.706895E+03               !m          NewYork 64               65               -74.01000        40.71000
+          JACOBM     8.701472E+03               !m          NewYork 64               65               -74.01000        40.71000
+         DENSA_J     9.908298E+03          !kg m-2          NewYork 64               65               -74.01000        40.71000
+         WHAT_JD    -1.868883E-03      !kg m-1 s-1          NewYork 64               65               -74.01000        40.71000
+              TA     3.021232E+02               !K          NewYork 64               65               -74.01000        40.71000
+              QV     1.715886E-02         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+            PRES     1.014601E+05              !Pa          NewYork 64               65               -74.01000        40.71000
+            DENS     1.138692E+00          !kg m-3          NewYork 64               65               -74.01000        40.71000
+              ZH     1.076781E+01               !m          NewYork 64               65               -74.01000        40.71000
+              ZF     2.153290E+01               !m          NewYork 64               65               -74.01000        40.71000
+              PV     4.446527E+00   !m2 K mg-1 s-1          NewYork 64               65               -74.01000        40.71000
+              QC     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+              QR     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+              QI     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+              QS     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+              QG     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+           QC_CU     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+           QI_CU     0.000000E+00         !kg kg-1          NewYork 64               65               -74.01000        40.71000
+       CLDFRA_DP     0.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+       CLDFRA_SH     0.000000E+00               !1          NewYork 64               65               -74.01000        40.71000
+! Data read from file:/work/MOD3DATA/2018_12NE3/met/mcipv5.4/METDOT3D_12NE3_20180702.nc (layer  1)
+!   Note: All Times are in GMT
+!       Variable       2018-07-03             units           siteid  col           row              longitude         latitude
+!       Variable         00:00:00             units           siteid  col           row                degrees          degrees
+          UWINDC    -1.559635E+00           !m s-1          NewYork 65               66               -74.01000        40.71000
+          VWINDC     2.413458E+00           !m s-1          NewYork 65               66               -74.01000        40.71000
+         UHAT_JD    -1.537080E+04      !kg m-1 s-1          NewYork 65               66               -74.01000        40.71000
+         VHAT_JD     2.380736E+04      !kg m-1 s-1          NewYork 65               66               -74.01000        40.71000
+           UWIND    -1.690977E+00           !m s-1          NewYork 65               66               -74.01000        40.71000
+           VWIND     2.505599E+00           !m s-1          NewYork 65               66               -74.01000        40.71000
+! Data read from file:/work/MOD3DATA/2018_12NE3/met/mcipv5.4/SOI_CRO_12NE3_20180702.nc (layer  1)
+!   Note: All Times are in GMT
+!       Variable       2018-07-03             units           siteid  col           row              longitude         latitude
+!       Variable         00:00:00             units           siteid  col           row                degrees          degrees
+          SOIT3D     3.030124E+02               !K          NewYork 64               65               -74.01000        40.71000
+          SOIM3D     4.201970E-02          !m3 m-3          NewYork 64               65               -74.01000        40.71000
