@@ -1766,6 +1766,7 @@ C... no sensitivity to pH now
           S_TH2O2( NP ) = S_INITGAS( NP, LH2O2 ) * ONE_OVER_XL
           C1 = -RH2O2 * HPLUS / ( 1.0D0 + 13.0D0 * HPLUS )
           IF ( IPT(NP) .EQ. 4 ) THEN ! hddm
+            CYCLE
             IP1 = IHIGH(NP,1)
             IP2 = IHIGH(NP,2)
             S_DSIVDT( NP,1 ) = C1 * ( S_H2O2L( NP )  * HSO3          + S_H2O2L( IP1 ) * S_HSO3( IP2 )
@@ -1798,16 +1799,17 @@ C...Calculate sulfur iv oxidation rate due to O3 (Jacobson, 1997)
         DO NP = 1, NPMAX
           S_TO3( NP ) = S_INITGAS( NP, LO3 ) * ONE_OVER_XL
           IF ( IPT(NP) .EQ. 4 ) THEN ! hddm
+            CYCLE
             IP1 = IHIGH(NP,1)
             IP2 = IHIGH(NP,2)
-            S_DSIVDT( NP,2 ) =  -C1 * ( S_SO2L( NP )  * O3L          + S_SO2L( IP1 ) * S_O3L( IP2 )
+            S_DSIVDT( NP,2 ) = - C1 * ( S_SO2L( NP )  * O3L          + S_SO2L( IP1 ) * S_O3L( IP2 )
      &                                + S_SO2L( IP2 ) * S_O3L( IP1 ) + SO2L          * S_O3L( NP ) )
      &                         - C2 * ( S_HSO3( NP )  * O3L          + S_HSO3( IP1 ) * S_O3L( IP2 )
      &                                + S_HSO3( IP2 ) * S_O3L( IP1 ) + HSO3          * S_O3L( NP ) )
      &                         - C3 * ( S_SO3 ( NP )  * O3L          + S_SO3 ( IP1 ) * S_O3L( IP2 )
      &                                + S_SO3 ( IP2 ) * S_O3L( IP1 ) + SO3           * S_O3L( NP ) )
           ELSE
-            S_DSIVDT( NP,2 ) =  -C1 * ( S_SO2L( NP ) * O3L + SO2L * S_O3L( NP ) )
+            S_DSIVDT( NP,2 ) = - C1 * ( S_SO2L( NP ) * O3L + SO2L * S_O3L( NP ) )
      &                         - C2 * ( S_HSO3( NP ) * O3L + HSO3 * S_O3L( NP ) )
      &                         - C3 * ( S_SO3 ( NP ) * O3L + SO3  * S_O3L( NP ) )
           END IF
@@ -1832,6 +1834,7 @@ C...Implement sulfate inhibition based on Martin and Good, 1991
 #ifdef sens
         DO NP = 1, NPMAX
           IF ( IPT(NP) .EQ. 4 ) THEN ! hddm
+            CYCLE
             IP1 = IHIGH(NP,1)
             IP2 = IHIGH(NP,2)
             IF (TS6 .GT. 0.0) THEN
@@ -1859,11 +1862,16 @@ C...Implement sulfate inhibition based on Martin and Good, 1991
      &        S_TS6(IP1))*2*(1.0D0+75.0D0*TS6**0.67D0)*75.0D0*0.67D0*TS6**(-0.33D0)*
      &        S_TS6(IP2))/((1.0D0+75.0D0*TS6**0.67D0)**2)**2)
           ELSE
-            S_DSIVDT( NP, 3 ) = -(((750.0D0*(S_MN_OX(NP)*SIV+MN_OX*S_SIV(NP))+2600.0D0*(S_FE_OX(NP)*SIV
-     &        +FE_OX*S_SIV(NP))+1.0D10*((S_MN_OX(NP)*FE_OX+MN_OX*S_FE_OX(NP))*SIV+MN_OX*FE_OX
-     &        *S_SIV(NP)))*(1.0D0+75.0D0*TS6**0.67D0)-(750.0D0*MN_OX*SIV+2600.0D0*
-     &        FE_OX*SIV+1.0D10*MN_OX*FE_OX*SIV)*75.0D0*0.67D0*TS6**(-0.33D0)*
-     &        S_TS6(NP))/(1.0D0+75.0D0*TS6**0.67D0)**2)
+c           S_DSIVDT( NP, 3 ) = -(((750.0D0*(S_MN_OX(NP)*SIV+MN_OX*S_SIV(NP))+2600.0D0*(S_FE_OX(NP)*SIV
+c    &        +FE_OX*S_SIV(NP))+1.0D10*((S_MN_OX(NP)*FE_OX+MN_OX*S_FE_OX(NP))*SIV+MN_OX*FE_OX
+c    &        *S_SIV(NP)))*(1.0D0+75.0D0*TS6**0.67D0)-(750.0D0*MN_OX*SIV+2600.0D0*
+c    &        FE_OX*SIV+1.0D10*MN_OX*FE_OX*SIV)*75.0D0*0.67D0*TS6**(-0.33D0)*
+c    &        S_TS6(NP))/(1.0D0+75.0D0*TS6**0.67D0)**2)
+            S_DSIVDT( NP, 3 ) = - 
+     &        ( 750.0D0  * ( MN_OX * S_SIV(NP) + S_MN_OX(NP) * SIV ) +
+     &          2600.0D0 * ( FE_OX * S_SIV(NP) + S_FE_OX(NP) * SIV ) +
+     &          1.0D10   * ( MN_OX * FE_OX * S_SIV(NP) + MN_OX * S_FE_OX(NP) * SIV + S_MN_OX(NP) * FE_OX * SIV ) )
+     &                / ( 1.0D0 + 75.0D0 *( TS6**0.67D0 ) )
           END IF
         END DO
 #endif
@@ -1886,6 +1894,7 @@ c... no sensitivity to pH now
           S_TMHP( NP ) = S_INITGAS( NP, LMHP ) * ONE_OVER_XL
           C1 = -RMHP * HPLUS
           IF ( IPT(NP) .EQ. 4 ) THEN ! hddm
+            CYCLE
             IP1 = IHIGH(NP,1)
             IP2 = IHIGH(NP,2)
             S_DSIVDT( NP, 4 ) = C1 * ( S_MHPL( NP )  * HSO3          + S_MHPL( IP1 ) * S_HSO3( IP2 )
@@ -1913,6 +1922,7 @@ c... no sensitivity to pH now
         DO NP = 1, NPMAX
           S_TPAA( NP ) = S_INITGAS( NP, LPAA ) * ONE_OVER_XL
           IF ( IPT(NP) .EQ. 4 ) THEN ! hddm
+            CYCLE
             IP1 = IHIGH(NP,1)
             IP2 = IHIGH(NP,2)
             C1 = -( RPAA * HPLUS + 7.00D2 )
@@ -1985,21 +1995,19 @@ C...Calculate OH consumption
           DO NP = 1, NPMAX
             S_TGLY( NP )  = S_INITGAS( NP, LGLY ) * ONE_OVER_XL
             S_TMGLY( NP ) = S_INITGAS( NP, LMGLY ) * ONE_OVER_XL
-c           IF ( IPT(NP) .EQ. 4 ) THEN ! hddm
-c             IP1 = IHIGH(NP,1)
-c             IP2 = IHIGH(NP,2)
-c             S_DGLYDT( NP ) = -RGLY3 * ( S_GLYL( NP )  * OHL          + S_GLYL( IP1 ) * S_OHL( IP2 )
-c    &                                  + S_GLYL( IP2 ) * S_OHL( IP1 ) + GLYL          * S_OHL( NP ) )
-c             S_DMGLYDT( NP ) = -RMGLY3 * ( S_MGLYL( NP )  * OHL + S_MGLYL( IP1 ) * S_OHL( IP2 )
-c    &                                    + S_MGLYL( IP2 ) * S_OHL( IP1 ) + MGLYL          * S_OHL( NP ) )
-c           ELSE
-c             S_DGLYDT( NP ) = -RGLY3 * ( S_GLYL( NP ) * OHL + GLYL * S_OHL( NP ) )
-c             S_DMGLYDT( NP ) = -RMGLY3 * ( S_MGLYL( NP ) * OHL + MGLYL * S_OHL( NP ) )
-c           ENDIF
-
+            IF ( IPT(NP) .EQ. 4 ) THEN ! hddm
+              CYCLE
+              IP1 = IHIGH(NP,1)
+              IP2 = IHIGH(NP,2)
+              S_DGLYDT( NP ) = -RGLY3 * ( S_GLYL( NP )  * OHL          + S_GLYL( IP1 ) * S_OHL( IP2 )
+     &                                  + S_GLYL( IP2 ) * S_OHL( IP1 ) + GLYL          * S_OHL( NP ) )
+              S_DMGLYDT( NP ) = -RMGLY3 * ( S_MGLYL( NP )  * OHL + S_MGLYL( IP1 ) * S_OHL( IP2 )
+     &                                    + S_MGLYL( IP2 ) * S_OHL( IP1 ) + MGLYL          * S_OHL( NP ) )
+            ELSE
 c assume no OH sensitivity for now, because it causes instability in sensitvities
-            S_DGLYDT( NP ) = -RGLY3 * S_GLYL( NP ) * OHL
-            S_DMGLYDT( NP ) = -RMGLY3 * S_MGLYL( NP ) * OHL
+              S_DGLYDT( NP ) = -RGLY3 * S_GLYL( NP ) * OHL
+              S_DMGLYDT( NP ) = -RMGLY3 * S_MGLYL( NP ) * OHL
+            END IF
 
           END DO
 #endif
@@ -2274,6 +2282,7 @@ C...gas concentrations (mol/molV)
 
 #ifdef sens
       DO NP = 1, NPMAX
+        IF ( IPT(NP) .EQ. 4 ) CYCLE ! hddm
         S_GAS( NP, LSO2   ) = ( S_PSO2F( NP )  + XL *  S_SIV( NP ) )   * RECIPAP1
 c       S_GAS( NP, LH2O2  ) = ( S_PH2O2F( NP ) + XL *  S_H2O2L( NP ) ) * RECIPAP1
 c       S_GAS( NP, LO3    ) = ( S_PO3F( NP )   + XL *  S_O3L( NP ) )   * RECIPAP1
@@ -2439,6 +2448,7 @@ C...aerosol concentrations (mol/molV)
 
 #ifdef sens
       DO NP =1, NPMAX
+        IF ( IPT(NP) .EQ. 4 ) CYCLE ! hddm
         S_AEROSOL( NP, LSO4, IAIT )   = S_AEROSOL( NP, LSO4, IAIT ) * EALFA3T
         S_AEROSOL( NP, LNH4, IAIT )   = S_AEROSOL( NP, LNH4, IAIT ) * EALFA3T
         S_AEROSOL( NP, LNO3, IAIT )   = S_AEROSOL( NP, LNO3, IAIT ) * EALFA3T

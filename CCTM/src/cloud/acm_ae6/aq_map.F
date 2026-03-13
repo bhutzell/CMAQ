@@ -270,7 +270,7 @@ C...Zero out concentrations
            GAS( IAQ ) = GAS( IAQ ) + REAL( POLC( ISPC ), 8 )
 #ifdef sens
            DO NP = 1, NPMAX
-              S_GAS( NP, IAQ ) = S_GAS( NP, IAQ ) + S_POLC ( NP, ISPC )
+              S_GAS( NP, IAQ ) = S_GAS( NP, IAQ ) +  REAL( S_POLC ( NP, ISPC ), 8 )
            ENDDO
 #endif
         END IF
@@ -281,7 +281,7 @@ C...Zero out concentrations
            AEROSOL( IAQ,IM ) = AEROSOL( IAQ,IM ) + REAL( POLC( ISPC ),8 )
 #ifdef sens
            DO NP = 1, NPMAX
-              S_AEROSOL( NP, IAQ, IM ) = S_AEROSOL( NP, IAQ, IM ) + S_POLC( NP, ISPC )
+              S_AEROSOL( NP, IAQ, IM ) = S_AEROSOL( NP, IAQ, IM ) + REAL( S_POLC( NP, ISPC ), 8 )
            ENDDO
 #endif
         END IF
@@ -319,7 +319,7 @@ C *** extract grid cell concentrations of aero species from CGRID
 C     into aerospc_conc in aero_data module
 
 #ifdef sens
-      CALL EXTRACT_AERO ( POLC, .FALSE., REAL(S_POLC,4), .TRUE. )
+      CALL EXTRACT_AERO ( POLC, .FALSE., S_POLC, .TRUE. )
 #else
       CALL EXTRACT_AERO ( POLC, .FALSE. )
 #endif
@@ -423,6 +423,7 @@ C...Now, re-apportion mass back into cend/remov (cgrid-type) array
 #endif             
                 END IF
              END IF
+
         END IF
       END DO
  
@@ -430,7 +431,7 @@ C *** extract grid cell concentrations of aero species from CGRID
 C     into aerospc_conc in aero_data module
 
 #ifdef sens
-      CALL EXTRACT_AERO ( CEND, .FALSE., REAL(S_CEND,4), .TRUE. )
+      CALL EXTRACT_AERO ( CEND, .FALSE., S_CEND, .TRUE. )
 #else
       CALL EXTRACT_AERO ( CEND, .FALSE. )
 #endif
@@ -461,9 +462,9 @@ C...Update aerosol number
 
 #ifdef sens
 C... Remove number sensitivity calculations for now
-      S_CEND( :, AERONUM_MAP( iait ) ) = 0.0
-      S_CEND( :, AERONUM_MAP( iacc ) ) = 0.0
-      S_CEND( :, AERONUM_MAP( icor ) ) = 0.0
+      S_CEND( :, AERONUM_MAP( iait ) ) = 1E-25
+      S_CEND( :, AERONUM_MAP( iacc ) ) = 1E-25
+      S_CEND( :, AERONUM_MAP( icor ) ) = 1E-25
 #endif
 
 C...check for minimums
@@ -494,9 +495,9 @@ C...Update surface area
 
 #ifdef sens
 C... Remove surface area sensitivity calculations for now
-      S_CEND( :, AEROSRF_MAP( IAIT ) ) = 0.0
-      S_CEND( :, AEROSRF_MAP( IACC ) ) = 0.0
-      S_CEND( :, AEROSRF_MAP( ICOR ) ) = 0.0
+      S_CEND( :, AEROSRF_MAP( IAIT ) ) = 1E-25
+      S_CEND( :, AEROSRF_MAP( IACC ) ) = 1E-25
+      S_CEND( :, AEROSRF_MAP( ICOR ) ) = 1E-25
 #endif
 
       RETURN
