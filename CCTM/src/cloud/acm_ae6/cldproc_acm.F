@@ -438,10 +438,17 @@ C...convert units on cgrid and pass data to local cgrd array
 #ifdef sens
              DO ROW = 1,NROWS
                DO COL = 1,NCOLS
-                 IF ( CGRD( COL,ROW, LAY, I ) .LE. 1.0E-30 ) THEN
-                   SENGRID( COL,ROW,LAY,:,I ) = 0.0
+                 IF ( CGRD( COL,ROW, LAY, I ) .LE. 1.0E-36 ) THEN
+                   SENGRID( COL,ROW,LAY,:,I ) = 1.0E-36
                  ELSE
-                   SENGRID( COL,ROW,LAY,:,I ) = SENGRID( COL,ROW,LAY,:,I ) * 1.0E-6
+                   SENGRID( COL,ROW,LAY,:,I ) = SENGRID( COL,ROW,LAY,:,I ) * 1.0E-6      
+                   DO NP = 1, NPMAX
+                     IF ( SENGRID( COL,ROW,LAY,NP,I ) .GE. 0.0 ) THEN
+                       SENGRID( COL,ROW,LAY,NP,I ) = MAX (SENGRID( COL,ROW,LAY,NP,I ), 1.0E-36 )
+                     ELSE
+                       SENGRID( COL,ROW,LAY,NP,I ) = MIN (SENGRID( COL,ROW,LAY,NP,I ), -1.0E-36 )
+                     END IF
+                   END DO
                  END IF
                END DO
              END DO
@@ -457,11 +464,18 @@ C...convert units on cgrid and pass data to local cgrd array
 #ifdef sens
              DO ROW = 1,NROWS
                DO COL = 1,NCOLS
-                 IF ( CGRD( COL,ROW,LAY,I ) .LE. 1.0E-30 ) THEN
-                   SENGRID( COL,ROW,LAY,:,I ) = 0.0
+                 IF ( CGRD( COL,ROW,LAY,I ) .LE. ( FAC(COL,ROW,LAY) * 1.0E-30/FAC(COL,ROW,LAY) ) ) THEN
+                   SENGRID( COL,ROW,LAY,:,I ) = CGRD( COL,ROW,LAY,I )
                  ELSE
-                   SENGRID( COL,ROW,LAY,:,I ) = FAC(COL,ROW,LAY) *
-     &                                          SENGRID( COL,ROW,LAY,:,I )
+                   DO NP = 1, NPMAX
+                     IF ( SENGRID( COL,ROW,LAY,NP,I ) .GE. 0.0 ) THEN
+                       SENGRID( COL,ROW,LAY,NP,I ) = FAC(COL,ROW,LAY) *
+     &                   MAX( SENGRID( COL,ROW,LAY,NP,I ), 1.0E-30/FAC(COL,ROW,LAY) )
+                     ELSE
+                       SENGRID( COL,ROW,LAY,NP,I ) = FAC(COL,ROW,LAY) *
+     &                   MIN( SENGRID( COL,ROW,LAY,NP,I ), -1.0E-30/FAC(COL,ROW,LAY) )
+                     END IF
+                   END DO
                  ENDIF
                END DO
              END DO
@@ -477,11 +491,18 @@ C...convert units on cgrid and pass data to local cgrd array
 #ifdef sens
              DO ROW = 1,NROWS
                DO COL = 1,NCOLS
-                 IF ( CGRD( COL,ROW,LAY,I ) .LE. 1.0E-30 ) THEN
-                    SENGRID( COL,ROW,LAY,:,I ) = 0.0
+                 IF ( CGRD( COL,ROW,LAY,I ) .LE. ( FAC(COL,ROW,LAY) * 1.0E-30/FAC(COL,ROW,LAY) ) ) THEN
+                   SENGRID( COL,ROW,LAY,:,I ) = CGRD( COL,ROW,LAY,I )
                  ELSE
-                    SENGRID( COL,ROW,LAY,:,I ) = FAC(COL,ROW,LAY) * 
-     &                                            SENGRID( COL,ROW,LAY,:,I )
+                   DO NP = 1, NPMAX
+                     IF ( SENGRID( COL,ROW,LAY,NP,I ) .GE. 0.0 ) THEN
+                       SENGRID( COL,ROW,LAY,NP,I ) = FAC(COL,ROW,LAY) *
+     &                   MAX( SENGRID( COL,ROW,LAY,NP,I ), 1.0E-30/FAC(COL,ROW,LAY) )
+                     ELSE
+                       SENGRID( COL,ROW,LAY,NP,I ) = FAC(COL,ROW,LAY) *
+     &                   MIN( SENGRID( COL,ROW,LAY,NP,I ), -1.0E-30/FAC(COL,ROW,LAY) )
+                     END IF
+                   END DO
                  ENDIF
                END DO
              END DO
