@@ -378,7 +378,7 @@
                 IV  = ELMO_TABLE( J )%VAR_TYPE
                 IDG = ELMO_TABLE( J )%ID
              
-                IF ( IDG .EQ. ID_PMF_PH ) THEN
+                IF ( IDG .EQ. ID_PMF_PH .AND. IV .EQ. ET_AEROPROP ) THEN
                    ! Special Averaging for Particle pH
                    ! Add whatever the current average is right now.
                    ! Certainly this is problematic, particularly
