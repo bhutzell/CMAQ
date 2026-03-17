@@ -924,93 +924,6 @@ C     end of the gas-phase chemical driver
           ALLOCATE(      EF_HNO3( NCOLS,NROWS,NLAYS ) )
        END IF
 
-C ***  Determine molecular weights
-       INV_MWCL  = REAL( 1.0 / aerospc_mw( ACL_IDX ), 8 )
-       MWCLH2O   = aerospc_mw( ACL_IDX ) / aerospc_mw( AH2O_IDX )
-       MWH2OCL   = 1.0 / MWCLH2O
-       CLNO2_IDX = INDEX1( 'CLNO2', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       
-       IF ( CLNO2_IDX .GT. 0 ) THEN
-          MWCLCLNO2 = aerospc_mw( ACL_IDX) / SPECIES_MOLWT( CLNO2_IDX )
-       ELSE
-          MWCLCLNO2 = 0.0
-       END IF
-       
-              
-       INV_MWFE  = REAL( 1.0 / aerospc_mw( AFE_IDX ), 8 )       
-       INV_MWMN  = REAL( 1.0 / aerospc_mw( AMN_IDX ), 8 )  
-       
-       IF ( AHMS_IDX .GT. 0 ) THEN
-         INV_MWHMS = REAL( 1.0 / aerospc_mw( AHMS_IDX ), 8 ) 
-       END IF
-       
-
-       IEPOX_IDX = INDEX1( 'IEPOX', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF ( IEPOX_IDX .GT. 0 ) THEN
-          MWTIEPOX  = REAL( SPECIES_MOLWT( IEPOX_IDX ), 8 ) 
-       ELSE
-          MWTIEPOX  = 118.1D0
-       END IF
-       CFACTOR_IEPOX = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTIEPOX * DPI ) )
-
-       IMAE_IDX = INDEX1( 'IMAE', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF( IMAE_IDX .GT. 0 )THEN
-           MWTIMAE  = REAL( SPECIES_MOLWT( IMAE_IDX ), 8 )
-       ELSE
-           MWTIMAE  = 102.0D0
-       END IF
-       CFACTOR_IMAE = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTIMAE * DPI ) )
-
-       IF( AIETET_IDX .GT. 0 ) THEN
-          INV_MWIETET = REAL( 1.0/ aerospc_mw( AIETET_IDX ), 8 )
-       ELSE
-          INV_MWIETET = 0.0D0
-       END IF
-
-       IF( AIEOS_IDX .GT. 0 ) THEN
-          INV_MWIEOS  = REAL( 1.0/ aerospc_mw( AIEOS_IDX  ), 8 )
-       ELSE 
-          INV_MWIEOS = 0.0D0
-       END IF
-
-       IF( ASO4_IDX .GT. 0 )THEN
-          INV_MWASO4 = REAL( 1.0/ aerospc_mw( ASO4_IDX ), 8 )
-       ELSE
-          INV_MWASO4 = 0D0
-       END IF
-
-       NO3_IDX = INDEX1( 'NO3', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF( NO3_IDX .GT. 0 )THEN
-           MWTNO3  = REAL( SPECIES_MOLWT( NO3_IDX ), 8 )
-       ELSE
-           MWTNO3  = 62.01D0
-       END IF
-       CFACTOR_NO3 = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTNO3 * DPI ) )
-
-       GLY_IDX = INDEX1( 'GLY', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF( GLY_IDX .GT. 0 )THEN
-           MWTGLY  = REAL( SPECIES_MOLWT( GLY_IDX ), 8 )
-       ELSE
-           MWTGLY  = 58.04D0
-       END IF
-       CFACTOR_GLY = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTGLY * DPI ) )
-
-       MGLY_IDX = INDEX1( 'MGLY', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF( MGLY_IDX .GT. 0 )THEN
-           MWTMGLY  = REAL( SPECIES_MOLWT( MGLY_IDX ), 8 )
-       ELSE
-           MWTMGLY  = 72.07D0
-       END IF
-       CFACTOR_MGLY = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTMGLY * DPI ) )
-
-       HO2_IDX = INDEX1( 'HO2', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF( HO2_IDX .GT. 0 )THEN
-           MWTHO2  = REAL( SPECIES_MOLWT( HO2_IDX ), 8 )
-       ELSE
-           MWTHO2  = 33.0D0
-       END IF
-       CFACTOR_HO2 = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTHO2 * DPI ) )
-
 C ***  Map to acids/nucleophiles for epoxide uptake
        CALL LOG_SUBHEADING( LOGDEV, 'Map Acid-Nuc Pairs for Heterogeneous Chemistry')
 
@@ -1058,6 +971,93 @@ C ***  Map to acids/nucleophiles for epoxide uptake
        AERO_CHEM_SET = .TRUE.
 
       END IF   ! first time condition
+
+C ***  Determine molecular weights
+      INV_MWCL  = REAL( 1.0 / aerospc_mw( ACL_IDX ), 8 )
+      MWCLH2O   = aerospc_mw( ACL_IDX ) / aerospc_mw( AH2O_IDX )
+      MWH2OCL   = 1.0 / MWCLH2O
+      CLNO2_IDX = INDEX1( 'CLNO2', NUMB_MECH_SPC, CHEMISTRY_SPC )
+
+      IF ( CLNO2_IDX .GT. 0 ) THEN
+         MWCLCLNO2 = aerospc_mw( ACL_IDX) / SPECIES_MOLWT( CLNO2_IDX )
+      ELSE
+         MWCLCLNO2 = 0.0
+      END IF
+      
+      
+      INV_MWFE  = REAL( 1.0 / aerospc_mw( AFE_IDX ), 8 )       
+      INV_MWMN  = REAL( 1.0 / aerospc_mw( AMN_IDX ), 8 )  
+       
+      IF ( AHMS_IDX .GT. 0 ) THEN
+         INV_MWHMS = REAL( 1.0 / aerospc_mw( AHMS_IDX ), 8 ) 
+      END IF
+
+
+      IEPOX_IDX = INDEX1( 'IEPOX', NUMB_MECH_SPC, CHEMISTRY_SPC )
+      IF ( IEPOX_IDX .GT. 0 ) THEN
+         MWTIEPOX  = REAL( SPECIES_MOLWT( IEPOX_IDX ), 8 ) 
+      ELSE
+         MWTIEPOX  = 118.1D0
+      END IF
+      CFACTOR_IEPOX = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTIEPOX * DPI ) )
+
+      IMAE_IDX = INDEX1( 'IMAE', NUMB_MECH_SPC, CHEMISTRY_SPC )
+      IF( IMAE_IDX .GT. 0 )THEN
+         MWTIMAE  = REAL( SPECIES_MOLWT( IMAE_IDX ), 8 )
+      ELSE
+         MWTIMAE  = 102.0D0
+      END IF
+      CFACTOR_IMAE = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTIMAE * DPI ) )
+
+      IF( AIETET_IDX .GT. 0 ) THEN
+         INV_MWIETET = REAL( 1.0/ aerospc_mw( AIETET_IDX ), 8 )
+      ELSE
+         INV_MWIETET = 0.0D0
+      END IF
+
+      IF( AIEOS_IDX .GT. 0 ) THEN
+         INV_MWIEOS  = REAL( 1.0/ aerospc_mw( AIEOS_IDX  ), 8 )
+      ELSE 
+         INV_MWIEOS = 0.0D0
+      END IF
+
+      IF( ASO4_IDX .GT. 0 )THEN
+         INV_MWASO4 = REAL( 1.0/ aerospc_mw( ASO4_IDX ), 8 )
+      ELSE
+         INV_MWASO4 = 0D0
+      END IF
+
+      NO3_IDX = INDEX1( 'NO3', NUMB_MECH_SPC, CHEMISTRY_SPC )
+      IF( NO3_IDX .GT. 0 )THEN
+         MWTNO3  = REAL( SPECIES_MOLWT( NO3_IDX ), 8 )
+      ELSE
+         MWTNO3  = 62.01D0
+      END IF
+      CFACTOR_NO3 = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTNO3 * DPI ) )
+
+      GLY_IDX = INDEX1( 'GLY', NUMB_MECH_SPC, CHEMISTRY_SPC )
+      IF( GLY_IDX .GT. 0 )THEN
+         MWTGLY  = REAL( SPECIES_MOLWT( GLY_IDX ), 8 )
+      ELSE
+         MWTGLY  = 58.04D0
+      END IF
+      CFACTOR_GLY = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTGLY * DPI ) )
+
+      MGLY_IDX = INDEX1( 'MGLY', NUMB_MECH_SPC, CHEMISTRY_SPC )
+      IF( MGLY_IDX .GT. 0 )THEN
+         MWTMGLY  = REAL( SPECIES_MOLWT( MGLY_IDX ), 8 )
+      ELSE
+         MWTMGLY  = 72.07D0
+       END IF
+       CFACTOR_MGLY = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTMGLY * DPI ) )
+
+       HO2_IDX = INDEX1( 'HO2', NUMB_MECH_SPC, CHEMISTRY_SPC )
+       IF( HO2_IDX .GT. 0 )THEN
+         MWTHO2  = REAL( SPECIES_MOLWT( HO2_IDX ), 8 )
+      ELSE
+         MWTHO2  = 33.0D0
+      END IF
+      CFACTOR_HO2 = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTHO2 * DPI ) )
 
       KHETERO = 0.0D0
       

@@ -90,6 +90,7 @@
       ! Variable to set time step for writing visibility file
       INTEGER, SAVE :: WSTEP  = 0          ! local write counter
       LOGICAL, SAVE :: WRITE_STEP =.FALSE. ! local write flag
+      INTEGER       :: MDATE, MTIME, MSTEP ! internal simulation date&time
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
     
@@ -153,18 +154,27 @@
       ELMO_NSTEP = ELMO_NSTEP + 1
 
       ! Get Meteorological Variables
-      CALL GET_MET( JDATE, JTIME, TSTEP(2) )
+      MDATE = JDATE
+      MTIME = JTIME
+      MSTEP = -1 * TIME2SEC( TSTEP( 2 ) )
+      IF ( .NOT. INIT_STEP ) THEN
+         ! if ELMO_DRIVER was called at the end of a sync step then
+         ! we need to go halfway back to the previous sync step to match
+         ! the met date that gets called in VDIFF
+         CALL NEXTIME ( MDATE, MTIME, SEC2TIME( MSTEP / 2 ) )
+      END IF
+      CALL GET_MET( MDATE, MTIME, TSTEP( 2 ) )
 
       ! get Wind Direction at 10 m (degrees)
       if ( wdir10_avail ) then
-           call interpolate_var ('WDIR10', jdate, jtime, WDIR10S)
+           call interpolate_var ('WDIR10', mdate, mtime, WDIR10S)
       else
            WDIR10S = ELMO_BLANK
       end if
 
       ! retrieve potential vorticity
       if ( pv_avail ) then
-           call interpolate_var ('PV', jdate, jtime, PVS)
+           call interpolate_var ('PV', mdate, mtime, PVS)
       else
            PVS = ELMO_BLANK
       end if
