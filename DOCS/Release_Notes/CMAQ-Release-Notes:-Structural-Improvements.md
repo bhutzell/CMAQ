@@ -1,5 +1,21 @@
 # Structural Improvements
 
+### rdbcon update
+**David Wong**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
+**Type of update**: Code Update
+**Release Version/Date**:  CMAQv6.0
+
+**Description**:
+Redesigned subroutine r_interpolate_var_2db to follow the idea in hadvppm.F which calls rdbcon by layer. This will also eliminate the scenario that interpolates the entire 3D boundary data when there is a time stamp change between layers.
+
+
+**Significance and Impact**:
+No impact on results, but enhances computational performance
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+
+
 ### parallel I/O implementation for pa_init.F
 **David Wong**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
 **Type of update**: Code Update
