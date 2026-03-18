@@ -221,7 +221,9 @@
       REAL    :: SIGST     = 0.7     ! sigma_sync_top value
       REAL    :: HDIV_LIM  = 0.9     ! cutoff for max horizontal divergence step adj
       REAL    :: CFL       = 0.75    ! maximum Courant-Friedrichs-Lewy number allowed
+      REAL    :: KZ_CUSTOM = 1.0     ! flag for custom KZL (only used when KZ_v55 is TRUE and MINKZ is FALSE)
       Logical :: MINKZ     = .TRUE.  ! flag for minimum Kz 
+      Logical :: KZ_v55    = .FALSE. ! flag for kz behavior from CMAQ 5.5
       LOGICAL :: W_VEL     = .FALSE. ! flag for vertical velocity 
       LOGICAL :: GRAV_SETL = .TRUE.  ! flag for aerosol gravitational setling
 
@@ -814,6 +816,8 @@
 
       ! CTM_KZMIN
       CALL GET_ENV ( MINKZ, 'KZMIN', MINKZ, VARDEV )
+      CALL GET_ENV ( KZ_CUSTOM, 'KZ_CUSTOM', KZ_CUSTOM, VARDEV )
+      CALL GET_ENV ( KZ_v55, 'KZ_v55', KZ_v55, VARDEV )
 
       ! CTM_WVEL
 #ifdef mpas
