@@ -45,6 +45,7 @@ C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 C   11 May 11 D.Wong: incorporated twoway model implementation
 C   May 2019 j. pleim:  removed yamo hadvect subroutines
 C   11 Dec 19 S.L.Napelenok: ddm-3d implementation for version 5.3.1
+C   31 Dec 25 D.Wong: called RDBCON by layer
       
 C-----------------------------------------------------------------------
 
@@ -118,12 +119,15 @@ C Local Variables:
       INTEGER      LVL                ! loop counters
       LOGICAL      L_WRITE_WARNING
 
+      INTEGER, SAVE :: TLVL  ! total number of levels with different time stamp
+
 C Required interface for allocatable array dummy arguments
 
       INTERFACE
-         SUBROUTINE RDBCON ( FDATE, FTIME, TSTEP, LVL, BCON,
+         SUBROUTINE RDBCON ( FDATE, FTIME, TSTEP, LVL, TLVL, BCON,
      &                       L_WRITE_WARNING )
             INTEGER, INTENT( IN )  :: FDATE, FTIME, TSTEP, LVL
+            INTEGER, INTENT( INOUT )  :: TLVL
             REAL,    INTENT( OUT ) :: BCON( :,: )
             LOGICAL, INTENT( INOUT ) :: L_WRITE_WARNING
          END SUBROUTINE RDBCON
@@ -194,6 +198,8 @@ C Get CGRID offsets
       END IF
 
       L_WRITE_WARNING = .TRUE.
+
+      TLVL = 0
       DO 301 LVL = 1, NLAYS
 
          STEP = TIME2SEC ( ASTEP( LVL ) )
@@ -208,7 +214,7 @@ C Get CGRID offsets
 
 101      CONTINUE
 
-         CALL RDBCON ( FDATE, FTIME, ASTEP( LVL ), LVL, BCON, L_WRITE_WARNING )
+         CALL RDBCON ( FDATE, FTIME, ASTEP( LVL ), LVL, TLVL, BCON, L_WRITE_WARNING )
 
          IF ( LIPR ) CGRID0( :,:,: ) = CGRID( :,:,LVL,: )
 

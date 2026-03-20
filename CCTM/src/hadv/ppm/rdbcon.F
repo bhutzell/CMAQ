@@ -19,7 +19,7 @@
 
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE RDBCON ( JDATE, JTIME, TSTEP, LVL, BCON,
+      SUBROUTINE RDBCON ( JDATE, JTIME, TSTEP, LVL, TLVL, BCON,
      &                    L_WRITE_WARNING )
 
 C-----------------------------------------------------------------------
@@ -51,6 +51,7 @@ C   14 Sep 15 J.Young: change Fortran string comparison to logical from advbc_ma
 C   01 Feb 19 D.Wong: Implemented centralized I/O approach, removed all MY_N
 C                     clauses
 C   11 Dec 19 S.L.Napelenok: ddm-3d implementation for version 5.3.1
+C   31 Dec 25 D.Wong: called interpolation_var by layer
 
 C-----------------------------------------------------------------------
 
@@ -74,6 +75,7 @@ C Arguments:
       INTEGER, INTENT( IN ) :: JTIME       ! current model time, coded HHMMSS
       INTEGER, INTENT( IN ) :: TSTEP       ! timestep
       INTEGER, INTENT( IN ) :: LVL         ! layer
+      INTEGER, INTENT( INOUT ) :: TLVL
       REAL,    INTENT( OUT ) :: BCON( :,: ) ! boundary concentrations
       LOGICAL, INTENT( INOUT ) :: L_WRITE_WARNING ! Write Aerosol BC Warning
 
@@ -273,13 +275,13 @@ C Fill in DENSJ array for boundaries
       ELSE
 
 #ifdef parallel
-         call interpolate_var ('JACOBM', mdate, mtime, JACOBM_BND, 'b', lvl)
+         call interpolate_var ('JACOBM', mdate, mtime, JACOBM_BND, 'b', tlvl, lvl)
 #else
          call interpolate_var ('JACOBM', mdate, mtime, JACOBM_BND, 'b')
 #endif
 
 #ifdef parallel
-         call interpolate_var ('DENSA_J', mdate, mtime, RHOJ_BND, 'b', lvl)
+         call interpolate_var ('DENSA_J', mdate, mtime, RHOJ_BND, 'b', tlvl, lvl)
 #else
          call interpolate_var ('DENSA_J', mdate, mtime, RHOJ_BND, 'b')
 #endif
@@ -296,7 +298,7 @@ C Read & interpolate boundary concentrations
          IF ( ONFILE( VAR ) ) THEN
             BBUF = 0.0   ! array assignment
 #ifdef parallel
-            call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b', lvl)
+            call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b', tlvl, lvl)
 #else
             call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b')
 #endif
@@ -333,7 +335,7 @@ C Read & interpolate boundary concentrations
          IF ( ONFILE( VAR ) ) THEN
             BBUF = 0.0   ! array assignment
 #ifdef parallel
-            call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b', lvl)
+            call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b', tlvl, lvl)
 #else
             call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b')
 #endif
@@ -344,7 +346,7 @@ C Read & interpolate boundary concentrations
                  BBUF_TMP = 0.0
                  BCNAME_TMP = 'APNCOM' // BCNAME( VAR )( 5:5 )
 #ifdef parallel
-                 call interpolate_var (BCNAME_TMP, mdate, mtime, BBUF_TMP, 'b', lvl)
+                 call interpolate_var (BCNAME_TMP, mdate, mtime, BBUF_TMP, 'b', tlvl, lvl)
 #else
                  call interpolate_var (BCNAME_TMP, mdate, mtime, BBUF_TMP, 'b')
 #endif
@@ -401,7 +403,7 @@ C Read & interpolate boundary concentrations
          IF ( ONFILE( VAR ) ) THEN
             BBUF = 0.0   ! array assignment
 #ifdef parallel
-            call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b', lvl)
+            call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b', tlvl, lvl)
 #else
             call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b')
 #endif
@@ -435,7 +437,7 @@ C Read & interpolate boundary concentrations
          IF ( ONFILE( VAR ) ) THEN
             BBUF = 0.0   ! array assignment
 #ifdef parallel
-            call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b', lvl)
+            call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b', tlvl, lvl)
 #else
             call interpolate_var (BCNAME(VAR), mdate, mtime, BBUF, 'b')
 #endif
