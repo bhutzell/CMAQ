@@ -153,38 +153,65 @@ C  subroutine to open site file and load arrays
       return
       end Subroutine loadSites
 ! ------------------------------------------------------------------------------
-          real function DecimalDate(date, time)
+          real function DecimalDate(julian_date, time)
 
-! convert date and time which used yyyyddd and  hhmmss format, to yyyy.seconds
+            Implicit None
+! convert date and time which uses yyyyddd and  hhmmss format, to yyyy.fraction
 
-            integer, intent(in) :: date    ! in yyyyddd format
-            integer, intent(in) :: time    ! in hhmmss format
+            integer, intent(in) :: julian_date ! in yyyyddd format
+            integer, intent(in) :: time        ! time of day in hhmmss format
             integer :: neg_time
-            integer :: time2sec, hr, min, sec
-            integer :: year, day
+            integer :: time2sec, hr, mins, sec
+            real    :: year, day
             real    :: time2FracDay
+            real    :: SecondsInYear
 
-            Real, Parameter :: Sec2FracDay = 1.0 / 8.64e+4
+            Real, Parameter :: Day2Secs    = 8.64e+4
+            Real, Parameter :: Sec2FracDay = 1.0 / Day2Secs
             
-            year = real( int( date/1000 ) )
-            day  = 8.64e4*real( mod( date,1000 ) )
+            year = real( int( julian_date/1000 ) )
+            day  = real( mod(julian_date,1000) )
 
             if (time .gt. 0) then
-               hr = time / 10000
-               min = mod(time/100, 100)
-               sec = mod(time, 100)
-               time2FracDay = Sec2FracDay*real(hr*3600 + min*60 + sec)
+               if ( time .gt. 240000 ) then
+                 write(6,'("Function DecimalDate input TIME = ",I8)')time
+                 write(6,'("Time of day greater then 24 hours not accepted input value")')
+                 STOP
+               end if                    
+               hr   = int( time/10000 )
+               mins = max( int(time/100)-100*hr,0 )
+               sec  = mod(time, 100)
+               time2FracDay = Sec2FracDay*real(hr*3600 + mins*60 + sec)
+               DecimalDate = year + ( day+time2FracDay )*yr2day( int( year ) )
             else if ( time .lt. 0 ) then
-               neg_time = abs(time)
-               hr = neg_time / 10000
-               min = mod(neg_time/100, 100)
-               sec = mod(neg_time, 100)
-               time2FracDay = -Sec2FracDay*real(hr*3600 + min*60 + sec)
+               write(6,'("Function DecimalDate input TIME = ",I8)')time
+               write(6,'("Negative time of day not accepted input value")')
+               STOP
+            else
+               time2FracDay = 0.0
+               DecimalDate  = year + day*yr2day( int( year ) )
             end if
-
-            DecimalDate = year + real( day+time2FacDay )/yr2day( year )
-
+            
           end function DecimalDate
+          real function Time2Secs(time)
+            Implicit None
+            
+            integer, intent(in) :: time        ! in hhmmss format
+            
+            Real, Parameter :: Day2Secs = 8.64e+4
+            
+            integer :: hr, mins, sec
+
+            if ( abs(time) .gt. 0 ) then
+               hr   = int( time/10000 )
+               mins = max( int(time/100)-100*hr,0 )
+               sec  = mod(time, 100)
+               Time2Secs = real(hr*3600 + mins*60 + sec)
+            else
+               Time2Secs = 0.0 
+            end if
+                 
+          end function Time2Secs
 ! ------------------------------------------------------------------------------
           real function yr2day (year)
 
@@ -204,7 +231,7 @@ C  subroutine to open site file and load arrays
 
 ! determine whether a given year is a leap year or not
 
-            integer :: year
+            integer, intent(in) :: year
 
             if (mod(year, 4) .ne. 0) then
                leap_year = .false.

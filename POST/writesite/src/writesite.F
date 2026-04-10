@@ -99,6 +99,15 @@ C... load file description from INFILE
         Call m3err ('writeSite', 0, 0, 'Could not load file description from IN_FILE', .TRUE.)
         endif
 
+C...compute end date and time of input file              
+      i = 1
+      endDate = SDATE3D
+      endTime = STIME3D 
+      do t = 2,MXREC3D
+         CALL NEXTIME(endDate,endTime,TSTEP3D)
+         i = i+ 1
+      enddo
+
 C... check for invalid layer
       if( layer.lt.1 .or. layer.gt.NLAYS3D ) then
         Call m3err ('writeSite', 0, 0, 'Invalid Layer number to process', .TRUE.)
@@ -106,13 +115,12 @@ C... check for invalid layer
 
 C... check for start and end dates
       startDate = ENVINT('STARTDATE','Starting Date', SDATE3D, status)
-      endDate = ENVINT('ENDDATE','Ending Date', 9999366, status)
+      endDate = ENVINT('ENDDATE','Ending Date', endDate, status)
 
 C... check for start and end times
       startTime = ENVINT('START_TIME','Starting Time', STIME3D, status)
-      endTime   = ENVINT('END_TIME','Ending Time', 240000, status)
+      endTime   = ENVINT('END_TIME','Ending Time', endTime, status)
 
-      print*,"startTime,endTime = ",startTime,endTime
 C... set map projection
       Call SETPROJ( GDTYP3D, Real(P_ALP3D),Real(P_BET3D),Real(P_GAM3D),Real(XCENT3D),Real(YCENT3D) )
 
@@ -203,6 +211,7 @@ C... start process loops for sites
         ! allocate data array for 1 species
         allocate( data(NCOLS3D, NROWS3D, 1) )
 
+
         do s = 1,NSITES
           write(*,'(''0) Processing site:'',a)') TRIM(siteid(s))
 
@@ -218,6 +227,7 @@ C... start process loops for sites
           if( USELOCAL .and. TSTEP3D.lt.240000 ) then
             tzoff = getTZ(longitude(s), latitude(s))
             endif
+
 
           do t = 1,MXREC3D
             if( ( cdate.ge.startDate .and. cdate.le.endDate )
@@ -363,7 +373,6 @@ C... start process loops for all cells
 
 
 ! pivot table so all times of variables on single line per site
-        print*,'NSITES = ',NSITES
       if( prthead ) then
         CALL ENVSTR( 'INFILE', 'Name of input file', 'INFILE', infile, status)
         write(lpfn,'(''! Data read from file:'',a,'' (layer'',i3,'')'')') TRIM(infile),layer
@@ -402,15 +411,37 @@ C... create header record
          call NEXTIME( cdate, ctime, TSTEP3D )
        end do
 
+       write(header1,'(A,6X,A)')TRIM(header1),
+     & "       units           siteid  col           row              longitude         latitude "
+       write(header2,'(A,6X,A)')TRIM(header2),
+     & "       units           siteid  col           row                degrees          degrees  "
+       write(lpfn,'(a)') TRIM(header1)
+       write(lpfn,'(a)') TRIM(header2)
+
+C... create header record
+      header1 = ""
+      header2 = ""
+      write(header1,'(A16,1X)')"JDAY"
+      write(header2,'(A16,1X)')"JTIME"
+
         cdate = SDATE3D
         ctime = STIME3D
-      write(header1,'(A,6X,A)')TRIM(header1),
-     &  "       units           siteid  col           row              longitude         latitude "
-      write(header2,'(A,6X,A)')TRIM(header2),
-     &  "       units           siteid  col           row                degrees          degrees  "
-        write(lpfn,'(a)') TRIM(header1)
-        write(lpfn,'(a)') TRIM(header2)
+        do t = 1,MXREC3D
+         if( cdate.ge.startDate .and. cdate.le.endDate
+     &       .and. ( ctime.ge.startTime .and. ctime.le.endTime ) ) then
+            write(header1,'(A,1X,F16.6)')TRIM(header1),DecimalDate(cdate,0)
+            write(header2,'(A,1X,F16.6)')TRIM(header2),Time2Secs(ctime)
 
+         endif
+         call NEXTIME( cdate, ctime, TSTEP3D )
+       end do
+       write(header1,'(A,1X,A16)')TRIM(header1),"!YYYY.fraction"
+       write(header2,'(A,1X,A16)')TRIM(header2),"!secs"
+       write(lpfn,'(a)') TRIM(header1)
+       write(lpfn,'(a)') TRIM(header2)
+
+        cdate = SDATE3D
+        ctime = STIME3D
         do s = 1,NSITES
           write(*,'(''2) Processing site:'',a)') TRIM(siteid(s))
 
@@ -434,6 +465,7 @@ C... create header record
 
 
             do t = 1,MXREC3D
+            
                if( cdate.ge.startDate .and. cdate.le.endDate 
      &           .and. ( ctime.ge.startTime .and. ctime.le.endTime ) ) then
 
