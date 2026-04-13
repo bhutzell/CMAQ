@@ -7,7 +7,7 @@
 This PR removes options associated with SAPRC07TIC in KMT2 and adds an internal wet deposition species for AHMSJ.
 
 **Significance and Impact**:  
-Impacts should be minimal for simulations using KMT2. This PR improves the linkages between KMT2 cloud chem and the cb6r5 updates in PR1414. This PR removes deprecated/unused options in KMT2.
+Impacts should be minimal for simulations using KMT2. This PR improves the linkages between KMT2 cloud chem and the cb6r5 updates in PR1414 (i.e., "Heterogeneous chemistry of sulfur species" in cb6r5). This PR removes deprecated/unused options in KMT2.
 
 
 |Merge Commit | Internal record|
