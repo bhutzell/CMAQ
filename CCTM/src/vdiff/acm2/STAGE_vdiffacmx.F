@@ -549,6 +549,17 @@ C-----------------------------------------------------------------------
 1021  FORMAT( ' CONVCT, DTS, EDDYV, MBAR, FNL: ', L3, 1X, 4(1PE13.5) )
 #endif
 
+         DO L = 1, NLAYS
+            DO V = 1, N_SPC_DIFF
+               CONC( V,L ) = CNGRD( DIFF_MAP( V ),L,C,R )
+            END DO
+#ifdef isam
+            DO JSPCTAG = 1, N_SPCTAG
+               SACONC( JSPCTAG,L ) = ISAM( C,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) )
+            END DO
+#endif
+         END DO
+
 #ifdef isam
          SA_SUM = 0.0
          DO V = 1, NSPC_SA
@@ -560,7 +571,7 @@ C-----------------------------------------------------------------------
 
          SAFRAC = 0.0
          DO JSPCTAG = 1, N_SPCTAG
-            SAFRAC( JSPCTAG ) = SACONC( JSPCTAG,1 ) / SA_SUM ( S_SPCTAG( JSPCTAG )   ) 
+            SAFRAC( JSPCTAG ) = SACONC( JSPCTAG,1 ) / SA_SUM ( S_SPCTAG( JSPCTAG )   )
          END DO
 
          IF ( ABFLUX .AND. L_NH4 ) THEN
@@ -578,21 +589,10 @@ C-----------------------------------------------------------------------
             TOTAL_SA_NO2 = 1.0 / SUM( SA_NO2 )
             DO ITAG = 1, NTAG_SA
                JSPCTAG = INDEX_SA_HONO( ITAG )
-               SAFRAC( JSPCTAG ) = SA_NO2( ITAG ) * TOTAL_SA_NO2 
-            END DO 
-         END IF                
-#endif
-
-         DO L = 1, NLAYS
-            DO V = 1, N_SPC_DIFF
-               CONC( V,L ) = CNGRD( DIFF_MAP( V ),L,C,R )
+               SAFRAC( JSPCTAG ) = SA_NO2( ITAG ) * TOTAL_SA_NO2
             END DO
-#ifdef isam
-            DO JSPCTAG = 1, N_SPCTAG
-               SACONC( JSPCTAG,L ) = ISAM( C,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) )
-            END DO
+         END IF
 #endif
-         END DO
 
 #ifdef sens
          DO NP = 1, NPMAX

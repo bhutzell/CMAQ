@@ -786,6 +786,8 @@ C Latitude and longitude for zenith angle calculation: Golam Sarwar * July 1, 20
       REAL      ANO3      ! fine mode nitrate [ ug/m3 ] 
       REAL      ANO3M     ! nitrate,  [moles / m3 ] 
 
+      REAL( 8 ) :: EXP_LNSG_J_FACTOR  ! Pre-computed EXP(0.5*LNSG(2)^2) for performance
+      
       REAL, SAVE :: JHNO3 = 0.0    ! HNO3 photolysis rate, 1/min
       REAL, SAVE :: FAC_HNO3 = 0.0 ! Enhancement factor for HNO3 photolysis rate for a grid-cell [-]  
       
@@ -924,93 +926,6 @@ C     end of the gas-phase chemical driver
           ALLOCATE(      EF_HNO3( NCOLS,NROWS,NLAYS ) )
        END IF
 
-C ***  Determine molecular weights
-       INV_MWCL  = REAL( 1.0 / aerospc_mw( ACL_IDX ), 8 )
-       MWCLH2O   = aerospc_mw( ACL_IDX ) / aerospc_mw( AH2O_IDX )
-       MWH2OCL   = 1.0 / MWCLH2O
-       CLNO2_IDX = INDEX1( 'CLNO2', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       
-       IF ( CLNO2_IDX .GT. 0 ) THEN
-          MWCLCLNO2 = aerospc_mw( ACL_IDX) / SPECIES_MOLWT( CLNO2_IDX )
-       ELSE
-          MWCLCLNO2 = 0.0
-       END IF
-       
-              
-       INV_MWFE  = REAL( 1.0 / aerospc_mw( AFE_IDX ), 8 )       
-       INV_MWMN  = REAL( 1.0 / aerospc_mw( AMN_IDX ), 8 )  
-       
-       IF ( AHMS_IDX .GT. 0 ) THEN
-         INV_MWHMS = REAL( 1.0 / aerospc_mw( AHMS_IDX ), 8 ) 
-       END IF
-       
-
-       IEPOX_IDX = INDEX1( 'IEPOX', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF ( IEPOX_IDX .GT. 0 ) THEN
-          MWTIEPOX  = REAL( SPECIES_MOLWT( IEPOX_IDX ), 8 ) 
-       ELSE
-          MWTIEPOX  = 118.1D0
-       END IF
-       CFACTOR_IEPOX = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTIEPOX * DPI ) )
-
-       IMAE_IDX = INDEX1( 'IMAE', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF( IMAE_IDX .GT. 0 )THEN
-           MWTIMAE  = REAL( SPECIES_MOLWT( IMAE_IDX ), 8 )
-       ELSE
-           MWTIMAE  = 102.0D0
-       END IF
-       CFACTOR_IMAE = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTIMAE * DPI ) )
-
-       IF( AIETET_IDX .GT. 0 ) THEN
-          INV_MWIETET = REAL( 1.0/ aerospc_mw( AIETET_IDX ), 8 )
-       ELSE
-          INV_MWIETET = 0.0D0
-       END IF
-
-       IF( AIEOS_IDX .GT. 0 ) THEN
-          INV_MWIEOS  = REAL( 1.0/ aerospc_mw( AIEOS_IDX  ), 8 )
-       ELSE 
-          INV_MWIEOS = 0.0D0
-       END IF
-
-       IF( ASO4_IDX .GT. 0 )THEN
-          INV_MWASO4 = REAL( 1.0/ aerospc_mw( ASO4_IDX ), 8 )
-       ELSE
-          INV_MWASO4 = 0D0
-       END IF
-
-       NO3_IDX = INDEX1( 'NO3', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF( NO3_IDX .GT. 0 )THEN
-           MWTNO3  = REAL( SPECIES_MOLWT( NO3_IDX ), 8 )
-       ELSE
-           MWTNO3  = 62.01D0
-       END IF
-       CFACTOR_NO3 = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTNO3 * DPI ) )
-
-       GLY_IDX = INDEX1( 'GLY', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF( GLY_IDX .GT. 0 )THEN
-           MWTGLY  = REAL( SPECIES_MOLWT( GLY_IDX ), 8 )
-       ELSE
-           MWTGLY  = 58.04D0
-       END IF
-       CFACTOR_GLY = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTGLY * DPI ) )
-
-       MGLY_IDX = INDEX1( 'MGLY', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF( MGLY_IDX .GT. 0 )THEN
-           MWTMGLY  = REAL( SPECIES_MOLWT( MGLY_IDX ), 8 )
-       ELSE
-           MWTMGLY  = 72.07D0
-       END IF
-       CFACTOR_MGLY = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTMGLY * DPI ) )
-
-       HO2_IDX = INDEX1( 'HO2', NUMB_MECH_SPC, CHEMISTRY_SPC )
-       IF( HO2_IDX .GT. 0 )THEN
-           MWTHO2  = REAL( SPECIES_MOLWT( HO2_IDX ), 8 )
-       ELSE
-           MWTHO2  = 33.0D0
-       END IF
-       CFACTOR_HO2 = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTHO2 * DPI ) )
-
 C ***  Map to acids/nucleophiles for epoxide uptake
        CALL LOG_SUBHEADING( LOGDEV, 'Map Acid-Nuc Pairs for Heterogeneous Chemistry')
 
@@ -1059,6 +974,93 @@ C ***  Map to acids/nucleophiles for epoxide uptake
 
       END IF   ! first time condition
 
+C ***  Determine molecular weights
+      INV_MWCL  = REAL( 1.0 / aerospc_mw( ACL_IDX ), 8 )
+      MWCLH2O   = aerospc_mw( ACL_IDX ) / aerospc_mw( AH2O_IDX )
+      MWH2OCL   = 1.0 / MWCLH2O
+      CLNO2_IDX = INDEX1( 'CLNO2', NUMB_MECH_SPC, CHEMISTRY_SPC )
+
+      IF ( CLNO2_IDX .GT. 0 ) THEN
+         MWCLCLNO2 = aerospc_mw( ACL_IDX) / SPECIES_MOLWT( CLNO2_IDX )
+      ELSE
+         MWCLCLNO2 = 0.0
+      END IF
+      
+      
+      INV_MWFE  = REAL( 1.0 / aerospc_mw( AFE_IDX ), 8 )       
+      INV_MWMN  = REAL( 1.0 / aerospc_mw( AMN_IDX ), 8 )  
+       
+      IF ( AHMS_IDX .GT. 0 ) THEN
+         INV_MWHMS = REAL( 1.0 / aerospc_mw( AHMS_IDX ), 8 ) 
+      END IF
+
+
+      IEPOX_IDX = INDEX1( 'IEPOX', NUMB_MECH_SPC, CHEMISTRY_SPC )
+      IF ( IEPOX_IDX .GT. 0 ) THEN
+         MWTIEPOX  = REAL( SPECIES_MOLWT( IEPOX_IDX ), 8 ) 
+      ELSE
+         MWTIEPOX  = 118.1D0
+      END IF
+      CFACTOR_IEPOX = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTIEPOX * DPI ) )
+
+      IMAE_IDX = INDEX1( 'IMAE', NUMB_MECH_SPC, CHEMISTRY_SPC )
+      IF( IMAE_IDX .GT. 0 )THEN
+         MWTIMAE  = REAL( SPECIES_MOLWT( IMAE_IDX ), 8 )
+      ELSE
+         MWTIMAE  = 102.0D0
+      END IF
+      CFACTOR_IMAE = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTIMAE * DPI ) )
+
+      IF( AIETET_IDX .GT. 0 ) THEN
+         INV_MWIETET = REAL( 1.0/ aerospc_mw( AIETET_IDX ), 8 )
+      ELSE
+         INV_MWIETET = 0.0D0
+      END IF
+
+      IF( AIEOS_IDX .GT. 0 ) THEN
+         INV_MWIEOS  = REAL( 1.0/ aerospc_mw( AIEOS_IDX  ), 8 )
+      ELSE 
+         INV_MWIEOS = 0.0D0
+      END IF
+
+      IF( ASO4_IDX .GT. 0 )THEN
+         INV_MWASO4 = REAL( 1.0/ aerospc_mw( ASO4_IDX ), 8 )
+      ELSE
+         INV_MWASO4 = 0D0
+      END IF
+
+      NO3_IDX = INDEX1( 'NO3', NUMB_MECH_SPC, CHEMISTRY_SPC )
+      IF( NO3_IDX .GT. 0 )THEN
+         MWTNO3  = REAL( SPECIES_MOLWT( NO3_IDX ), 8 )
+      ELSE
+         MWTNO3  = 62.01D0
+      END IF
+      CFACTOR_NO3 = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTNO3 * DPI ) )
+
+      GLY_IDX = INDEX1( 'GLY', NUMB_MECH_SPC, CHEMISTRY_SPC )
+      IF( GLY_IDX .GT. 0 )THEN
+         MWTGLY  = REAL( SPECIES_MOLWT( GLY_IDX ), 8 )
+      ELSE
+         MWTGLY  = 58.04D0
+      END IF
+      CFACTOR_GLY = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTGLY * DPI ) )
+
+      MGLY_IDX = INDEX1( 'MGLY', NUMB_MECH_SPC, CHEMISTRY_SPC )
+      IF( MGLY_IDX .GT. 0 )THEN
+         MWTMGLY  = REAL( SPECIES_MOLWT( MGLY_IDX ), 8 )
+      ELSE
+         MWTMGLY  = 72.07D0
+       END IF
+       CFACTOR_MGLY = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTMGLY * DPI ) )
+
+       HO2_IDX = INDEX1( 'HO2', NUMB_MECH_SPC, CHEMISTRY_SPC )
+       IF( HO2_IDX .GT. 0 )THEN
+         MWTHO2  = REAL( SPECIES_MOLWT( HO2_IDX ), 8 )
+      ELSE
+         MWTHO2  = 33.0D0
+      END IF
+      CFACTOR_HO2 = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTHO2 * DPI ) )
+
       KHETERO = 0.0D0
       
       IF ( L_ELMO ) THEN
@@ -1072,6 +1074,10 @@ C ***  Map to acids/nucleophiles for epoxide uptake
          EF_HNO3      = 0.0
       END IF
      
+C *** Pre-compute loop-invariant factors for performance
+C     AEROMODE_LNSG does not change during grid cell iteration
+      EXP_LNSG_J_FACTOR = DEXP ( 0.5D0 * AEROMODE_LNSG( 2 ) * AEROMODE_LNSG( 2 ) )
+
 C *** Calculate rate constants at each grid cell location
       LOOP_LAY: DO L = 1, NLAYS
          LOOP_ROW: DO R = 1, NROWS
@@ -1094,27 +1100,27 @@ C     area and diameter values.
                CALL HETCHEM_EXTRACT_AERO( CGRID( C,R,L,: ), C, R, L,
      &               WET_M2, WET_M3, DE_WET )
 
-C *** Load Meteorological Variables
+C *** Load Meteorological Variables (use local copies to avoid repeated array access)
                AIRTEMP = REAL( TEMP( C,R,L ), 8 )
                AIRPRES = REAL(  PRESS( C,R,L ), 8 )   
 
 C *** to compute RH & molecular kinetic factors
-               H2OVP = REAL( PRESS( C,R,L ) * WVAPOR( C,R,L )
+               H2OVP = REAL( AIRPRES * WVAPOR( C,R,L )
      &               / ( EPSWATER  + WVAPOR( C,R,L ) ), 8 )    
      
                AIRRH = MAX( 0.005D0, MIN( 0.99D0, H2OVP * INV_ESATL( AIRTEMP ) ) )
 
-               CBAR_COEFF  = REAL( SQRT( CFACTOR * TEMP( C,R,L ) ), 8) 
+               CBAR_COEFF  = REAL( SQRT( CFACTOR * AIRTEMP ), 8) 
                
-               ADJUST_DIFF = REAL( ( TEMP( C,R,L ) * INV_STDTEMP ) ** 1.75 * ( STDATMPA / PRESS( C,R,L ) ), 8 )
+               ADJUST_DIFF = REAL( ( AIRTEMP * INV_STDTEMP ) ** 1.75 * ( STDATMPA / AIRPRES ), 8 )
 
                IF ( PRESENT( DENS ) ) THEN
-                  PPM_FACTOR  = 1.0D-3 * REAL( MWAIR / DENS( C,R,L ), 8 )
+                  PPM_FACTOR  = 1.0D-3 * REAL( MWAIR / AIRDENS, 8 )
                ELSE
-                  PPM_FACTOR  = UGM3_CONV_FAC * REAL( TEMP( C,R,L ) / PRESS( C,R,L ), 8 )
+                  PPM_FACTOR  = UGM3_CONV_FAC * REAL( AIRTEMP / AIRPRES, 8 )
                END IF
               
-               RFACTOR = 60.0D0 * COEF1 * REAL( PRESS( C,R,L ) / TEMP( C,R,L ), 8 )
+               RFACTOR = 60.0D0 * COEF1 * REAL( AIRPRES / AIRTEMP, 8 )
 
 C *** calculate molecular speeds (m/s) using Eq 4 of Pleim et al (1995)
                CBAR = CBAR_COEFF * INV_SQRT_MWN2O5
@@ -1319,10 +1325,10 @@ C *** Fo SO4, use SO4/NA emissions ratio in seasalt
      &                                         Real ( aerospc_conc( AK_IDX,2 )  / aerospc(AK_IDX)%density, 8  ) +          ! KJ - m3/m3
      &                                         Real ( aerospc_conc( ACA_IDX,2 ) / aerospc(ACA_IDX)%density, 8 ) +          ! CAJ - m3/m3
      &                                         Real ( 0.2514 * aerospc_conc( ANA_IDX,2 ) / aerospc(ASO4_IDX)%density, 8) ) ! SO4 - m3/m3 - use SO4/NA ratio in seasalt
-                     SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * DEXP ( 0.5D0 * AEROMODE_LNSG( 2 ) * AEROMODE_LNSG( 2 ) )
+                     SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * EXP_LNSG_J_FACTOR
                    ELSE  ! CMAQ version 6.0 approach
                      SSALT_VOL  =   1.0D-9 * Real ( aerospc_conc( ASEAST_IDX,2 ) / aerospc(ASEAST_IDX)%density, 8 )        ! m3/m3 - use seasalt concentration 
-                     SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * DEXP ( 0.5D0 * AEROMODE_LNSG( 2 ) * AEROMODE_LNSG( 2 ) )
+                     SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * EXP_LNSG_J_FACTOR
                    END IF
                ELSE
                    SSALT_SURFA = 0.0D0 
@@ -3322,7 +3328,7 @@ C FEMNprec = limit soluble Fe and Mn by solid precipitation (less Fe available t
       INTEGER, PARAMETER :: IONEFF = 1     ! 1 = Use ionic strength enhancement factors for Henry's Law coefs for SO2 and H2O2, 
                                            ! SO2 dissoc coefs, and kO3 and kh2o2 rate coefficients; 0 = no addnl ionic EFs
       INTEGER, PARAMETER :: HMSlo = 0      ! 0 for high HMS prod rate, 1 for low HMS prod rate, 2 for avg
-      INTEGER, PARAMETER :: TVOL = 3       ! 1 = just inorg water, 2 = total water, 3 = total J mode volume
+      INTEGER, PARAMETER :: TVOL = 3       ! 1 = just inorg water, 2 = total water, 3 = total J mode volume, 4 = just inorg spcs considered in isorropia
       INTEGER, PARAMETER :: FEMNprec = 1   ! 1 = limit Fe and Mn by solid precipitation 
 
 C *** Parameters for SO2        
@@ -3381,9 +3387,41 @@ C *** Partial pressure of SO2
 C *** Volume assumption for rate/concentration calculations
 C *** TVOL = 1 - Use inorganic water
 C *** TVOL = 2 - Use inorganic + organic water 
-C *** TVOL = 3 - Use total J mode volume    
+C *** TVOL = 3 - Use total J mode volume
+C *** TVOL = 4 - Calculate volume using only transported species considered
+C ***            in ISORROPIA, including (inorganic) water    
 
-       IF( TVOL .EQ. 3 ) THEN
+
+       IF( TVOL .EQ. 4 ) THEN
+      
+C *** J-mode particle volume [L/m**3 air]
+         volume = 0.0d0
+         Do i = 1, n_aerospc 
+            If ( aerospc( i )%tracer ) Cycle
+            If ( aerospc( i )%om ) Cycle
+            If ( aerospc( i )%bulkname .EQ. 'AHMS    ') Cycle
+            If ( aerospc( i )%bulkname .EQ. 'ABR     ') Cycle
+            If ( aerospc( i )%charge == 0) Cycle
+            If ( aero_missing( i,2 ) ) Cycle
+               volume = volume + (Real( aerospc_conc( i, 2 ) / 
+     &                aerospc(i)%density, 8 ) * 1.0d-6)
+         End Do
+ 
+ 
+         Do i = 1, n_aerospc 
+            If ( aerospc( i )%bulkname .EQ. 'AH2O    ') Then
+               volume = volume + (Real( aerospc_conc( i, 2 ) / 
+     &                aerospc(i)%density, 8 ) * 1.0d-6)
+            End If
+         End Do
+
+         inv_volume = 1.d0 / volume  
+
+         TOTWATER = REAL( aerospc_conc( ah2o_idx, 2 ),8) ! Just inorg H2O here
+     
+         INORGWAT = REAL( aerospc_conc( ah2o_idx, 2 ),8)
+ 
+       ELSE IF( TVOL .EQ. 3 ) THEN
       
 C *** J-mode particle volume [L/m**3 air]
          volume = 0.0d0
@@ -3394,6 +3432,7 @@ C *** J-mode particle volume [L/m**3 air]
                volume = volume + (Real( aerospc_conc( i, 2 ) / 
      &                aerospc(i)%density, 8 ) * 1.0d-6)
          End Do
+
          inv_volume = 1.d0 / volume  
 
          TOTWATER = REAL( aerospc_conc( ah2o_idx, 2 ) + 
@@ -3414,7 +3453,7 @@ C *** J-mode particle volume [L/m**3 air]
        
        ELSE
        
-         TOTWATER = REAL( aerospc_conc( ah2o_idx, 2 ),8)
+         TOTWATER = REAL( aerospc_conc( ah2o_idx, 2 ),8) ! Just inorg H2O here
      
          INORGWAT = REAL( aerospc_conc( ah2o_idx, 2 ),8)
        
@@ -3482,7 +3521,7 @@ C *** Calculate total sulfate concentration in ALW and calculate SO42- and HSO4-
        SO42M = TS6 / ( 1.0D0 + ( HPLUS / K2) )     ! sulfate M 
        HSO4M = TS6 - SO42M                         ! bisulfate M
 
-! *** Determine ionic strength [M of m]
+! *** Determine ionic strength [M or m]
     
        IONIC = 0.50 * HPLUS *1.0D0
      &          + 0.50 * REAL(aerospc_conc( ana_idx, 2 )/aerospc_mw( ana_idx),8) * inv_volume / 1.d6 *1.0D0  

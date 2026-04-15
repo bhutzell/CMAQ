@@ -360,7 +360,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          SELECT CASE( KTYPE( NXX ) )
           CASE( -1 )
-             DO IPR = 1, NHETERO
+             DO IPR = 1, MHETERO
                 IF ( IHETERO( IPR,1 ) .EQ. NXX )EXIT
              END DO
              IDX = IHETERO( IPR, 2 )
@@ -612,7 +612,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 5119    FORMAT( ' k<sub>0</sub> = ', ES12.4,'*exp<sup>(',ES12.4,'/T)</sup>*(T/300)<sup>',ES12.4,'</sup>;',
      &          ' k<sub>2</sub> = ', ES12.4,'*exp<sup>(',ES12.4,'/T)</sup>*(T/300)<sup>',ES12.4,'</sup>;',
      &          ' k<sub>3</sub> = ', ES12.4,'*exp<sup>(',ES12.4,'/T)</sup>')
-5120   FORMAT('SEAWATER*min(', ES10.3,'*exp<sup>(',ES10.3'*P),</sup> +', ES10.3,'*exp<sup>(',ES10.3'*P),</sup>, ',ES10.3')')
+5120   FORMAT('SEAWATER*min(',
+     &         ES10.3,
+     &        '*exp<sup>(',
+     &        ES10.3,
+     &        '*P)</sup> +',
+     &         ES10.3,
+     &        '*exp<sup>(',
+     &        ES10.3,'*P)</sup>, ',
+     &        ES10.3,')')
 
 5121   FORMAT('{|class="wikitable"',
      &        / '|-',
@@ -940,7 +948,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          SELECT CASE( KTYPE( NXX ) )
           CASE( -1 )
-             DO IPR = 1, NHETERO
+             DO IPR = 1, MHETERO
                 IF ( IHETERO( IPR,1 ) .EQ. NXX )EXIT
              END DO
              IDX = IHETERO( IPR, 2 )
@@ -1191,7 +1199,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 5119    FORMAT( ' k<sub>0</sub> = ', ES12.4,'e<sup>(',ES12.4,'/T)</sup>(T/300)<sup>',ES12.4,'</sup>;',
      &          ' k<sub>2</sub> = ', ES12.4,'e<sup>(',ES12.4,'/T)</sup>(T/300)<sup>',ES12.4,'</sup>;',
      &          ' k<sub>3</sub> = ', ES12.4,'e<sup>(',ES12.4,'/T)</sup>')
-5120   FORMAT('SEAWATER*min(', ES10.3,'e<sup>(',ES10.3'P),</sup> +', ES10.3,'e<sup>(',ES10.3'P),</sup>, ',ES10.3')')
+5120   FORMAT('SEAWATER*min(', ES10.3,'e<sup>(',ES10.3,'P),</sup> +', ES10.3,'e<sup>(',ES10.3,'P)</sup>, ',ES10.3,')')
 
 5121   FORMAT(  '|Reaction Number|Reaction Label|Reaction|Rate Constant Formula|Value at ',F6.2,' K; ',
      &           ES12.4,' molec/cm<sup>3</sup>; ', F6.2,' Atm.',
@@ -1996,7 +2004,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          SELECT CASE( KTYPE( NXX ) )
           CASE( -1 )
-             DO IPR = 1, NHETERO
+             DO IPR = 1, MHETERO
                 IF ( IHETERO( IPR,1 ) .EQ. NXX )EXIT
              END DO
              IDX = IHETERO( IPR, 2 )
@@ -2245,7 +2253,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 5119    FORMAT( ' k0 = ', ES12.4,'*exp(',ES12.4,'/T)*(T/300)^',ES12.4,';',
      &          ' k2 = ', ES12.4,'*exp(',ES12.4,'/T)*(T/300)^',ES12.4,';',
      &          ' k3 = ', ES12.4,'*exp(',ES12.4,'/T)')
-5120   FORMAT('SEAWATER*min of ', ES10.3,'*exp(',ES10.3'*P), +', ES10.3,'*exp(',ES10.3'*P) and ',ES10.3'')
+5120   FORMAT('SEAWATER*min of ', ES10.3,'*exp(',ES10.3,'*P), +', ES10.3,'*exp(',ES10.3,'*P) and ',ES10.3,'')
 
 5121   FORMAT(  'Reaction Number,Reaction Label,Reaction,Rate Constant Formula,Value at ',F6.2,' K; ',
      &           ES12.4,' molec/cm^3; ', F6.2,' Atm.',
@@ -2540,7 +2548,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          SELECT CASE( KTYPE( NXX ) )
           CASE( -1 )
-             DO IPR = 1, NHETERO
+             DO IPR = 1, MHETERO
                 IF ( IHETERO( IPR,1 ) .EQ. NXX )EXIT
              END DO
              IDX = IHETERO( IPR, 2 )
@@ -2905,13 +2913,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &         ' k<sub>3</sub> = ', ES12.4,'exp(',F9.2,'/T)')
 5109    FORMAT(' k<sub>0</sub> = ', ES12.4,'exp(',F9.2,'/T)<br>',
      &         ' k<sub>1</sub> = ', ES12.4,'exp(',F9.2,'/T)')
-5110    FORMAT(' k<sub>o</sub> = ', ES12.4,'exp(',F9.2,'/T)(T/300)<sup>',F6.2'</sup><br>',
+5110    FORMAT(' k<sub>o</sub> = ', ES12.4,'exp(',F9.2,'/T)(T/300)<sup>',F6.2,'</sup><br>',
      &         ' k<sub>inf</sub> = ', ES12.4,'exp(',F9.2,'/T)(T/300)<sup>',F6.2,'</sup><br>',
      &         ' n = ', F6.2,'; F = ', F6.2 )
 5119    FORMAT( ' k0 = ', ES12.4,'exp(',F9.2,'/T)(T/300)<sup>',F6.2,'</sup><br>',
      &          ' k2 = ', ES12.4,'exp(',F9.2,'/T)(T/300)<sup>',F6.2,'</sup><br>',
      &          ' k3 = ', ES12.4,'exp(',F9.2,'/T)')
-5120   FORMAT('SEAWATER*min(', ES10.3,'exp(',ES10.3'P) +' ES10.3,'exp(',ES10.3'P), ',ES10.3')')
+5120   FORMAT('SEAWATER*min(', ES10.3,'exp(',ES10.3,'P) +' ES10.3,'exp(',ES10.3,'P), ',ES10.3,')')
 5121   FORMAT( 'Value (molecules/(sec*cm<sup>3</sup>)) <br> at ',
      &         F6.2,' K<br> ', ES12.4,' molec/cm<sup>3</sup><br> ', F6.2,' Atm.')
 
@@ -3251,7 +3259,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          SELECT CASE( KTYPE( NXX ) )
           CASE( -1 )
-             DO IPR = 1, NHETERO
+             DO IPR = 1, MHETERO
                 IF ( IHETERO( IPR,1 ) .EQ. NXX )EXIT
              END DO
              IDX = IHETERO( IPR, 2 )
@@ -3531,7 +3539,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 5119    FORMAT( 'k<sub>0</sub>=', ES12.4,'e<sup>',F8.1,'/T</sup>(T/300)<sup>',F6.2,'</sup><br>',
      &          'k<sub>2</sub>=', ES12.4,'e<sup>',F8.1,'/T</sup>(T/300)<sup>',F6.2,'</sup><br>',
      &          'k<sub>3</sub>=', ES12.4,'e<sup>',F9.2,'/T</sup>')
-5120   FORMAT('SEAWATER*min(', ES10.3,'e<sup>',ES10.3'P</sup>+', ES10.3,'e<sup>',ES10.3'P</sup>, <br>',ES10.3')')
+5120   FORMAT('SEAWATER*min(', ES10.3,'e<sup>',ES10.3,'P</sup>+', ES10.3,'e<sup>',ES10.3,'P</sup>, <br>',ES10.3,')')
 
 5121   FORMAT(  '|Label|Reaction            |Rate Constant Formula| Value<br> molecules/(sec*cm<sup>3</sup>)|   ',
      &        / '|:---|:-------------------|:--------------------|:----:|   ')
@@ -4002,7 +4010,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          
          SELECT CASE( KTYPE( NXX ) )
           CASE( -1 )
-             DO IPR = 1, NHETERO
+             DO IPR = 1, MHETERO
                 IF ( IHETERO( IPR,1 ) .EQ. NXX )EXIT
              END DO
              IDX = IHETERO( IPR, 2 )
@@ -4195,7 +4203,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          WRITE(BOTTOM_UP_UNIT,'(A)')    "CS{i} = 'Cross_Section_" // TRIM( PHOTAB(IDX) ) // ".csv';"
          WRITE(BOTTOM_UP_UNIT,'(A,/)')  "QY{i} = 'Quantum_Yield_" // TRIM( PHOTAB(IDX) ) // ".csv';"
       END DO
-      DO IDX = 1,NHETERO
+      DO IDX = 1,MHETERO
          WRITE(KTABLE_UNIT,'(/,A)')"i = i + 1;"
          WRITE(KTABLE_UNIT,'(A)')  "Knames{i}   = 'K_" // TRIM( HETERO(IDX) ) // "';"
          WRITE(KTABLE_UNIT,'(A,/)')"krx(:,i)    =  1.0E-60;"
@@ -4276,7 +4284,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &        'SEAWATER    = (OPEN_OCEAN+SURF_ZONE)-SEA_ICE;',/,
      &        'SEAWATER(SEAWATER<0.0)    = 0.0;',/,
      &        'Patm = 0.001.*P;',/,
-     &        'a = ',  ES10.3,'.*exp(',ES10.3'.*Patm) +', ES10.3,'.*exp(',ES10.3'.*Patm);',/,
+     &        'a = ',  ES10.3,'.*exp(',ES10.3,'.*Patm) +', ES10.3,'.*exp(',ES10.3,'.*Patm);',/,
      &        'b = ',ES10.3,';',/,
      &        'a(a>b) = b;',/,
      &        'k(:,i) = a.*ILLUMINATED.*SEAWATER;',/)

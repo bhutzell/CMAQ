@@ -1247,7 +1247,9 @@ C Find indices of required species
          marine = .False.
        End If
 
-      If ( Index( mechname, 'CRACMM3' ) .Gt. 0 ) Then
+      If ( (Index( mechname, 'CRACMM3' ) .Gt. 0 ) .OR.
+     &       Index( mechname, 'CB6R5_AE7_AQ'      ) .Gt. 0  .OR.
+     &       Index( mechname, 'CB6R5M_AE7_AQ'     ) .Gt. 0 ) Then
          ahms_idx     = findAero( req_hms,     .True. ) 
          hethms = .True.
       Else

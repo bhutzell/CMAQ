@@ -526,7 +526,7 @@
       & MEMBER("CLNO            ",  190, "GC",   65.50D0, F), &
       & MEMBER("CLNO2           ",  191, "GC",   81.50D0, F), &
       & MEMBER("CLNO3           ",  192, "GC",   97.50D0, F), &
-      & MEMBER("HCL             ",  193, "GC",   36.00D0, F), &
+      & MEMBER("HCL             ",  193, "GC",   36.50D0, F), &
       & MEMBER("NO2PIJ          ",  195, "GC",   46.00D0, F), &
       & MEMBER("NO2PK           ",  196, "GC",   46.00D0, F), &
       & MEMBER("ACLI            ",  242, "AE",   35.50D0, T), &
@@ -739,7 +739,7 @@
       DATA CHEMISTRY_SPC( 200 ), SPECIES_MOLWT( 200 ) / 'CLNO            ',   65.50D0 /
       DATA CHEMISTRY_SPC( 201 ), SPECIES_MOLWT( 201 ) / 'CLNO2           ',   81.50D0 /
       DATA CHEMISTRY_SPC( 202 ), SPECIES_MOLWT( 202 ) / 'CLNO3           ',   97.50D0 /
-      DATA CHEMISTRY_SPC( 203 ), SPECIES_MOLWT( 203 ) / 'HCL             ',   36.00D0 /
+      DATA CHEMISTRY_SPC( 203 ), SPECIES_MOLWT( 203 ) / 'HCL             ',   36.50D0 /
       DATA CHEMISTRY_SPC( 204 ), SPECIES_MOLWT( 204 ) / 'NO2PIJ          ',   46.00D0 /
       DATA CHEMISTRY_SPC( 205 ), SPECIES_MOLWT( 205 ) / 'NO2PK           ',   46.00D0 /
       DATA CHEMISTRY_SPC( 206 ), SPECIES_MOLWT( 206 ) / 'ACLI            ',   35.50D0 /

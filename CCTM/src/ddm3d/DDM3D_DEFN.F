@@ -100,15 +100,15 @@ c     Logical, Save           :: ES   ! Flag for pre-merged emissions
       CHARACTER( 16 ) :: SPCNAME
 
 c Cloud module variables
-      REAL( 8 ), ALLOCATABLE, SAVE       :: S_CONDEP( :,:,:,: )  ! sens of conv wdep
-      REAL( 8 ), ALLOCATABLE, SAVE       :: S_TOTDEP( :,:,:,: )  ! sens of tot dep
-      REAL( 8 ), ALLOCATABLE, SAVE       :: S_TOTDEP0( :,:,:,: )  ! sens of tot dep
+      REAL( 4 ), ALLOCATABLE, SAVE       :: S_CONDEP( :,:,:,: )  ! sens of conv wdep
+      REAL( 4 ), ALLOCATABLE, SAVE       :: S_TOTDEP( :,:,:,: )  ! sens of tot dep
+      REAL( 4 ), ALLOCATABLE, SAVE       :: S_TOTDEP0( :,:,:,: )  ! sens of tot dep
       REAL( 4 ), ALLOCATABLE, SAVE       :: S_DEPWRT( :,:,: )    ! wdep write array
 
-      REAL( 8 ), ALLOCATABLE, SAVE       :: S_POLC ( :,: )       ! sens of incloud conc (mol/mol) 
-      REAL( 8 ), ALLOCATABLE, SAVE       :: S_CEND ( :,: )       ! sens of ending conc (mol/mol)
-      REAL( 8 ), ALLOCATABLE, SAVE       :: S_REMOV( :,: )       ! sens of moles/m2 or mm*mol/lit scavenged
-      REAL( 8 ), ALLOCATABLE, SAVE       :: S_REMOVAC( : )       ! sens of variable storing H+ deposition
+      REAL( 4 ), ALLOCATABLE, SAVE       :: S_POLC ( :,: )       ! sens of incloud conc (mol/mol) 
+      REAL( 4 ), ALLOCATABLE, SAVE       :: S_CEND ( :,: )       ! sens of ending conc (mol/mol)
+      REAL( 4 ), ALLOCATABLE, SAVE       :: S_REMOV( :,: )       ! sens of moles/m2 or mm*mol/lit scavenged
+      REAL( 4 ), ALLOCATABLE, SAVE       :: S_REMOVAC( : )       ! sens of variable storing H+ deposition
 
       REAL,      ALLOCATABLE, SAVE       :: S_HPWDEP ( : )       ! hydrogen wet dep (mm mol/liter)
       REAL( 8 ), ALLOCATABLE, SAVE       :: S_GAS    ( :,: )     ! gas phase conc (mol/mol)
@@ -116,21 +116,21 @@ c Cloud module variables
       REAL( 8 ), ALLOCATABLE, SAVE       :: S_AEROSOL( :,:,: )   ! aerosol conc (mol/mol)
       REAL( 8 ), ALLOCATABLE, SAVE       :: S_AERWDEP( :,:,: )   ! aerosol wet dep array (mm mol/liter)
 
-      REAL( 8 ), ALLOCATABLE, SAVE       :: S_CCR     ( :,:,: )
-      REAL( 8 ), ALLOCATABLE, SAVE       :: S_CBELOW  ( :,: )
+      REAL( 4 ), ALLOCATABLE, SAVE       :: S_CCR     ( :,:,: )
+      REAL( 4 ), ALLOCATABLE, SAVE       :: S_CBELOW  ( :,: )
 
       Character( 16 ), Allocatable, Save :: S_WETDEPSPC( : )     ! List of variable names in sens wet dep file
 
-      REAL( 8 ), ALLOCATABLE, SAVE :: S_CONC    ( :,:,: )
-      REAL( 8 ), ALLOCATABLE, SAVE :: S_BMOL    ( :,: )   ! moles/m2 species below cloud
-      REAL( 8 ), ALLOCATABLE, SAVE :: S_CBASE0  ( :,: )   ! initial ave trace gas mix rat below cld
-      REAL( 8 ), ALLOCATABLE, SAVE :: S_CBASEF  ( :,: )   ! final ave trac gas mix rat blw cld (moles/mole)
-      REAL( 8 ), ALLOCATABLE, SAVE :: S_BCLDWT  ( :,:,: ) ! below cloud weighting function
-      REAL( 8 ), ALLOCATABLE, SAVE :: S_INCLOUD ( :,:,: ) ! fin. in cloud conc. after mix and chem moles/mole
-      REAL( 8 ), ALLOCATABLE, SAVE :: S_OUTCLOUD( :,:,: ) ! fin. outside cld conc. "   "   "   " moles/mole
-      REAL( 8 ), ALLOCATABLE, SAVE :: S_PCLD    ( :,:,: ) ! moles sp/mole air in cloud
-      REAL( 8 ) S_CONDIS
-      REAL( 8 ) DDM3D_CONCMINL                            ! the conc small number is too small even with real(8)!!!!
+      REAL( 4 ), ALLOCATABLE, SAVE :: S_CONC    ( :,:,: )
+      REAL( 4 ), ALLOCATABLE, SAVE :: S_BMOL    ( :,: )   ! moles/m2 species below cloud
+      REAL( 4 ), ALLOCATABLE, SAVE :: S_CBASE0  ( :,: )   ! initial ave trace gas mix rat below cld
+      REAL( 4 ), ALLOCATABLE, SAVE :: S_CBASEF  ( :,: )   ! final ave trac gas mix rat blw cld (moles/mole)
+      REAL( 4 ), ALLOCATABLE, SAVE :: S_BCLDWT  ( :,:,: ) ! below cloud weighting function
+      REAL( 4 ), ALLOCATABLE, SAVE :: S_INCLOUD ( :,:,: ) ! fin. in cloud conc. after mix and chem moles/mole
+      REAL( 4 ), ALLOCATABLE, SAVE :: S_OUTCLOUD( :,:,: ) ! fin. outside cld conc. "   "   "   " moles/mole
+      REAL( 4 ), ALLOCATABLE, SAVE :: S_PCLD    ( :,:,: ) ! moles sp/mole air in cloud
+      REAL( 4 ) S_CONDIS
+      REAL( 4 ), ALLOCATABLE, SAVE :: DDM3D_CONCMINL(:,:)  
 
 c VDIFF module variables
       REAL, ALLOCATABLE, SAVE :: SNGRD( :,:,:,:,: )        ! sengrid replacement

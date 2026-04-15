@@ -1,5 +1,45 @@
 # Post-processors
 
+## [sitecmp](../../POST/sitecmp/README.md) 
+### Update handling of CASTNET QA Flags for ozone, increase number of species allowed in expressions 
+[Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Improved functionality   
+**Release Version/Date**: CMAQv6.0
+
+**Description**:   
+
+The code changes make three updates to the functionality of the `sitecmp` post-processing tool.
+
+- Update the CASTNET ozone QA flags recognized by `sitecmp`. Starting in 2019, the AMET-ready CASTNET hourly files with meteorology and ozone observations use additional QA flags for ozone (H, J, and Y) that are currently not recognized by `sitecmp` when checking for QA flags. Since these flags indicate invalid observations, not screening for them can lead to sporadic errors in model evaluation by including invalid observations in the analysis.
+- Update the code to recognize new environment variables `QA_FLAG_CHECK` (default Y) and `QA_FLAG_VALUES` (default '#BCDFHIJKLMNPRTY') so that QA flag check behavior can now be controlled by setting run script options. This feature was already implemented in `sitecmp_dailyo3`.
+- Increase the number of species allowed in the expressions that define the observations and model values to be matched. In the current code, the maximum number of observed and modeled variables allowed in `sitecmp` species matching expressions is 20. This number is insufficient when defining pairs for the new AMET AQS_Daily_VOC network used in CRACMM evaluations because some of these pairs include more than 20 individual observed compounds. The code update increases the maximum number of allowed species to 50.
+
+**Significance and Impact**:  
+In a test case for summer 2022, updating the CASTNET ozone QA flags recognized by `sitecmp` was found to have only a small effect on domain-wide model performance statistics (changing the bias by 0.1 ppb), but locally the impacts of not fully screening for observations flagged as invalid can be more pronounced and will depend on the time period and domain to be modeled. The increase in the number of species allowed in expressions defining observation/model pairs allows the evaluation of additional VOC species simulated by CRACMM.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1376 (URL to be added)]() | [PR#1376](https://github.com/USEPA/CMAQ_Dev/pull/1376)  |  
+
+
+## [sitecmp_dailyo3](../../POST/sitecmp_dailyo3/README.md) 
+### Update handling of CASTNET QA Flags for ozone 
+[Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Improved functionality   
+**Release Version/Date**: CMAQv6.0
+
+**Description**:   
+
+The code changes update the CASTNET ozone QA flags recognized by `sitecmp_dailyo3`. Starting in 2019, the AMET-ready CASTNET hourly files with meteorology and ozone observations use additional QA flags for ozone (H, J, and Y) that are currently not recognized by `sitecmp_dailyo3` when checking for QA flags. Since these flags indicate invalid observations, not screening for them can lead to sporadic errors in model evaluation by including invalid observations in the analysis.
+
+**Significance and Impact**:  
+In a test case for summer 2022, updating the CASTNET ozone QA flags recognized by `sitecmp_dailyo3` was found to have only a small effect on domain-wide model performance statistics (changing the bias by 0.1 ppb), but locally the impacts of not fully screening for observations flagged as invalid can be more pronounced and will depend on the time period and domain to be modeled. 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1376 (URL to be added)]() | [PR#1376](https://github.com/USEPA/CMAQ_Dev/pull/1376)  |  
+
+
 ## [calc_tmetric](../../POST/calc_tmetric/README.md) 
 ### Expand functionality of calc_tmetric
 [William T. Hutzell](mailto:hutzell.bill@epa.gov)], U.S. Environmental Protection Agency    

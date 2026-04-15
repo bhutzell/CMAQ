@@ -951,11 +951,11 @@ CMPST =
                 'ug m-3', 'COARSE', 
                 '0.0320 * ASEACAT + 0.0838 * ASOIL + 0.0562 * ACORS',
 
+! HAPS aerosol species, coarse mode
+
 'PMC_HNI'      , 'Coarse-Mode Nickel',
                 'ng m-3', 'COARSE',
                 'ANI',
-
-! HAPS aerosol species, coarse mode
 
 'PMC_HCR6'     , 'Coarse-Mode Hexavalent Chromium',
                 'ng m-3', 'COARSE',
@@ -1455,6 +1455,7 @@ CMPST =
                 'ug m-3', 'PM25TO10', 
                 'ANA + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS',
 
+!HAPs
 'PM25TO10_HNI' , 'Coarse-Mode Nickel',
                 'ng m-3', 'PM25TO10',
                 'ANI',
@@ -1591,6 +1592,7 @@ CMPST =
                 'ug m-3', 'TSP',
                 'ACL',
 
+!HAPs
 'TSP_HNI'     , 'Total Particulate Nickel',
                 'ng m-3', 'TSP',
                 'ANI',
@@ -2066,20 +2068,20 @@ CMPST =
                 'DD_TSP_NA + WD_TSP_NA',
 
 !-- Chloride --!
-'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
-                'kg ha-1', 'DEP_FINE', 
+'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride',
+                'kg ha-1', 'DEP_FINE',
                 'DD_ACL',
 
-'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride', 
-                'kg ha-1', 'DEP_COARSE', 
+'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride',
+                'kg ha-1', 'DEP_COARSE',
                 'DD_ACL',
 
-'DD_TSP_CL'   , 'Dry Dep of Particulate Chloride', 
-                'kg ha-1', 'DEP', 
+'DD_TSP_CL'   , 'Dry Dep of Particulate Chloride',
+                'kg ha-1', 'DEP',
                 'DD_PMF_CL + DD_PMC_CL',
 
-'WD_TSP_CL'   , 'Wet Dep of Particulate Chloride', 
-                'kg ha-1', 'DEP', 
+'WD_TSP_CL'   , 'Wet Dep of Particulate Chloride',
+                'kg ha-1', 'DEP',
                 'WD_ACL',
 
 !-- Calcium --!

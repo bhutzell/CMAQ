@@ -89,6 +89,10 @@
 !  03/10/25, D. Wong: 1. set LUCRO_AVAIL = .TRUE. in WRF-CMAQ coupled model
 !                     2. enabled receiving LUFRAC information from WRF through
 !                        unified coupler in subroutine retrieve_lufrac_cro_data
+!  12/31/25, D. Wong: Redesigned subroutine r_interpolate_var_2db to follow the idea in
+!                     hadvppm.F which calls rdbcon by layer. This will also eliminate the
+!                     scenario that interpolates the entire 3D boundary data when there
+!                     is a time stamp change between layers.
 !------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------!
@@ -2953,13 +2957,12 @@
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT3 )
           end if
 
-          if (BIOGEMIS_BEIS .and. .not. USE_SEGA_N) then
-             ALLOCATE( PTYPE( NCOLS,NROWS ),
-     &                 PULSEDATE( NCOLS,NROWS ),
-     &                 PULSETIME( NCOLS,NROWS ),
-     &                 RAINFALL( NCOLS,NROWS, mxhrs ),
-     &                 DDTTM( mxhrs ),
-     &                 STAT=STAT )
+          ALLOCATE( PTYPE( NCOLS,NROWS ),
+     &              PULSEDATE( NCOLS,NROWS ),
+     &              PULSETIME( NCOLS,NROWS ),
+     &              RAINFALL( NCOLS,NROWS, mxhrs ),
+     &              DDTTM( mxhrs ),
+     &              STAT=STAT )
              if (stat .ne. 0) then
                 MESG = 'Failure BIOGEMIS_BEIS soil arrays'
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT3 )
@@ -2967,21 +2970,15 @@
 
              RAINFALL = 0.0
              DDTTM    = ' '   ! array
-          end if
 
           if (BIOGEMIS_MEGAN) then
-             ALLOCATE (PTYPE( NCOLS,NROWS ),
-     &                 PULSEDATE( NCOLS,NROWS ),
-     &                 PULSETIME( NCOLS,NROWS ),
-     &                 RAINFALL( NCOLS,NROWS, mxhrs ),
-     &                 t24y     ( ncols,nrows        ),
+             ALLOCATE (t24y     ( ncols,nrows        ),
      &                 sw24y    ( ncols,nrows        ),
      &                 lai_y    ( ncols,nrows        ),
      &                 HRNO_SW  ( NCOLS,NROWS, mxhrs ),
      &                 HRNO_T2M ( NCOLS,NROWS, mxhrs ),
      &                 t24sum   ( ncols,nrows        ),
      &                 sw24sum  ( ncols,nrows        ),
-     &                 DDTTM    ( mxhrs ),
      &                 stat=stat)
      
              IF ( STAT .NE. 0 ) THEN
@@ -6996,7 +6993,7 @@ C Read the various categories of normalized emissions
         end subroutine i_interpolate_var_2d
 
 ! -------------------------------------------------------------------------
-        subroutine r_interpolate_var_2db (vname, date, time, data, type, lvl)
+        subroutine r_interpolate_var_2db (vname, date, time, data, type, tlvl, lvl)
 
 ! Function: Interpolation for Boundary Real 2-D Data
           
@@ -7008,14 +7005,15 @@ C Read the various categories of normalized emissions
           character (1), intent(in) :: type
           integer, intent(in)       :: date, time
           real, intent(out)         :: data(:,:)
-          integer, intent(in), optional :: lvl
+          integer, intent(inout), optional :: tlvl
+          integer, intent(in),    optional :: lvl
 
           integer :: head_beg_ind, head_end_ind,
      &               tail_beg_ind, tail_end_ind,
      &               store_beg_ind, store_end_ind,
      &               var_loc, loc_head, loc_tail, m, r, c,k, ib,
      &               loc_jdate, loc_jtime, starting_pt, mype_p1,
-     &               beg_k, end_k, loc_tstep
+     &               beg_k, end_k, loc_tstep, loc_tlvl
           integer, save :: lns_size, lew_size, gns_size, gew_size,
      &                     ls_start, ls_end, ln_start, ln_end,
      &                     le_start, le_end, lw_start, lw_end,
@@ -7024,6 +7022,10 @@ C Read the various categories of normalized emissions
           integer, save :: prev_time = -1
           real :: ratio1, ratio2
           character(200) :: xmsg
+          integer       :: ll, stat
+          logical       :: found
+          integer, allocatable, save :: loc_date_time(:, :)
+          real, allocatable, save    :: loc_ratios(:, :)
 
           if (loc_firstime) then
              loc_firstime = .false.
@@ -7041,6 +7043,23 @@ C Read the various categories of normalized emissions
              LW_START = LN_END + 1
              LW_END   = LW_START + LEW_SIZE - 1
 
+             IF ( .not. SOUTH_PE ) THEN
+                LS_START = 0
+                LS_END   = -1
+             END IF
+             IF ( .not. EAST_PE ) THEN
+                LE_START = 0
+                LE_END   = -1
+             END IF
+             IF ( .not. NORTH_PE ) THEN
+                LN_START = 0
+                LN_END   = -1
+             END IF
+             IF ( .not. WEST_PE ) THEN
+                LW_START = 0
+                LW_END   = -1
+             END IF
+
              GNS_SIZE = NTHIK * ( GL_NCOLS + NTHIK )
              GEW_SIZE = NTHIK * ( GL_NROWS + NTHIK )
 
@@ -7049,6 +7068,7 @@ C Read the various categories of normalized emissions
              GN_SKIP = GNS_SIZE + GEW_SIZE + NTHIK*( COLSX_PE( 1, mype_p1 ) - 1 ) - LN_START + 1
              GW_SKIP = 2*GNS_SIZE + GEW_SIZE + NTHIK*( ROWSX_PE( 1, mype_p1 ) - 1 ) - LW_START + 1
 
+             allocate (loc_date_time(2, nlays), loc_ratios(2, nlays), stat=stat)
           end if
 
           var_loc = binary_search (vname, cio_bndy_var_name(:,1), n_cio_bndy_vars)
@@ -7084,109 +7104,132 @@ C Read the various categories of normalized emissions
                 end if
              end if
 
-             if ((cio_bndy_data_tstamp(1, 2, var_loc) .eq. date) .and.
-     &           (cio_bndy_data_tstamp(2, 2, var_loc) .eq. time)) then
-                count = count + 1
+             if (present(tlvl)) then
+                loc_tlvl = tlvl
              else
+                loc_tlvl = 0
+             end if
 
-                cio_bndy_data_tstamp(1, 2, var_loc) = date
-                cio_bndy_data_tstamp(2, 2, var_loc) = time
+             ll = 0
+             found = .false.
+             do while ((ll < loc_tlvl) .and. (.not. found))
+               ll = ll + 1
+               if (      (loc_date_time(1, ll) == date)
+     &             .and. (loc_date_time(2, ll) == time)) then
+                  found = .true.
+                  ratio1 = loc_ratios(1, ll)
+                  ratio2 = loc_ratios(2, ll)
+               end if
+             end do
 
+             if (.not. found) then
+                loc_tlvl = loc_tlvl + 1
+                loc_date_time(1, loc_tlvl) = date
+                loc_date_time(2, loc_tlvl) = time
+
+                if (cio_bndy_data_tstamp(1, loc_head, var_loc) .eq. date) then
+                   ratio2 =   real(time_diff(time, cio_bndy_data_tstamp(2, loc_head, var_loc))) 
+     &                      / real(time2sec(loc_tstep))
+                   ratio1 = 1.0 - ratio2
+                else
+                   ratio2 =   real(time_diff(240000, cio_bndy_data_tstamp(2, loc_head, var_loc))) 
+     &                      / real(time2sec(loc_tstep))
+                   ratio1 = 1.0 - ratio2
+                end if
+
+                loc_ratios(1, loc_tlvl) = ratio1
+                loc_ratios(2, loc_tlvl) = ratio2
+             end if
+
+             cio_bndy_data_tstamp(1, 2, var_loc) = date
+             cio_bndy_data_tstamp(2, 2, var_loc) = time
+
+             if (present(lvl)) then
+                head_beg_ind  = cio_bndy_data_inx(1,loc_head,var_loc) + (lvl -1) * size_b2d
+                head_end_ind  = head_beg_ind + size_b2d - 1
+                tail_beg_ind  = cio_bndy_data_inx(1,loc_tail,var_loc) + (lvl -1) * size_b2d
+                tail_end_ind  = tail_beg_ind + size_b2d - 1
+                store_beg_ind = cio_bndy_data_inx(1,2,var_loc) + (lvl -1) * size_b2d
+                store_end_ind = store_beg_ind + size_b2d - 1
+                beg_k = lvl
+                end_k = lvl
+             else
                 head_beg_ind  = cio_bndy_data_inx(1,loc_head,var_loc)
                 head_end_ind  = cio_bndy_data_inx(2,loc_head,var_loc)
                 tail_beg_ind  = cio_bndy_data_inx(1,loc_tail,var_loc)
                 tail_end_ind  = cio_bndy_data_inx(2,loc_tail,var_loc)
                 store_beg_ind = cio_bndy_data_inx(1,2,var_loc)
                 store_end_ind = cio_bndy_data_inx(2,2,var_loc)
-
-                if (cio_bndy_var_name(var_loc, 2) == 'bc') then
-                   cio_bndy_data(store_beg_ind:store_end_ind) = cio_bndy_data(head_beg_ind:head_end_ind)
-                else
-                   if (cio_bndy_data_tstamp(1, loc_head, var_loc) .eq. date) then
-                      ratio2 =   real(time_diff(time, cio_bndy_data_tstamp(2, loc_head, var_loc))) 
-     &                         / real(time2sec(loc_tstep))
-                      ratio1 = 1.0 - ratio2
-                   else
-                      ratio2 =   real(time_diff(240000, cio_bndy_data_tstamp(2, loc_head, var_loc))) 
-     &                         / real(time2sec(loc_tstep))
-                      ratio1 = 1.0 - ratio2
-                   end if
-                   prev_time = time
-                   
-#ifdef verbose_cio
-                   if ( (ratio1 .lt. 0) .or. (ratio2 .lt. 0) 
-     &             .or. (ratio1 .gt. 1) .or. (ratio2 .gt. 1)) then
-                      write(logdev,'(5X,a)'),
-     &               'ERROR: Incorrect Interpolation in 2-D Boundary Interpolation for variable: ',
-     &                trim(vname) 
-                     
-                     write(logdev,'(5X,a,i7,a,i6)'), 
-     &               'Requested TIME & DATE: ',date,':',time
-                     
-                     write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)'),
-     &               'Interpolation Bounds ',cio_bndy_data_tstamp(1,0,var_loc),
-     &               ':',cio_bndy_data_tstamp(2,0,var_loc),' to ',
-     &                cio_bndy_data_tstamp(1,1,var_loc),':',cio_bndy_data_tstamp(2,1,var_loc)
-
-                     call m3exit( 'Centralized I/O',date,time,'',1 )
-
-                      write(logdev,'(5X,a)'),
-     &                'ERROR: Program EXIT in subroutine r_interpolate_var_2db in module centralized io'
-           
-                   end if 
-#endif
-                   cio_bndy_data(store_beg_ind:store_end_ind) =   cio_bndy_data(head_beg_ind:head_end_ind) * ratio1
-     &                                                          + cio_bndy_data(tail_beg_ind:tail_end_ind) * ratio2
-
-                end if
-
-             end if
-
-             if (present(lvl)) then
-                beg_k = lvl
-                end_k = lvl
-             else
                 beg_k = 1
                 end_k = nlays
              end if
 
+             if (cio_bndy_var_name(var_loc, 2) == 'bc') then
+                cio_bndy_data(store_beg_ind:store_end_ind) = cio_bndy_data(head_beg_ind:head_end_ind)
+             else
+#ifdef verbose_cio
+                if ( (ratio1 .lt. 0) .or. (ratio2 .lt. 0) 
+     &             .or. (ratio1 .gt. 1) .or. (ratio2 .gt. 1)) then
+                   write(logdev,'(5X,a)'),
+     &            'ERROR: Incorrect Interpolation in 2-D Boundary Interpolation for variable: ',
+     &             trim(vname) 
+                  
+                  write(logdev,'(5X,a,i7,a,i6)'), 
+     &            'Requested TIME & DATE: ',date,':',time
+                  
+                  write(logdev,'(5X,a,i7,a,i6,a,i7,a,i6)'),
+     &            'Interpolation Bounds ',cio_bndy_data_tstamp(1,0,var_loc),
+     &            ':',cio_bndy_data_tstamp(2,0,var_loc),' to ',
+     &             cio_bndy_data_tstamp(1,1,var_loc),':',cio_bndy_data_tstamp(2,1,var_loc)
+
+                  call m3exit( 'Centralized I/O',date,time,'',1 )
+
+                   write(logdev,'(5X,a)'),
+     &             'ERROR: Program EXIT in subroutine r_interpolate_var_2db in module centralized io'
+        
+                end if 
+#endif
+
+                cio_bndy_data(store_beg_ind:store_end_ind) =   cio_bndy_data(head_beg_ind:head_end_ind) * ratio1
+     &                                                       + cio_bndy_data(tail_beg_ind:tail_end_ind) * ratio2
+
+             end if
+
              data = 0.0
              store_beg_ind = cio_bndy_data_inx(1,2,var_loc)
+
              DO k = beg_k, end_k
                 starting_pt = store_beg_ind + (k - 1) * size_b2d - 1
-! Construct SOUTH boundary
-                IF ( SOUTH_PE ) THEN
-                   m = starting_pt + GS_SKIP
-                   DO IB = LS_START, LS_END
-                      data( IB,k ) = cio_bndy_data( m+IB )
-                   END DO
-                END IF
 
-! Construct EAST boundary
-                IF ( EAST_PE ) THEN
-                   m = starting_pt + GE_SKIP
-                   DO IB = LE_START, LE_END
-                      data( IB,k ) = cio_bndy_data( m+IB)
-                   END DO
-                END IF
+! Construct SOUTH boundary if necessary
+                m = starting_pt + GS_SKIP
+                DO IB = LS_START, LS_END
+                   data( IB,k ) = cio_bndy_data( m+IB )
+                END DO
 
-! Construct NORTH boundary
-                IF ( NORTH_PE ) THEN
-                   m = starting_pt + GN_SKIP
-                   DO IB = LN_START, LN_END
-                      data( IB,k ) = cio_bndy_data( m+IB)
-                   END DO
-                END IF
+! Construct EAST boundary if necessary
+                m = starting_pt + GE_SKIP
+                DO IB = LE_START, LE_END
+                   data( IB,k ) = cio_bndy_data( m+IB)
+                END DO
 
-! Construct WEST boundary
-                IF ( WEST_PE ) THEN
-                   m = starting_pt + GW_SKIP
-                   DO IB = LW_START, LW_END
-                      data( IB,k ) = cio_bndy_data( m+IB)
-                   END DO
-                END IF
+! Construct NORTH boundary if necessary
+                m = starting_pt + GN_SKIP
+                DO IB = LN_START, LN_END
+                   data( IB,k ) = cio_bndy_data( m+IB)
+                END DO
+
+! Construct WEST boundary if necessary
+                m = starting_pt + GW_SKIP
+                DO IB = LW_START, LW_END
+                   data( IB,k ) = cio_bndy_data( m+IB)
+                END DO
              END DO
 
+          end if
+
+          if (present(tlvl)) then
+             tlvl = loc_tlvl
           end if
 
         end subroutine r_interpolate_var_2db

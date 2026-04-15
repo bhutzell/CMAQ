@@ -11,6 +11,86 @@ CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version buil
 **Significance and Impact**:   
 CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enable a wider range of applications of CRACMM.
 
+
+### CRACMM HAP evaluation using AQS data
+[Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Diagnostic/Postprocessing Update  
+**Release Version/Date**: CMAQv6.0  
+
+**Description**: 
+Several HAPs are routinely reported to EPA's AQS. This update enables additional output in COMBINE files to facilitate automated evaluation through AMET. This update is best leveraged by using the most recent version of AMET.
+
+The following table indicates which HAPs are reported to AQS, the pregenerated files they come from, AQS species identifiers, and the corresponding CRACMM3HAPs species. Note that PM2.5 metals are measured via XRF and thus represent the element in all its forms. PM10 and TSP measurements were from chromotography techniques and likely to be ionic. TSP measurements were matched with model output only if PM10 measurements were not available. Conditions of local temperature and pressure (LC) were preferentially matched over STP measurements. Note that multiple AQS species are summed to create the XYLENE HAP for comparison with CMAQ. In addition, several representative structures in CRACMM3HAPs were updated.
+
+
+|	AQS Parameter Code	|	AQS Parameter Name	|	AQS Units of Measure	|	AQS Pregenerated File	|	CRACMM3HAP species name	|	CRACMM3 species?	|	SpecDef/Combine species	|	SpecDef/Combine units	|	Notes	|	AQS Rep DTXSID	|	MOLECULAR_FORMULA	|	CRACMM3HAP DTXSID	|
+|	---	|	---	|	---	|	---	|	---	|	---	|	---	|	---	|	---	|	---	|	---	|	---	|
+|	14115	|	Chromium VI (TSP) LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	ACR_VI	|	No	|	CR_VI_PM10	|	ng m-3	|	PM10 from model used as estimate of measured TSP; no measured PM10 available.	|	DTXSID7023982	|	[Cr+6]	|	DTXSID7023982	|
+|	43218	|	1,3-Butadiene	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS, hourly_VOCS	|	BDE13	|	Yes	|	BUTADIENE13	|	ppb	|	No SpecDef updates needed.	|	DTXSID3020203	|	C4H6	|	DTXSID3020203	|
+|	43231	|	n-Hexane	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	HEXANE	|	No	|	HEXANE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID0021917	|	C6H14	|	DTXSID0021917	|
+|	43502	|	Formaldehyde	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	HCHO	|	Yes	|	FORMALDEHYDE	|	ppb	|	No SpecDef updates needed.	|	DTXSID7020637	|	CH2O	|	DTXSID7020637	|
+|	43503	|	Acetaldehyde	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	ACD	|	Yes	|	ACETALDEHYDE	|	ppb	|	No SpecDef updates needed.	|	DTXSID5039224	|	C2H4O	|	DTXSID5039224	|
+|	43509	|	Acrolein - Verified	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	ACRO	|	Yes	|	ACROLEIN	|	ppb	|	No SpecDef updates needed.	|	DTXSID5020023	|	C3H4O	|	DTXSID5020023	|
+|	43702	|	Acetonitrile	|	Parts per billion Carbon	|	daily_VOCS	|	ACET_NITRILE	|	No	|	ACET_NITRILE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID7020009	|	C2H3N	|	DTXSID7020009	|
+|	43704	|	Acrylonitrile	|	Parts per billion Carbon	|	daily_VOCS	|	ACRY_NITRILE	|	No	|	ACRY_NITRILE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID5020029	|	C3H3N	|	DTXSID5020029	|
+|	43801	|	Chloromethane	|	Parts per billion Carbon	|	daily_VOCS	|	METHCHLORIDE	|	No	|	METHCHLORIDE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID0021541	|	CH3Cl	|	DTXSID0021541	|
+|	43802	|	Dichloromethane	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	CL2_ME	|	No	|	CL2_ME_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID0020868	|	CH2Cl2	|	DTXSID0020868	|
+|	43803	|	Chloroform	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS, hourly_VOCS	|	CHCL3	|	No	|	CHCL3_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID1020306	|	CHCl3	|	DTXSID1020306	|
+|	43804	|	Carbon tetrachloride	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	CARBONTET	|	No	|	CARBONTET_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID8020250	|	CCl4	|	DTXSID8020250	|
+|	43815	|	Ethylene dichloride	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	CL2_C2_12	|	No	|	CL2_C2_12_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID6020438	|	C2H4Cl2	|	DTXSID6020438	|
+|	43817	|	Tetrachloroethylene	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS, hourly_VOCS	|	CL4_ETHE	|	No	|	CL4_ETHE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID2021319	|	C2Cl4	|	DTXSID2021319	|
+|	43818	|	1,1,2,2-Tetrachloroethane	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	CL4_ETHANE	|	No	|	CL4_ETHANE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID7021318	|	C2H2Cl4	|	DTXSID7021318	|
+|	43824	|	Trichloroethylene	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS	|	CL3_ETHE	|	No	|	CL3_ETHE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID0021383	|	C2HCl3	|	DTXSID0021383	|
+|	43829	|	1,2-Dichloropropane	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	PROPYL_DICL	|	No	|	PROPYL_DICL_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID0020448	|	C3H6Cl2	|	DTXSID0020448	|
+|	43835	|	Chloroprene	|	Parts per billion Carbon	|	daily_VOCS	|	CHLOROPRENE	|	No	|	CHLOROPRENE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID5020316	|	C4H5Cl	|	DTXSID5020316	|
+|	43843	|	Ethylene dibromide	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	BR2_C2_12	|	No	|	BR2_C2_12	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID3020415	|	C2H4Br2	|	DTXSID3020415	|
+|	43860	|	Vinyl chloride	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS, hourly_VOCS	|	CL_ETHE	|	No	|	CL_ETHE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID8021434	|	C2H3Cl	|	DTXSID8021434	|
+|	45109	|	m/p Xylene	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	XYLENE	|	No	|	XYLENE_PPB	|	ppb	|	SpecDef updated to output XYLENE in ppb. Note measured m/P xylene and o-xylene should be combined to compare with model XYLENE. XYLENE differs from CRACMM3 XYL as XYL includes other species.	|	DTXSID80109469	|	C8H10	|	DTXSID2021446	|
+|	45201	|	Benzene	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS, hourly_VOCS	|	BEN	|	Yes	|	BENZENE	|	ppb	|	No SpecDef updates needed.	|	DTXSID3039242	|	C6H6	|	DTXSID3039242	|
+|	45202	|	Toluene	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	TOL	|	Yes	|	TOLUENE	|	ppb	|	No SpecDef updates needed.	|	DTXSID7021360	|	C7H8	|	DTXSID7021360	|
+|	45203	|	Ethylbenzene	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	EBZ	|	Yes	|	ETHB	|	ppb	|	No SpecDef updates needed.	|	DTXSID3020596	|	C8H10	|	DTXSID3020596	|
+|	45204	|	o-Xylene	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	XYLENE	|	No	|	XYLENE_PPB	|	pbb	|	SpecDef updated to output XYLENE in ppb. Note measured m/P xylene and o-xylene should be combined to compare with model XYLENE. XYLENE differs from CRACMM3 XYL as XYL includes other species.	|	DTXSID3021807	|	C8H10	|	DTXSID2021446	|
+|	45220	|	Styrene	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	STY	|	Yes	|	STYRENE	|	ppb	|	No SpecDef updates needed.	|	DTXSID2021284	|	C8H8	|	DTXSID2021284	|
+|	82103	|	Arsenic PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	AAS	|	No	|	ARSENIC_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID70872433	|	[As+5]	|	DTXSID4023886	|
+|	82105	|	Beryllium PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	ABE	|	No	|	BERYLLIUM_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID701317564	|	[Be++]	|	DTXSID4023913	|
+|	82110	|	Cadmium PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	ACADMIUM	|	No	|	CADMIUM_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID60177060	|	[Cd++]	|	DTXSID60177060	|
+|	82112	|	Chromium PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	ACR_III and ACRVI	|	No	|	CHROMIUM_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID2023981	|	[Cr+3]	|		|
+|	82128	|	Lead PM10 STP	|	Micrograms/cubic meter (25 C)	|	daily_HAPS	|	APB	|	No	|	LEAD_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID10872437	|	[Pb++]	|	DTXSID2024161	|
+|	82132	|	Manganese PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	AMN_HAPS	|	No	|	MANGANESE_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID00167687	|	[Mn++]	|	DTXSID00167687	|
+|	82136	|	Nickel PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	ANI	|	No	|	NICKEL_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID60163564	|	[Ni++]	|	DTXSID2020925	|
+|	82142	|	Mercury PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	APHG	|	No	|	HG_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID9074933	|	[Hg++]	|	DTXSID9074933	|
+|	88103	|	Arsenic PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	AAS	|	No	|	ARSENIC_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID4023886	|	As	|	DTXSID4023886	|
+|	88110	|	Cadmium PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	ACADMIUM	|	No	|	CADMIUM_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID1023940	|	Cd	|	DTXSID60177060	|
+|	88112	|	Chromium PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	ACR_III and ACRVI	|	No	|	CHROMIUM_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID3031022	|	Cr	|		|
+|	88128	|	Lead PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	APB	|	No	|	LEAD_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID2024161	|	Pb	|	DTXSID2024161	|
+|	88132	|	Manganese PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	AMN_HAPS	|	No	|	MANGANESE_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID2024169	|	Mn	|	DTXSID00167687	|
+|	88136	|	Nickel PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	ANI	|	No	|	NICKEL_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID2020925	|	Ni	|	DTXSID2020925	|
+
+**Significance and Impact**:  
+This update allows for AQS HAPs to be evaluated via AMET. It also improves identifiers for model species.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+### CRACMM Species Documentation and Propagation of Information Outside CMAQ
+ [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
+
+**Type of update**: Documentation  
+
+**Release Version/Date**:  CMAQv6.0
+
+**Description**:  Several minor typos were corrected in documentation of species and reactions for CRACMM. The workflow for how CRACMM species information is propagated to synthesis tables (e.g., in https://github.com/USEPA/CRACMM) was updated. In CMAQv6.0, CRACMM more rigorously follows the convention that a species that exists in two phases should have the same name in each phase. A prepended A (for aerosol) and V (for vapor) are used in the AE and GC nml as well as mech.def to refer to the species in a given phase. In CRACMM2, a legacy AGLY persists but in CRACMM3, that species has been renamed AGLYOLIG to avoid overlap with gas-phase glyoxal (GLY) (see [other Release Note](/DOCS/Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-cracmm-species-names)). Three exceptions remain in CRACMM3: 
+- ANO3 (aerosol nitrate ion), NO3 (nitrate radical in gas phase)
+- ACL (aerosol chlorine ion), CL (chlorine radical in gas phase)
+- ABR (aerosol bromine ion), BR (bromine radical) (CRACMM3M only)
+
+The above aerosol species have special handling in the species description files (stored in the CCTM/src/MECHS folders). "ASpecial" is used in the species name in the species description file to retain the prepended A on the ionic version of the species and avoid matching with the gas-phase radical version. In all other cases, the species description files do not contain a phase identifier (e.g., ASO4 is SO4) and the phase is identified by the presence in a given namelist. This allows for species across phases to be automatically detected when additional CRACMM documentation is generated for the CRACMM repository.
+
+**Significance and Impact**: Updates CRACMM documentation
+
+**Internal PRs**: (Replace xxx with your PR number.)
+[PR#1392](https://github.com/USEPA/CMAQ_Dev/pull/1392)  
+
+
 ### Heterogeneous chemistry of sulfur species
 [Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
@@ -47,6 +127,21 @@ Chlorine chemistry increases nitryl chloride (ClNO2) in winter which subsequentl
 |:------:|:-------:|
 |[Merge for PR#1252](https://github.com/USEPA/CMAQ/commit/686bde3e7b2a335d8769b8ff14368d068ba95583) | [PR#1252](https://github.com/USEPA/CMAQ_Dev/pull/1252)  |
 
+### Correct the molecular weight of HCL for CRACMM
+[Havala Pye](mailto:pye.havala@epa.gov),  U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix  
+**Release Version/Date**: CMAQv6.0  
+
+**Description**:  
+The molecular weight of HCL used in CRACMM has been corrected from 36 g/mol to 36.5 g/mol. Updating the molecular weight of this species can affect partioning from HCL to aerosol chlorine (model species ACL), and these changes lead to differences in other model species concentrations.  
+ 
+**Significance and Impact**:   
+This bug fix does not significantly change results for monthly to annual averages. Differences may be more notable for daily averages. In an annual simulation for the year 2022 over the northern hemisphere using CRACMM3M, the largest differences (i.e., largest change in any grid cell for any day) in maximum daily 8 hour average ozone ranged from -1.1 to 0.7 ppb. The largest differences in daily average PM2.5 ranged from -1.1 to 3.2 ug/m3. The largest impacts for PM2.5 tended to occur over eastern China in this test.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+| | [PR#1400](https://github.com/USEPA/CMAQ_Dev/pull/1400)  |
+
 ### Photolysis of aerosol nitrate in CRACMM3  
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
@@ -74,22 +169,33 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 |:------:|:-------:|
 |[Merge for PR#1185](https://github.com/USEPA/CMAQ/commit/189dc7f9b7e60b87efe76f5ff9af53088c2b469a) | [PR#1185](https://github.com/USEPA/CMAQ_Dev/pull/1185)  |
 
-
 ### Updates to semi- and intermediate volatility ROCOXY system yields and products
 [Havala Pye](mailto:pye.havala@epa.gov) and Ben Murphy, U.S. Environmental Protection Agency  
 **Type of update**: Science Update  
 **Release Version/Date**: CMAQv6.0  
 
 **Description**: 
-Semi- and intermediate volatility species (S/IVOCs) are emitted from sources such as wood burning as well as formed in the atmosphere from chemical reaction. The ROCOXY system (A/VROCN_OXY_, A/VROCP_OXY_ species) describe these emissions and secondary species. In CRACMM1, their chemistry, including product yields, was informed by the 2-D VBS framework. In CRACMM3, the parameters have been updated. The following updates were made in the ROCOXY system:
-- Reactions with the hydroxyl radical (HO) sequester HO.
-- Unsaturated dicarbonyl products (DCB1) have been replaced by a generic ketone (KET).
-- Acetaldehyde yields have been reduced and corresponding carbon mass split evenly between formaldehyde (HCHO) and acetaldehyde (ACD) (2 moles HCHO for 1 mole ACD).
-- ROCOXY product yields for other ROCOXY species have been recalculated.
-  
-**Significance and Impact**:  
-Reactions of S/IVOC ROCOXY sequester more HO than in CRACMM2. HOx can still be released from further reaction of products. Sources with large ROCOXY emissions (wildland fires) produce less secondary acetaldehyde and more secondary formaldehyde.
+Semi- and intermediate volatility species (S/IVOCs) are emitted from sources such as wood burning as well as formed in the atmosphere from chemical reaction. The ROCOXY system (A/VROCN_OXY_, A/VROCP_OXY_ species) describe these emissions and secondary species (Pye et al., 2023). In CRACMM1, their chemistry, including product yields, was informed by the 2-D VBS framework. In CRACMM3, ROCOXY system reactions have been updated in the following ways:
+- Reactions with the hydroxyl radical (HO) sequester HO. Known atmospheric reactions (e.g., alkane + HO) can sequester HOx radicals in products when peroxides and other species form. The amount of HOx sequestered vs regenerated is not known for many ROCOXY species since the compound identities of many emitted species are not known (e.g., their mass is part of an unresolved complex mixture) and the oxidation products of identified species are generally not represented on an individual structure level. Thus, an estimate of how much HOx is sequestered must be made considering the limits of no regeneration (CRACMM1-2 assumption) or large sequestration. In CRACMM3, each HO reaction was assumed to sequester 1 HOx.
+- Unsaturated dicarbonyl products (DCB1) have been replaced by a generic ketone (KET). During development of CRACMM1, both representative structures and chemistry were being developed at the same time. Now that representative structures are available for all species, the suitability of them as oxidation products is being revisited. As ROCOXY species are initially oxidized and multigenerational chemistry only continues to oxidize and fragment compounds, DCB1 (with a double bond) was considered less suitable than a generic ketone as a representative oxidation product.
+- Acetaldehyde yields have been reduced and corresponding carbon mass split evenly between formaldehyde (HCHO) and acetaldehyde (ACD) (2 moles HCHO for 1 mole ACD). HCHO was previously overlooked as a potential oxidation product. In addition, ACD was overpredicted downwind of fires using CRACMM2 chemistry (Pye et al., 2026).
+- ROCOXY product yields for other ROCOXY species have been recalculated. For scenarios like the WINTER campaign (Jan-March 2015) that have abundant ROCOXY species, CMAQ underpredicts O:C. Adjusting parameters for the oxygen addition to fragments may be able to reduce fragmentation and increase probability of forming low volatility, high O:C species. The probability of adding 1, 2, or 3 oxygens is adjusted as detailed in the following table:
 
+|  | CRACMM1 | CRACMM3 |
+| --- | --- | --- |
+| 0 Oxygens | 0   | 0   |
+| 1 Oxygen  | 30% | 72% |
+| 2 Oxygens | 50% | 12% |
+| 3 Oxygens | 20% | 16% |
+
+**Significance and Impact**:  
+Reactions of S/IVOC ROCOXY sequester more HO than in CRACMM2. The true amount of regeneration remains unknown. Sources with large ROCOXY emissions (wildland fires) produce less secondary acetaldehyde and more secondary formaldehyde in CRACMM3 which should improve biases downwind of wildfires. The impacts of updates to the ROCOXY system will be most pronounced where ROCOXY emissions are highest (such as in wildland fire smoke).
+
+**References**:    
+Pye, H. O. T., Hutzell, W. T., Fann, N. L., Skipper, T. N., Pye, M., Beidler, J., Allen, C., Murphy, B. N., D’Ambro, E. L., Lin, S., Talgo, K., Reynolds, L., Kang, D., Bash, J., Seltzer, K. M., Farrell, S. L., Appel, K. W., Brehme, K., Gilliam, R. C., Henderson, B. H. and Chan, A. W. H.: The risks to human health of air toxics, PM2.5, and ozone from the 2023 Canadian wildfires, Environ. Sci. Technolo. Lett. https://doi.org/10.1021/acs.estlett.5c01181, 2026.
+
+Pye, H. O. T.; Place, B. K.; Murphy, B. N.; Seltzer, K. M.; D’Ambro, E. L.; Allen, C.; Piletic, I. R.; Farrell, S.; Schwantes, R. H.; Coggon, M. M.; Saunders, E.; Xu, L.; Sarwar, G.; Hutzell, W. T.; Foley, K. M.; Pouliot, G.; Bash, J.; and Stockwell, W. R., Linking gas, particulate, and toxic endpoints to air emissions in the Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM), Atmos Chem Phys, 23, 5043–5099, https://doi.org/10.5194/acp-23-5043-2023, 2023.
+  
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1269](https://github.com/USEPA/CMAQ/commit/886e6a336fbc76cc533f62b78fe579ec587ba32f) | [PR#1269](https://github.com/USEPA/CMAQ_Dev/pull/1269)  | 
@@ -333,18 +439,18 @@ Representative structures are provided for all CRACMM species to communicate inf
 **Description**:   
 CRACMM3 include multiple photolytic reactions. Many of these photolytic reactions were retained from RACM2 which was developed more than 10 years ago. Photolysis frequencies are calculated using absorption cross-sections and quantum yields. Some of the absorption cross-sections and quantum yields data in CRACMM3 are out of date. Here, absorption cross-sections and quantum yields are updated for several chemical species. In addition, two new photolytic reactions of PPN are added. 
 
-Photolytic reactions of MVK (methyl vinyl ketone), GLY (glyoxal), PAN1 (peroxyacetyl nitrate), ONIT (organic nitrate) are not updated but their photolysis frequencies are updated. For MVK and GLY, absorption cross-section and quantum yield data are taken from the NASA JPL-19 (Burkholder et al., 2019). Photolysis frequencies of PAN1 are updated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al. (2008). For ONIT, NASA JPL-19 provides more recent data than Calvert et al. (2008) who gives data for more organic nitrate compounds. The used cross-section is an average between these organic nitrate compounds. Quantum yields from the NASA JPL-19 are used. CRACMM3 includes two terpene nitrate species (TRPN and HONIT) which currently use photolysis data for ONIT. A recent study by Wang et al. (2023) provides absorption cross-section and average quantum yield data for three terpene nitrates. Data for α-pinene nitrate from the article are now used for TRPN and HONIT.
+Photolytic reactions of MVK (methyl vinyl ketone), GLY (glyoxal), PAN (peroxyacetyl nitrate), ONIT (organic nitrate) are not updated but their photolysis frequencies are updated. For MVK and GLY, absorption cross-section and quantum yield data are taken from the NASA JPL-19 (Burkholder et al., 2019). Photolysis frequencies of PAN are updated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al. (2008). For ONIT, cross-section data is from Calvert et al. (2008) based on several organic nitrate compounds and quantum yields are from the NASA JPL-19. CRACMM2 included two terpene nitrate species (TRPN and HONIT) which used photolysis data for ONIT. A recent study by Wang et al. (2023) provides updated absorption cross-section and average quantum yield data for three terpene nitrates. Data for α-pinene nitrate from the article are now used for TRPN and HONIT.
 
-In CRACMM3, photolysis of BALD (benzaldehyde), only proceeds with one pathway:
-<R027> BALD  = BEN  + CO                        # 1.0/<BALD_RACM2>;
+In CRACMM2, photolysis of BALD (benzaldehyde), only proceeded with one pathway:
+<R027> BALD  = CHO + HO2 + CO                    # 1.0/<BALD_RACM2>;
 
-The process is updated to include 2 different pathways as follows:
+The process is updated to include one additional pathway and update the product structure for the original reaction as follows:
 <R027a> BALD  = BEN  + CO                        # 1.0/<BALD1_CALVERT11>;
 <R027b> BALD  = BAL1 + CO + HO2                  # 1.0/<BALD2_CALVERT11>;
 
 The photolysis frequencies of BALD are also updated to use absorption cross-section and quantum yield data from Calvert et al. (2011).
 
-CRACMM3 does not include any photolytic reaction for PPN (peroxypropionyl nitrate). Two photolytic reactions of PPN are added. Photolysis frequencies are calculated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al.(2008).
+CRACMM2 does not include any photolytic reaction for PPN (peroxypropionyl nitrate). Two photolytic reactions of PPN are added in CRACMM3. Photolysis frequencies are calculated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al.(2008).
 <R033a> PPN = RCO3      + NO2          # 1.0/<PPN1_JPL19>;
 <R033b> PPN = HC3P      + NO3          # 1.0/<PPN2_JPL19>;
 
@@ -506,25 +612,33 @@ Errors in conservation of nitrogen for select reactions ported from RACM2 into C
 |[Merge for PR#1205](https://github.com/USEPA/CMAQ/commit/a0f806bd2666d217ff25c4a2b3b04d2347c1d607) | [PR#1205](https://github.com/USEPA/CMAQ_Dev/pull/1205)  |
 
 
-
 ### CRACMM Reaction Metadata File  
 [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Documentation    
 **Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
-A Metadata file has been added to document updates to CRACMM chemistry at the reaction level. The file is named MECH_rxn_metadata.csv and resides in the mechanism_information folder for the MECH. This has only been implemented for CRACMM2 and CRACMM3. CRACMM3 information is not yet complete. The file is a csv file with the following columns:
+A Metadata file has been added to document updates to CRACMM chemistry at the reaction level. The file is named MECH_rxn_metadata.csv and resides in the mechanism_information folder for the MECH. This has only been implemented for CRACMM mechanisms. The file is a csv file with the following columns:
 - reaction_id: letter/number combination from mech.def file that labels reaction        
-- reactants: reactants from mech.def file
-- products: products from from mech.def file         
-- rate_constant: from mechanism markdown file (at 298 K)  
-- reaction_family: this describes where the reaction originated, current values are RACM2, CRACMM1, CRACMM2, CRACMM3          
+- reactants: reactants 
+- products: products          
+- rate_constant: rate constant   
+- reaction_family: this describes when the reaction was last updated, current values are RACM2, CRACMM1, CRACMM2, CRACMM3, CRACMM3M          
 - reaction_phase: gas, mixed, particle options        
-- publication_string: “Author et al., year” citation for where the reaction came from/was first documented for CRACMM            
+- publication_string: “Author et al. year” citation for where the reaction came from/was documented for CRACMM.            
 - publication_doi: link to article in above field         
-- underlying_data_publication_string: “Author et al., year” citation that provides a critical piece of data upon which the CRACMM reaction was built. This could be an experimental paper, another mechanism (e.g., MCM), or other work that helps document the underlying basis
+- underlying_data_publication_string: “Author et al. year” citation that provides a data upon which the CRACMM reaction was built. This could be an experimental paper, another mechanism (e.g., MCM or previous CMAQ implementation), or other work that helps document the underlying basis
 - underlying_data_publication_doi: link to article in above field      
 - Notes: information on how reaction was developed such as if coefficients represent a weighted mixture of compounds or if a specific simplification technique was used. This field allows for several sentences.
+
+The rxn metadata files are most easily updated by starting with the reaction csv files output by CHEMMECH to obtaine the reaction id, reactants, products, and rate constants. To minimize differences, remove all spaces, ----, <, and > in those columns. For more information on complex rate constants, see the the reaction markdown file in the same folder.
+
+Additional guidance for updating this file:
+
+Reaction_family is not updated for species name changes that mean the same thing in each version (e.g., OP3 to VOP3; INO2 to ISONP in CRACMM2 to CRACMM3) although a note may be added about name changes in the last column. Adding CO2 or changing the rate are considered updates and labeled with the version where the last updated occurred. Changes to reaction_family should include information in the Notes about the update.
+
+References (publication and underlying_data_publication) are two levels of documentation. The publication column is ideally a CRACMM-specific publication that contains the reaction implementation or most recent MAJOR update to the reaction. This is the reference to cite if that reaction is highly relevant to a particular study. The underlying_data_publication may be a laboratory parameterization, reaction from another model/mechanism (e.g., MOZART), original CMAQ implementation that has been further modified, or other relevant reference that was used to inform the reaction. If there are multiple (or limited) references available to document a reaction, choose reference(s) that best indicate the implementation and scientific basis in two levels. This could mean the main publication is not CRACMM specific and/or the uderlying_data_publication is a CMAQ reference. Additional detail can be added in the Notes column and/or CMAQ Release Notes.
+
 
 **Significance and Impact**:   
 This file provides information on CRACMM updates at the reaction level. This file will be posted on github.com/USEPA/CRACMM upon public release of CRACMM in CMAQ. This file will feed efforts to link chemical reactions across EPA such as the Chemical Transformations Database (CheT, https://ccte-cced-chet.epa.gov/).

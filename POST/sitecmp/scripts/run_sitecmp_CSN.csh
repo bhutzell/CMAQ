@@ -20,9 +20,9 @@
  source ./config_cmaq.csh
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v55               #> Code Version
+ set VRSN      = v6a1               #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cb6r3_ae7_aq      #> Mechanism ID
+ set MECH      = cb6r5_ae7_aq      #> Mechanism ID
  set APPL      = Bench_2016_12SE1        #> Application Name (e.g. Gridname)
                                                       
 #> Define RUNID as any combination of parameters above or others. By default,
@@ -68,44 +68,55 @@
 #>
 #> The expression is in the form:
 #>       [factor1]*Obs_name1 [+][-] [factor2]*Obs_name2 ...
- setenv AERO_1 "SO4,ug/m3, ASO4IJ,,SO4"                     # sulfate
- setenv AERO_2 "NO3,ug/m3, ANO3IJ,,NO3"                     # nitrate
- setenv AERO_3 "NH4,ug/m3, ANH4IJ,,NH4"                     # ammonium
- setenv AERO_4 "PM25,ug/m3,ATOTIJ,,PM_TOT"          # PM2.5
- setenv AERO_5 "PM25,ug/m3,PMIJ_FRM,,PM_FRM"      # FRM Equivalent PM2.5
- setenv AERO_6 "88320,ug/m3, AOCIJ,,OC"                   # Organic Carbon
- setenv AERO_7 "88321,ug/m3, AECIJ,,EC"                      # Elemental Carbon
- setenv AERO_8 "88320+88321,ug/m3,AOCIJ+AECIJ,,TC"    # Total Carbon
+  setenv AERO_1 "SO4,ug/m3, ASO4IJ,,SO4"                     		     # sulfate
+  setenv AERO_2 "NO3,ug/m3, ANO3IJ,,NO3"                     		     # nitrate
+  setenv AERO_3 "NH4,ug/m3, ANH4IJ,,NH4"                     		     # ammonium
+  setenv AERO_4 "PM25,ug/m3,ATOTIJ,,PM_TOT"        # PM2.5 (88101 and 88502)
+  setenv AERO_5 "PM25_88101,ug/m3,ATOTIJ,,PM_TOT_88101"  	     # PM2.5 (88101 only)
+  setenv AERO_6 "PM25_88502,ug/m3,ATOTIJ,,PM_TOT_88502"	     # PM2.5 (88502 only)
+  setenv AERO_7 "PM10_81102,ug/m3,ATOTIJ+ATOTK,,PM10_IJK"         # PM10 (81102 vs ATOTIJK)
+  setenv AERO_8 "OC,ug/m3, AOCIJ,,OC"      				     # Organic Carbon (best available)
+  setenv AERO_9 "EC,ug/m3, AECIJ,,EC"                        		     # Elemental Carbon (best available)
+  setenv AERO_10 "OC+EC,ug/m3,AOCIJ+AECIJ,,TC"     			     # Total Carbon (best available)
+  setenv AERO_11 "OC_88305,ug/m3, AOCIJ,,OC_88305"                          # Organic Carbon (88305 raw)
+  setenv AERO_12 "OC_88305_adj,ug/m3,AOCIJ,,OC_88305_adj"                  # Organic Carbon (88305 adjusted)
+  setenv AERO_13 "OC_88370,ug/m3, AOCIJ,,OC_88370"                         # Organic Carbon (88370 raw)
+  setenv AERO_14 "OC_88370_adj,ug/m3,AOCIJ,,OC_88370_adj"                  # Organic Carbon (88370 adjusted)
+  setenv AERO_15 "OC_88320,ug/m3,AOCIJ,,OC_88320"                          # Organic Carbon (88320)
+  setenv AERO_16 "EC_88307,ug/m3, AECIJ,,EC_88307"                         # Elemental Carbon (88307 raw)
+  setenv AERO_17 "EC_88307_adj,ug/m3,AECIJ,,EC_88307_adj"                  # Elemental Carbon (88307 adjusted)
+  setenv AERO_18 "EC_88380,ug/m3, AECIJ,,EC_88380"                         # Elemental Carbon (88380)
+  setenv AERO_19 "EC_88321,ug/m3,AECIJ,,EC_88321"                          # Elemental Carbon (88321)
      
  #> PM2.5 Sharp Cutoff Species
  #> Requires preprocessing using setenv CCTM_AELMO file
-  setenv AERO_9 "SO4,ug/m3, PM25_SO4,,PM25_SO4"                    # sulfate (sharp cutoff)
-  setenv AERO_10 "NO3,ug/m3, PM25_NO3,,PM25_NO3"                   # nitrate (sharp cutoff)
-  setenv AERO_11 "NH4,ug/m3, PM25_NH4,,PM25_NH4"                   # ammonium (sharp cutoff)
-  setenv AERO_12 "88320,ug/m3, PM25_OC,,PM25_OC"              # Organic Carbon (sharp cutoff)
-  setenv AERO_13 "88321,ug/m3, PM25_EC,,PM25_EC"              # Elemental Carbon (sharp cutoff)
-  setenv AERO_14 "88320+88321,ug/m3,PM25_OC+PM25_EC,,PM25_TC"    # Total Carbon (sharp cutoff)
-  setenv AERO_15 "PM25,ug/m3,PM25_TOT,ug/m3,PM25_TOT"      # Total PM2.5 (sharp cutoff)
-  setenv AERO_16 "PM25,ug/m3,PM25_FRM,ug/m3,PM25_FRM"      # FRM Equivalent PM2.5 (sharp cutoff)
+  setenv AERO_20 "SO4,ug/m3, PM25_SO4,,PM25_SO4"                   	     # sulfate (sharp cutoff)
+  setenv AERO_21 "NO3,ug/m3, PM25_NO3,,PM25_NO3"                  	     # nitrate (sharp cutoff)
+  setenv AERO_22 "NH4,ug/m3, PM25_NH4,,PM25_NH4"                  	     # ammonium (sharp cutoff)
+  setenv AERO_23 "OC,ug/m3, PM25_OC,,PM25_OC"                    	     # Organic Carbon (sharp cutoff)
+  setenv AERO_24 "EC,ug/m3, PM25_EC,,PM25_EC"                 # Elemental Carbon (sharp cutoff)
+  setenv AERO_25 "OC+EC,ug/m3,PM25_OC+PM25_EC,,PM25_TC"       # Total Carbon (sharp cutoff)
+  setenv AERO_26 "PM25,ug/m3,PM25_TOT,ug/m3,PM25_TOT"       # Total PM2.5 (sharp cutoff)
+  setenv AERO_27 "PM10_81102,ug/m3,PM10,ug/m3,PM10"      # PM10 (sharp cutoff)
 
 #> setenv AERO6 species
 #> note we use Sodium Ion instead of sodium (XRF) becasue XRF is not reliable for sodium
 #> all other elemental concentrations (including Cl and K) come from XRF
-  setenv AERO_17 "Na,ug/m3, ANAIJ,,Na"          # sodium
-  setenv AERO_18 "Cl,ug/m3, ACLIJ,,Cl"        # chlorine
-  setenv AERO_19 "Fe,ug/m3, AFEJ,,Fe"         # iron
-  setenv AERO_20 "Al,ug/m3,AALJ,,Al"          # aluminum
-  setenv AERO_21 "Si,ug/m3, ASIJ,,Si"         # silicon
-  setenv AERO_22 "Ti,ug/m3, ATIJ,,Ti"         # titanium
-  setenv AERO_23 "Ca,ug/m3,ACAJ,,Ca"          # calcium
-  setenv AERO_24 "Mg,ug/m3,AMGJ,,Mg"          # magnesium
-  setenv AERO_25 "K,ug/m3,AKJ,,K"             # potassium
-  setenv AERO_26 "Mn,ug/m3,AMNJ,,Mn"          # manganese
-  setenv AERO_27 "2.2*Al+2.49*Si+1.63*Ca+2.42*Fe+1.94*Ti,ug/m3,ASOILJ,,soil" # SOIL_OLD
-  setenv AERO_28 "Na + Cl, ug/m3, ANAIJ+ACLIJ,,NaCl"                                   # NaCl
-  setenv AERO_29 "PM25-SO4-NO3-NH4-88320-88321-[Na]-[Cl]-2.2*Al-2.49*Si-1.63*Ca-2.42*Fe-1.94*Ti , ug/m3, AUNSPEC1IJ,,OTHER"        # PM Other
-  setenv AERO_30 "0.8*88320,ug/m3, ANCOMIJ,,NCOM"    # PM Other
-  setenv AERO_31 "PM25-SO4-NO3-NH4-88320-88321-[Na]-[Cl]-2.2*Al-2.49*Si-1.63*Ca-2.42*Fe-1.94*Ti-0.8*88320,ug/m3, AUNSPEC2IJ,,OTHER_REM"    # PM Other no NCOM
+  setenv AERO_28 "Na,ug/m3, ANAIJ,,Na"        # sodium
+  setenv AERO_29 "Cl,ug/m3, ACLIJ,,Cl"        # chlorine
+  setenv AERO_30 "Fe,ug/m3, AFEJ,,Fe"         # iron
+  setenv AERO_31 "Al,ug/m3,AALJ,,Al"          # aluminum
+  setenv AERO_32 "Si,ug/m3, ASIJ,,Si"         # silicon
+  setenv AERO_33 "Ti,ug/m3, ATIJ,,Ti"         # titanium
+  setenv AERO_34 "Ca,ug/m3,ACAJ,,Ca"          # calcium
+  setenv AERO_35 "Mg,ug/m3,AMGJ,,Mg"          # magnesium
+  setenv AERO_36 "K,ug/m3,AKJ,,K"             # potassium
+  setenv AERO_37 "Mn,ug/m3,AMNJ,,Mn"          # manganese
+  setenv AERO_38 "2.2*Al+2.49*Si+1.63*Ca+2.42*Fe+1.94*Ti,ug/m3,ASOILJ,,soil" # SOIL_OLD
+  setenv AERO_39 "Na + Cl, ug/m3, ANAIJ+ACLIJ,,NaCl"                                   # NaCl
+  setenv AERO_40 "PM25-SO4-NO3-NH4-OC-EC-[Na]-[Cl]-2.2*Al-2.49*Si-1.63*Ca-2.42*Fe-1.94*Ti , ug/m3, AUNSPEC1IJ,,OTHER"        # PM Other
+  setenv AERO_41 "0.8*OC,ug/m3, ANCOMIJ,,NCOM"    # PM Other
+  setenv AERO_42 "PM25-SO4-NO3-NH4-OC-EC-[Na]-[Cl]-2.2*Al-2.49*Si-1.63*Ca-2.42*Fe-1.94*Ti-0.8*OC,ug/m3, AUNSPEC2IJ,,OTHER_REM"    # PM Other no NCOM
   
 #>> End Species List <<#
 
@@ -138,13 +149,16 @@
 #> This should only be non-zero if the M3_FILE_n files were pre-processed with a utility like m3tshift (default 0).
  setenv TIME_SHIFT 0
 
+#> indicate whether or not to check QA flag (default Y)
+ setenv QA_FLAG_CHECK N 
+
 #############################################################
 #  Input files
 #############################################################
 
 #> ioapi input files containing VNAMES (max of 10)
- setenv M3_FILE_1 ${CMAQ_DATA}/POST/COMBINE_ACONC_${RUNID}_201607.nc
-         #[Add location of input file, e.g. COMBINE_ACONC file.]
+ setenv M3_FILE_1 ${CMAQ_DATA}/POST/COMBINE_AELMO_${RUNID}_201607.nc
+         #[Add location of input file, e.g. COMBINE_AELMO file.]
 
 #> SITE FILE containing site-id, longitude, latitude, and optionally 
 #> GMT offset, state, county, and elevation (csv format)

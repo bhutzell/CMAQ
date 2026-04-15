@@ -183,6 +183,7 @@ ANH4IJ          ,ug m-3    ,PMF_NH4[1]
 ANH4K           ,ug m-3    ,PMC_NH4[1]
 ASO4IJ          ,ug m-3    ,PMF_SO4[1]
 ASO4K           ,ug m-3    ,PMC_SO4[1]
+AHMSJ           ,ug m-3    ,PMF_HMS[1]
 
 !! Organic Particle Species
 APOCIJ          ,ugC m-3   ,PMF_POC[1]
@@ -258,11 +259,12 @@ PM25_NO3        ,ug m-3    ,PM25_NO3[1]
 PM25_OC         ,ugC m-3   ,PM25_OC[1] 
 PM25_OM         ,ug m-3    ,PM25_OA[1] 
 PM25_SOIL       ,ug m-3    ,PM25_RCSOIL[1]  
-PM25_SO4        ,ug m-3    ,PM25_SO4[1] 
+PM25_SO4        ,ug m-3    ,PM25_SO4[1]
+PM25_HMS        ,ug m-3    ,PM25_HMS[1] 
 PM25_TOT        ,ug m-3    ,PM25[1] 
 !PM25_UNSPEC1    ,ug m-3    ,PM25_OTHWNC[1] 
 PM25_UNSPEC1    ,ug m-3    ,PM25[1]-(PM25_CL[1]+PM25_EC[1]+PM25_NA[1]+PM25_NH4[1] \
-                           +PM25_NO3[1]+PM25_OC[1]+PM25_RCSOIL[1]+PM25_SO4[1])
+                           +PM25_NO3[1]+PM25_OC[1]+PM25_RCSOIL[1]+PM25_SO4[1]+PM25_HMS[1])
 PM25_UNSPCRS    ,ug m-3    ,PM25_UNSPCRS[1] 
 !PM25_UNSPCRS    ,ug m-3    ,PMC[1]*FPM25_COR[1] - (PMC_SO4[1]*FPM25_COR[1] \
 !                                                  +PMC_CL[1]*FPM25_COR[1]  \
@@ -293,9 +295,10 @@ PMC_NO3         ,ug m-3    ,PM25TO10_NO3[1]
 PMC_SO4         ,ug m-3    ,PM25TO10_SO4[1] 
 PMC_TOT         ,ug m-3    ,PM25TO10[1] 
 
-!! Deisel PM Species
-DIESEL_PM10     ,ug m-3    ,PM10_HDIESEL[1]
-DIESEL_PM25     ,ug m-3    ,PM25_HDIESEL[1]
+!! Diesel PM Species
+! convert ELMO output from ng m-3 to ug m-3
+DIESEL_PM10     ,ug m-3    ,1.0e-3*PM10_HDIESEL[1]
+DIESEL_PM25     ,ug m-3    ,1.0e-3*PM25_HDIESEL[1]
 
 !!Benzo-A-Pyrene, gas and aerosol species
 BAP_GAS         ,ng/m3     ,1000.0*P_BENAPY[1]

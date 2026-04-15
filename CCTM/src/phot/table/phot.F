@@ -58,6 +58,7 @@ C                         to an optional diagnostic file
 C    07 Jul 14 B.Hutzell: replaced mechanism include file(s) with fortran module
 C    Aug 12, 15 D. Wong: Replaced MYPE with IO_PE_INCLUSIVE for parallel I/O implementation
 C    Mar 12, 19 D. Wong: Implemented centralized I/O approach, removed all MY_N clauses
+C    Jan 12, 26 D. Wong: Removed SE_BARRIER call
 C
 C----------------------------------------------------------------------
 
@@ -464,7 +465,6 @@ C...open the photolysis rate diagnostic files
          END IF
 #endif
 
-         CALL SUBST_BARRIER
          RETURN ! Added for MIO Implementation
 
       END IF  ! FIRSTIME

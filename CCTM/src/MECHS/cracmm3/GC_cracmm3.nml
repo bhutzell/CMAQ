@@ -195,7 +195,7 @@ GC_SPECIES_DATA =
 'CLNO'          , 65.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,''    ,''    ,''    ,'Yes',!Nitrosyl chloride,E,DTXSID5051945,ClN=O
 'CLNO2'         , 81.5  ,''      ,-1     ,''     ,-1     ,'VD_CLNO2'          , 1   ,'NITRYL_CHLORIDE', 1  ,'CLNO2'        ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nitryl chloride,E,DTXSID601317066,ClN(=O)=O
 'CLNO3'         , 97.5  ,''      ,-1     ,''     ,-1     ,'VD_CLNO3'          , 1   ,'CLNO3'          , 1  ,'CLNO3'        ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Chlorine nitrate,E,DTXSID00163043,[O-][N+](=O)OCl
-'HCL'           , 36.0   ,''     ,-1     ,''     ,-1     ,'VD_HCL'            , 1   ,'HCL'            , 1  ,'HCL'          ,'HCL'    ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrochloric acid,E,DTXSID2020711,Cl
+'HCL'           , 36.5   ,''     ,-1     ,''     ,-1     ,'VD_HCL'            , 1   ,'HCL'            , 1  ,'HCL'          ,'HCL'    ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrochloric acid,E,DTXSID2020711,Cl
 'CLOO'          , 67.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,''    ,''    ,''    ,'Yes',!Chlorine dioxide,E,DTXSID5023958,O=Cl[O]
 'NO2PIJ'        , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''   ,''    ,'Yes',!Dioxidonitrogen, E, NA,[N+](=O)=O
 'NO2PK'         , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''    ,''   ,'Yes',!Dioxidonitrogen, E, NA, [N+](=O)=O

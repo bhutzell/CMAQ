@@ -651,7 +651,7 @@ REACTIONS[CM] =
 <IO25>  I + NO2            = INO2                     # 3.0E-31^-1.0 &
                                                         6.6E-11^0.00 &
                                                         0.63 & 1.0;
-<IO26>  IO + NO2           = INO3                     # 7.7-31^-5.0 &
+<IO26>  IO + NO2           = INO3                     # 7.7E-31^-5.0 &
                                                         1.6E-11^0.0 &
                                                         0.40 & 1.0;
 <IO27>  CH3I + OH          = I + FORM                 # 4.3E-12 @1120;
@@ -713,6 +713,20 @@ REACTIONS[CM] =
 ! Aerosol nitrate photolysis (implemented as heterogeneous reactions)
 <HET_ANO3I> ANO3I = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
 <HET_ANO3J> ANO3J = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
+
+! heterogeneous reaction of SO2 in ALW
+<HET_SO2_H2O2> SO2 + H2O2 = ASO4J # 1.0~<HETERO_SO2H>;
+<HET_SO2_O3> SO2 + O3 = ASO4J # 1.0~<HETERO_SO2O>;
+<HET_SO2_MEPX> SO2 + MEPX = ASO4J + MEOH # 1.0~<HETERO_SO2M>;
+<HET_SO2_PACD> SO2 + PACD = ASO4J + AACD # 1.0~<HETERO_SO2P>;
+<HET_SO2_NO2> SO2 + NO2 = ASO4J + HONO # 1.0~<HETERO_SO2N>;
+
+<HET_SO2_TMI> SO2 + AFEJ + AMNJ = ASO4J + AFEJ + AMNJ 
+                                # 1.0~<HETERO_SO2T>;                                
+<HET_SO2_HCHO> SO2 + FORM = AHMSJ # 1.0~<HETERO_HMSP>;
+<HET_SO2_HNO4> SO2 + PNA = ASO4J + ANO3J # 1.0~<HETERO_HNO4>;
+<HET_HMS_L1> AHMSJ + OH = HO2 + SO2 + FACD # 1.0~<HETERO_HMSL1>;
+<HET_HMS_L2> AHMSJ = SO2 + FORM # 1.0~<HETERO_HMSL2>;
 
 END MECH
 
