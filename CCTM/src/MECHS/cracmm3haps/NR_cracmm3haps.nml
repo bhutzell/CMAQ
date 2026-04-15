@@ -10,14 +10,14 @@ NR_SPECIES_DATA =
 'ACRY_NITRILE'   , 53.10  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'ACRYLONITRILE'   , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Acrylonitrile,E,DTXSID5020029,C=CC#N
 'CARBONTET'      ,153.80  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CARBONTETRACHLOR', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Carbon Tetrachloride,E,DTXSID8020250,ClC(Cl)(Cl)Cl
 'PROPYL_DICL'    ,113.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'PROPYLENE_DICHLO', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Propylene Dichloride,E,DTXSID0020448,CC(Cl)CCl
-'DICL_PROPENE'   , 99.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'13DICHLOROPROPEN', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!13-Dichloropropene,E,DTXSID1022057, ClCC=CCl
+'DICL_PROPENE'   , 99.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'13DICHLOROPROPEN', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!13-Dichloropropene,E,DTXSID1022057,ClCC=CCl
 'CL4_ETHANE'     ,167.90  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'1122-CL4ETHANE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!1122-Tetrachloroethane,E,DTXSID7021318,ClC(Cl)C(Cl)Cl
-'CHCL3'          ,119.40  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CHLOROFORM'      , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Chloroform,E,DTXSID1020306, ClC(Cl)Cl
+'CHCL3'          ,119.40  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CHLOROFORM'      , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Chloroform,E,DTXSID1020306,ClC(Cl)Cl
 'BR2_C2_12'      ,187.90  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'12DIBROMOETHANE' , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!12-Dibromoethane,E,DTXSID3020415,BrCCBr
 'CL2_C2_12'      , 99.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'12DICHLOROETHANE', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!12-Dichloroethane,E,DTXSID6020438,CLCCCL
 'ETOX'           , 44.10  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'ETHYLENE_OXIDE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Ethylene Oxide,E,DTXSID0020600,C1CO1
-'CL2_ME'         , 84.90  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'METHYLENE_CHLORI', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Methylene Chloride,E, DTXSID0020868,CLCCL
-'CL4_ETHE'       ,165.80  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'PERCHLOROETHYLEN', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Perchloroethylene,E, DTXSID2021319,ClC(Cl)=C(Cl)Cl
+'CL2_ME'         , 84.90  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'METHYLENE_CHLORI', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Methylene Chloride,E,DTXSID0020868,CLCCL
+'CL4_ETHE'       ,165.80  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'PERCHLOROETHYLEN', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Perchloroethylene,E,DTXSID2021319,ClC(Cl)=C(Cl)Cl
 'CL3_ETHE'       ,131.40  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'TRICHLOROETHENE' , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Trichloroethylene,E,DTXSID0021383,ClC=C(Cl)Cl
 'CL_ETHE'        , 62.50  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'VINYL_CHLORIDE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Vinyl Chloride,E,DTXSID8021434,ClC=C
 'QUINOLINE'      ,129.20  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'QUINOLINE'       , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Quinoline,E,DTXSID1021798,C1=CC2=C(C=C1)N=CC=C2
@@ -27,7 +27,7 @@ NR_SPECIES_DATA =
 'TOL_DIIS'       ,174.20  ,''     ,-1      ,''     ,-1     ,'VD_TOLUENE_DIIS' , 1   ,'24-TOLUENE_DIIS' , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!24-Toluene Diisocyanate,E,DTXSID7026156,CC1=CC=C(C=C1N=C=O)N=C=O
 'TRIETHYLAMIN'   ,101.20  ,''     ,-1      ,''     ,-1     ,'VD_TRIETHYLAMINE', 1   ,'TRIETHYLAMINE'   , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Triethylamine,E,DTXSID3024366,CCN(CC)CC
 'DICL_BENZENE'   ,147.00  ,''     ,-1      ,''     ,-1     ,'VD_BENZ'         , 1   ,'P_DICHLOROBENZEN', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!14-Dichlorobenzene,E,DTXSID1020431,ClC1=CC=C(Cl)C=C1
-'ACET_NITRILE'   , 41.05  ,''     ,-1      ,''     ,-1     ,'VD_ACETONITRILE' , 1   ,'ACETONITRILE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Acetonitrile,E,DTXSID0020868,CC#N
+'ACET_NITRILE'   , 41.05  ,''     ,-1      ,''     ,-1     ,'VD_ACETONITRILE' , 1   ,'ACETONITRILE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Acetonitrile,E,DTXSID7020009,CC#N
 'XYLENE'         ,106.20  ,''     ,-1      ,''     ,-1     ,'VD_XYLMN'        , 1   ,'M-XYLENE'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!m-xylene,L,DTXSID2021446,CC1=CC(C)=CC=C1
 'ACRYACID'       , 72.06  ,''     ,-1      ,''     ,-1     ,'VD_ACRYACID'     , 1   ,'ACRYACID'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!acrylic acid,E,DTXSID0039229, OC(=O)C=C
 'HEXANE'         , 86.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'HEXANE'          , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!n-Hexane,E,DTXSID0021917,CCCCCC
@@ -35,8 +35,8 @@ NR_SPECIES_DATA =
 'CARBSULFIDE'    , 60.10  ,''     ,-1      ,''     ,-1     ,'VD_CARBSULFIDE'  , 1   ,'CARBSULFIDE'     , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Carbonyl Sulfide,E,DTXSID6023949,O=C=S
 'CHLOROPRENE'    , 88.50  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CHLOROPRENE'     , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Chloroprene,E,DTXSID5020316,ClC(=C)C=C
 'BENAPY'         ,252.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'BENAPY'          , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Benzo[a]Pyrene,E,DTXSID2020139,C1=CC=C2C(=C1)C=C1C=CC3=CC=CC4=CC=C2C1=C34
-'HG'             ,200.6   ,''     ,-1      ,''     ,-1     ,'VD_HG'           , 1   ,'HG'              , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Elemental Mercury,E,DTXSID9074933,Hg
-'HGIIGAS'        ,271.5   ,''     ,-1      ,''     ,-1     ,'VD_HGIIGAS'      , 1   ,'HGIIGAS'         , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Mercuric Chloride,L,DTXSID9074933,[Hg++]
+'HG'             ,200.6   ,''     ,-1      ,''     ,-1     ,'VD_HG'           , 1   ,'HG'              , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Elemental Mercury,E,DTXSID1024172,Hg
+'HGIIGAS'        ,271.5   ,''     ,-1      ,''     ,-1     ,'VD_HGIIGAS'      , 1   ,'HGIIGAS'         , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Mercuric Chloride,L,DTXSID5020811,[Cl-].[Cl-].[Hg++]
 'PAH_000E0'      ,186.2   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Anthracene,L,DTXSID0023878,C1=CC2=CC3=C(C=CC=C3)C=C2C=C1
 'PAH_176E5'      ,197.7   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Chrysene,L,DTXSID0022432,C1=CC=C2C(C=CC3=C2C=CC2=CC=CC=C32)=C1
 'PAH_880E5'      ,197.9   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Fluoranthene,L,DTXSID3024104,C1=CC2=C(C=C1)C1=C3C2=CC=CC3=CC=C1
@@ -46,5 +46,5 @@ NR_SPECIES_DATA =
 'PAH_101E2'      ,268.4   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!3-Methylcholanthrene,L,DTXSID0020862,CC1=C2CCC3=C4C=CC5=CC=CC=C5C4=CC(C=C1)=C23
 'PAH_176E2'      ,302.4   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Dibenzo[a;h]pyrene,L,DTXSID4059752,C1=CC=C2C(=C1)C=C1C=CC3=C4C(C=CC2=C14)=CC1=CC=CC=C31
 'PAH_114E1'      ,256.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!7;12-Dimethylbenz(a)anthracene,L,DTXSID1020510,CC1=C2C=CC=CC2=C(C)C2=C3C=CC=CC3=CC=C12
-'HCN'            ,27.02   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'HYDROGEN_CYANIDE',1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes' !Hydrogen Cyanide,E,DTXSID9024148,C#N
+'HCN'            ,27.02   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'HYDROGEN_CYANIDE',1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Hydrogen Cyanide,E,DTXSID9024148,C#N
 /
