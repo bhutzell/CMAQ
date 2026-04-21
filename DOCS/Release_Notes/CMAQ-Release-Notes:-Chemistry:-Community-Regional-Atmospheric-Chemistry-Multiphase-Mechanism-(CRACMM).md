@@ -71,6 +71,8 @@ This update allows for AQS HAPs to be evaluated via AMET. It also improves ident
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
+|[Merge for PR#1415](https://github.com/USEPA/CMAQ/commit/9d25dce9785f08eeab1152653a464ad2c93fb0ca) | [PR#1415](https://github.com/USEPA/CMAQ_Dev/pull/1415)  |
+
 ### CRACMM Species Documentation and Propagation of Information Outside CMAQ
  [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
 
@@ -87,9 +89,28 @@ The above aerosol species have special handling in the species description files
 
 **Significance and Impact**: Updates CRACMM documentation
 
-**Internal PRs**: (Replace xxx with your PR number.)
-[PR#1392](https://github.com/USEPA/CMAQ_Dev/pull/1392)  
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1392](https://github.com/USEPA/CMAQ/commit/04abca1ecaeb5237438692a1229506c113fe0bfd) | [PR#1392](https://github.com/USEPA/CMAQ_Dev/pull/1392)  |  
+|[Merge for PR#1405](https://github.com/USEPA/CMAQ/commit/45ca41c63ced63463f425fcce517afca85356987) | [PR#1405](https://github.com/USEPA/CMAQ_Dev/pull/1405)  |  
 
+### 2023 12US4 CRACMM2/3/3haps platform for CONUS and Canada
+[Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
+
+**Type of update**: Run script
+
+**Release Version/Date**: CMAQv6.0
+
+**Description**: The script and control files for 2023 are based on emissions created for CRACMM2 which are fully compatible in CRACMM3. In addition, a full set of HAP emissions are included enabling use of CRACMM3HAPs. To prioritize fewer files, the 2022r1 cracmm2 and cracmm3 Chem control files were linked to the 2023 versions. Due to differences in naming of the residential wood combustion sector, the 2023 script does not apply the downward adjustment in POA emissions that is applied in 2022r1. This is a choice and can be changed, e.g., by changing the rwc stream name in the 2023 run script. The CRACMM3HAPs Chem control file is unique to 2023 due specific naming conventions (use of prepended T_ to indicate tracer HAPs that are optional in any run). The platform is documented in the SI at the reference listed below. The reference also indicates were the full set of emissions, meteorological, and other inputs can be obtained.
+
+**Significance and Impact**: This run script and control files enable CAP-HAP simulations over the US and Canada during 2023 which included intense Canadian wildfire activity and the AGES+ field campaigns.
+
+**References**:
+Pye, H. O. T., Hutzell, W. T., Fann, N. L., Skipper, T. N., Pye, M. J., Beidler, J., Allen, C., Murphy, B. N., D'Ambro, E. L., Lin, S., Talgo, K., Reynolds, L., Kang, D., Bash, J., Seltzer, K. M., Farrell, S. L., Appel, K. W., Brehme, K., Gilliam, R. C., Henderson, B. H., and Chan, A. W.: The risks to human health of air toxics, PM2.5, and ozone from the 2023 Canadian wildfires. Environmental Science & Technology Letters, 13, (2), 268-274, 2026, DOI: 10.1021/acs.estlett.5c01181 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1388](https://github.com/USEPA/CMAQ/commit/a5ca86a351999808d497a0179da3389200067dd5) | [PR#1388](https://github.com/USEPA/CMAQ_Dev/pull/1388)  |  
 
 ### Heterogeneous chemistry of sulfur species
 [Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
@@ -140,7 +161,7 @@ This bug fix does not significantly change results for monthly to annual average
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-| | [PR#1400](https://github.com/USEPA/CMAQ_Dev/pull/1400)  |
+|[Merge for PR#1400](https://github.com/USEPA/CMAQ/commit/9874aa0c95ec12decafe803445ebc759bb6b54a1) | [PR#1400](https://github.com/USEPA/CMAQ_Dev/pull/1400)  |
 
 ### Photolysis of aerosol nitrate in CRACMM3  
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency    
@@ -148,22 +169,29 @@ This bug fix does not significantly change results for monthly to annual average
 **Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
-This pull request adds photolysis of aerosol nitrate (ANO3) to CRACMM3 following the procedure described in Sarwar et al., 2024. It adds a new aerosol species, ASEAST, which represents entire fine-mode sea-salt with a molecular weight of 31.3 grams per mole. Molecular weight of ASEAST is calculated using sea-salt composition data and molecular weight of individual chemical species represented in AERO_DATA.F. ASEAT and ANO3, and their molecular weights are used to calculate an enhancement factor which is then multiplied by the photolysis frequency of nitric acid to calculate the photolysis frequency of ANO3. A new Euler Backward Iterative (EBI) solver is developed.
+This pull request adds photolysis of aerosol nitrate (ANO3) to CRACMM3 following the procedure described in Sarwar et al., 2024. It adds a new aerosol species, ASEAST, which represents entire fine-mode sea-salt. The molecular weight of ASEAST is calculated using sea-salt composition data and the molecular weights of sulfate, chloride, sodium, calcium, magnesium, potassium, and bromide (MWASEAST = 31.3 g/mol). ASEAST and ANO3, and their molecular weights are used to calculate an enhancement factor (EF):
+
+$$EF = 100 \times \max\left(\frac{[ASEAST]}{[ASEAST] + [ANO3]}, 0.1\right)$$
+
+Where [ASEAST] and [ANO3] are the molar concentrations of each species. The EF is then multiplied by the photolysis frequency of nitric acid (HNO3) to calculate the photolysis frequency of ANO3. 
+
 
 **Significance and Impact**:   
-Model ozone (O3) concentrations without the photolysis of aerosol nitrate are shown in Figure 1a. Higher values are predicted over the southern portion than the northern portion. Model O3 enhancements with the photolysis of aerosol nitrate are shown Figure 1b. Enhancements occur only over small areas and are much smaller than those obtained with the hemispheric CMAQ model (Sarwar et al., 2024). The majority of the enhancements in the hemispheric model occurs over the ocean and are transported over land. The impacts on O3 are small since the continental US domain contains only a small oceanic area. 
+Previous versions of CMAQ do not include any photolysis of ANO3. However, recent studies suggest that ANO3 can undergo photolysis to produce HONO and NO2 which can affect CMAQ predicted ozone (O3). Inclusion of this new pathway increased monthly mean ground-level ozone by 13-32% over the modeling domain (Sarwar et al., 2025). These increases were larger over the Western U.S. than over the Eastern U.S., improved the model performance across the Western U.S., and reduced the underestimation of springtime O3 across the entire U.S. Thus, it is incorporated into CMAQv6.0. Modeled O3 concentrations without the photolysis of ANO3 are shown in Figure 1a. Model O3 enhancements with the photolysis of ANO3 are shown in Figure 1b. Minor enhancements in O3 concentrations occur over the contiguous U.S. (CONUS) domain with larger enhancements occurring over some portions of the ocean. These enhancements, however, are much smaller than those obtained with the hemispheric CMAQ model (Sarwar et al., 2024). Most of the enhancements in the hemispheric model occur over the ocean where ANO3 can undergo photolysis at a higher frequency and is transported over land. The impacts on O3 over the CONUS domain are small given the small oceanic area.
 
 ![Photolysis_of_aerosol_nitrate_CRACMM3_Image_1](./images/chemistry/cmaqv6.0_release_notes_Photolysis_of_aerosol_nitrate_CRACMM3_12US1_figure_1.png)
-Figure 1: (a) Model O3 without the aerosol nitrate photolysis (b) Impact of the aerosol nitrate photolysis on O3 compared to those without the aerosol nitrate photolysis 
+Figure 1: (a) Modeled O3 concentrations without ANO3 photolysis for May 20-31, 2019 and (b) average differences in O3 concentrations for this same episode due to ANO3 photolysis.
 
-Model aerosol nitrate concentrations without the photolysis of aerosol nitrate are shown in Figure 2a. Higher values are predicted only over the Mid-west. Changes in model aerosol nitrate concentrations with the photolysis of aerosol nitrate are shown Figure 2b. Aerosol nitrate concentrations decrease over some oceanic areas. However, the impacts over land areas are small.
+The impacts of ANO3 photolysis on modeled ANO3 concentration are shown in Figure 2. ANO3 concentrations decrease over some oceanic areas (Fig. 2b) coinciding with an increase in O3 due to these updates (Fig. 1b). The impacts over land areas, however, are small due to lower ANO3 photolysis frequency – consistent with changes in O3 from ANO3 photolysis.
 
 ![Photolysis_of_aerosol_nitrate_CRACMM3_Image_2](./images/chemistry/cmaqv6.0_release_notes_Photolysis_of_aerosol_nitrate_CRACMM3_12US1_figure_2.png)
 
-Figure 2: (a) Model aerosol nitrate concentrations without the aerosol nitrate photolysis (b) Impact of the aerosol nitrate photolysis on aerosol nitrate concentrations compared to those without the aerosol nitrate photolysis 
+Figure 2: (a) Modeled ANO3 concentrations without ANO3 photolysis for May 20-31, 2019 and (b) average differences in ANO3 concentrations for this same episode due to ANO3 photolysis. 
 
 **References**:   
 Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A., B., Lee, J., Carpenter, L. J.: Examining the Impact of the photolysis of aerosol nitrate over Northern Hemisphere, Science of the Total Environment, 917, 170406, 2024. https://doi.org/10.1016/j.scitotenv.2024.170406
+
+Sarwar, G., Sidi, F., Simon, H., Henderson, B., Willison, J., Gilliam, R., Hogrefe, C., Foley, K., Mathur, R., Appel, W., 2025: Representing particulate nitrate photolysis over seawater improves CMAQ ozone predictions over the contiguous United States, Science of the Total Env., 970, 178968.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|

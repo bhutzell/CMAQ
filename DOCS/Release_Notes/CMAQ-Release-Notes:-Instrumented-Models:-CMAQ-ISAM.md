@@ -1,5 +1,51 @@
 # Integrated Source Apportionment Method (ISAM)
 
+## Vapor Species for ISAM in CRACMM mechanisms]
+[Sergey L. Napelenok](mailto:Napelenok.Sergey@epa.gov), U.S. Environmental Protection Agency
+**Type of update**: Bug Fix
+**Release Version/Date**: CMAQv6.0
+
+**Description**: The ISAM model was resulting in unreasonable behavior of the tagged species VELHOM and VHOM for some applications. When tracking, for example, contributions of EGU sources, these species returned unreasonably large values soon after the beginning of the simulation. It was determined that during the implementation of ISAM for the CRACMM family of mechanisms, vapor species were added to the tracked species lists without corresponding aerosol components including VELHOM and VHOM. For example, the list of tracked species for CRACMM3 includes:
+
+     'VELHOM    ','VHOM      ','VHONIT    ','VOP3      ',  ….
+     'VTRPN     ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
+     'VROCN1ALK ','VROCP0ALK ','VROCP1ALK ','VROCP2ALK ','VROCP3ALK ',
+     'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
+     'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
+     'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
+     'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1',
+
+Since these species don't have the aerosol phase to partition into, the sum of their tags begins to exceed the bulk concentration and starts to destabilize some of the calculation that eventually lead to erroneous results. There are two options for addressing this issue.
+
+Option 1 is to add the corresponding aerosol species for each vapor species.
+
+Option 2 is to remove all the vapor species from the tracked list.
+
+Option 2 is chosen here to be mindful of potentially unacceptable runtimes of the ISAM model. This choice is further supported by the absence of vapor species in the other mechanisms.
+
+**Significance and Impact**:
+This PR stabilizes ISAM outputs, but has no impact on concentrations.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1393](https://github.com/USEPA/CMAQ_Dev/commit/95db33911a8d7a41383b1c5050a2c77ba9b88537) | [PR#1390](https://github.com/USEPA/CMAQ_Dev/pull/1393)  |
+
+
+## Correction to the STAGE implementation of ISAM
+[Sergey L. Napelenok](mailto:Napelenok.Sergey@epa.gov), U.S. Environmental Protection Agency
+**Type of update**: Bug Fix
+**Release Version/Date**: CMAQv6.0
+
+**Description**: Variable "SACONC" was used in a calculation before it was populated from the ISAM array at the top of the subroutine vdiffacmx. This caused errors as previously defined values for SACONC were used instead of correct current ones
+Significance and Impact: There is no impact on CMAQ base model output. There is some impact on ISAM apportionment results depending on user application.
+
+**Significance and Impact**:
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1390](https://github.com/USEPA/CMAQ/commit/7aa0bfb1d3deb07f34741b60133cd64af4b46cc6) | [PR#1390](https://github.com/USEPA/CMAQ_Dev/pull/1390)  |
+
+
 ##  Add cracmm3m to mechanisms supported by ISAM
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Science Update      

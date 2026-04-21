@@ -10,44 +10,58 @@ Golam Sarwar, Sarwar.golam@epa.gov, U.S. Environmental Protection Agency
 **Release Version/Date**:  CMAQv6.0
 
 **Description**:  
-This pull request adds photolysis of aerosol nitrate to CB6R5 following the procedure described in Sarwar et al., 2024. A new Euler Backward Iterative (EBI) solver is developed.
+This pull request adds photolysis of aerosol nitrate (ANO3) to CB6R5 following the procedure described in Sarwar et al., 2024. It adds a new aerosol species, ASEAST, which represents fine-mode sea-salt. The molecular weight of ASEAST is calculated using sea-salt composition data and the molecular weights of sulfate, chloride, sodium, calcium, magnesium, potassium, and bromide (MWASEAST = 31.3 g/mol). ASEAST and ANO3, and their molecular weights are used to calculate an enhancement factor (EF):
+
+$$ EF = 100 \times \max\left(\frac{[ASEAST]}{[ASEAST] + [ANO3]}, 0.1\right) $$
+
+Where [ASEAST] and [ANO3] are the molar concentration of each species. The EF is then multiplied by the photolysis frequency of nitric acid (HNO3) to calculate the photolysis frequency of ANO3.
 
 **Significance and Impact**:  
 
-Model ozone (O3) concentrations without the photolysis of aerosol nitrate in May are shown in Figure 1a. Higher values are predicted over the southern portion than the northern portion. Model O3 enhancements with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model without photolysis of aerosol nitrate) are shown Figure 1b and O3 enhancements with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model with photolysis of aerosol nitrate) are shown Figure 1c. Photolysis of aerosol nitrate enhances O3 by small margins over small areas when the aerosol nitrate photolysis is only active within the modeling domain (RUN_B – RUN_A). The impacts on O3 are small since the continental U.S. domain contains only a small oceanic area. In contrast, it enhances O3 by larger margins over the entire modeling domain when aerosol nitrate photolysis is active within and outside the modeling domain through the effect of boundary conditions (RUN_C – RUN_A). Thus, the majority of the enhancements occur due to the boundary conditions which contain larger enhancements from the hemispheric model with the aerosol nitrate photolysis.
+Previous versions of CMAQ do not include any photolysis of ANO3. However, recent studies suggest that ANO3 can undergo photolysis to produce HONO and NO2 which can affect CMAQ predicted ozone. Inclusion of this new pathway increased monthly mean ground-level ozone by 13-32% over the modeling domain (Sarwar et al., 2025). Model runs used to test the impact of these code changes are described in Table 1.
 
-<img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/48894c39-4e92-4cc2-836a-a6d6f0435beb" />
+**Table 1**. Model simulations over the Contiguous U.S. (CONUS) Domain for the month of May 2022
+| Model Run        | Description                                                                                         |
+| :---             | :---                                                                                                |
+| Base             | Base CMAQ without ANO3 photolysis                                                                   |
+| Phot_ANO3_Dom         | CMAQ run with ANO3 photolysis only in the CONUS Domain                                              |
+| Phot_ANO3_Dom_ICBC    | CMAQ run with ANO3 photolysis in both the CONUS Domain and in the initial and boundary conditions (ICBC)  |
 
-Figure 1: (a) Model O3 without the pNO3 photolysis in May 2022 (RUN_A) (b) Impact of pNO3 photolysis on model O3 with initial and boundary conditions generated from hemispheric CMAQ without pNO3 photolysis (RUN_B -  RUN_A) (c) Impact of pNO3 photolysis on model O3 with initial and boundary conditions generated from hemispheric CMAQ with pNO3 photolysis (RUN_C -  RUN_A) 
 
-Daily Mean Bias was calculated by using model predicted daily maximum 8-hour average (DMA8) O3 and observed data from the AQS monitoring network over the western and eastern U.S. [Figure 2(a-b)]. Over the western U.S., model without the aerosol nitrate photolysis (RUN_A) underpredicts observed data for almost all days while model with the aerosol nitrate photolysis (RUN_C) increases O3 and eliminates the negative bias for majority of the days. However, model under-predictions remain on some days. Over the eastern U.S., model without the aerosol nitrate photolysis (RUN_A) has mixed impacts on model performance producing negative bias for almost all days in January-May and October-December, and positive bias in June-September. Model with the aerosol nitrate photolysis (RUN_C) improves the negative bias in January-May and October-December but deteriorates the bias in June-September.
+The impact of ANO3 photolysis on modeled ozone (O3) concentrations is shown in Figure 1. Higher O3 concentrations are predicted over the southern portion of the CONUS domain than the northern portion in the Base run (Fig. 1a). Photolysis of ANO3 slightly enhances O3 when ANO3 photolysis is only active within the modeling domain (Fig. 1b). These minimal impacts can be attributed to a relatively small oceanic area within the CONUS domain (as opposed to that of the entire Northern Hemisphere). In contrast, ANO3 photolysis enhances O3 by larger margins in the Phot_ANO3_Dom_ICBC model run (Fig. 1c), indicating the significance of its effect on O3 concentrations when also included in the boundary conditions.
+
+
+![](./images/chemistry/cmaqv6.0_ANO3phot_fig1_O3_diff.png)
+
+Figure 1: (a) Modeled episode averaged O3 in the Base run (b) average differences in modeled O3 due to ANO3 photolysis in the CONUS domain (Phot_ANO3_Dom -  Base) and (c) average differences in modeled O3 due to ANO3 photolysis in both the CONUS Domain and in the ICBC (Phot_ANO3_Dom_ICBC - Base).
+
+Daily Mean Bias was calculated by using model predicted daily maximum 8-hour average O3 concentrations (MDA8O3) and observed MDA8O3 from the AQS monitoring network over the Western and Eastern U.S. (Figure 2). Over the Western U.S., model predicted MDA8O3 in the Base run underpredicts observed data for almost all days while model predicted MDA8O3 in the Phot_ANO3_Dom_ICBC run increases MDA8O3 and resolves some of the previous negative bias for majority of the days (Fig. 2a). Wintertime modeled MDA8O3 underpredictions over the Eastern U.S. are also improved in the Phot_ANO3_Dom_ICBC run, with overpredictions of modeled MDA8O3 now occurring during the spring and becoming more pronounced during the summer (Fig. 2b).
 
 <img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/f9addeee-cdbc-418c-8423-866a61e440ff" />
 
-Figure 2: (a) Times series of daily maximum 8-hr O3 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the western U.S. (b) Times series of daily maximum 8-hr O3 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the eastern U.S. Western U.S. consists of Northwest, Northern Rockies, West, and Southwest climate regions while eastern U.S. consists of South, Southeast, Ohio Valley, Upper Midwest, and Northeast climate regions.
+Figure 2: Time series of MDA8O3 bias in the Base run and in the Phot_ANO3_Dom_ICBC run at (a) AQS sites over the Western U.S. and (b) Eastern U.S. The Western U.S. consists of the Northwest, Northern Rockies, West, and Southwest climate regions while the Eastern U.S. consists of South, Southeast, Ohio Valley, Upper Midwest, and Northeast climate regions.
 
-Model PM2.5 concentrations without the photolysis of aerosol nitrate (RUN_A) are shown in Figure 3a. Higher values are predicted over land than over seawater. Changes in model PM2.5 concentrations with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model without photolysis of aerosol nitrate) are shown Figure 3b while PM2.5 concentration changes with the photolysis of aerosol nitrate (using initial and boundary conditions from hemispheric model with photolysis of aerosol nitrate) are shown Figure 3c. Photolysis of aerosol nitrate affects PM2.5 concentrations only by small margins when the aerosol nitrate photolysis is only active within the modeling domain (RUN_B – RUN_A) and also when aerosol nitrate photolysis is active within and outside the modeling domain through the effect of boundary conditions (RUN_C – RUN_A). Reductions occur due to the loss aerosol nitrate by photolysis while the enhancements occur from the changes in secondary aerosols due to the changes in oxidant levels. 
+The impacts of ANO3 photolysis on modeled PM2.5 concentrations are shown in Figure 3. Photolysis of ANO3 has a minimal effect on PM2.5 concentrations when ANO3 photolysis is only active within the CONUS domain (Fig. 3b). When ANO3 photolysis is also active in the ICBC (Fig. 3c), larger enhancements in PM2.5 concentrations are seen over land. Reductions in PM2.5 occur largely over the oceans and coastal areas - due to the loss of ANO3 via photolysis. Enhancements over land occur due to higher oxidant levels, which increase secondary aerosol formation.
 
 <img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/ee097124-0fd8-4b9f-bfa6-f5fe73e9e3d9" />
 
-Figure 3: (a) Model PM2.5 without the pNO3 photolysis in May 2022 (RUN_A) (b) Impact of pNO3 photolysis on model PM2.5 with boundary conditions generated from hemispheric CMAQ without pNO3 photolysis (RUN_B -  RUN_A) (c) Impact of pNO3 photolysis on model PM2.5 with boundary conditions generated from hemispheric CMAQ with pNO3 photolysis (RUN_C -  RUN_A) 
+Figure 3: For the month of May 2022 (a) average modeled PM2.5 in the Base run, (b) average differences in modeled PM2.5 due to ANO3 photolysis turned on in the CONUS domain (Phot_ANO3_Dom - Base) and (c) average differences in modeled PM2.5 due to ANO3 photolysis turned on in both the CONUS Domain and in the ICBC (Phot_ANO3_Dom_ICBC - Base). 
 
-Daily Mean Bias was calculated by using model predicted daily mean PM2.5 and observed data from the AQS monitoring network over the western and eastern U.S. [Figure 4(a-b)]. Bias without and with the aerosol nitrate photolysis in each month is similar over the western and eastern U.S. Thus, the aerosol nitrate photolysis has low impacts on model performance for PM2.5.
+Daily Mean Bias was calculated by using model predicted daily mean PM2.5 concentrations and observed PM2.5 concentrations from the AQS monitoring network over the Western and Eastern U.S. (Figure 4). Bias in the Base and Phot_ANO3_Dom_ICBC model runs for each month is similar over the Western and Eastern U.S. Thus, ANO3 photolysis does not greatly impact model performance for PM2.5.
 
 <img width="900" height="225" alt="image" src="https://github.com/user-attachments/assets/6214d231-b9ca-496a-aae4-e86bb3a9258e" />
 
-Figure 4: (a) Times series of PM2.5 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the western U.S. (b) Times series of PM2.5 bias without (RUN_A) and with aerosol nitrate photolysis (RUN_C) at AQS sites over the eastern U.S. Western U.S. consists of Northwest, Northern Rockies, West, and Southwest climate regions while eastern U.S. consists of South, Southeast, Ohio Valley, Upper Midwest, and Northeast climate regions.
+Figure 4: Time series of PM2.5 bias in the Base run and in the Phot_ANO3_Dom_ICBC run at AQS sites over the (a) Western U.S. and (b) over the Eastern U.S.
 
  **References**:   
 Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A., B., Lee, J., Carpenter, L. J.: Examining the Impact of the photolysis of aerosol nitrate over Northern Hemisphere, Science of the Total Environment, 917, 170406, 2024. 
 
 Sarwar, G., Sidi, F., Simon, H., Henderson, B., Willison, J., Gilliam, R., Hogrefe, C., Foley, K., Mathur, R., Appel, W., 2025: Representing particulate nitrate photolysis over seawater improves CMAQ ozone predictions over the contiguous United States, Science of the Total Env., 970, 178968.
 
-
- **Internal PRs**: 
-[PR#1382](https://github.com/USEPA/CMAQ_Dev/pull/1382)  
-
-
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1382](https://github.com/USEPA/CMAQ/commit/4d4f27dca58bcfb4de8e6af3f67ce9f26223758f) | [PR#1382](https://github.com/USEPA/CMAQ_Dev/pull/1382)  | 
+|[Merge for PR#1396](https://github.com/USEPA/CMAQ/commit/a51dda79ddb6c13ade9b21243600c8a85b438f66) | [PR#1396](https://github.com/USEPA/CMAQ_Dev/pull/1396)  | 
 
 
 ### Correction to molecular weight of HGIIGAS in species tables

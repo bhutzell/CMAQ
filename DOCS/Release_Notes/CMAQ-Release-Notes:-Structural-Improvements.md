@@ -13,7 +13,7 @@ No impact on results
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-
+|[Merge for PR#1410](https://github.com/USEPA/CMAQ/commit/734ae28f16bbda73783cbd633474faa52043f694) | [PR#1410](https://github.com/USEPA/CMAQ_Dev/pull/1410)  |   
 
 ### rdbcon update
 **David Wong**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
@@ -29,6 +29,7 @@ No impact on results, but enhances computational performance
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
+|[Merge for PR#1409](https://github.com/USEPA/CMAQ/commit/36e5984f2920dc7a3ff9fe8a91c0cd1849aea874) | [PR#1409](https://github.com/USEPA/CMAQ_Dev/pull/1409)  |   
 
 
 ### parallel I/O implementation for pa_init.F
