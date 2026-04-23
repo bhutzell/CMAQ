@@ -1,20 +1,5 @@
 # Structural Improvements
 
-### Barrier update
-**David Wong**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
-**Type of update**: Code Update
-**Release Version/Date**:  CMAQv6.0
-
-**Description**:
-removed unnecessary SE_BARRIER subroutine calls
-
-**Significance and Impact**:
-No impact on results
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1410](https://github.com/USEPA/CMAQ/commit/734ae28f16bbda73783cbd633474faa52043f694) | [PR#1410](https://github.com/USEPA/CMAQ_Dev/pull/1410)  |   
-
 ### rdbcon update
 **David Wong**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
 **Type of update**: Code Update

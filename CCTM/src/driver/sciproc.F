@@ -53,7 +53,6 @@ C    11 May 11 D.Wong: incorporated twoway model implementation
 C    25 Mar 16 R.Mathur: incorporated pot. vorticity strat. O3 scaling
 C    16 Sep 16 J.Young: update for inline procan (IPR)
 C    10 July 19 F. Sidi: Renamed Couple_WRF to be couple
-C    12 Jan 26 D. Wong: Removed SE_BARRIER call
 C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
@@ -260,6 +259,7 @@ C-----------------------------------------------------------------------
          IF ( BUDGET_DIAG .OR. LIPR ) CALL PA_UPDATE_PROC ( IPR_ZADV, CGRID, JDATE, JTIME, TSTEP, .TRUE. )
          IF ( PRINT_PROC_TIME ) CALL TIMING_SPLIT ( CPU_TIME_START, 1, 'COUPLE' )
 
+         CALL SUBST_BARRIER
          CALL HADV ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
          IF ( CKSUM ) CALL CKSUMMER ( 'HADV', CGRID, JDATE, JTIME )
          IF ( BUDGET_DIAG .OR. LIPR ) CALL PA_UPDATE_HADV ( CGRID, JDATE, JTIME, TSTEP )

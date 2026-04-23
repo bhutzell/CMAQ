@@ -67,7 +67,6 @@ C   1 Feb 19 David Wong: Implemented centralized I/O approach, removed
 C                        all MY_N clauses
 C   29 Oct 18 L.Zhou, S.Napelenok: isam implementation
 C   26 Nov 19 S. Napelenok: DDM3D implementation for CMAQ v5.3.1
-C   12 Jan 26 D. Wong: Removed SE_BARRIER call
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE HGRD_DEFN             ! horizontal domain specifications
@@ -247,6 +246,7 @@ C *** Open the aerosol parameters file (diameters and standard deviations).
      &        // 'try to open new'
          CALL M3MESG( MSG )
          ! Open the file new
+         CALL SUBST_BARRIER
          CALL OPCONC ( STDATE, STTIME, TSTEP( 1 ) )
 #ifdef parallel
          CALL OPVEXT ( STDATE, STTIME, TSTEP( 1 ) )
@@ -331,6 +331,8 @@ C Open SA_CONC_1 and SA_CGRID_1
 
       END IF
 #endif
+
+      CALL SUBST_BARRIER
 
 #endif
 
