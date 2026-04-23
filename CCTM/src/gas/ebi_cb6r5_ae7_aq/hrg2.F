@@ -28,7 +28,7 @@ C  PRECONDITIONS: For the CB6R5_AE7_AQ mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Jan 26, 2026
+C  REVISION HISTORY: Created by EBI solver program, Feb 23, 2026
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -247,7 +247,7 @@ c..Remaining HONO production terms
      &    +    5.0000D-01 * RXRAT(   278 )      ! NO2=0.5000D+00*HONO+...
      &    +    6.7000D-01 * RXRAT(   350 )      ! ANO3I=0.6700D+00*HONO+...
      &    +    6.7000D-01 * RXRAT(   351 )      ! ANO3J=0.6700D+00*HONO+...
-     &    +                 RXRAT(   356 )      ! SO2+NO2=HONO+ASO4J
+     &    +                 RXRAT(   356 )      ! SO2+NO2=HONO+ASO4J+SO4HRXN
 
       P19 = YC0( HONO ) + P19 * DTC
 
@@ -339,7 +339,7 @@ c..HONO loss terms not included in R4_19
 c..PNA loss terms not included in R5_21
       L21 =    4.1000D-01 * RKI(    50 )                         ! PNA=0.5900D+...
      &    +                 RKI(    51 ) * YC ( OH           )   ! PNA+OH=NO2
-     &    +                 RKI(   359 ) * YC ( SO2          )   ! PNA+SO2=ASO4J+ANO3J
+     &    +                 RKI(   359 ) * YC ( SO2          )   ! PNA+SO2=ASO4J+...
 
       L21   = 1.0D0 + L21 * DTC + R5_21
 

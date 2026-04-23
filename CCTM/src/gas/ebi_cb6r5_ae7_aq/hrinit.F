@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Jan 26, 2026
+C  REVISION HISTORY: Created by EBI solver program, Feb 23, 2026
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -139,7 +139,7 @@ C***********************************************************************
 
 c..Allocate and define ebi species
 
-      N_EBISP  = 141
+      N_EBISP  = 142
       ALLOCATE( EBISP( N_EBISP ), STAT = IOS ) 
       IF ( IOS .NE. 0 ) THEN
          MSG = 'Error allocating EBISP' 
@@ -284,9 +284,10 @@ c..Allocate and define ebi species
       EBISP( 136 ) = MSA
       EBISP( 137 ) = ANO3I
       EBISP( 138 ) = ANO3J
-      EBISP( 139 ) = AFEJ
-      EBISP( 140 ) = AMNJ
-      EBISP( 141 ) = AHMSJ
+      EBISP( 139 ) = SO4HRXN
+      EBISP( 140 ) = AFEJ
+      EBISP( 141 ) = AMNJ
+      EBISP( 142 ) = AHMSJ
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -443,6 +444,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( MSA          ) = 5.0D-04
       RTOL( ANO3I        ) = 5.0D-04
       RTOL( ANO3J        ) = 5.0D-04
+      RTOL( SO4HRXN      ) = 1.0D+00
       RTOL( AFEJ         ) = 5.0D-04
       RTOL( AMNJ         ) = 5.0D-04
       RTOL( AHMSJ        ) = 5.0D-04

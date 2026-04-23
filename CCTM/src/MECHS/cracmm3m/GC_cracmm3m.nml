@@ -235,4 +235,5 @@ GC_SPECIES_DATA =
 'NO2PK'         , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''    ,''   ,'Yes',!Dioxidonitrogen, E, NA, [N+](=O)=O
 'I2O3'          ,301.8  ,''      ,-1     ,''     ,-1     ,'VD_I2O3'           , 1   ,'I2O3'           , 1  ,''             ,''        ,'Yes' ,''    ,''   ,'Yes',!Diiodine trioxide,E,NA,O=IOI(=O)
 'I2O4'          ,317.8  ,''      ,-1     ,''     ,-1     ,'VD_I2O4'           , 1   ,'I2O4'           , 1  ,''             ,''        ,'Yes' ,''    ,''   ,'Yes',!Diiodine Tetroxide,E,NA,O=IOI(=O)=O
+'SO4HRXN'       ,96.0    ,''     ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,'SO4HRXN'     ,''        ,''    ,''    ,''    ,''   ,!NA,NA,NA,NA
 /

@@ -619,14 +619,14 @@ Information is based on the mech.def file.
 | HET_CLN3_WAJ   | CLNO3 ----> HOCL + HNO3  | HETERO_CLN3_WAJ | Not Available<sup>2</sup> | 
 | HET_CLN3_ACLJ   | CLNO3 + ACLJ ----> CL2 + ANO3J  | HETERO_CLN3_ACLJ | Not Available<sup>2</sup> | 
 | SOAphot01   | AHOMJ ---->   0.8000\*AMTN1J +    0.2000\*ORA1  |   1.0000E-02\*NO2_RACM2 | Not Available<sup>1</sup> | 
-| HET_SO2_H2O2   | SO2 + H2O2 ----> ASO4J  | HETERO_SO2H | Not Available<sup>2</sup> | 
-| HET_SO2_O3   | SO2 + O3 ----> ASO4J  | HETERO_SO2O | Not Available<sup>2</sup> | 
-| HET_SO2_MEPX   | SO2 + OP1 ----> ASO4J + MOH  | HETERO_SO2M | Not Available<sup>2</sup> | 
-| HET_SO2_PACD   | SO2 + PAA ----> ASO4J + ORA2  | HETERO_SO2P | Not Available<sup>2</sup> | 
-| HET_SO2_NO2   | SO2 + NO2 ----> ASO4J + HONO  | HETERO_SO2N | Not Available<sup>2</sup> | 
-| HET_SO2_TMI   | SO2 + AFEJ + AMNJ ----> ASO4J + AFEJ + AMNJ  | HETERO_SO2T | Not Available<sup>2</sup> | 
+| HET_SO2_H2O2   | SO2 + H2O2 ----> ASO4J + SO4HRXN  | HETERO_SO2H | Not Available<sup>2</sup> | 
+| HET_SO2_O3   | SO2 + O3 ----> ASO4J + SO4HRXN  | HETERO_SO2O | Not Available<sup>2</sup> | 
+| HET_SO2_MEPX   | SO2 + OP1 ----> ASO4J + MOH + SO4HRXN  | HETERO_SO2M | Not Available<sup>2</sup> | 
+| HET_SO2_PACD   | SO2 + PAA ----> ASO4J + ORA2 + SO4HRXN  | HETERO_SO2P | Not Available<sup>2</sup> | 
+| HET_SO2_NO2   | SO2 + NO2 ----> ASO4J + HONO + SO4HRXN  | HETERO_SO2N | Not Available<sup>2</sup> | 
+| HET_SO2_TMI   | SO2 + AFEJ + AMNJ ----> ASO4J + AFEJ + AMNJ + SO4HRXN  | HETERO_SO2T | Not Available<sup>2</sup> | 
 | HET_SO2_HCHO   | SO2 + HCHO ----> AHMSJ  | HETERO_HMSP | Not Available<sup>2</sup> | 
-| HET_SO2_HNO4   | SO2 + HNO4 ----> ASO4J + ANO3J  | HETERO_HNO4 | Not Available<sup>2</sup> | 
+| HET_SO2_HNO4   | SO2 + HNO4 ----> ASO4J + ANO3J + SO4HRXN  | HETERO_HNO4 | Not Available<sup>2</sup> | 
 | HET_HMS_L1   | AHMSJ + HO ----> HO2 + SO2 + ORA1  | HETERO_HMSL1 | Not Available<sup>2</sup> | 
 | HET_HMS_L2   | AHMSJ ----> SO2 + HCHO  | HETERO_HMSL2 | Not Available<sup>2</sup> | 
 

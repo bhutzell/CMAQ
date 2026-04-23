@@ -98,6 +98,7 @@
 | SESQRXN           | counter species for aerosol from sesquiterpenes                              | 204                  | L                      |
 | SO2               | sulfur dioxide                                                               | 64                   | E                      |
 | SOAALK            | tracer for alkanes that can form secondary organic aerosol                   | 112                  | L                      |
+| SO4HRXN           | counter species for sulfate from heterogeneous chem. in aerosol water        | 96                   | E                      |
 | SULF              | sulfuric acid (gaseous)                                                      | 98                   | E                      |
 | SULRXN            | sulfate aerosol precursor                                                    | 98                   | E                      |
 | SVAVB1	        | low volatility organic gas from oxidation of anthropogenic VOCs              | 179.0                | L |
@@ -149,6 +150,7 @@
 | AGLY              | Glyoxal and Methylglyoxal SOA  in aqueous aerosol material                      | 66.4                 | L                      |
 | AH2O              | Water                                                | 18                   | E                      |
 | AH3OP             | Hydronium Ion                                        | 19                   | E                      |
+| AHMS              | Hydroxymethanesulfonate ion                          | 111.1                | E                      |
 | AISO1             | Semivolatile SOA Product from Isoprene               | 132.0                | L                      |
 | AISO2             | High-Volatility SOA Product from Isoprene            | 133.0                | L                      |
 | AISO3             | Acid-catalyzed Isoprene Epoxydiol SOA                | 168.2                | L                      |

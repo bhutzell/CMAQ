@@ -28,7 +28,7 @@ C..ARGUMENTS: None
 
 C..PARAMETERS:
       INTEGER, PARAMETER :: MAX_GRP_SPC   = 20  ! Max no. species in group list
-      INTEGER, PARAMETER :: N_LOW_TOL_SPC = 28  ! No. species w/ low tols, revised by Golam Sarwar
+      INTEGER, PARAMETER :: N_LOW_TOL_SPC = 29  ! No. species w/ low tols, revised by Golam Sarwar
       INTEGER, PARAMETER :: N_HII_TOL_SPC =  4  ! No. species w/ strict rtols, revised by Golam Sarwar
 
 C..EXTERNAL FUNCTIONS:
@@ -65,7 +65,8 @@ C     &                   'O3P'   , 'O1D'     , 'SULF'  /           !radm2
      &                   'HCO3'   ,                                    !cb05     
      &                   'O3P'    , 'O1D2'     , 'BZ_O'   , 'TBU_O'  , !saprc99
      &                   'BZNO2_O', 'HOCOO'    , 'ALK5RXN',
-     &                   'ALKRXN' , 'PAHRO2'   , 'PAHHRXN', 'PAHNRXN' / !  version 5.1 SOA production
+     &                   'ALKRXN' , 'PAHRO2'   , 'PAHHRXN', 'PAHNRXN', !  version 5.1 SOA production
+     &                   'SO4HRXN'  / ! version 6.0 Heterogeneous Sulfate Chemistry Tracking
 
 C set up SPECIES array
 

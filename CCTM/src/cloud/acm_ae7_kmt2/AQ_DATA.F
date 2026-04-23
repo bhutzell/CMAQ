@@ -48,7 +48,7 @@ C-----------------------------------------------------------------------
       Implicit None
 
       Integer, Parameter :: n_aq_gas = 29   ! number of gas-phase species for AQCHEM
-      Integer, Parameter :: n_aq_aer = 32+6   ! number of aerosol surrogate species for AQCHEM
+      Integer, Parameter :: n_aq_aer = 39   ! number of aerosol surrogate species for AQCHEM
 
 !      Integer, Parameter :: naddaer = 2 ! number of additional aerosol surrogate species for AQCHEM
 !      Integer, Parameter :: nadd_tx = 6 ! number of surrogates for HAPS aerosol species for AQCHEM
@@ -185,6 +185,7 @@ C                    ----------  ----------  ------  -----
      & sur_aer_type('DIMER     ',   0.0,     1400.0, 248.23 ),
      & sur_aer_type('ISO3      ',   0.0,     1400.0, 168.2 ),
      & sur_aer_type('HMS       ',   0.0,     1800.0, 111.1 ),
+     & sur_aer_type('STMTRACER ',   0.0,     1800.0,  96.0 ),
      & sur_aer_type('NUM       ',   0.0,        1.0,   1.0 ),
      & sur_aer_type('SRF       ',   0.0,        1.0,   1.0 )/)
 
@@ -214,20 +215,21 @@ C...Pointers for the AQCHEM array AEROSOL
       Integer, Parameter :: lmgco3     = 22 !  Magnesium Carbonate aerosol (place holder)
       Integer, Parameter :: la3fe      = 23 !  Iron aerosol (place holder)
       Integer, Parameter :: lb2mn      = 24 !  Manganese aerosol (place holder)
-      Integer, Parameter :: lso4aqh2o2 = 25 ! Sulfate from aq H2O2 rxn
-      Integer, Parameter :: lso4aqo3   = 26 ! Sulfate from aq O3 rxn
-      Integer, Parameter :: lso4aqfemn = 27 ! Sulfate from aq rxn catalyzed by FE&MN
-      Integer, Parameter :: lso4aqmhp  = 28 ! Sulfate from aq MHP rxn
-      Integer, Parameter :: lso4aqpaa  = 29 ! Sulfate from aq PAA rxn
-      Integer, Parameter :: lietet     = 30 !  
-      Integer, Parameter :: lieos      = 31 !  
-      Integer, Parameter :: limga      = 32 !  
-      Integer, Parameter :: limos      = 33 !  
-      Integer, Parameter :: ldimer     = 34 !  
-      Integer, Parameter :: liso3      = 35 !
-      Integer, Parameter :: lhms       = 36  
-      Integer, Parameter :: lnum       = 37 !  Number
-      Integer, Parameter :: lsrf       = 38 !  Surface area
+      Integer, Parameter :: lso4aqh2o2 = 25 !  Sulfate from aq H2O2 rxn
+      Integer, Parameter :: lso4aqo3   = 26 !  Sulfate from aq O3 rxn
+      Integer, Parameter :: lso4aqfemn = 27 !  Sulfate from aq rxn catalyzed by FE&MN
+      Integer, Parameter :: lso4aqmhp  = 28 !  Sulfate from aq MHP rxn
+      Integer, Parameter :: lso4aqpaa  = 29 !  Sulfate from aq PAA rxn
+      Integer, Parameter :: lietet     = 30 !  2-methyltetrols from IEPOX uptake onto particles
+      Integer, Parameter :: lieos      = 31 !  IEPOX-derived organosulfate
+      Integer, Parameter :: limga      = 32 !  2-methylglyceric acid from MAE+HMML uptake onto particles
+      Integer, Parameter :: limos      = 33 !  MAE+HMML-derived organosulfate 
+      Integer, Parameter :: ldimer     = 34 !  Oligomers (dimers) from IEPOX uptake onto particles  
+      Integer, Parameter :: liso3      = 35 !  Acid-Catalyzed Isoprene SOA compounds
+      Integer, Parameter :: lhms       = 36 !  Hydroxymethanesulfonate 
+      Integer, Parameter :: lstmtracer = 37 !  Sulfate from other STM processes 
+      Integer, Parameter :: lnum       = 38 !  Number
+      Integer, Parameter :: lsrf       = 39 !  Surface area
       
       Integer, Save :: n_aqsrg_gas( n_aq_gas )             ! Store Number of CGRID species pointing to each surrogate
       Integer, Save :: n_aqsrg_aer( n_aq_aer,n_mode )      ! Store Number of CGRID species pointing to each surrogate

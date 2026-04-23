@@ -1504,6 +1504,7 @@
              INDEX_MSA          = IOLD2NEW( INDEX_MSA         , 1 )
              INDEX_ANO3I        = IOLD2NEW( INDEX_ANO3I       , 1 )
              INDEX_ANO3J        = IOLD2NEW( INDEX_ANO3J       , 1 )
+             INDEX_SO4HRXN      = IOLD2NEW( INDEX_SO4HRXN     , 1 )
              INDEX_AFEJ         = IOLD2NEW( INDEX_AFEJ        , 1 )
              INDEX_AMNJ         = IOLD2NEW( INDEX_AMNJ        , 1 )
              INDEX_AHMSJ        = IOLD2NEW( INDEX_AHMSJ       , 1 )

@@ -54,7 +54,7 @@ C-----------------------------------------------------------------------
 
       Implicit None
 
-      Integer, Parameter :: n_precursor = 31   ! # of precursors
+      Integer, Parameter :: n_precursor = 32   ! # of precursors
 
       Type precursor_type
          Character( 16 ) :: name               ! species name
@@ -69,7 +69,7 @@ C                       Name    RxnCounter  Update  Required
 C                    ---------   ---------- ------  ------
      & precursor_type( 'NO2    ', .False. , .True., .True.  ),
      & precursor_type( 'N2O5   ', .False. , .True., .True.  ),
-     & precursor_type( 'O3     ', .False. , .True., .False. ),
+     & precursor_type( 'O3     ', .False. , .False., .False. ),
      & precursor_type( 'HNO3   ', .False. , .True., .True.  ),
      & precursor_type( 'HONO   ', .False. , .True., .True.  ),
      & precursor_type( 'ISOPRXN', .True.  , .True., .False. ),
@@ -92,12 +92,13 @@ C                    ---------   ---------- ------  ------
      & precursor_type( 'PAHHRXN', .True.  , .True., .False. ),
      & precursor_type( 'PCSOARXN',.True.  , .True., .False. ),
      & precursor_type( 'PHGRXN ', .True.  , .True., .False. ),    
-     & precursor_type( 'H2O2   ', .False. , .True., .False. ),
-     & precursor_type( 'HCHO   ', .False. , .True., .False. ),
-     & precursor_type( 'HNO4   ', .False. , .True., .False. ),
-     & precursor_type( 'OP1    ', .False. , .True., .False. ),
-     & precursor_type( 'PAA    ', .False. , .True., .False. ),
-     & precursor_type( 'SO2    ', .False. , .True., .False. )/)
+     & precursor_type( 'H2O2   ', .False. , .False., .False. ),
+     & precursor_type( 'HCHO   ', .False. , .False., .False. ),
+     & precursor_type( 'HNO4   ', .False. , .False., .False. ),
+     & precursor_type( 'OP1    ', .False. , .False., .False. ),
+     & precursor_type( 'PAA    ', .False. , .False., .False. ),
+     & precursor_type( 'SO2    ', .False. , .False., .False. ),
+     & precursor_type( 'SO4HRXN', .True.  , .True., .False. )/)
      
 C Required species
       Character( 16 ), Private, Parameter :: req_NO2    = 'NO2'
@@ -117,6 +118,7 @@ C Required species
       Character( 16 ), Private, Parameter :: req_O3     = 'O3'
       Character( 16 ), Private, Parameter :: req_OP1    = 'OP1'
       Character( 16 ), Private, Parameter :: req_PAA    = 'PAA'
+      Character( 16 ), Private, Parameter :: req_SO4HRXN = 'SO4HRXN'
 
 C Indices of required species
       Integer :: NO2_idx
@@ -136,6 +138,7 @@ C Indices of required species
       Integer :: O3_idx
       Integer :: OP1_idx
       Integer :: PAA_idx
+      Integer :: SO4HRXN_idx
 
       Real( 8 ) :: precursor_mw( n_precursor )   ! mol wt from cgrid_spcs [g/mol]
 
@@ -171,7 +174,7 @@ C----------------------------------------------------------------------
       Use cgrid_spcs, only: n_gc_g2ae, gc_g2ae, gc_g2ae_map, gc_molwt, gc_strt,
      &                      n_nr_n2ae, nr_n2ae, nr_n2ae_map, nr_molwt, nr_strt
       Use utilio_defn, only: index1, xstat3, m3warn, m3exit
-      Use runtime_vars, only: logdev, log_subheading
+      Use runtime_vars, only: logdev, log_subheading, stm
 
       Implicit None
 
@@ -238,76 +241,90 @@ C Find indices of required species
       end if
       
       If ( hethms ) Then 
-        SO2_idx    = findPrecursor( req_SO2,    .false.)
-        H2O2_idx   = findPrecursor( req_H2O2,   .false.)
-        HCHO_idx   = findPrecursor( req_HCHO,   .false.)
-        HNO4_idx   = findPrecursor( req_HNO4,   .false.)
-        O3_idx     = findPrecursor( req_O3,     .false.)
-        OP1_idx    = findPrecursor( req_OP1,    .false.)
-        PAA_idx    = findPrecursor( req_PAA,    .false.)
-	 	  
+         SO2_idx    = findPrecursor( req_SO2,    .false.)
+         H2O2_idx   = findPrecursor( req_H2O2,   .false.)
+         HCHO_idx   = findPrecursor( req_HCHO,   .false.)
+         HNO4_idx   = findPrecursor( req_HNO4,   .false.)
+         O3_idx     = findPrecursor( req_O3,     .false.)
+         OP1_idx    = findPrecursor( req_OP1,    .false.)
+         PAA_idx    = findPrecursor( req_PAA,    .false.)
+         If ( stm ) 
+     &     SO4HRXN_idx    = findPrecursor( req_SO4HRXN,    .false.)
+ 
          If(   precursor_map( SO2_idx ) .Lt. 1  )Then
-           xmsg = ' Gas Phase Precursor ' // Trim( req_SO2 )
+            xmsg = ' Gas Phase Precursor ' // Trim( req_SO2 )
      &         // ' SO2 is not found -> is missing'
-           Call m3warn( 'map_precursor', 0, 0, xmsg )
-	   Precursor_eflag = .true.
-         End If 	 
-	 
+            Call m3warn( 'map_precursor', 0, 0, xmsg )
+            Precursor_eflag = .true.
+         End If  
+ 
          If(   precursor_map( H2O2_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_H2O2 )
      &         // ' H2O2 is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
-	   Precursor_eflag = .true.
-         End If 	 
-	 
+           Precursor_eflag = .true.
+         End If  
+ 
          If(   precursor_map( O3_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_O3 )
      &         // ' O3 is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
-	   Precursor_eflag = .true.
+           Precursor_eflag = .true.
          End If 
 
          If(   precursor_map( HCHO_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_HCHO )
      &         // ' HCHO is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
-	   Precursor_eflag = .true.
+           Precursor_eflag = .true.
          End If 
-	   
+   
          If(   precursor_map( HNO4_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_HNO4 )
      &         // ' HNO4 is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
-	   Precursor_eflag = .true.
-         End If 	   
+           Precursor_eflag = .true.
+         End If    
 
          If(   precursor_map( OP1_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_OP1 )
      &         // ' OP1 is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
-	   Precursor_eflag = .true.
+           Precursor_eflag = .true.
           End If
-	  
-	  If(   precursor_map( PAA_idx ) .Lt. 1  )Then
+  
+         If(   precursor_map( PAA_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_PAA )
      &         // ' PAA is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
-	   Precursor_eflag = .true.
-          End If
+           Precursor_eflag = .true.
+         End If
+  
+         If ( stm ) Then
+            If(   precursor_map( SO4HRXN_idx ) .Lt. 1  )Then
+              xmsg = ' Gas Phase Precursor ' // Trim( req_SO4HRXN )
+     &         // ' SO4HRXN is not found -> is missing'
+              Call m3warn( 'map_precursor', 0, 0, xmsg )
+              Precursor_eflag = .true.
+            End If
+         End If
 
 #ifdef verbose_aero
         Else 
-         xmsg = ' No heterogeneous sulfur chemistry in aerosol water.'
-         Call m3warn( 'map_precursor', 0, 0, xmsg )
-               SO2_idx = 0
-	       H2O2_idx = 0
-	       O3_idx = 0
-	       HCHO_idx = 0
-	       HNO4_idx = 0
-	       OP1_idx = 0
-	       PAA_idx = 0
+           xmsg = ' No heterogeneous sulfur chemistry in aerosol water.'
+           Call m3warn( 'map_precursor', 0, 0, xmsg )
+           SO2_idx = 0
+           H2O2_idx = 0
+           O3_idx = 0
+           HCHO_idx = 0
+           HNO4_idx = 0
+           OP1_idx = 0
+           PAA_idx = 0
+           If ( stm ) Then
+              SO4HRXN_idx = 0
+           End If
 #endif
-      End If      
+        End If      
 
 #ifdef verbose_aero
       Write( logdev,'( /5x, a )' ) 'map_precursor required species'
@@ -327,6 +344,7 @@ C Find indices of required species
       Write( logdev,'( 5x, a, i4 )' ) 'O3_idx:     ', O3_idx
       Write( logdev,'( 5x, a, i4 )' ) 'OP1_idx:    ', OP1_idx
       Write( logdev,'( 5x, a, i4 )' ) 'PAA_idx:    ', PAA_idx
+      Write( logdev,'( 5x, a, i4 )' ) 'SO4HRXN_idx:', SO4HRXN_idx
       
       if( aphgj_idx .gt. 0 )then
           Write( logdev,'( 5x, a, i4 )' ) 'PHGRXN_idx:     ', PHGRXN_idx

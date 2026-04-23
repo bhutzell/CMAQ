@@ -3328,7 +3328,7 @@ C FEMNprec = limit soluble Fe and Mn by solid precipitation (less Fe available t
       INTEGER, PARAMETER :: IONEFF = 1     ! 1 = Use ionic strength enhancement factors for Henry's Law coefs for SO2 and H2O2, 
                                            ! SO2 dissoc coefs, and kO3 and kh2o2 rate coefficients; 0 = no addnl ionic EFs
       INTEGER, PARAMETER :: HMSlo = 0      ! 0 for high HMS prod rate, 1 for low HMS prod rate, 2 for avg
-      INTEGER, PARAMETER :: TVOL = 3       ! 1 = just inorg water, 2 = total water, 3 = total J mode volume, 4 = just inorg spcs considered in isorropia
+      INTEGER, PARAMETER :: TVOL = 3       ! 1 = just inorg water, 2 = total water, 3 = total J mode volume, 4 = just inorg aero spcs in isorropia, fe3+, mn2+, h2o
       INTEGER, PARAMETER :: FEMNprec = 1   ! 1 = limit Fe and Mn by solid precipitation 
 
 C *** Parameters for SO2        
@@ -3389,7 +3389,7 @@ C *** TVOL = 1 - Use inorganic water
 C *** TVOL = 2 - Use inorganic + organic water 
 C *** TVOL = 3 - Use total J mode volume
 C *** TVOL = 4 - Calculate volume using only transported species considered
-C ***            in ISORROPIA, including (inorganic) water    
+C ***            in ISORROPIA, including (inorganic) water, as well as Fe3+, Mn2+    
 
 
        IF( TVOL .EQ. 4 ) THEN

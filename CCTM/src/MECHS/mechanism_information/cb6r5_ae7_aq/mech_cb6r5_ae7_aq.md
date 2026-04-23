@@ -366,6 +366,16 @@ Information is based on the mech.def file.
 | DMS4   | DMS + CL ---->   0.8600\*SO2 + MEO2 +    0.4500\*FORM +    0.4500\*HCL +    0.1400\*MSA +    0.5500\*CLO  |   3.40E-13e<sup>  2081.00/T</sup> |   3.6537E-10 |
 | HET_ANO3I   | ANO3I ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_ANO3 | Not Available<sup>2</sup> | 
 | HET_ANO3J   | ANO3J ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_ANO3 | Not Available<sup>2</sup> | 
+| HET_SO2_H2O2   | SO2 + H2O2 ----> ASO4J + SO4HRXN  | HETERO_SO2H | Not Available<sup>2</sup> | 
+| HET_SO2_O3   | SO2 + O3 ----> ASO4J + SO4HRXN  | HETERO_SO2O | Not Available<sup>2</sup> | 
+| HET_SO2_MEPX   | SO2 + MEPX ----> ASO4J + MEOH + SO4HRXN  | HETERO_SO2M | Not Available<sup>2</sup> | 
+| HET_SO2_PACD   | SO2 + PACD ----> ASO4J + AACD + SO4HRXN  | HETERO_SO2P | Not Available<sup>2</sup> | 
+| HET_SO2_NO2   | SO2 + NO2 ----> ASO4J + HONO + SO4HRXN  | HETERO_SO2N | Not Available<sup>2</sup> | 
+| HET_SO2_TMI   | SO2 + AFEJ + AMNJ ----> ASO4J + AFEJ + AMNJ + SO4HRXN  | HETERO_SO2T | Not Available<sup>2</sup> | 
+| HET_SO2_HCHO   | SO2 + FORM ----> AHMSJ  | HETERO_HMSP | Not Available<sup>2</sup> | 
+| HET_SO2_HNO4   | SO2 + PNA ----> ASO4J + ANO3J + SO4HRXN  | HETERO_HNO4 | Not Available<sup>2</sup> | 
+| HET_HMS_L1   | AHMSJ + OH ----> HO2 + SO2 + FACD  | HETERO_HMSL1 | Not Available<sup>2</sup> | 
+| HET_HMS_L2   | AHMSJ ----> SO2 + FORM  | HETERO_HMSL2 | Not Available<sup>2</sup> | 
 
 <sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     
 <sup>1</sup>Photolysis Reaction;depends on radiation and predicted concentrations     

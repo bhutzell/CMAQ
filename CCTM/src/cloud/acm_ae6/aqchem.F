@@ -446,7 +446,7 @@ C...for sulfur tracking
       REAL( 8 ) :: FE_SOL          ! Fractional Fe solubility, GS - July 1, 2011
       REAL( 8 ) :: MN_SOL          ! Fractional Mn solubility, GS - July 1, 2011
 
-      REAL( 8 ) :: TRACI, POAI, PRII, SOAI
+      REAL( 8 ) :: TRACI, POAI, PRII, SOAI, STMTRACI
 
       REAL( 8 ), SAVE :: SOIL_FE_FAC  ! Fe molar fraction of ASOIL
       REAL( 8 ), SAVE :: CORS_FE_FAC  ! Fe molar fraction of ACORS
@@ -483,6 +483,9 @@ C...........Local Variables (arrays):
       REAL( 8 ) :: TRACERCOR        ! TRACER coarse aerosol in cloudwater (mol/liter)
       REAL( 8 ) :: HGFINE           ! mercury PM acc+akn aerosol in cloudwater (mol/liter)
       REAL( 8 ) :: HGCOR            ! mercury PM coarse aerosol in cloudwater (mol/liter)
+      
+      REAL( 8 ) :: STMTRACER           ! STM TRACER acc+akn aerosol in cloudwater (mol/liter)
+      REAL( 8 ) :: STMTRACERCOR        ! STM TRACER coarse aerosol in cloudwater (mol/liter)
 
 
 #ifdef sens
@@ -946,6 +949,8 @@ C...   = Initial amount - amount deposited  (mol/liter)
         PRII = LOADING( LPRI, IAIT ) - WETDEP( LPRIIL ) * XC1
         SOAI = LOADING( LSOA, IAIT ) - WETDEP( LSOAIL ) * XC1
 
+        IF ( STM ) STMTRACI = LOADING( LSTMTRACER, IAIT ) - WETDEP( LSTMTRACIL ) * XC1
+
 !       FE_OX = 0.5D0 * 0.62D0 * FE      ! SLN 28March2011
 !       MN_OX = 1.0D0 * 0.84D0 * MN      ! SLN 28March2011
 
@@ -995,6 +1000,7 @@ C...don't allow aerosol concentrations to go below zero
           TS6AQFEMN = MAX( TS6AQFEMN, 0.0D0 )
           TS6AQMHP  = MAX( TS6AQMHP,  0.0D0 )
           TS6AQPAA  = MAX( TS6AQPAA,  0.0D0 )
+          STMTRACI  = MAX( STMTRACI,  0.0D0 )
         END IF
         NA      = MAX( NA,      0.0D0 )
         CA      = MAX( CA,      0.0D0 )
@@ -1146,6 +1152,15 @@ C...Aerosol specific to TXHG Versions
         
         TRACERCOR  = LOADING( LTRACER,  ICOR ) - WETDEP( LTRACERCORL ) * XC1
         TRACERCOR = MAX( TRACERCOR, 0.0D0 )
+
+        IF ( STM ) THEN
+           STMTRACER = LOADING( LSTMTRACER,  IACC ) + LOADING( LSTMTRACER,  IAIT )
+     &             - WETDEP( LSTMTRACL ) * XC1
+           STMTRACER    = MAX( STMTRACER,    0.0D0 )
+        
+           STMTRACERCOR  = LOADING( LSTMTRACER,  ICOR ) - WETDEP( LSTMTRACCORL ) * XC1
+           STMTRACERCOR = MAX( STMTRACERCOR, 0.0D0 )
+        END IF
  
         HGFINE    = LOADING( LPHG,  IACC ) + LOADING( LPHG,  IAIT )
      &             - WETDEP( LPHGFINEL ) * XC1
@@ -1657,6 +1672,7 @@ C...load the liquid concentration array with current values
           LIQUID( LTS6AQFEMNL   ) = TS6AQFEMN
           LIQUID( LTS6AQMHPL    ) = TS6AQMHP
           LIQUID( LTS6AQPAAL    ) = TS6AQPAA
+          LIQUID( LSTMTRACIL )    = STMTRACI
         END IF
 
 #ifdef sens
@@ -1722,6 +1738,11 @@ C...Load array variable TXHG Version
         LIQUID( LTRACERCORL )  = TRACERCOR
         LIQUID( LPHGFINEL   )  = HGFINE
         LIQUID( LPHGCORL    )  = HGCOR
+
+        IF ( STM ) THEN
+           LIQUID( LSTMTRACL    )  = STMTRACER
+           LIQUID( LSTMTRACCORL )  = STMTRACERCOR
+        END IF
 
 
 C...if the maximum cloud lifetime has not been reached, then compute
@@ -2406,13 +2427,24 @@ C...aerosol concentrations (mol/molV)
       AEROSOL( LSOA, IAIT ) = AEROSOL( LSOA, IAIT ) * EALFA3T
 
       AEROSOL( LSO4, IACC ) = TS6ACC * XL * RECIPAP1
+      
       IF ( STM ) THEN
+        
+        AERWDEP( LSTMTRACER, IAIT ) = 0.0D0
+        AERWDEP( LSTMTRACER, IACC ) = WETDEP( LSTMTRACL )
+        AERWDEP( LSTMTRACER, ICOR ) = WETDEP( LSTMTRACCORL )
+        AEROSOL( LSTMTRACER, IAIT ) = AEROSOL( LSTMTRACER, IAIT ) * EALFA3T
+        AEROSOL( LSTMTRACER, IACC ) = STMTRACER    * XL * RECIPAP1
+        AEROSOL( LSTMTRACER, ICOR ) = STMTRACERCOR * XL * RECIPAP1
+      
         AEROSOL( LSO4AQH2O2, IACC ) = TS6AQH2O2  * XL * RECIPAP1
         AEROSOL( LSO4AQO3,   IACC ) = TS6AQO3    * XL * RECIPAP1
         AEROSOL( LSO4AQFEMN, IACC ) = TS6AQFEMN  * XL * RECIPAP1
         AEROSOL( LSO4AQMHP,  IACC ) = TS6AQMHP   * XL * RECIPAP1
         AEROSOL( LSO4AQPAA,  IACC ) = TS6AQPAA   * XL * RECIPAP1
+
       END IF
+      
       AEROSOL( LEC,  IACC ) = EC     * XL * RECIPAP1
       AEROSOL( LPRI, IACC ) = PRIM   * XL * RECIPAP1
 
@@ -2493,6 +2525,12 @@ C   bulk aerosol aqueous chemistry tracer
       IF( AEROSOL(LSOA, IACC) .GT. 0.d0 ) 
      &   FRACAIT( LSOA ) = MIN((SOAI  * XL * RECIPAP1) / 
      &                     AEROSOL(LSOA, IACC), 1.0D0)
+
+      IF ( STM ) THEN
+         IF( AEROSOL(LSTMTRACER, IACC) .GT. 0.d0 ) 
+     &      FRACAIT( LSTMTRACER )  = MIN((STMTRACI  * XL * RECIPAP1) / 
+     &                         AEROSOL(LSTMTRACER, IACC), 1.0D0)
+      END IF 
 
 C...store the amount of hydrogen deposition
 
