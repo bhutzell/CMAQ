@@ -47,7 +47,7 @@ C-----------------------------------------------------------------------
 #endif
 
 #ifdef sens
-      USE DDM3D_DEFN, ONLY : NP, NPMAX, SENGRID, IPT
+      USE DDM3D_DEFN, ONLY : NP, NPMAX, SENGRID, IPT, IREGION
 #endif
       USE CONST, ONLY : PI180
      
@@ -243,6 +243,7 @@ C     DO L = KPV, NLAYS
                DO NP = 1, NPMAX
                   IF ( IPT( NP ) .EQ. 6 ) THEN
                      SENGRID( C, R, L, NP, VO3 ) = CGRID( C, R, L, VO3 )
+     &                                           * IREGION( C,R,L,NP )
                   END IF
                END DO
 #endif
