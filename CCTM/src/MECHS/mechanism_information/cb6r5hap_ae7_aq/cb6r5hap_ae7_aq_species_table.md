@@ -161,6 +161,7 @@
 | AGLY              | Glyoxal and Methylglyoxal SOA  in aqueous aerosol material                      | 66.4                 | L                      |
 | AH2O              | Water                                                | 18                   | E                      |
 | AH3OP             | Hydronium Ion                                        | 19                   | E                      |
+| AHMS              | Hydroxymethanesulfonate ion                          | 111.1                | E                      |
 | AISO1             | Semivolatile SOA Product from Isoprene               | 132.0                | L                      |
 | AISO2             | High-Volatility SOA Product from Isoprene            | 133.0                | L                      |
 | AISO3             | Acid-catalyzed Isoprene Epoxydiol SOA                | 168.2                | L                      |

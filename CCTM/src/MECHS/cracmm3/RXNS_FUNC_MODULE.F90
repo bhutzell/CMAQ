@@ -2065,6 +2065,7 @@
              INDEX_ACLJ        = IOLD2NEW( INDEX_ACLJ       , 1 )
              INDEX_ACLK        = IOLD2NEW( INDEX_ACLK       , 1 )
              INDEX_AMTN1J      = IOLD2NEW( INDEX_AMTN1J     , 1 )
+             INDEX_SO4HRXN     = IOLD2NEW( INDEX_SO4HRXN    , 1 )
              INDEX_AFEJ        = IOLD2NEW( INDEX_AFEJ       , 1 )
              INDEX_AMNJ        = IOLD2NEW( INDEX_AMNJ       , 1 )
              INDEX_AHMSJ       = IOLD2NEW( INDEX_AHMSJ      , 1 )

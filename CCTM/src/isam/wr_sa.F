@@ -24,7 +24,6 @@ c
 C     Revision history
 C     01 Nov 2018: S.Napelenok Updates for cmaq5.3 release 
 C     09 May 2019: D.Wong Removed all MY_ clauses
-C     12 Jan 2026: D.Wong Removed SE_BARRIER call
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       SUBROUTINE WR_SA ( JDATE, JTIME, TSTEP, NSTEPS )
@@ -78,6 +77,10 @@ c     INTEGER          ALLOCSTAT, LOGDEV
       REAL, ALLOCATABLE, SAVE :: ISAM_BUFF ( :,:,:,: )  ! save added on 20140306
 
 C-----------------------------------------------------------------------
+
+
+      CALL SUBST_BARRIER
+
 
 Ckrt     print*,'N_SPCTAG, JDATE, JTIME '
 Ckrt     print*, N_SPCTAG, JDATE, JTIME  

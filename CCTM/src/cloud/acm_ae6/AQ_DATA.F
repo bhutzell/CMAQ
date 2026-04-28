@@ -46,9 +46,9 @@ C-----------------------------------------------------------------------
       Implicit None
 
       Integer, Parameter :: n_aq_gas = 15   ! number of gas-phase species for AQCHEM
-      Integer, Parameter :: n_aq_aer = 31   ! number of aerosol surrogate species for AQCHEM
+      Integer, Parameter :: n_aq_aer = 32   ! number of aerosol surrogate species for AQCHEM
 
-      Integer, Parameter :: n_aq_liqs = 64  ! number of liquid-phase species in AQCHEM
+      Integer, Parameter :: n_aq_liqs = 67  ! number of liquid-phase species in AQCHEM
       Integer, Parameter :: mxsrg = 70  ! maximum number of species for surrogate
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -142,6 +142,7 @@ C                    ----------  ----------  ------  -----
      & sur_aer_type('SO4_AQFEMN',   0.0,     1800.0,  96.0 ),
      & sur_aer_type('SO4_AQMHP ',   0.0,     1800.0,  96.0 ),
      & sur_aer_type('SO4_AQPAA ',   0.0,     1800.0,  96.0 ),
+     & sur_aer_type('STMTRACER ',   0.0,     1800.0,  96.0 ),
      & sur_aer_type('NUM       ',   0.0,        1.0,   1.0 ),
      & sur_aer_type('SRF       ',   0.0,        1.0,   1.0 )/)
 
@@ -175,8 +176,9 @@ C...Pointers for the AQCHEM array AEROSOL
       Integer, Parameter :: lso4aqfemn = 27 ! Sulfate from aq rxn catalyzed by FE&MN
       Integer, Parameter :: lso4aqmhp  = 28 ! Sulfate from aq MHP rxn
       Integer, Parameter :: lso4aqpaa  = 29 ! Sulfate from aq PAA rxn
-      Integer, Parameter :: lnum       = 30 !  Number
-      Integer, Parameter :: lsrf       = 31 !  Surface area
+      Integer, Parameter :: lstmtracer = 30 ! 
+      Integer, Parameter :: lnum       = 31 !  Number
+      Integer, Parameter :: lsrf       = 32 !  Surface area
 
 C...Pointers for the AQCHEM arrays LIQUID and WETDEP
       Integer, Parameter :: lacl        = 01  ! Hydrogen ion
@@ -243,10 +245,14 @@ C for sulfur tracking model
       Integer, Parameter :: lts6aqmhpl  = 59 ! total S(VI) from aq MHP rxn
       Integer, Parameter :: lts6aqpaal  = 60 ! total S(VI) from aq PAA rxn
       
-      Integer, Parameter :: ltracil = 61
-      Integer, Parameter :: lpoail = 62
-      Integer, Parameter :: lpriil = 63
-      Integer, Parameter :: lsoail = 64
+      Integer, Parameter :: ltracil = 61     ! Aitken mode TRACER surrogate transferred to/remaining in droplet
+      Integer, Parameter :: lpoail = 62      ! Aitken mode POA surrogate transferred to/remaining in droplet
+      Integer, Parameter :: lpriil = 63      ! Aitken mode PRI surrogate transferred to/remaining in droplet
+      Integer, Parameter :: lsoail = 64      ! Aitken mode SOA surrogate transferred to/remaining in droplet
+
+      Integer, Parameter :: lstmtracil = 65   ! Aitken mode STMTRACER surrogate transferred to/remaining in droplet
+      Integer, Parameter :: lstmtracl = 66    ! accumulation mode STMTRACER
+      Integer, Parameter :: lstmtraccorl = 67 ! coarse mode STMTRACER
 
       Integer, Save :: n_aqsrg_gas( n_aq_gas )             ! Store Number of CGRID species pointing to each surrogate
       Integer, Save :: n_aqsrg_aer( n_aq_aer,n_mode )      ! Store Number of CGRID species pointing to each surrogate

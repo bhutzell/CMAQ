@@ -1,5 +1,34 @@
 # Detailed Emissions Scaling Isolation and Diagnostics Module (DESID)
 
+### Minor Bug Fix to DESID and ISAM
+**Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
+**Type of update**: Bug Fix   
+**Release Version/Date**:  CMAQv6.0 
+
+**Description**:
+Issue1) DESID is incapable of meeting at least one mapping feature. It cannot create a new rule for a species just over a specific region of the domain. For example, if the species ETOX is scaled to CO emissions for wildfires in CANADA:
+
+"CANADA",  "WILDFIRE",  "CO",  "ETOX",  "GAS",  0.0002, "a"
+will not produce emissions. However, if this rule is preceded by a rule that defines ETOX emissions (even if they're zero), then the correct emissions are produced.
+
+"CANADA",  "WILDFIRE",  "CO",  "ETOX",  "GAS",  0.0, "a"
+"CANADA",  "WILDFIRE",  "CO",  "ETOX",  "GAS",  0.0002, "a"
+The first rule doesn't even have to be just over CANADA:
+
+"EVERYWEHERE",  "WILDFIRE",  "CO",  "ETOX",  "GAS",  0.0, "a"
+"CANADA",  "WILDFIRE",  "CO",  "ETOX",  "GAS",  0.0002, "a"
+This PR revises the algorithm for defining unique regions. Instead of setting the region of the first scale factor manually to the full domain, the new algorithm initializes the unique region vector to 0 and adds every unique region, including the full domain explicitly.
+
+Issue 2) Chloride was omitted from the implementation of PM_IONS in ISAM. This is now added.
+
+**Significance and Impact**:
+This PR will ensure that mapping with DESID works even in complex cases like scaling a new species just over a specific region of the full domain. It will also make sure chloride aerosol concentrations are reported for source apportionment simulations when the PM_IONS option is chosen for ISAM.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1360](https://github.com/USEPA/CMAQ_Dev/commit/0e2e923b2c07e6b76ea63dbf6d0f792253f4ed80) | [PR#1360](https://github.com/USEPA/CMAQ_Dev/pull/1360)  | 
+
+
 ### Improve DESID Error Checking for Negative Emissions  
 **Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix   

@@ -1,5 +1,19 @@
 # Process Analysis and Sulfur Tracking Model (STM)
 
+## Sulfur Tracking Method updates for cb6* and cracmm3* mechanisms
+ [Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Science Update 
+**Release Version/Date**: CMAQv6.0
+
+**Description**: 
+This update adds a new sulfur tracking tag to account for the sulfate production in aerosol water added to the cb6* and cracmm3* mechanisms in CMAQv6.0.
+
+**Significance and Impact**: 
+With the recent addition of heterogeneous sulfur chemistry to cb6* and cracmm3* chemical mechanisms, CMAQ's Sulfur Tracking Method required an update to account for sulfate formation in aerosol water. Only minimal changes to standard model outputs are expected.
+
+ **Internal PRs**:
+[PR#1420](https://github.com/USEPA/CMAQ_Dev/pull/1420)  
+
 ## Fix to Process Analysis Tool
 **Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of Update**: Bug Fix   

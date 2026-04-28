@@ -119,6 +119,7 @@ Table 2. Sulfur Tracking Species
 |AE           |ASO4AQMHPJ  | 96.0 |ASO4J produced by aqueous-phase methyl hydrogen peroxide oxidation reaction:  MHP + S(IV) -> S(VI) |
 |AE           |ASO4AQPAAJ  | 96.0 |ASO4J produced by aqueous-phase peroxyacetic acid oxidation reaction:  PAA + S(IV) -> S(VI) |
 |AE           |ASO4GASJ    | 96.0 |ASO4J condensation following gas-phase reaction:  OH + SO<sub>2</sub> -> SULF + HO<sub>2</sub> |
+|AE           |ASO4HETJ    | 96.0 |ASO4J produced by heterogeneous reactions in aerosol water |
 |AE           |ASO4EMISJ   | 96.0 |ASO4J from source emissions |
 |AE           |ASO4ICBCJ   | 96.0 |ASO4J from boundary and initial conditions |
 |AE           |ASO4GASI    | 96.0 |Aitken mode sulfate (ASO4I) nucleation and/or condensation following gas-phase reaction:  OH + SO<sub>2</sub> -> SULF + HO<sub>2</sub> |
@@ -139,6 +140,7 @@ Table 3.  Additional Tracking Species Representing Loss of Inorganic Sulfate to 
 |AE           |OSO4AQFEMNJ | 96.0 |Loss of ASO4AQFEMNJ to organosulfate |
 |AE           |OSO4AQMHPJ  | 96.0 |Loss of ASO4AQMHPJ to organosulfate |
 |AE           |OSO4AQPAAJ  | 96.0 |Loss of ASO4AQPAAJ to organosulfate |
+|AE           |OSO4HETJ    | 96.0 |Loss of ASO4HETJ to organosulfate |
 |AE           |OSO4GASJ    | 96.0 |Loss of ASO4GASJ to organosulfate |
 |AE           |OSO4EMISJ   | 96.0 |Loss of ASO4EMISJ to organosulfate |
 |AE           |OSO4ICBCJ   | 96.0 |Loss of ASO4ICBCJ to organosulfate |

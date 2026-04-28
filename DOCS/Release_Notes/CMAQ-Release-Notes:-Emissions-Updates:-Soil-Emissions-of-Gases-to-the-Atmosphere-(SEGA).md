@@ -80,6 +80,7 @@ Figure 13, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2018 1
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1332](https://github.com/USEPA/CMAQ_Dev/pull/1332/commits/56687957431443800ffdb28ed51e1e53540b0ac1) | [PR#1332](https://github.com/USEPA/CMAQ_Dev/pull/1332)  | 
+|[Merge for PR#1332](https://github.com/USEPA/CMAQ_Dev/commit/f5192cffca116ad6144d01216cf5fd128cef2132) | [PR#1332](https://github.com/USEPA/CMAQ_Dev/pull/1332) | 
 |[Merge for PR#1379](https://github.com/USEPA/CMAQ_Dev/commit/ab3f9bce2f7850f4ffea887a08272106bc6e7b42) | [PR#1379](https://github.com/USEPA/CMAQ_Dev/pull/1379) | 
-| | [PR#1386](https://github.com/USEPA/CMAQ_Dev/pull/1386) |
+|[Merge for PR#1386](https://github.com/USEPA/CMAQ_Dev/commit/d00b77ea602d4957120a13d2d96b1bd5771f0341) | [PR#1386](https://github.com/USEPA/CMAQ_Dev/pull/1386) |
+|[Merge for PR#1394](https://github.com/USEPA/CMAQ_Dev/commit/de4621bcb5eb67e5da1e3fa614d498fe9525247b) | [PR#1394](https://github.com/USEPA/CMAQ_Dev/pull/1394) |

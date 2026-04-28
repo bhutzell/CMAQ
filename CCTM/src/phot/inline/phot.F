@@ -107,7 +107,6 @@
 !     Aug 12, 15 D. Wong: Replaced MYPE with IO_PE_INCLUSIVE for parallel I/O implementation
 !     Feb 01, 19 David Wong: Implemented centralized I/O approach, removed all MY_N
 !                            clauses
-!     Jan 12, 26 David Wong: Removed SE_BARRIER call
 
 !----------------------------------------------------------------------
 
@@ -634,6 +633,9 @@ C...modules
 #endif
 
          END IF  ! photdiag
+#ifndef mpas
+         CALL SUBST_BARRIER
+#endif
 
          ALLOCATE ( AERO_EXT_550( NCOLS,NROWS,NLAYS ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
