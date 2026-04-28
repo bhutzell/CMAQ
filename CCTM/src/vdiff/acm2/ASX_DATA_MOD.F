@@ -852,11 +852,11 @@ C Arguments:
 
 C Parameters:
          Real, Parameter :: cond_min = 1.0 / resist_max ! minimum conductance [m/s]
-         Real, Parameter :: KZL    = 0.01       ! lowest KZ 
-         Real, Parameter :: KZU    = 1.0        ! 2.0  ! highest KZ
+         Real, Parameter :: KZL    = 0.01       ! lowest KZ, when Urban fraction is zero
          Real, Parameter :: EPS    = 1.0E-08    ! small number for temperature difference
 
 C Local variables:
+         Real    KZU ! highest KZ, when urban fraction is 100
          Real    FINT
          Real    CPAIR, LV, QST 
          Real    TMPFX, TMPVTCON, TST, TSTV
@@ -1096,30 +1096,18 @@ C-------------------------------- Calculated Variables -------------------------
 
          Met_Data%RDEPVHT = 1.0 / Met_Data%ZF( :,:,1 )
 
-         IF (KZ_v55) THEN ! revert to pre-6.0 behavior
-            IF ( MINKZ ) THEN
-               Met_Data%KZMIN = KZL
-               DO L = 1, NLAYS
-                  Where( Met_Data%ZF( :,:,L ) .LE. 500. )
-                     Met_Data%KZMIN( :,:,L ) = KZL + ( KZU - KZL ) * 0.01 * Grid_data%PURB
-                  End Where
-               End Do
-            ELSE
-               Met_Data%KZMIN = KZ_CUSTOM ! Default value is 1.0
-            END IF
-         else 
-            IF ( MINKZ ) THEN
-               Met_Data%KZMIN = KZL
-               DO L = 1, NLAYS
-                  Where( Met_Data%ZF( :,:,L ) .LE. Met_Data%PBL )
-                     Met_Data%KZMIN( :,:,L ) = KZL + ( KZU - KZL ) * 0.01 * Grid_data%PURB
-                  End Where
-               End Do
-            ELSE
-               Met_Data%KZMIN = KZL
-            END IF
-         end if
+         KZU = KZ_CUSTOM ! default 1.0
 
+         IF ( MINKZ ) THEN
+            Met_Data%KZMIN = KZL
+            DO L = 1, NLAYS
+               Where( Met_Data%ZF( :,:,L ) .LE. Met_Data%PBL )
+                  Met_Data%KZMIN( :,:,L ) = KZL + ( KZU - KZL ) * 0.01 * Grid_data%PURB
+               End Where
+            End Do
+         ELSE
+            Met_Data%KZMIN = KZL
+         END IF
 
          BUFF3D = Met_Data%TA * ( 1.0 + 0.608 * Met_Data%QV )
          Met_Data%THETAV = BUFF3D * ( P0 / Met_Data%PRES ) ** 0.286
