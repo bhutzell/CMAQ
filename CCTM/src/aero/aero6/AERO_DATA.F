@@ -122,7 +122,7 @@ C----------------------------------------------------------------------
       USE RUNTIME_VARS
       Use utilio_defn
 #ifdef sens
-      USE DDM3D_DEFN, ONLY : NP, NPMAX
+      USE DDM3D_DEFN, ONLY : NP, NPMAX, IPT
       Use aero_ddm3d, ONLY : s_aerospc_conc, ae_ddm3d_ready,
      &                       init_aero_ddm3d
 #endif 
@@ -1098,12 +1098,13 @@ C Build mapping to CGRID for each species in the master AeroList
       Allocate ( aerospc_conc  ( n_aerospc, n_mode ) )
       Allocate ( aero_missing  ( n_aerospc, n_mode ) )
 
-#ifdef sens
-      Allocate ( s_aerospc_conc( n_aerospc,n_mode,npmax ) )
-#endif
-
       aero_missing( :,: ) = .True.
       aerospc_conc( :,: ) = conmin
+
+#ifdef sens
+      Allocate ( s_aerospc_conc( n_aerospc,n_mode,npmax ) )
+      s_aerospc_conc( :,:,: ) = conmin
+#endif
 
       Do spc = 1, n_aerospc ! Loop through user-requested chemical species
          l = map_aerotolist( spc )
@@ -1548,6 +1549,7 @@ C Copy aerospc_conc back to grid cell concentrations
                     conc( n ) = Max( aerospc_conc( spc,m ), aerospc( spc )%min_conc( m ) )
 #ifdef sens
                     Do np = 1, npmax
+                       If ( IPT(np) .eq. 4 ) Cycle ! Disable HDDM
                        If ( conc( n ) .Eq. aerospc( spc )%min_conc( m ) ) Then
                           s_conc( np,n ) = 0.0
                        Else
@@ -1566,6 +1568,7 @@ C Copy aerospc_conc back to grid cell concentrations
                     conc( n ) = aerospc_conc( spc,m )
 #ifdef sens
                     Do np = 1, npmax
+                       If ( IPT(np) .eq. 4 ) Cycle ! Disable HDDM
                        s_conc( np,n ) = Real( s_aerospc_conc( spc,m,np ), 4 )
                     End Do
 #endif
