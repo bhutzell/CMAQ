@@ -816,7 +816,6 @@
       ! CTM_KZMIN
       CALL GET_ENV ( MINKZ, 'KZMIN', MINKZ, VARDEV )
       CALL GET_ENV ( KZ_CUSTOM, 'KZ_CUSTOM', KZ_CUSTOM, VARDEV )
-      CALL GET_ENV ( KZ_v55, 'KZ_v55', KZ_v55, VARDEV )
 
       ! CTM_WVEL
 #ifdef mpas
