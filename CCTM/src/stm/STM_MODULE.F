@@ -52,14 +52,14 @@ C-----------------------------------------------------------------------
       Use aero_budget, Only: aero_cond, aero_npf
       Use aero_data, Only : aso4_idx, aso4aqh2o2_idx, aso4aqo3_idx,
      &                      aso4aqfemn_idx, aso4aqmhp_idx, aso4aqpaa_idx,
-     &                      aso4gas_idx, aso4emis_idx, aso4icbc_idx,
+     &                      aso4gas_idx, aso4het_idx, aso4emis_idx, aso4icbc_idx,
      &                      oso4aqh2o2_idx, oso4aqo3_idx, oso4aqfemn_idx,
      &                      oso4aqmhp_idx, oso4aqpaa_idx, oso4_idx,
-     &                      oso4gas_idx, oso4emis_idx, oso4icbc_idx,
-     &                      aerospc_map, aerospc_mw, aerospc,
+     &                      oso4gas_idx, oso4het_idx, oso4emis_idx, oso4icbc_idx,
+     &                      aerospc_map, aerospc_mw, aerospc, hethms, 
      &                      n_mode, ae6isoa,
      &                      findAero
-      Use stm_vars, Only: organosulf
+      Use stm_vars, Only: organosulf      
 
       Implicit None
 
@@ -113,6 +113,7 @@ C...  for the accumulation mode, add aqueous tracked species
      &                          + aero_conc( aso4aqfemn_idx,m )
      &                          + aero_conc( aso4aqmhp_idx, m )
      &                          + aero_conc( aso4aqpaa_idx, m )
+                        If ( hethms ) aso4tot = aso4tot + aero_conc( aso4het_idx, m )
 
                      End If
 
@@ -154,6 +155,9 @@ C...  for the accumulation mode, adjust aqueous tracked species
                            aero_conc( aso4aqpaa_idx, m ) =
      &                        Max( aero_conc( aso4aqpaa_idx, m ) * mscor,
      &                             aerospc( aso4aqpaa_idx )%min_conc( m ) )
+                           If ( hethms ) aero_conc( aso4het_idx, m ) =
+     &                        Max( aero_conc( aso4het_idx, m ) * mscor,
+     &                             aerospc( aso4het_idx )%min_conc( m ) )
                         End If
 
                      End If
@@ -172,6 +176,7 @@ C...    only the accumulation mode sulfate can be converted to organosulfate
      &                             + aero_conc( oso4aqfemn_idx,m )
      &                             + aero_conc( oso4aqmhp_idx, m )
      &                             + aero_conc( oso4aqpaa_idx, m )
+                           If ( hethms ) oso4tot = oso4tot + aero_conc( oso4het_idx, m )
 
                            If ( oso4tot .Gt. 0.0 ) Then
 
@@ -205,7 +210,9 @@ C...    only the accumulation mode sulfate can be converted to organosulfate
                               aero_conc( oso4aqpaa_idx, m ) =
      &                           Max( aero_conc( oso4aqpaa_idx, m ) * mscor,
      &                                aerospc( oso4aqpaa_idx )%min_conc( m ) )
-
+                              If ( hethms ) aero_conc( oso4het_idx, m ) =
+     &                           Max( aero_conc( oso4het_idx, m ) * mscor,
+     &                                aerospc( oso4het_idx )%min_conc( m ) )
                            End If
                         End If
                      End If
@@ -240,12 +247,19 @@ C-----------------------------------------------------------------------
       Use utilio_defn
       Use aero_data, Only : aso4_idx, aso4aqh2o2_idx, aso4aqo3_idx,
      &                      aso4aqfemn_idx, aso4aqmhp_idx, aso4aqpaa_idx,
-     &                      aso4gas_idx, aso4emis_idx, aso4icbc_idx,
+     &                      aso4gas_idx, aso4het_idx, aso4emis_idx, aso4icbc_idx,
      &                      oso4aqh2o2_idx, oso4aqo3_idx, oso4aqfemn_idx,
      &                      oso4aqmhp_idx, oso4aqpaa_idx, oso4_idx,
-     &                      oso4gas_idx, oso4emis_idx, oso4icbc_idx,
-     &                      aerospc, n_mode, ae6isoa
+     &                      oso4gas_idx, oso4het_idx, oso4emis_idx, oso4icbc_idx,
+     &                      aerospc, n_mode, ae6isoa, aerospc_mw, hethms
       Use stm_vars, Only: organosulf
+      Use precursor_data, Only: PRECURSOR_CONC, SO4HRXN_IDX, EXTRACT_PRECURSOR
+      Use asx_data_mod,  Only: met_data
+      Use aeromet_data, Only: airdens
+      Use runtime_vars, Only: logdev
+#ifdef sens
+      Use ddm3d_defn, Only : sengrid
+#endif
 
       Implicit None
 
@@ -267,7 +281,7 @@ C local variables
       Integer c, r, l, m
       Integer allocstat
 
-      Real fso4, omfso4
+      Real fso4, omfso4, hso4, lso4
       Real, Save, Allocatable :: so4b4( :,:,:,: )
 
 C-----------------------------------------------------------------------
@@ -286,7 +300,7 @@ C  begin body of subroutine stm_wrap_gas
 
       End If
 
-      if ( .not. organosulf ) Return
+      if ( .not. organosulf .and. .not. hethms ) Return
 
 C capture the loss of ASO4J to organosulfate
       m = 2  ! in the current implementation of heterogeneous chemistry,
@@ -304,7 +318,7 @@ C extract aerosol species from CGRID
 
                   so4b4( c,r,l,m ) = Max( aero_conc( aso4_idx, m ),
      &                                    aerospc( aso4_idx )%min_conc( m ) )
-
+       
                End Do
             End Do
          End Do
@@ -314,8 +328,8 @@ C scale sulfur tracking species by change in ASO4J following call to CHEM
 
          Do c = 1, ncols
             Do r = 1, nrows
-               Do l = 1, nlays
-
+               Do l = 1, nlays       
+   
 C extract aerosol species from CGRID
                   Call stm_extract_aero ( cgrid( c,r,l,: ) )
 
@@ -323,15 +337,47 @@ C extract aerosol species from CGRID
      &                 ( so4b4( c,r,l,m ) .Gt. 0.0 ) ) Then
 
 C fractional change in ASO4J
-                     fso4 = Max( aero_conc( aso4_idx, m ),
-     &                           aerospc( aso4_idx )%min_conc( m ) )
-     &                    / so4b4( c,r,l,m )
-                     omfso4 = 1.0 - fso4
+     
+                     If ( hethms ) Then
 
-                     aero_conc( oso4_idx, m ) =
-     &                  Max( ( aero_conc( oso4_idx, m )
+                        airdens  = met_data%dens( c,r,l )
+#ifdef sens
+                        Call extract_precursor ( cgrid( c,r,l,: ), sengrid( c,r,l,:,: ) )
+#else
+                        Call extract_precursor ( cgrid( c,r,l,: ) )
+#endif
+                        hso4 = PRECURSOR_CONC( SO4HRXN_IDX )                                                                ! prod of sulfate from hetchem in last call to CHEM
+                        lso4 = hso4 + so4b4( c,r,l,m ) - Max( aero_conc( aso4_idx, m ), aerospc( aso4_idx )%min_conc( m ) ) ! loss to organosulfate in last call to CHEM
+ 
+                        If( lso4 .ge. 0.0 ) Then
+                           omfso4 = lso4/so4b4( c,r,l,m )
+                        Else
+                           omfso4 = 0.0
+                           lso4 = 0.0
+                        End If 
+     
+                        fso4 = 1.0 - omfso4
+       
+                     Else
+     
+                        fso4 = Max( aero_conc( aso4_idx, m ),
+     &                         aerospc( aso4_idx )%min_conc( m ) )
+     &                       / so4b4( c,r,l,m )
+                        omfso4 = 1.0 - fso4
+
+                     End If     
+
+                     If ( hethms ) Then
+                        aero_conc( oso4_idx, m ) =
+     &                     Max( ( aero_conc( oso4_idx, m )
+     &                       + lso4 ),
+     &                       aerospc( oso4_idx )%min_conc( m ) )
+                     Else
+                        aero_conc( oso4_idx, m ) =
+     &                     Max( ( aero_conc( oso4_idx, m )
      &                       + ( so4b4( c,r,l,m ) - aero_conc( aso4_idx, m ) ) ),
      &                       aerospc( oso4_idx )%min_conc( m ) )
+                     End If
 
                      aero_conc( oso4gas_idx, m ) =
      &                  Max( ( aero_conc( oso4gas_idx, m )
@@ -365,6 +411,11 @@ C fractional change in ASO4J
      &                  Max( ( aero_conc( oso4aqpaa_idx, m )
      &                       + aero_conc( aso4aqpaa_idx, m ) * omfso4 ),
      &                       aerospc( oso4aqpaa_idx )%min_conc( m ) )
+     
+                     If( hethms ) aero_conc( oso4het_idx, m ) =
+     &                  Max( ( aero_conc( oso4het_idx, m )
+     &                       + aero_conc( aso4het_idx, m ) * omfso4 ),
+     &                       aerospc( oso4het_idx )%min_conc( m ) )
 
 c  reduce tracked inorganic species by amount converted to organosulfate
                      aero_conc( aso4gas_idx, m ) =
@@ -391,6 +442,10 @@ c  reduce tracked inorganic species by amount converted to organosulfate
                      aero_conc( aso4aqpaa_idx, m ) =
      &                  Max( aero_conc( aso4aqpaa_idx, m ) * fso4,
      &                       aerospc( aso4aqpaa_idx )%min_conc( m ) )
+     
+                     if ( hethms ) aero_conc( aso4het_idx, m ) =
+     &                  Max( aero_conc( aso4het_idx, m ) * fso4 + hso4,
+     &                       aerospc( aso4het_idx )%min_conc( m ) )
                   End If
 
 C update aerosol species in CGRID

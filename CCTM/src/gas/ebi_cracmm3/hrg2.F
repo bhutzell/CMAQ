@@ -28,7 +28,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, May 27, 2025
+C  REVISION HISTORY: Created by EBI solver program, Apr 10, 2026
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -426,7 +426,7 @@ c..Remaining HONO production terms
       P19 =    5.0000D-01 * RXRAT(   431 )      ! NO2=0.5000D+00*HONO+...
      &    +    6.7000D-01 * RXRAT(   541 )      ! ANO3I=0.6700D+00*HONO+...
      &    +    6.7000D-01 * RXRAT(   542 )      ! ANO3J=0.6700D+00*HONO+...
-     &    +                 RXRAT(   609 )      ! SO2+NO2=HONO+ASO4J
+     &    +                 RXRAT(   609 )      ! SO2+NO2=HONO+ASO4J+SO4HRXN
 
       P19 = YC0( HONO ) + P19 * DTC
 
@@ -618,7 +618,7 @@ c..HONO loss terms not included in R4_19
 c..HNO4 loss terms not included in R5_21
       L21 =    2.0000D-01 * RKI(     9 )                        ! HNO4=0.8000D+...
      &    +                 RKI(    78 ) * YC ( HO          )   ! HNO4+HO=NO2
-     &    +                 RKI(   612 ) * YC ( SO2         )   ! HNO4+SO2=ASO4J+ANO3J
+     &    +                 RKI(   612 ) * YC ( SO2         )   ! HNO4+SO2=ASO4J+...
 
       L21   = 1.0D0 + L21 * DTC + R5_21
 

@@ -257,9 +257,9 @@ REAL( kind=dp )FUNCTION KIEPOX ( KH, KHSO4 )
             K2 = KHSO4 * VAR( ind_L_HSO4MIN ) * PHI2
         
             KIEPOX = K1 + K2 
-!
+
 ! Aqueous diffusion limitation for IEPOX
-!
+
             q1 = 0.0D0
             Q = 1.0D0
 

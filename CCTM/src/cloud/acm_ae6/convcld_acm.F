@@ -133,11 +133,11 @@ C-----------------------------------------------------------------------
       USE AQ_DATA
       USE AERO_DATA, ONLY : ASO4_IDX, ASO4AQH2O2_IDX, ASO4AQO3_IDX,
      &                      ASO4AQFEMN_IDX, ASO4AQMHP_IDX, ASO4AQPAA_IDX,
-     &                      ASO4GAS_IDX, ASO4EMIS_IDX, ASO4ICBC_IDX,
+     &                      ASO4GAS_IDX, ASO4HET_IDX, ASO4EMIS_IDX, ASO4ICBC_IDX,
      &                      OSO4AQH2O2_IDX, OSO4AQO3_IDX, OSO4AQFEMN_IDX,
      &                      OSO4AQMHP_IDX, OSO4AQPAA_IDX, OSO4_IDX, 
-     &                      OSO4GAS_IDX, OSO4EMIS_IDX, OSO4ICBC_IDX,
-     &                      AEROSPC_MAP, N_MODE, AE6ISOA, MAP_AERO
+     &                      OSO4GAS_IDX, OSO4HET_IDX, OSO4EMIS_IDX, OSO4ICBC_IDX,
+     &                      AEROSPC_MAP, N_MODE, AE6ISOA, MAP_AERO, hethms
       USE PRECURSOR_DATA, ONLY: SULF_IDX, PRECURSOR_MAP, MAP_PRECURSOR
       USE RXNS_DATA, ONLY: MECHNAME       ! chemical mechanism data
       USE ASX_DATA_MOD,  ONLY: GRID_DATA, MET_DATA
@@ -673,18 +673,22 @@ C...  for the accumulation mode, add aqueous tracked species
               SURCLDMX( AEROSPC_MAP( ASO4AQFEMN_IDX,M ) ) = AEROSPC_MAP( ASO4_IDX,M )
               SURCLDMX( AEROSPC_MAP( ASO4AQMHP_IDX, M ) ) = AEROSPC_MAP( ASO4_IDX,M )
               SURCLDMX( AEROSPC_MAP( ASO4AQPAA_IDX, M ) ) = AEROSPC_MAP( ASO4_IDX,M )
+              IF ( hethms ) SURCLDMX( AEROSPC_MAP( ASO4HET_IDX,   M ) ) = AEROSPC_MAP( ASO4_IDX,M )
 
             END IF
 
             IF ( ( AE6ISOA ) .OR.
      &           ( INDEX( MECHNAME, 'CB6R5_AE7'  ) .GT. 0 ) .OR.
-     &           ( INDEX( MECHNAME, 'CB6R5M_AE7' ) .GT. 0 ) ) THEN
+     &           ( INDEX( MECHNAME, 'CB6R5M_AE7' ) .GT. 0 ) .OR.
+     &           ( INDEX( MECHNAME, 'CRACMM2'    ) .GT. 0 ) .OR.
+     &           ( INDEX( MECHNAME, 'CRACMM3'    ) .GT. 0 ) ) THEN
     
 C...  for the accumulation mode, add aqueous tracked species
 
               IF ( M .EQ. 2 ) THEN
 
                 SURCLDMX( AEROSPC_MAP( OSO4GAS_IDX,   M ) ) = AEROSPC_MAP( OSO4_IDX,M )
+                IF ( hethms ) SURCLDMX( AEROSPC_MAP( OSO4HET_IDX,   M ) ) = AEROSPC_MAP( OSO4_IDX,M )
                 SURCLDMX( AEROSPC_MAP( OSO4EMIS_IDX,  M ) ) = AEROSPC_MAP( OSO4_IDX,M )
                 SURCLDMX( AEROSPC_MAP( OSO4ICBC_IDX,  M ) ) = AEROSPC_MAP( OSO4_IDX,M )
                 SURCLDMX( AEROSPC_MAP( OSO4AQH2O2_IDX,M ) ) = AEROSPC_MAP( OSO4_IDX,M )

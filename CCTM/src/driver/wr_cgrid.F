@@ -33,7 +33,6 @@ C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                        removed deprecated TRIMLEN
 C   12 Aug 15 D.Wong:  Replaced MYPE with IO_PE_INCLUSIVE and added code
 C                        to handle parallel I/O implementation
-C   12 Jan 26 D.Wong:  Removed general SE_BARRIER call but kept the one for parallel I/O
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -88,6 +87,8 @@ C-----------------------------------------------------------------------
          FIRSTIME = .FALSE.
 
 C Try to open existing file for update
+
+         CALL SUBST_BARRIER
 
          OK = OPEN3( S_CGRID, FSRDWR3, PNAME )
          CALL SUBST_GLOBAL_LOGICAL( OK, 'AND' )

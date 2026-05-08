@@ -83,6 +83,10 @@ Additional minor changes were made to support ELMOv2 implementation:
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
+|[Merge for PR#1377](https://github.com/USEPA/CMAQ/commit/02332d8bbdb93b01c838acd9e9014d125b652419)| [PR#1377](https://github.com/USEPA/CMAQ_Dev/pull/1377)  |
+|[Merge for PR#1373](https://github.com/USEPA/CMAQ/commit/6ec9dc8be7dbc81adf5a68419d52cdf2411b9a59)| [PR#1372](https://github.com/USEPA/CMAQ_Dev/pull/1373)  |
+|[Merge for PR#1372](https://github.com/USEPA/CMAQ/commit/03928985ae2aaf19911704578b5cb9af6ed83392)| [PR#1372](https://github.com/USEPA/CMAQ_Dev/pull/1372)  |
+|[Merge for PR#1369](https://github.com/USEPA/CMAQ/commit/8aae97cf667fea22a73b7bb8d19cb9258aa81fa0)| [PR#1369](https://github.com/USEPA/CMAQ_Dev/pull/1369)  |
 |[Merge for PR#1290](https://github.com/USEPA/CMAQ/commit/8aae97cf667fea22a73b7bb8d19cb9258aa81fa0)| [PR#1290](https://github.com/USEPA/CMAQ_Dev/pull/1290)  |   
 |[Merge for PR#1277](https://github.com/USEPA/CMAQ/commit/79c7418a26c0567d9628d5fd0a74bc262c82a395)| [PR#1277](https://github.com/USEPA/CMAQ_Dev/pull/1277)  |   
 |[Merge for PR#1267](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e)| [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  |   
@@ -93,7 +97,7 @@ Additional minor changes were made to support ELMOv2 implementation:
 |[Merge for PR#1238](https://github.com/USEPA/CMAQ/commit/5c1180ebd2fe633dca8a79a053386a6161ebc592)| [PR#1238](https://github.com/USEPA/CMAQ_Dev/pull/1238)  |   
 |[Merge for PR#1184](https://github.com/USEPA/CMAQ/commit/d0d1a121ffe55e22a8712a8d1b13b6567ae3b199) | [PR#1184](https://github.com/USEPA/CMAQ_Dev/pull/1184)  |  
 |[Merge for PR#1176](https://github.com/USEPA/CMAQ/commit/5f0a76d2abceaf1e0e6e5b0ef98cf2cef85c5b20)| [PR#1176](https://github.com/USEPA/CMAQ_Dev/pull/1176)  |   
-|[Merge for PR#1166](https://github.com/USEPA/CMAQ/commit/7797e7939ab221b9e345af14c360ee3f6a25ed34) | [PR#1166](https://github.com/USEPA/CMAQ_Dev/pull/1166)  |   
+|[Merge for PR#1166](https://github.com/USEPA/CMAQ/commit/7797e7939ab221b9e345af14c360ee3f6a25ed34) | [PR#1166](https://github.com/USEPA/CMAQ_Dev/pull/1166)  |
 
 
 ### Redirect ELMO for indicator of ozone production regime  

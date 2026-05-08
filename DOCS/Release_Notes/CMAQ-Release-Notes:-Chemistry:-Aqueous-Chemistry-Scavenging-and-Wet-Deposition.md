@@ -1,3 +1,19 @@
+### Removal of unused options in KMT2 rate updates and addition of AHMSJ wet deposition species
+[Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Maintenance 
+**Release Version/Date**: CMAQv6.0  
+
+**Description**: 
+This PR removes options associated with SAPRC07TIC in KMT2 and adds an internal wet deposition species for AHMSJ.
+
+**Significance and Impact**:  
+Impacts should be minimal for simulations using KMT2. This PR improves the linkages between KMT2 cloud chem and the cb6r5 updates in PR1414 (i.e., "Heterogeneous chemistry of sulfur species" in cb6r5). This PR removes deprecated/unused options in KMT2.
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1417](https://github.com/USEPA/CMAQ_Dev/commit/3e18a7c6377976213bcb0a11ea9a1708eee0cd6d) | [PR#1417](https://github.com/USEPA/CMAQ_Dev/pull/1417)  |
+
 ### KMT2 rate updates and minor bugfix
 [Kathleen Fahey](mailto:fahey.kathleen@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Rate coefficient update and bug fix  
