@@ -715,6 +715,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 # =====================================================================
 
  set ETfile    = ETirradiance.dat
+ set ATfile    = ActinicSpectrumAlt0kmLat20degJdate182.txt
  set PROFfile  = PROFILES.dat
  set O2ABSfile = O2_JPL06-2
  set O3ABSfile = O3O1D_JPL06-2
@@ -723,6 +724,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 #>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
  setenv ET        $ETpath/$ETfile
+ setenv AT        ${ATpath}/${ATfile}
  setenv PROFILES  $PROFpath/$PROFfile
  setenv TOMS      $TOMSpath/$TOMSfile
  setenv O2ABS     $CSQYpath/$O2ABSfile
