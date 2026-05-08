@@ -11,6 +11,66 @@ CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version buil
 **Significance and Impact**:   
 CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enable a wider range of applications of CRACMM.
 
+
+### CRACMM HAP evaluation using AQS data
+[Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Diagnostic/Postprocessing Update  
+**Release Version/Date**: CMAQv6.0  
+
+**Description**: 
+Several HAPs are routinely reported to EPA's AQS. This update enables additional output in COMBINE files to facilitate automated evaluation through AMET. This update is best leveraged by using the most recent version of AMET.
+
+The following table indicates which HAPs are reported to AQS, the pregenerated files they come from, AQS species identifiers, and the corresponding CRACMM3HAPs species. Note that PM2.5 metals are measured via XRF and thus represent the element in all its forms. PM10 and TSP measurements were from chromotography techniques and likely to be ionic. TSP measurements were matched with model output only if PM10 measurements were not available. Conditions of local temperature and pressure (LC) were preferentially matched over STP measurements. Note that multiple AQS species are summed to create the XYLENE HAP for comparison with CMAQ. In addition, several representative structures in CRACMM3HAPs were updated.
+
+
+|	AQS Parameter Code	|	AQS Parameter Name	|	AQS Units of Measure	|	AQS Pregenerated File	|	CRACMM3HAP species name	|	CRACMM3 species?	|	SpecDef/Combine species	|	SpecDef/Combine units	|	Notes	|	AQS Rep DTXSID	|	MOLECULAR_FORMULA	|	CRACMM3HAP DTXSID	|
+|	---	|	---	|	---	|	---	|	---	|	---	|	---	|	---	|	---	|	---	|	---	|	---	|
+|	14115	|	Chromium VI (TSP) LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	ACR_VI	|	No	|	CR_VI_PM10	|	ng m-3	|	PM10 from model used as estimate of measured TSP; no measured PM10 available.	|	DTXSID7023982	|	[Cr+6]	|	DTXSID7023982	|
+|	43218	|	1,3-Butadiene	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS, hourly_VOCS	|	BDE13	|	Yes	|	BUTADIENE13	|	ppb	|	No SpecDef updates needed.	|	DTXSID3020203	|	C4H6	|	DTXSID3020203	|
+|	43231	|	n-Hexane	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	HEXANE	|	No	|	HEXANE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID0021917	|	C6H14	|	DTXSID0021917	|
+|	43502	|	Formaldehyde	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	HCHO	|	Yes	|	FORMALDEHYDE	|	ppb	|	No SpecDef updates needed.	|	DTXSID7020637	|	CH2O	|	DTXSID7020637	|
+|	43503	|	Acetaldehyde	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	ACD	|	Yes	|	ACETALDEHYDE	|	ppb	|	No SpecDef updates needed.	|	DTXSID5039224	|	C2H4O	|	DTXSID5039224	|
+|	43509	|	Acrolein - Verified	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	ACRO	|	Yes	|	ACROLEIN	|	ppb	|	No SpecDef updates needed.	|	DTXSID5020023	|	C3H4O	|	DTXSID5020023	|
+|	43702	|	Acetonitrile	|	Parts per billion Carbon	|	daily_VOCS	|	ACET_NITRILE	|	No	|	ACET_NITRILE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID7020009	|	C2H3N	|	DTXSID7020009	|
+|	43704	|	Acrylonitrile	|	Parts per billion Carbon	|	daily_VOCS	|	ACRY_NITRILE	|	No	|	ACRY_NITRILE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID5020029	|	C3H3N	|	DTXSID5020029	|
+|	43801	|	Chloromethane	|	Parts per billion Carbon	|	daily_VOCS	|	METHCHLORIDE	|	No	|	METHCHLORIDE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID0021541	|	CH3Cl	|	DTXSID0021541	|
+|	43802	|	Dichloromethane	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	CL2_ME	|	No	|	CL2_ME_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID0020868	|	CH2Cl2	|	DTXSID0020868	|
+|	43803	|	Chloroform	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS, hourly_VOCS	|	CHCL3	|	No	|	CHCL3_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID1020306	|	CHCl3	|	DTXSID1020306	|
+|	43804	|	Carbon tetrachloride	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	CARBONTET	|	No	|	CARBONTET_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID8020250	|	CCl4	|	DTXSID8020250	|
+|	43815	|	Ethylene dichloride	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	CL2_C2_12	|	No	|	CL2_C2_12_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID6020438	|	C2H4Cl2	|	DTXSID6020438	|
+|	43817	|	Tetrachloroethylene	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS, hourly_VOCS	|	CL4_ETHE	|	No	|	CL4_ETHE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID2021319	|	C2Cl4	|	DTXSID2021319	|
+|	43818	|	1,1,2,2-Tetrachloroethane	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	CL4_ETHANE	|	No	|	CL4_ETHANE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID7021318	|	C2H2Cl4	|	DTXSID7021318	|
+|	43824	|	Trichloroethylene	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS	|	CL3_ETHE	|	No	|	CL3_ETHE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID0021383	|	C2HCl3	|	DTXSID0021383	|
+|	43829	|	1,2-Dichloropropane	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	PROPYL_DICL	|	No	|	PROPYL_DICL_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID0020448	|	C3H6Cl2	|	DTXSID0020448	|
+|	43835	|	Chloroprene	|	Parts per billion Carbon	|	daily_VOCS	|	CHLOROPRENE	|	No	|	CHLOROPRENE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID5020316	|	C4H5Cl	|	DTXSID5020316	|
+|	43843	|	Ethylene dibromide	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS	|	BR2_C2_12	|	No	|	BR2_C2_12	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID3020415	|	C2H4Br2	|	DTXSID3020415	|
+|	43860	|	Vinyl chloride	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS, hourly_VOCS	|	CL_ETHE	|	No	|	CL_ETHE_PPB	|	ppb	|	SpecDef updated to output species in ppb.	|	DTXSID8021434	|	C2H3Cl	|	DTXSID8021434	|
+|	45109	|	m/p Xylene	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	XYLENE	|	No	|	XYLENE_PPB	|	ppb	|	SpecDef updated to output XYLENE in ppb. Note measured m/P xylene and o-xylene should be combined to compare with model XYLENE. XYLENE differs from CRACMM3 XYL as XYL includes other species.	|	DTXSID80109469	|	C8H10	|	DTXSID2021446	|
+|	45201	|	Benzene	|	Parts per billion Carbon	|	daily_HAPS, daily_VOCS, hourly_HAPS, hourly_VOCS	|	BEN	|	Yes	|	BENZENE	|	ppb	|	No SpecDef updates needed.	|	DTXSID3039242	|	C6H6	|	DTXSID3039242	|
+|	45202	|	Toluene	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	TOL	|	Yes	|	TOLUENE	|	ppb	|	No SpecDef updates needed.	|	DTXSID7021360	|	C7H8	|	DTXSID7021360	|
+|	45203	|	Ethylbenzene	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	EBZ	|	Yes	|	ETHB	|	ppb	|	No SpecDef updates needed.	|	DTXSID3020596	|	C8H10	|	DTXSID3020596	|
+|	45204	|	o-Xylene	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	XYLENE	|	No	|	XYLENE_PPB	|	pbb	|	SpecDef updated to output XYLENE in ppb. Note measured m/P xylene and o-xylene should be combined to compare with model XYLENE. XYLENE differs from CRACMM3 XYL as XYL includes other species.	|	DTXSID3021807	|	C8H10	|	DTXSID2021446	|
+|	45220	|	Styrene	|	Parts per billion Carbon	|	daily_VOCS, hourly_VOCS	|	STY	|	Yes	|	STYRENE	|	ppb	|	No SpecDef updates needed.	|	DTXSID2021284	|	C8H8	|	DTXSID2021284	|
+|	82103	|	Arsenic PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	AAS	|	No	|	ARSENIC_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID70872433	|	[As+5]	|	DTXSID4023886	|
+|	82105	|	Beryllium PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	ABE	|	No	|	BERYLLIUM_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID701317564	|	[Be++]	|	DTXSID4023913	|
+|	82110	|	Cadmium PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	ACADMIUM	|	No	|	CADMIUM_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID60177060	|	[Cd++]	|	DTXSID60177060	|
+|	82112	|	Chromium PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	ACR_III and ACRVI	|	No	|	CHROMIUM_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID2023981	|	[Cr+3]	|		|
+|	82128	|	Lead PM10 STP	|	Micrograms/cubic meter (25 C)	|	daily_HAPS	|	APB	|	No	|	LEAD_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID10872437	|	[Pb++]	|	DTXSID2024161	|
+|	82132	|	Manganese PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	AMN_HAPS	|	No	|	MANGANESE_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID00167687	|	[Mn++]	|	DTXSID00167687	|
+|	82136	|	Nickel PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	ANI	|	No	|	NICKEL_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID60163564	|	[Ni++]	|	DTXSID2020925	|
+|	82142	|	Mercury PM10 STP	|	Nanograms/cubic meter (25 C)	|	daily_HAPS	|	APHG	|	No	|	HG_PM10_S	|	ng sm-3	|	Added STP version to SpecDef	|	DTXSID9074933	|	[Hg++]	|	DTXSID9074933	|
+|	88103	|	Arsenic PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	AAS	|	No	|	ARSENIC_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID4023886	|	As	|	DTXSID4023886	|
+|	88110	|	Cadmium PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	ACADMIUM	|	No	|	CADMIUM_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID1023940	|	Cd	|	DTXSID60177060	|
+|	88112	|	Chromium PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	ACR_III and ACRVI	|	No	|	CHROMIUM_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID3031022	|	Cr	|		|
+|	88128	|	Lead PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	APB	|	No	|	LEAD_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID2024161	|	Pb	|	DTXSID2024161	|
+|	88132	|	Manganese PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	AMN_HAPS	|	No	|	MANGANESE_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID2024169	|	Mn	|	DTXSID00167687	|
+|	88136	|	Nickel PM2.5 LC	|	Micrograms/cubic meter (LC)	|	daily_HAPS	|	ANI	|	No	|	NICKEL_PM25	|	ng m-3	|	No SpecDef updates needed.	|	DTXSID2020925	|	Ni	|	DTXSID2020925	|
+
+**Significance and Impact**:  
+This update allows for AQS HAPs to be evaluated via AMET. It also improves identifiers for model species.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
 ### CRACMM Species Documentation and Propagation of Information Outside CMAQ
  [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
 

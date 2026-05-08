@@ -24,6 +24,7 @@ c
 C     Revision history
 C     01 Nov 2018: S.Napelenok Updates for cmaq5.3 release 
 C     09 May 2019: D.Wong Removed all MY_ clauses
+C     12 Jan 2026: D.Wong Removed SE_BARRIER call
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       SUBROUTINE WR_SA_CGRID ( JDATE, JTIME, TSTEP )
@@ -90,8 +91,6 @@ C-----------------------------------------------------------------------
       IF ( FIRSTIME ) THEN
         
         FIRSTIME = .FALSE.
-
-        CALL SUBST_BARRIER
 
 !20140519 add subst_global_logical call as done in wr_cgrid
         OK = OPEN3( SA_CGRID_1, FSRDWR3, PNAME )
@@ -220,8 +219,6 @@ C-----------------------------------------------------------------------
           ENDIF  ! mype 0
 
         END IF ! sa_cgrid_1 opened ?
-
-        CALL SUBST_BARRIER
 
         ALLOCATE ( ISAM_BUFF( NCOLS, NROWS, NLAYS, N_SPCTAG ),
      &     STAT = ALLOCSTAT )

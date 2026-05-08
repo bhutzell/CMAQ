@@ -41,6 +41,7 @@ C     30 Sept 2021 G. Sarwar: added CB6R5_AE7_AQ
 C     04 Oct  2021 G. Sarwar: added CB6R5HAP_AE7_AQ
 C     14 Sep  2023 G. Sarwar: added CRACMM2
 C     14 Nov  2024 G. Sarwar: added CRACMM3M
+C     12 Jan  2026 D. Wong: Removed SE_BARRIER call
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE DESID_VARS
@@ -652,7 +653,6 @@ C Build description for, and open beis diagnostic file
 C Open mass output file (tons/hour)
 
             SNAME = 'B3GTS_S'
-            CALL SUBST_BARRIER
             IF ( IO_PE_INCLUSIVE ) THEN
                IF ( .NOT. OPEN3( SNAME, FSNEW3, PNAME ) ) THEN
                   MESG = 'Could not open "' // TRIM( SNAME ) // '" file'
