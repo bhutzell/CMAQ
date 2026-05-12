@@ -1096,7 +1096,7 @@ C-------------------------------- Calculated Variables -------------------------
 
          Met_Data%RDEPVHT = 1.0 / Met_Data%ZF( :,:,1 )
 
-         KZU = KZ_CUSTOM ! default 1.0
+         KZU = KZU_CUSTOM ! default 1.0
 
          IF ( MINKZ ) THEN
             Met_Data%KZMIN = KZL
