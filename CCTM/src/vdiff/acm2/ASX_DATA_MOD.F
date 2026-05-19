@@ -852,11 +852,11 @@ C Arguments:
 
 C Parameters:
          Real, Parameter :: cond_min = 1.0 / resist_max ! minimum conductance [m/s]
-         Real, Parameter :: KZL    = 0.01     ! lowest KZ
-         Real, Parameter :: KZU    = 1.0      ! 2.0  ! highest KZ
-         Real, Parameter :: EPS    = 1.0E-08  ! small number for temperature difference
+         Real, Parameter :: KZL    = 0.01       ! lowest KZ, when Urban fraction is zero
+         Real, Parameter :: EPS    = 1.0E-08    ! small number for temperature difference
 
 C Local variables:
+         Real    KZU ! highest KZ, when urban fraction is 100
          Real    FINT
          Real    CPAIR, LV, QST 
          Real    TMPFX, TMPVTCON, TST, TSTV
@@ -1095,6 +1095,8 @@ C-------------------------------- Calculated Variables -------------------------
          Met_Data%DZF = Met_Data%ZF - EOSHIFT(Met_Data%ZF, Shift = -1, Boundary = 0.0, Dim = 3)
 
          Met_Data%RDEPVHT = 1.0 / Met_Data%ZF( :,:,1 )
+
+         KZU = KZU_CUSTOM ! default 1.0
 
          IF ( MINKZ ) THEN
             Met_Data%KZMIN = KZL
