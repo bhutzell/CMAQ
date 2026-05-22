@@ -708,6 +708,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  set CSQYpath   = $PHOT_DATA # CSQY input data
  set PROFpath   = $PHOT_DATA # PROF input data
  set ETpath     = $PHOT_DATA # ET input data
+ set ATpath     = $BLD       # Actinic Flux spectrum to support chamber
  set TOMSpath   = $PHOT_DATA # TOMS input data
 
 # =====================================================================
