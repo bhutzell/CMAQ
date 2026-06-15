@@ -81,23 +81,13 @@ C..Arguments:
 
 C..Parameters:
 
-c..ROS3 solver parameters - from KPP
-      REAL( 8 ), PARAMETER :: GAM =  0.43586652150845899941601945119356D+00
-      REAL( 8 ), PARAMETER :: C21 = -0.10156171083877702091975600115545D+01
-      REAL( 8 ), PARAMETER :: C31 =  0.40759956452537699824805835358067D+01
-      REAL( 8 ), PARAMETER :: C32 =  0.92076794298330791242156818474003D+01
-      REAL( 8 ), PARAMETER :: B1  =  0.10000000000000000000000000000000D+01
-      REAL( 8 ), PARAMETER :: B2  =  0.61697947043828245592553615689730D+01
-      REAL( 8 ), PARAMETER :: B3  = -0.42772256543218573326238373806514D+00
-      REAL( 8 ), PARAMETER :: D1  =  0.50000000000000000000000000000000D+00
-      REAL( 8 ), PARAMETER :: D2  = -0.29079558716805469821718236208017D+01
-      REAL( 8 ), PARAMETER :: D3  =  0.22354069897811569627360909276199D+00
-      REAL( 8 ), PARAMETER :: A21 =  1.0D+00
-      REAL( 8 ), PARAMETER :: A31 =  1.0D+00
-      REAL( 8 ), PARAMETER :: A32 =  0.0D+00
-      REAL( 8 ), PARAMETER :: G1  =  0.43586652150845899941601945119356D+00
-      REAL( 8 ), PARAMETER :: G2  =  0.24291996454816804366592249683314D+00
-      REAL( 8 ), PARAMETER :: G3  =  0.21851380027664058511513169485832D+01
+c..RODAS3 solver parameters - from KPP
+      REAL( 8 ), PARAMETER :: GAM = -0.50000000000000000000000000000000D+00
+      REAL( 8 ), PARAMETER :: C21 = -0.40000000000000000000000000000000D+01
+      REAL( 8 ), PARAMETER :: C43 = -0.80000000000000000000000000000000D+01
+     &                            /  0.30000000000000000000000000000000D+01      
+      REAL( 8 ), PARAMETER :: B31 = -0.20000000000000000000000000000000D+01
+      REAL( 8 ), PARAMETER :: B41 = -0.20000000000000000000000000000000D+01
       REAL( 8 ), PARAMETER :: GROW = 1.0D+00 / 3.00D+00
       REAL( 8 ), PARAMETER :: RGAM = 1.0D+00 / GAM
 
@@ -370,7 +360,9 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 
          DTINV = 1.0D+00 / DT
 
-         GDTINV = DTINV * (-2.0D0)
+         GDTINV = DTINV * RGAM
+!
+!        GDTINV = DTINV * (-2.0D0)
       
          CALL RBJACOB( NCSP, Y )
 
@@ -395,7 +387,7 @@ c..stage 2
          X1 = C21 * DTINV
          DO N = 1, N_SPEC
             DO NCELL = 1, NUMCELLS
-               K2( NCELL,N ) = YDOT( NCELL,N ) - ( 4.0D0 ) * K1( NCELL,N ) * DTINV
+               K2( NCELL,N ) = YDOT( NCELL,N ) + X1 * K1( NCELL,N )
             END DO
          END DO      
 
@@ -404,20 +396,16 @@ c..stage 2
 c..stage 3
          DO N = 1, N_SPEC
             DO NCELL = 1, NUMCELLS
-               YP( NCELL,N ) = Y( NCELL,N ) - (2.0D0) * K1( NCELL,N ) ! + (0.0D0) * K2( NCELL,N )
+               YP( NCELL,N ) = Y( NCELL,N ) + B31 * K1( NCELL,N )
             END DO
          END DO      
 
          CALL RBFEVAL( NCSP, YP, YDOT )
 
-         X1 = C31 * DTINV
-         X2 = C32 * DTINV
          DO N = 1, N_SPEC
             DO NCELL = 1, NUMCELLS
-               K3( NCELL,N ) = YDOT( NCELL,N ) - K1( NCELL,N )  * DTINV
-     &                       + K2( NCELL, N )  * DTINV
-!               K3( NCELL,N ) = -YDOT( NCELL,N ) - (1.0D0) * K1( NCELL,N )  * DTINV
-!     &                       - (-1.0D0) * K2( NCELL, N )  * DTINV
+               K3( NCELL,N ) = YDOT( NCELL,N )
+     &                       + ( K2( NCELL,N ) - K1( NCELL,N ) ) * DTINV
             END DO
          END DO
 
@@ -426,22 +414,18 @@ c..stage 3
 c..stage 4
          DO N = 1, N_SPEC
             DO NCELL = 1, NUMCELLS
-               YP( NCELL,N ) = Y( NCELL,N ) - 2.0D0 * K1( NCELL,N ) - K3( NCELL,N ) 
-!               YP( NCELL,N ) = Y( NCELL,N ) + (2.0D0) * K1( NCELL,N ) + (0.0D0) * K2( NCELL,N )
+               YP( NCELL,N ) = Y( NCELL,N ) + B41 * K1( NCELL,N ) - K3( NCELL,N ) 
             END DO
          END DO      
 
          CALL RBFEVAL( NCSP, YP, YDOT )
 
-         X1 = C21 * DTINV
          DO N = 1, N_SPEC
             DO NCELL = 1, NUMCELLS
                K4( NCELL,N ) = YDOT( NCELL,N ) 
-     &                       - K1( NCELL,N ) * DTINV
-     &                       + K2( NCELL, N )* DTINV
-     &                       + 8.0D0/3.0D0 *  K3( NCELL, N ) * DTINV              
-!               K4( NCELL,N ) = -YDOT( NCELL,N ) - (1.0D0) * K1( NCELL,N ) * DTINV - (-1.0D0) * K2( NCELL, N ) * DTINV
-!     &                         - (-8.0D0/3.0D0) *  K3( NCELL, N ) * DTINV              
+     &                       + ( K2( NCELL,N )
+     &                       -   K1( NCELL,N )
+     &                       -   C43 * K3( NCELL,N ) ) * DTINV              
             END DO
          END DO      
 
@@ -450,8 +434,7 @@ c..final solution
          DO N = 1, N_SPEC
             DO NCELL = 1, NUMCELLS
                YP( NCELL,N ) = Y( NCELL,N ) 
-     &                       - 2.0D0 * K1( NCELL,N ) - K3( NCELL,N ) - K4( NCELL,N )
-!     &                      +  0.0D0 * K2( NCELL,N ) + 1.0D0 * K3( NCELL,N ) + 1.0D0 * K4( NCELL,N )
+     &                       + B41 * K1( NCELL,N ) - K3( NCELL,N ) - K4( NCELL,N )
             END DO
          END DO
 
@@ -461,8 +444,6 @@ c..Estimate error
             DO NCELL = 1, NUMCELLS
                YTOL = ATOL( N ) + RTOL( N ) * ABS( YP( NCELL,N ) )
                ERR( NCELL ) = ERR( NCELL ) + ( K4( NCELL,N ) / YTOL ) ** 2.0
-!     &                      + ( ( (0.0D0) * K1( NCELL,N ) + (0.0D0) * K2( NCELL,N )
-!     &                      + (0.0D0) * K3( NCELL,N ) + (1.0D0) * K4( NCELL,N )) / YTOL ) ** 2
            END DO
          END DO
 
@@ -565,9 +546,7 @@ c..Estimate error
      
                DO N = 1, N_SPEC
                   YTOL = ATOL( N ) + RTOL( N ) * ABS( YP( CELL_MAXERR, N ) )
-                  MAX_SPC_ERR = ( ( D1 * K1( CELL_MAXERR,N ) 
-     &                        +     D2 * K2( CELL_MAXERR,N ) 
-     &                        +     D3 * K3( CELL_MAXERR,N ) ) / YTOL ) ** 2.0D0
+                  MAX_SPC_ERR = ( K4( CELL_MAXERR,N ) / YTOL ) ** 2.0D0
      &                        / ERR( CELL_MAXERR )
      
                   ISPOLD = INEW2OLD( N, NCS )
