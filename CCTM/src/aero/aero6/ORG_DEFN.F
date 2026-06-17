@@ -75,7 +75,7 @@ C   15 Sep 23 G. Sarwar: updated for CRACMM2
 C 28 Nov 23 N. Skipper: added new species for CRACMM2
 C-----------------------------------------------------------------------
 #ifdef sens
-      USE DDM3D_DEFN, ONLY : NP, NPMAX
+      USE DDM3D_DEFN, ONLY : NP, NPMAX, IPT
       Use aero_ddm3d, ONLY : init_aero_ddm3d, ae_ddm3d_ready, og_sens, rog_dsens
 #endif 
       Implicit None
@@ -625,6 +625,7 @@ C-----------------------------------------------------------------------
             conc( n ) = Max ( og_conc( spc ) / vtmp, min_gasconc )
 #ifdef sens
             Do np = 1, npmax
+               If ( IPT(np) .eq. 4 ) Cycle ! Disable HDDM
                If ( conc( n ) .Eq. min_gasconc ) Then
                   s_conc( np,n ) = 0.0
                Else

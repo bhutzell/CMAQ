@@ -48,7 +48,7 @@ C D.Wong  02/01/19 added one more variable in the USE clause
 C-----------------------------------------------------------------------
 
 #ifdef sens
-      USE DDM3D_DEFN, ONLY : NP, NPMAX
+      USE DDM3D_DEFN, ONLY : NP, NPMAX, IPT
       Use aero_ddm3d, ONLY : init_aero_ddm3d, s_precursor_conc, ae_ddm3d_ready
 #endif 
 
@@ -516,6 +516,7 @@ C copy precursor_conc back to grid cell concentrations
                   NPF_BUDGET( n )    = NPF_BUDGET( n )    / vtmp
 #ifdef sens
                   do np = 1, npmax
+                     If ( IPT(np) .eq. 4 ) Cycle ! Disable HDDM
                      If ( conc( n ) .Eq. min_gasconc ) Then
                         s_conc( np,n ) = 0.0
                      Else

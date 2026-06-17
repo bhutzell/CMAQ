@@ -44,11 +44,12 @@ C           06 Aug 2018: M.Qin: added new lumped anthropogenic semivolatiles
 C           16 Aug 2018: G. Sarwar: added ClNO3 and FMBR, and updated INO3 and BRNO3 name changes
 C           21 Nov 2018: G. Sarwar: added several halogen species
 C           09 Jan 2021: G. Sarwar: removed CH3BR
-C           10 Mar 2025: G. SarwarL added CRACMM3M species
+C           10 Mar 2025: G. Sarwar: added CRACMM3M species
+C           22 Jan 2026: G. Sarwar: Updated reactivities for several halogen species and removed species that are not used
 C-----------------------------------------------------------------------
 
       INTEGER, PARAMETER :: LDDEP = 4
-      INTEGER, PARAMETER :: LTOTG = 276
+      INTEGER, PARAMETER :: LTOTG = 266
       INTEGER, PARAMETER :: LCMP  = 8
       CHARACTER( 16 )    :: DEPV_METHOD
 
@@ -348,17 +349,7 @@ C-------------------------------------------------------------------------------
          DEPSPC( 263) = 'IPX             '
          DEPSPC( 264) = 'INALD           '
          DEPSPC( 265) = 'HONIT           '
-         DEPSPC( 266) = 'HCOCL           '
-         DEPSPC( 267) = 'CH2BR2          '
-         DEPSPC( 268) = 'CHBR3           '
-         DEPSPC( 269) = 'HCOBR           '
-         DEPSPC( 270) = 'CH2I2           '
-         DEPSPC( 271) = 'CH2IBR          '
-         DEPSPC( 272) = 'CH2ICL          ' 
-         DEPSPC( 273) = 'CHBR2CL         '
-         DEPSPC( 274) = 'CHBRCL2         '
-         DEPSPC( 275) = 'CH2BRCL         '
-         DEPSPC( 276) = 'VMTN1           '
+         DEPSPC( 266) = 'VMTN1           '
 
          N_USE_DEPSPC = 0
          USE_DEPSPC = .FALSE.   ! array
