@@ -139,9 +139,10 @@ set make_options = "-j"                #> additional options for make command if
  set ModPlmrs  = plrise/smoke               #> in-line emissions plume rise
  set ModCgrds  = spcs/cgrid_spcs_nml        #> chemistry species configuration module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/spcs)
- set ModPhot   = phot/inline                #> photolysis calculation module 
-#set ModPhot   = phot/table                 #> photolysis calculation module 
-#set ModPhot   = phot/chamber               #> photolysis calculation module 
+ set ModPhot   = phot/inline                #> Photolysis Frequencies Calculation using met input and species concentrations
+#set ModPhot   = phot/table                 #> Photolysis Frequencies Calculation using of precalculated values 
+#set ModPhot   = phot/chamber               #> Photolysis Frequencies Calculation using data from
+                                            #  from environmental chamber experiments
                                             #>     (see $CMAQ_MODEL/CCTM/src/phot)
 
  set ModMech   = MECHS/${Mechanism}
@@ -162,10 +163,11 @@ set make_options = "-j"                #> additional options for make command if
      set ModCloud = cloud/acm_ae7_kmt2
  endif
 
- # Gas chem solver
- setenv ChemSolver ros3                   #> [ default for boxmodeling, ebi and smvgear other options]
- if (  $?ISAM_CBOX ) then           # check whether best solver is best for mechanism
-    setenv ChemSolver ebi                                             #> ros3 (or smvgear) are system independent
+ # Gas chem solver: ros3 is default for boxmodeling, ebi, rodas3, and smvgear are other options
+ #> ros3, rodas3, and smvgear are Chemical Mechanism independent
+ setenv ChemSolver ros3   
+ if (  $?ISAM_CBOX ) then  # ebi is only solver that supports ISAM
+    setenv ChemSolver ebi                                         
  endif
                                          
  if ( $ChemSolver == ebi ) then             

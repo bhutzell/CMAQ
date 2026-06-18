@@ -127,7 +127,7 @@ C scratch local variables:
 
       INTEGER      JVUNIT
       INTEGER      JVDATE             ! Julian date on JVALUE file
-      INTEGER   :: CLDATT = 1         ! flag for cloud attenuation; 1=on,0=off
+      INTEGER   :: CLDATT = 0         ! flag for cloud attenuation; 1=on,0=off
       INTEGER      NDAYS              ! local day angle
       INTEGER      NT                 ! time loop index
       INTEGER      NHT                ! height loop index
