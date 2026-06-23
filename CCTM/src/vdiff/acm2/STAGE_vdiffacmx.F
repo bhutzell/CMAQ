@@ -897,13 +897,13 @@ C --------------- END of HET HONO RX ----------
                DO V = 1, N_SPC_DIFF
                   DD( V,L ) = 0.0
                   UU( V,L ) = 0.0
-               END DO
 #ifdef sens
                   DO NP = 1, NPMAX
                      S_DD( V,L,NP) = 0.0
                      S_UU( V,L,NP) = 0.0
                   END DO
 #endif
+               END DO
             END DO
 
 #ifdef isam

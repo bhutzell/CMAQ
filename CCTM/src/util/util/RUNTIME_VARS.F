@@ -221,6 +221,7 @@
       REAL    :: SIGST     = 0.7     ! sigma_sync_top value
       REAL    :: HDIV_LIM  = 0.9     ! cutoff for max horizontal divergence step adj
       REAL    :: CFL       = 0.75    ! maximum Courant-Friedrichs-Lewy number allowed
+      REAL    :: KZU_CUSTOM = 1.0     ! Passed to KZU in ASX_DATA_MOD for urban KZ adjustment
       Logical :: MINKZ     = .TRUE.  ! flag for minimum Kz 
       LOGICAL :: W_VEL     = .FALSE. ! flag for vertical velocity 
       LOGICAL :: GRAV_SETL = .TRUE.  ! flag for aerosol gravitational setling
@@ -814,6 +815,7 @@
 
       ! CTM_KZMIN
       CALL GET_ENV ( MINKZ, 'KZMIN', MINKZ, VARDEV )
+      CALL GET_ENV ( KZU_CUSTOM, 'KZU_CUSTOM', KZU_CUSTOM, VARDEV )
 
       ! CTM_WVEL
 #ifdef mpas

@@ -81,6 +81,7 @@ C             unnecessary SAVE attribute (02/2019)
 C    G. Sarwar: Removed CH3BR (03/2021)
 C    R. Gilliam: Include PX soil texture information when available (03/2022)
 C    G. Sarwar: Added CRACMM3M species (02/2022)
+C    G. Sarwar: Updated reactivities for several halogen species and removed species that are not used
 C-------------------------------------------------------------------------------
       Use RUNTIME_VARS
       Use GRID_CONF           ! horizontal & vertical domain specifications
@@ -264,9 +265,9 @@ C Land use information:
       DATA depname( 18), dif0( 18), ar( 18), meso( 18), lebas( 18) / 'N2O5            ', 0.0808, 5000.0, 0.0,  49.0 /
       DATA depname( 19), dif0( 19), ar( 19), meso( 19), lebas( 19) / 'NO3             ', 0.1153, 5000.0, 0.0,  28.0 /
       DATA depname( 20), dif0( 20), ar( 20), meso( 20), lebas( 20) / 'GENERIC_ALDEHYDE', 0.0916,   0.01, 0.0,  56.0 /
-      DATA depname( 21), dif0( 21), ar( 21), meso( 21), lebas( 21) / 'CL2             ', 0.1080,   10.0, 0.0,  49.0 /
-      DATA depname( 22), dif0( 22), ar( 22), meso( 22), lebas( 22) / 'HOCL            ', 0.1300,   10.0, 0.0,  38.5 / ! used value of HCL
-      DATA depname( 23), dif0( 23), ar( 23), meso( 23), lebas( 23) / 'HCL             ', 0.1510, 8000.0, 0.0,  31.5 /
+      DATA depname( 21), dif0( 21), ar( 21), meso( 21), lebas( 21) / 'CL2             ', 0.1080,   13.5, 0.0,  49.0 /
+      DATA depname( 22), dif0( 22), ar( 22), meso( 22), lebas( 22) / 'HOCL            ', 0.1300,    1.5, 0.0,  38.5 / ! used value of HCL
+      DATA depname( 23), dif0( 23), ar( 23), meso( 23), lebas( 23) / 'HCL             ', 0.1510,10000.0, 0.0,  31.5 /
       DATA depname( 24), dif0( 24), ar( 24), meso( 24), lebas( 24) / 'FMCL            ', 0.1094,   10.0, 0.0,  45.5 / ! default value
       DATA depname( 25), dif0( 25), ar( 25), meso( 25), lebas( 25) / 'HG              ', 0.1194,    0.1, 0.0,  14.8 / ! lebas not used
       DATA depname( 26), dif0( 26), ar( 26), meso( 26), lebas( 26) / 'HGIIGAS         ', 0.0976, 8000.0, 0.0,  95.0 / ! estimation from back calculating to get dw25 = 1.04e-5 (Garland et al, 1965)
@@ -306,7 +307,7 @@ C Land use information:
       DATA depname( 60), dif0( 60), ar( 60), meso( 60), lebas( 60) / 'NTR_OH          ', 0.0665,   16.0, 0.1, 140.4 /
       DATA depname( 61), dif0( 61), ar( 61), meso( 61), lebas( 61) / 'HYDROXY_NITRATES', 0.0646,   16.0, 0.0, 147.8 /
       DATA depname( 62), dif0( 62), ar( 62), meso( 62), lebas( 62) / 'PROPNN          ', 0.0677,   16.0, 0.0, 133.0 /
-      DATA depname( 63), dif0( 63), ar( 63), meso( 63), lebas( 63) / 'NITRYL_CHLORIDE ', 0.0888,    8.0, 0.0,  45.5 /  ! dif0 estimated following Erickson III et al., JGR, 104, D7, 8347-8372, 1999
+      DATA depname( 63), dif0( 63), ar( 63), meso( 63), lebas( 63) / 'NITRYL_CHLORIDE ', 0.0888,   0.01, 0.0,  45.5 /  ! dif0 estimated following Erickson III et al., JGR, 104, D7, 8347-8372, 1999
       DATA depname( 64), dif0( 64), ar( 64), meso( 64), lebas( 64) / 'ISOPNN          ',0.0457,  275.9, 0.0,  206.8 /
       DATA depname( 65), dif0( 65), ar( 65), meso( 65), lebas( 65) / 'MTNO3           ',0.0453,   96.2, 0.0,  251.2 /
       DATA depname( 66), dif0( 66), ar( 66), meso( 66), lebas( 66) / 'IEPOX           ',0.0579,   0.12, 0.0,  110.8 /
@@ -326,22 +327,22 @@ C Land use information:
       DATA depname( 80), dif0( 80), ar( 80), meso( 80), lebas( 80) / 'SVTRP2          ',0.0559,   13.0, 0.0,  218.8 /
       DATA depname( 81), dif0( 81), ar( 81), meso( 81), lebas( 81) / 'SVXYL1          ',0.0610, 3586.7, 0.0,  154.6 /
       DATA depname( 82), dif0( 82), ar( 82), meso( 82), lebas( 82) / 'SVXYL2          ',0.0585,   72.2, 0.0,  194.6 /
-      DATA depname( 83), dif0( 83), ar( 83), meso( 83), lebas( 83) / 'IO              ',0.1004,    8.0, 0.0,   45.5 /
-      DATA depname( 84), dif0( 84), ar( 84), meso( 84), lebas( 84) / 'OIO             ',0.0940,    8.0, 0.0,   52.5 /
-      DATA depname( 85), dif0( 85), ar( 85), meso( 85), lebas( 85) / 'I2O2            ',0.0734,    8.0, 0.0,   91.0 /
-      DATA depname( 86), dif0( 86), ar( 86), meso( 86), lebas( 86) / 'I2O3            ',0.0709,    8.0, 0.0,   98.0 /
-      DATA depname( 87), dif0( 87), ar( 87), meso( 87), lebas( 87) / 'I2O4            ',0.0686,    8.0, 0.0,  105.0 /
-      DATA depname( 88), dif0( 88), ar( 88), meso( 88), lebas( 88) / 'HI              ',0.1047,    8.0, 0.0,   45.5 /
-      DATA depname( 89), dif0( 89), ar( 89), meso( 89), lebas( 89) / 'HOI             ',0.0974,    8.0, 0.0,   52.5 /
-      DATA depname( 90), dif0( 90), ar( 90), meso( 90), lebas( 90) / 'INO             ',0.0885,    8.0, 0.0,   52.5 /
-      DATA depname( 91), dif0( 91), ar( 91), meso( 91), lebas( 91) / 'INO2            ',0.0835,   20.0, 0.0,   59.5 /
-      DATA depname( 92), dif0( 92), ar( 92), meso( 92), lebas( 92) / 'INO3            ',0.0794,    8.0, 0.0,   66.5 /
-      DATA depname( 93), dif0( 93), ar( 93), meso( 93), lebas( 93) / 'BRO             ',0.1146,    1.0, 0.0,   38.5 /
+      DATA depname( 83), dif0( 83), ar( 83), meso( 83), lebas( 83) / 'IO              ',0.1004,    1.3, 0.0,   45.5 /
+      DATA depname( 84), dif0( 84), ar( 84), meso( 84), lebas( 84) / 'OIO             ',0.0940,    8.3, 0.0,   52.5 /
+      DATA depname( 85), dif0( 85), ar( 85), meso( 85), lebas( 85) / 'I2O2            ',0.0734,    8.2, 0.0,   91.0 /
+      DATA depname( 86), dif0( 86), ar( 86), meso( 86), lebas( 86) / 'I2O3            ',0.0709,    8.2, 0.0,   98.0 /
+      DATA depname( 87), dif0( 87), ar( 87), meso( 87), lebas( 87) / 'I2O4            ',0.0686,    8.2, 0.0,  105.0 /
+      DATA depname( 88), dif0( 88), ar( 88), meso( 88), lebas( 88) / 'HI              ',0.1047,10000.0, 0.0,   45.5 /
+      DATA depname( 89), dif0( 89), ar( 89), meso( 89), lebas( 89) / 'HOI             ',0.0974,    1.3, 0.0,   52.5 /
+      DATA depname( 90), dif0( 90), ar( 90), meso( 90), lebas( 90) / 'INO             ',0.0885,   0.01, 0.0,   52.5 /
+      DATA depname( 91), dif0( 91), ar( 91), meso( 91), lebas( 91) / 'INO2            ',0.0835,   0.01, 0.0,   59.5 /
+      DATA depname( 92), dif0( 92), ar( 92), meso( 92), lebas( 92) / 'INO3            ',0.0794,  724.0, 0.0,   66.5 /
+      DATA depname( 93), dif0( 93), ar( 93), meso( 93), lebas( 93) / 'BRO             ',0.1146,   0.01, 0.0,   38.5 /
       DATA depname( 94), dif0( 94), ar( 94), meso( 94), lebas( 94) / 'HOBR            ',0.1104,    1.0, 0.0,   45.5 /
-      DATA depname( 95), dif0( 95), ar( 95), meso( 95), lebas( 95) / 'HBR             ',0.1219,    2.0, 0.0,   38.5 /
-      DATA depname( 96), dif0( 96), ar( 96), meso( 96), lebas( 96) / 'BRNO3           ',0.0871,    1.0, 0.0,   59.5 /
-      DATA depname( 97), dif0( 97), ar( 97), meso( 97), lebas( 97) / 'BRNO2           ',0.0922,    1.0, 0.0,   52.5 /
-      DATA depname( 98), dif0( 98), ar( 98), meso( 98), lebas( 98) / 'BRCL            ',0.0968,    1.0, 0.0,   56.0 /
+      DATA depname( 95), dif0( 95), ar( 95), meso( 95), lebas( 95) / 'HBR             ',0.1219,  10000, 0.0,   38.5 /
+      DATA depname( 96), dif0( 96), ar( 96), meso( 96), lebas( 96) / 'BRNO3           ',0.0871,  724.0, 0.0,   59.5 /
+      DATA depname( 97), dif0( 97), ar( 97), meso( 97), lebas( 97) / 'BRNO2           ',0.0922,   0.01, 0.0,   52.5 /
+      DATA depname( 98), dif0( 98), ar( 98), meso( 98), lebas( 98) / 'BRCL            ',0.0968,   0.01, 0.0,   56.0 /
       DATA depname( 99), dif0( 99), ar( 99), meso( 99), lebas( 99) / 'DMS             ',0.0896,    2.0, 0.0,   77.0 /
       DATA depname(100), dif0(100), ar(100), meso(100), lebas(100) / 'MSA             ',0.0844,    2.0, 0.0,   77.0 /
       DATA depname(101), dif0(101), ar(101), meso(101), lebas(101) / 'METHANE         ',0.2107,    2.0, 0.0,   29.6 / ! dif0, eqn 9-22 Schwarzenbach Gschwend & Imboden (1993) Env Org Chem
@@ -405,22 +406,22 @@ C Land use information:
       DATA depname(159), dif0(159), ar(159), meso(159), lebas(159) / 'SVAVB2          ',0.0600,  1461.2,     0.0, 163.2/
       DATA depname(160), dif0(160), ar(160), meso(160), lebas(160) / 'SVAVB3          ',0.0620,   175.2,     0.0, 163.0/
       DATA depname(161), dif0(161), ar(161), meso(161), lebas(161) / 'SVAVB4          ',0.0650,    20.8,     0.0, 162.7/
-      DATA depname(162), dif0(162), ar(162), meso(162), lebas(162) / 'CLNO3           ',0.0902,    8.0,      0.0,  52.5/
-      DATA depname(163), dif0(163), ar(163), meso(163), lebas(163) / 'FMBR            ',0.0965,   10.0,      0.0,  52.5/
-      DATA depname(164), dif0(164), ar(164), meso(164), lebas(164) / 'I2              ',0.0795,    4.0,      0.0,  77.0/
-      DATA depname(165), dif0(165), ar(165), meso(165), lebas(165) / 'CH3I            ',0.0881,    2.0,      0.0,  66.5/
-      DATA depname(166), dif0(166), ar(166), meso(166), lebas(166) / 'ICL             ',0.0878,    4.0,      0.0,  63.0/
-      DATA depname(167), dif0(167), ar(167), meso(167), lebas(167) / 'IBR             ',0.0851,    4.0,      0.0,  70.0/
-      DATA depname(168), dif0(168), ar(168), meso(168), lebas(168) / 'MI2             ',0.0713,    2.0,      0.0,  98.0/
-      DATA depname(169), dif0(169), ar(169), meso(169), lebas(169) / 'MIB             ',0.0753,    2.0,      0.0,  91.0/
-      DATA depname(170), dif0(170), ar(170), meso(170), lebas(170) / 'MIC             ',0.0773,    2.0,      0.0,  84.0/
-      DATA depname(171), dif0(171), ar(171), meso(171), lebas(171) / 'BR2             ',0.0925,    2.0,      0.0,  63.0/
-      DATA depname(172), dif0(172), ar(172), meso(172), lebas(172) / 'MB3             ',0.0705,    2.0,      0.0, 108.5/
-      DATA depname(173), dif0(173), ar(173), meso(173), lebas(173) / 'MB2             ',0.0804,    2.0,      0.0,  84.0/
-      DATA depname(174), dif0(174), ar(174), meso(174), lebas(174) / 'MB2C            ',0.0720,    2.0,      0.0, 101.5/
-      DATA depname(175), dif0(175), ar(175), meso(175), lebas(175) / 'MBC2            ',0.0739,    2.0,      0.0,  94.5/
-      DATA depname(176), dif0(176), ar(176), meso(176), lebas(176) / 'MBC             ',0.0834,    2.0,      0.0,  77.0/
-      DATA depname(177), dif0(177), ar(177), meso(177), lebas(177) / 'CLO             ',0.1288,    8.0,      0.0,  31.5/
+      DATA depname(162), dif0(162), ar(162), meso(162), lebas(162) / 'CLNO3           ',0.0902,  724.0,      0.0,  52.5/
+      DATA depname(163), dif0(163), ar(163), meso(163), lebas(163) / 'FMBR            ',0.0965,   0.01,      0.0,  52.5/
+      DATA depname(164), dif0(164), ar(164), meso(164), lebas(164) / 'I2              ',0.0795,   0.01,      0.0,  77.0/
+      DATA depname(165), dif0(165), ar(165), meso(165), lebas(165) / 'CH3I            ',0.0881,   0.01,      0.0,  66.5/
+      DATA depname(166), dif0(166), ar(166), meso(166), lebas(166) / 'ICL             ',0.0878,    1.1,      0.0,  63.0/
+      DATA depname(167), dif0(167), ar(167), meso(167), lebas(167) / 'IBR             ',0.0851,   0.01,      0.0,  70.0/
+      DATA depname(168), dif0(168), ar(168), meso(168), lebas(168) / 'MI2             ',0.0713,   0.01,      0.0,  98.0/
+      DATA depname(169), dif0(169), ar(169), meso(169), lebas(169) / 'MIB             ',0.0753,   0.01,      0.0,  91.0/
+      DATA depname(170), dif0(170), ar(170), meso(170), lebas(170) / 'MIC             ',0.0773,   0.01,      0.0,  84.0/
+      DATA depname(171), dif0(171), ar(171), meso(171), lebas(171) / 'BR2             ',0.0925,   0.01,      0.0,  63.0/
+      DATA depname(172), dif0(172), ar(172), meso(172), lebas(172) / 'MB3             ',0.0705,   0.01,      0.0, 108.5/
+      DATA depname(173), dif0(173), ar(173), meso(173), lebas(173) / 'MB2             ',0.0804,   0.01,      0.0,  84.0/
+      DATA depname(174), dif0(174), ar(174), meso(174), lebas(174) / 'MB2C            ',0.0720,   0.01,      0.0, 101.5/
+      DATA depname(175), dif0(175), ar(175), meso(175), lebas(175) / 'MBC2            ',0.0739,   0.01,      0.0,  94.5/
+      DATA depname(176), dif0(176), ar(176), meso(176), lebas(176) / 'MBC             ',0.0834,   0.01,      0.0,  77.0/
+      DATA depname(177), dif0(177), ar(177), meso(177), lebas(177) / 'CLO             ',0.1288,   0.01,      0.0,  31.5/
       DATA depname(178), dif0(178), ar(178), meso(178), lebas(178) / 'ACETALDEHYDE    ',0.0975,   0.01,      0.0,  58.9/
       DATA depname(179), dif0(179), ar(179), meso(179), lebas(179) / 'ACETYLENE       ',0.1212,   0.01,      0.0,  45.8/
       DATA depname(180), dif0(180), ar(180), meso(180), lebas(180) / 'ACROOPERA       ',0.0869,   0.01,      0.0,  70.5/
@@ -509,17 +510,7 @@ C Land use information:
       DATA depname(263), dif0(263), ar(263), meso(263), lebas(263) / 'IPXOPERA        ',0.0716,   0.01,      0.3,  99.3/
       DATA depname(264), dif0(264), ar(264), meso(264), lebas(264) / 'INALDOPERA      ',0.0671,   0.01,      0.1,  78.0/
       DATA depname(265), dif0(265), ar(265), meso(265), lebas(265) / 'HONITOPERA      ',0.0517,216903.,      0.1, 152.2/ ! HONIT
-      DATA depname(266), dif0(266), ar(266), meso(266), lebas(266) / 'HCOCL           ',0.1094,   10.0,      0.0,  45.5/ ! Use FMCL data
-      DATA depname(267), dif0(267), ar(267), meso(267), lebas(267) / 'CH2BR2          ',0.0804,    2.0,      0.0,  84.0/ ! Use MB2 data
-      DATA depname(268), dif0(268), ar(268), meso(268), lebas(268) / 'CHBR3           ',0.0705,    2.0,      0.0, 108.5/ ! Use MB3 data
-      DATA depname(269), dif0(269), ar(269), meso(269), lebas(269) / 'HCOBR           ',0.0965,   10.0,      0.0,  52.5/ ! Use FMBR data
-      DATA depname(270), dif0(270), ar(270), meso(270), lebas(270) / 'CH2I2           ',0.0713,    2.0,      0.0,  98.0/ ! Use MI2 data
-      DATA depname(271), dif0(271), ar(271), meso(271), lebas(271) / 'CH2IBR          ',0.0753,    2.0,      0.0,  91.0/ ! Use MIB data
-      DATA depname(272), dif0(272), ar(272), meso(272), lebas(272) / 'CH2ICL          ',0.0773,    2.0,      0.0,  84.0/ ! Use MIC data
-      DATA depname(273), dif0(273), ar(273), meso(273), lebas(273) / 'CHBR2CL         ',0.0720,    2.0,      0.0, 101.5/ ! Use MB2C data
-      DATA depname(274), dif0(274), ar(274), meso(274), lebas(274) / 'CHBRCL2         ',0.0739,    2.0,      0.0,  94.5/ ! Use MBC2 data
-      DATA depname(275), dif0(275), ar(275), meso(275), lebas(275) / 'CH2BRCL         ',0.0834,    2.0,      0.0,  77.0/ ! Use MBC data
-      DATA depname(276), dif0(276), ar(276), meso(276), lebas(276) / 'VMTN1OPERA      ',0.0524, 7220.0,      0.0, 153.8/ 
+      DATA depname(266), dif0(266), ar(266), meso(266), lebas(266) / 'VMTN1OPERA      ',0.0524, 7220.0,      0.0, 153.8/ 
 
       CONTAINS
 
@@ -852,11 +843,11 @@ C Arguments:
 
 C Parameters:
          Real, Parameter :: cond_min = 1.0 / resist_max ! minimum conductance [m/s]
-         Real, Parameter :: KZL    = 0.01     ! lowest KZ
-         Real, Parameter :: KZU    = 1.0      ! 2.0  ! highest KZ
-         Real, Parameter :: EPS    = 1.0E-08  ! small number for temperature difference
+         Real, Parameter :: KZL    = 0.01       ! lowest KZ, when Urban fraction is zero
+         Real, Parameter :: EPS    = 1.0E-08    ! small number for temperature difference
 
 C Local variables:
+         Real    KZU ! highest KZ, when urban fraction is 100
          Real    FINT
          Real    CPAIR, LV, QST 
          Real    TMPFX, TMPVTCON, TST, TSTV
@@ -1095,6 +1086,8 @@ C-------------------------------- Calculated Variables -------------------------
          Met_Data%DZF = Met_Data%ZF - EOSHIFT(Met_Data%ZF, Shift = -1, Boundary = 0.0, Dim = 3)
 
          Met_Data%RDEPVHT = 1.0 / Met_Data%ZF( :,:,1 )
+
+         KZU = KZU_CUSTOM ! default 1.0
 
          IF ( MINKZ ) THEN
             Met_Data%KZMIN = KZL

@@ -485,7 +485,7 @@
 #ifdef isam 
       N_TABLE = N_TABLE * NTAG_SA
 #elif defined( sens )
-      N_TABLE = N_TABLE * NPMAX
+      N_TABLE = N_TABLE * ( NPMAX + 1 )
 #endif
       ALLOCATE( ELMO_TABLE( N_TABLE ), STAT=IOS )
       CALL CHECKMEM( IOS, 'ELMO_TABLE',PNAME ) 
