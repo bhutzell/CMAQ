@@ -181,7 +181,6 @@ setenv CTM_BIOGEMIS_BE Y     #> calculate in-line biogenic emissions with BEIS [
 setenv CTM_BIOGEMIS_MG N     #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N         #> turns on BDSNP soil NO emissions [ default: N ]
 setenv USE_SEGA_N N          #> turns on EPA soil NO and HONO emissions [ default: N ]
-setenv USE_SEGA_N_EF N       #> Use BEIS input emission factor file for soil NO and HONO [ default: N ]
 
 setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affecting photolysis
                              #> frequencies ( 3 is the default value )
@@ -192,13 +191,6 @@ setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affec
                              #>      model where optics determined by
                              #>      (4-Tabular Mie; 5-Mie Calculation; 6-Case Approx to Mie Theory)
 
-setenv AERO_MT "HYB"         #> Specify Inorganic Aerosol Mass Transfer Approach [default = HYB].
-                             #>    Set to EQB to assume equilibirum partitioning for all aerosol 
-                             #>    modes. Set to DYN to calculate dynamic fluxes with respect to 
-                             #>    a fixed sub-time-step. Set to HYB for coarse mode to use dynamic
-                             #>    mass transfer and fine modes to use equilibrium partitioning.
-setenv AERO_DYN_TSTEP 90     #> Specify the fixed sub-time-step for dynamic partitioning of aerol 
-                             #>    modes. 
 setenv BC_AERO_M2WET F       #> Specify whether or not boundary condition aerosol size distribution 
                              #>    is wet or dry [ default: F = dry ]. This option should be set
                              #>    to True if boundary condition size distirbution parameters are
@@ -460,21 +452,15 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      setenv USE_LTNG_DATA  Y        #> use hourly NLDN strike file [ default: Y ]
      if ( $USE_LTNG_DATA == Y ) then
         setenv LTNG_DATA ${IN_LTpath}/NLDN_12km_60min_${YYYYMMDD}.ioapi
-	setenv LNO_OPTION 1 # default, use lightning strikes such as NLDN, WWLLNs
-        # LNO_OPTION 2:  use GLM flashes
-        # LNO_OPTION 3:  use GLM Energy
-        # LNO_OPTION 4:  use synergized GLM/WWLLN Energy
-	# LNO_OPTION 5:  use synergized GLM/WWLLNs Energy with ICCG adjustment to set upper bound
-
+        setenv LNO_OPTION 1
+             # LNO_OPTION 1: default, use lightning strikes such as NLDN, WWLLNs
+             # LNO_OPTION 2: use synergized GLM/WWLLNs Energy with ICCG adjustment to set upper bound
      endif
      setenv LTNGPARMS_FILE ${IN_LTpath}/LTNG_AllParms_12US1.ncf #> lightning parameter file; ignore if LTNGPARAM = N
   endif
 
   if( $USE_SEGA_N == 'Y' ) then
      setenv SEGA_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
-     if( $USE_SEGA_N_EF == 'Y') then
-        setenv SEGA_EF ${INPDIR}/surface/BEIS4_SEGA_beld6_norm_emis_12US1.ncf
-     endif
   endif
 
   #> In-line biogenic emissions configuration
