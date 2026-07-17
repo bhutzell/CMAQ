@@ -15,15 +15,15 @@
 
 The Detailed Emissions Scaling, Isolation and Diagnostics (DESID) module included with CMAQv5.3+ provides comprehensive customization and transparency of emissions manipulation to the user. The customization of emissions is accomplished via a series of Control Namelists, which contain variables that modify the behavior of the emissions module. These include ***Emission Scaling Rules***, ***Size Distributions***, ***Regions Registry***, ***Chemical Families***, ***Region Families***, and ***Area Adjustments***.
 
-To determine its configuration, DESID makes use of input primarily from three files: the CMAQ runscript, the CMAQ Control File ([CMAQ_Control.nml][link_B.1_control]) and the Chemical Control file ([CMAQ_Chemical_Control_{$MECH}.nml][link_B.1_chem_control]). 
+To determine its configuration, DESID makes use of input primarily from three files: the CMAQ runscript, the CMAQ Control File ([CMAQ_Control.nml][link_B.1_control]) and the Chemical Control file ([CMAQ_Chem_Control_${MECH}.nml][link_B.1_chem_control]). 
 A separate version of the chemical mapping control file exists for every mechanism because these namelists are preloaded with likely rules linking emissions of important CMAQ primary species to their typical emission species names as output by SMOKE. 
-By default, this namelist is stored in each chemical mechanism folder (e.g. MECHS/cb6r5_ae7_aq) and is copied into the user's build directory when bldit_cctm.csh is executed and a chemical mechanism is chosen. If the user modifies the name or location of the DESID control file or chemical mapping file, then the following commands in the RunScript should be updated as well:
+By default, this namelist is stored in each chemical mechanism folder (e.g. MECHS/cb6r5_ae7_aq) and is copied into the user's build directory when bldit_cctm.csh is executed and a chemical mechanism is chosen. If the user modifies the name or location of the DESID control file or chemical mapping file, then the following commands in the runscript should be updated as well:
 ```
 setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
 setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml
 ```
 
-If the user does not provide a DESID Control Files or the path to the files in the RunScript are incorrect, then the model will abort and indicate the error. If the user would like all emissions set to 0, it is recommended that they use the syntax outlined here and in the DESID tutorial to do so.   
+If the user does not provide a DESID Control Files or the path to the files in the runscript are incorrect, then the model will abort and indicate the error. If the user would like all emissions set to 0, it is recommended that they use the syntax outlined here and in the DESID tutorial to do so.   
 
 
 ## B.2 Chemical Mapping Control
@@ -37,6 +37,7 @@ The set of rules used by CMAQ to interpret emissions shall be provided in one ar
 - 'Stream Label' - Short Name from Run Script (e.g. the value of GR_EMIS_01_LAB or STK_EMIS_01_LAB). There are a few reserved names that apply to online emissions streams. These are:
   - BIOG - Biogenic VOC emissions computed by BEIS
   - MIOG - Biogenic VOC emissions computed by MEGAN
+  - SEGA - Soil NOx emissions computed by SEGA
   - MGEM - Marine Gas Emissions
   - LTNG - Lightning NO Emissions
   - WBDUST - Wind-Blown Dust Emissions
@@ -128,22 +129,26 @@ To avoid large swings in repartitioning after emission, it is a good idea to spl
 
 #### B.2.2.2 Supporting Potential Combustion SOA
 
-Potential Combustion SOA (pcSOA) is a CMAQ species introduced to account for missing pathways for SOA formation from combustion sources. It includes IVOC oxidation as well as other phenomena (Murphy et al., ACP, 2017). It was parameterized primarily in LA, where vehicle exhaust continues to dominate. The following emission rulese add the gas-phase precursor to pcSOA to the model scaled to POA.
+Potential Combustion SOA (pcSOA) is a CMAQ species introduced to account for missing pathways for SOA formation from combustion sources. It includes IVOC oxidation as well as other phenomena (Murphy et al., ACP, 2017). It was parameterized primarily in LA, where vehicle exhaust continues to dominate. The following emission rules add the gas-phase precursor to pcSOA to the model scaled to POA.
+```
     'EVERYWHERE', 'ALL'          ,'POC'   ,'PCVOC'      ,'GAS' ,6.579,'MASS','a',  
     'EVERYWHERE', 'ALL'          ,'PNCOM' ,'PCVOC'      ,'GAS' ,6.579,'MASS','a',  
+```
 
 However, the added pcSOA is probably inappropriate for Fire sources, especially in its current configuration. This pathway should be zeroed out for all fire and wood-burning related sources. The default emission control interfaces include a number of emission rules with the most common stream names for fire emission inputs in order to maximize the likelihood of zeroing out pcSOA from fires. The user should confirm that pcVOC emissions from fire sources are zero for all simulations.  
+```
     'EVERYWHERE', 'PT_FIRES'     ,'ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o',
     'EVERYWHERE', 'PT_RXFIRES'   ,'ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o',
     'EVERYWHERE', 'PT_AGFIRES'   ,'ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o',
     'EVERYWHERE', 'PT_OTHFIRES'  ,'ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o',
     'EVERYWHERE', 'PT_FIRES_MXCA','ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o',
     'EVERYWHERE', 'GR_RES_FIRES' ,'ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o',
+```
 
 The CRACMM mechanism (introduced in CMAQv5.4) does not use PCSOA or PCVOC because it provides a mechanistic estimate of OA production. If those species are present, they should be removed. The only exception is if they are coming from the boundary conditions (i.e. if boundary conditions are being supplied by a non-CRACMM model run).  
 
 ## B.3 DESID Control
-The DESID control file (CMAQ_Control_DESID.nml) provides chemical mechanism-independent user inputs to DESID. Important variable sections are the General Options, Area Normalization, Size Distribution Parameters, Region Definitions, and Diagnostic Output Configuration.  
+The CMAQ control file (CMAQ_Control.nml) provides chemical mechanism-independent user inputs to DESID. Important variable sections are the General Options, Area Normalization, Size Distribution Parameters, Region Definitions, and Diagnostic Output Configuration.  
 
 ### B.3.1 General Options
 The maximum number of DEISD layers can be set with
@@ -166,8 +171,8 @@ Definition of Fields:
 
 Example:
 ```
-&AreaNorm
- AREA_NML  =
+&Desid_AreaNorm
+ Desid_Area_Nml  =
  !         | Stream Label   | Area Normalization | Projection Adjustment
                 'ALL'       ,'AUTO'              ,'AUTO',
                 'GRIDDED'   ,'TRUE'              ,'TRUE',
@@ -179,7 +184,7 @@ If emissions have been prepared by SMOKE or a similar emissions processing tool 
 This feature was developed primarily for applications where an offline emission model produces area-normalized emission fluxes, not emission rates.  
 
 ### B.3.3 Aerosol Size Distributions  
-The treatment of aerosol size distributions in CMAQv5.3 has been updated to be more consistent with the way particle sizes and modes are treated by the National Emission Inventory and in emissions processing tools like SMOKE, MOVES, SPECIATE, and Speciation Tool. Specifically, in these tools, aerosol emissions are typically parameterized into two main modes, Fine and Coarse. Although the size distribution parameters (i.e. total number, diameter, standard deviation, etc.) for these modes will vary among emission sources, previous versions of CMAQ assumed that all primary fine particles had the same size distribution upon emission. Coarse-mode particles were assumed to exhibit a larger diameter but were also uniform across all sources (excluding wind-blown dust and sea spray).
+The treatment of aerosol size distributions was updated in CMAQv5.3 to be more consistent with the way particle sizes and modes are treated by the National Emission Inventory and in emissions processing tools like SMOKE, MOVES, SPECIATE, and Speciation Tool. Specifically, in these tools, aerosol emissions are typically parameterized into two main modes, Fine and Coarse. Although the size distribution parameters (i.e. total number, diameter, standard deviation, etc.) for these modes will vary among emission sources, previous versions of CMAQ assumed that all primary fine particles had the same size distribution upon emission. Coarse-mode particles were assumed to exhibit a larger diameter but were also uniform across all sources (excluding wind-blown dust and sea spray).
 
 In CMAQv5.3 and beyond, users link particle emission species to CMAQ particle species via the DESID_Scaling section of the Chemical Mapping Control Namelist. Examples of default mapping rules can be found in any of the Chemical Mapping Control Namelists in the CMAQ repository. The three lines below assign emissions for all streams for particulate-phase sulfate, ammonium, and nitrate.
 ```
@@ -259,7 +264,7 @@ will scale emissions of all species from all streams by +50% but only in grid ce
 
 #### B.3.4.2 Defining Regions  
 
-The Desid_RegionDef section of the DESID Control Namelist maps each "Region Label" to specific variables on specific files. Here is the Desid_RegionDef section in the default namelist:
+The Desid_RegionDef section of the CMAQ Control Namelist maps each "Region Label" to specific variables on specific files. Here is the Desid_RegionDef section in the default namelist:
 ```
 &Desid_RegionDef
  Desid_Reg_nml  =   
@@ -269,13 +274,13 @@ The Desid_RegionDef section of the DESID Control Namelist maps each "Region Labe
 /
 ```
 As indicated, the Region Label "EVERYWHERE" is active by default and returns a mask that operates uniformly across the entire domain. 
-The "File_Label" field identifies the environment variable in the RunScript that stores the location and name of the file containing the mask. 
-The user may modify this to any name they wish as long as it is consistent with the variable name on the RunScript. 
+The "File_Label" field identifies the environment variable in the runscript that stores the location and name of the file containing the mask. 
+The user may modify this to any name they wish as long as it is consistent with the variable name in the runscript. 
 The "Variable on File" field identifies the variable on the input file that stores the gridded field to be used for this region. 
 Examples are provided for two cases. 
 The variable Desid_Max_Reg in the Desid_RegionDefVars section must be greater than the number of regions that will be defined.
 
-In this case, a region with label "WATER" is defined and referenced to the variable "OPEN" (which is short for *open water*) in the file 'CMAQ_MASKS' which needs to be defined in the RunScript. Using this "WATER" region will apply a scaling rule only for open water grid cells and fractionally along coastlines.  
+In this case, a region with label "WATER" is defined and referenced to the variable "OPEN" (which is short for *open water*) in the file 'CMAQ_MASKS' which needs to be defined in the runscript. Using this "WATER" region will apply a scaling rule only for open water grid cells and fractionally along coastlines.  
 
 As an additional example, let's assume file us_states.nc is defined in the runscript as US_STATES as follows:
 ```
@@ -303,7 +308,7 @@ Alternatively, all the variables on the US_STATES file may be enabled at once:
 ```
 Rather than listing out all variables on the file and explicitly linking them to "Region Labels", the user can invoke the "ALL" keyword in both the 'Region Label' and 'Variable on File' fields and all variables will be read and stored. Once either of these definitions are included in the &Desid_RegionDef section, region labels NC and SC can be used in emission scaling instructions as in the Kentucky example above.  
 
-These gridded mask files are read by CMAQ through environmental variables, which are identified in the RunScript. If variables from multiple mask files are used, each of these mask files needs to be defined in the RunScript. Two example mask files are available on the CMAS Data Warehouse: US states grid mask file and NOAA climate regions grid mask file.  These mask files can be used with the 12US1 modeling grid domain (grid origin x = -2556000 m, y = -1728000 m; N columns = 459, N rows = 299).
+These gridded mask files are read by CMAQ through environmental variables, which are identified in the runscript. If variables from multiple mask files are used, each of these mask files needs to be defined in the runscript. Two example mask files are available on the CMAS Data Warehouse: US states grid mask file and NOAA climate regions grid mask file.  These mask files can be used with the 12US1 modeling grid domain (grid origin x = -2556000 m, y = -1728000 m; N columns = 459, N rows = 299).
 
 * [Link to grid mask files on CMAS Data Warehouse Google Drive](https://drive.google.com/drive/folders/1x9mJUbKjJaMDFawgy2PUbETwEUopAQDl)
 * [Link to metadata for the grid mask files is posted on the CMAS Center Dataverse site](https://doi.org/10.15139/S3/XDYYB9)
@@ -364,9 +369,9 @@ See the [CMAQ Chemical Control Namelist Description](../CMAQ_UG_ch04_model_input
 
 One additional note: if a chemical familiy is defined for use in an emission scaling rule, the user should be careful about confirming that the members of that family are present on the emission input file or the CMAQ model species list, depending on which the user is trying to modify. Since the names on the input files are often different than those on the CMAQ model species list, care is advised. DESID will print warnings to the CMAQ log file when it cannot find species that it is looking for from a chemical family on an input file or in the list of CMAQ model species. Please confirm that the model is operating as you expect.  
  
-## B.3.7 Emissions Diagnostics  
-### B.3.7.1 Summary Output to Processor-Specific Logfiles  
-Diagnostic output is an important feature of the new emissions module, DESID. Because the impact of emissions is so critical for CMAQ predictions and because the features available for scaling emissions are now quite complex, a comprehensive text-based output has been added to the CMAQ logfiles to enhance transparency.
+### B.3.7 Emissions Diagnostics  
+#### B.3.7.1 Summary Output to Processor-Specific Logfiles  
+Diagnostic output is an important feature of DESID. Because the impact of emissions is so critical for CMAQ predictions and because the features available for scaling emissions are now quite complex, a comprehensive text-based output has been added to the CMAQ logfiles to enhance transparency.
 
 The logfiles now provide several lists of information to support users from unexpected behaviors or conflicts like inconsistent naming between emissions and CMAQ speciation. First, CMAQ reports for each stream the number and names of all the emission species that were not used. Second, it prints the names of emission species that the user told it to look for but that it could not find on any of the emission streams. If the environment variable:
 ```
@@ -376,9 +381,9 @@ is set to 'Y' or 'True', then the model will abort if it cannot find any individ
 
 Finally, CMAQ loops through streams and outputs the size distribution modes available for each stream and the full list of every emission instructions applied to each stream. These are ordered by CMAQ species (with 'i', 'j', and 'k' modes listed separately) and emission species name so that a full understanding of the scaling rules applied to each CMAQ species'' emissions can be grasped quickly. Columns are printed for the applicable region(s) of the grid, the phase/mode applied, the input scale factor, the scaling basis, the operation, and the final scale factor applied taking into account any molecular weight conversions, if needed, and size distribution fractions.
 
-### B.3.7.2 Diagnostic Gridded Output Files
+#### B.3.7.2 Diagnostic Gridded Output Files
 This component allows users to specify individual species for output on emissions diagnostic output files. In this way, users are able to probe emissions magnitudes and scaling changes for species of interest while not sacrificing the hard disk space needed to save the emission rates of all species for every emission stream. 
-It is also possible to combine components of chemical families or stream families as the user''s interest dictates.   
+It is also possible to combine components of chemical families or stream families as the user's interest dictates.   
 
 The Desid_Diag section of the DESID Control File contains variables for configuring this diagnostic output. 
 Users may specify any number of rules that, when processed, will result in one or more diagnostic files to be output. This example:
@@ -413,7 +418,7 @@ The keyword TOTAL may be used in place of ALL in the Streams variable to indicat
   EmissDiagSpec(3,:)   = 'ALL'
 /
 ```
-We have already described the first example. The second exmaple will sum up all streams using the keyword with the '*' expansion and create one 3D gridded file with six variables: 'AEC' = AECI + AECJ + AECK; 'AECI'; 'NO2'; 'ACLK'; 'AMG' and 'TERP'. 
+We have already described the first example. The second example will sum up all streams using the keyword with the '*' expansion and create one 3D gridded file with six variables: 'AEC' = AECI + AECJ + AECK; 'AECI'; 'NO2'; 'ACLK'; 'AMG' and 'TERP'. 
 The third example will create a diagnostic of the sum of the components of the PT_SOURCES family (defined in the stream family section). This file will be column sums and will include all the emitted species appearing on at least one of the streams within PT_SOURCES. 
 For this set of example, Desid_N_Diag_Rules in the Desid_DiagVars section should be set to 3. Desid_Max_Diag_Streams and Desid_Max_Diag_Spec should be greater than the maximum number of streams or species on any diagnostic rule list.  
 
@@ -421,7 +426,7 @@ For this set of example, Desid_N_Diag_Rules in the Desid_DiagVars section should
 <!-- BEGIN COMMENT -->
 
 [<< Previous Appendix](CMAQ_UG_appendixA_model_options.md) - [Home](../README.md) - [Next Appendix >>](CMAQ_UG_appendixC_spatial_data.md)<br>
-CMAQv5.5 User's Guide <br>
+CMAQv6.0 User's Guide <br>
 
 <!-- END COMMENT -->
 

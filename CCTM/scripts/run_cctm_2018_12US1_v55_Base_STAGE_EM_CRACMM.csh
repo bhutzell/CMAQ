@@ -1,7 +1,7 @@
 #!/bin/csh -f
 
 # ============== CCTMv6.X STAGE EM CRACMM 12US1 Run Script ================
-# Usage: run_cctm_2018_12US1_v54_Base_STAGE_EM_CRACMM.csh >&! cctm_2018_12US1_CRACMM.log &                                
+# Usage: run_cctm.csh >&! cctm_2018_12US1_CRACMM.log &                                
 #
 # To report problems or request help with this script/program:
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -34,7 +34,7 @@ source ./config_cmaq.csh $compiler $compilerVrsn
 cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v6a1               #> Code Version
+ set VRSN      = v6                #> Code Version
  set PROC      = mpi               #> serial or mpi
  setenv MECH     cracmm3           #> Mechanism ID
  set EMIS      = WR705_2018gc2     #> Emission Inventory Details

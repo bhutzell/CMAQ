@@ -1,32 +1,32 @@
 # Structural Improvements
 
-### rdbcon update
+
+### Optimizing reading of data from boundary conditions by model layer
 **David Wong**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
-**Type of update**: Code Update
-**Release Version/Date**:  CMAQv6.0
+**Type of update**: Code Update      
+**Release Version**:  CMAQv6.0
 
 **Description**:
-Redesigned subroutine r_interpolate_var_2db to follow the idea in hadvppm.F which calls rdbcon by layer. This will also eliminate the scenario that interpolates the entire 3D boundary data when there is a time stamp change between layers.
-
+This update redesigns the subroutine that interpolates lateral boundary conditions so that boundary conditions are interpolated layer by layer. Different vertical layers may have different advection time steps. This update makes it so that boundary conditions for each layer are only interpolated when needed for each individual layer rather than interpolating the boundary conditions for all layers at the frequency of the layer with the smallest advection time step. This update improves the computational efficiency of the model.  
 
 **Significance and Impact**:
-No impact on results, but enhances computational performance
+Improved computational efficiency, no impact on model outputs.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1409](https://github.com/USEPA/CMAQ/commit/36e5984f2920dc7a3ff9fe8a91c0cd1849aea874) | [PR#1409](https://github.com/USEPA/CMAQ_Dev/pull/1409)  |   
 
 
-### parallel I/O implementation for pa_init.F
+### Parallel I/O implementation for process analysis
 **David Wong**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
-**Type of update**: Code Update
-**Release Version/Date**:  CMAQv6.0
+**Type of update**: Code Update      
+**Release Version**:  CMAQv6.0
 
 **Description**:
-Allows users to output PA output files in true parallel fashion
+When using a parallel file system (e.g., Lustre), a code block is needed to ensure that the file is open on all processors. Otherwise, the model crashes. This update adds the necessary code to allow for output of process analysis files with true parallel I/O.  
 
 **Significance and Impact**:
-No impact on results, but allows the code to output in parallel
+Allows for running process analysis with parallel I/O, no impact on model outputs expected.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
@@ -36,7 +36,7 @@ No impact on results, but allows the code to output in parallel
 ### Reorganize Aero Module  
 **Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)      
 **Type of update**: Restructure  
-**Release Version/Date**:  CMAQv6.0   
+**Release Version**:  CMAQv6.0   
 
 **Description**:   
 This update cosmetically restructures the lcoations of subroutines in the Aerosol module. The subroutines in the aero_subs file have been split up, and these subroutines have been grouped into more intuitive places, making the code more digestible. For example, the subroutines relevant for calculating the fraction of mass for each aerosol species that is captured with a particular inlet (e.g. PM1, PM2.5, PM10) are now located in the file called aerosol_inlet.F.
@@ -53,11 +53,11 @@ No impact on results.
 ### Enable parallel I/O for Lightning and ELMO files
 **Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
 **Type of update**: Fix/added feature    
-**Release Version/Date**: CMAQv6.0  
+**Release Version**: CMAQv6.0  
 
 **Description**:   
 When using a parallel file system (e.g., Lustre), a code block is needed to ensure that the file is open on all processors. Otherwise, the model crashes.
-See this thread on the user forum. @dwongepa initially submitted PR #1350 to address this, but that was built on top of v5.5 code and it was easier to port the changes to this new PR.
+See link below to thread on the user forum. @dwongepa initially submitted PR #1350 to address this, but that was built on top of v5.5 code and it was easier to port the changes to this new PR.
 
 **Significance and Impact**:   
 Was not tested given no access to a parallel file system, however, not anticipated to change results
@@ -73,7 +73,7 @@ Was not tested given no access to a parallel file system, however, not anticipat
 ### Improvements to compiling with GCC 
 **Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Compilation    
-**Release Version/Date**: CMAQv6.0  
+**Release Version**: CMAQv6.0  
 
 **Description**:   
 Compiling the CCTM with gcc has always generated a daunting number of WARNING messages. There are so many that we have ignored them. This PR resolves many of those warnings, with the hope that developers or integrators might notice and address new ones that are created.
@@ -101,7 +101,7 @@ Generally, warnings should be addressed when possible. You never know when GCC m
 ### Replace CONST.EXT include file with module and update constant values  
 **Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Restructure     
-**Release Version/Date**: CMAQv6.0  
+**Release Version**: CMAQv6.0  
 
 **Description**:   
 In this PR, the code is restructured to define and use a CONST module in lieu of the CONST.EXT include file. 
@@ -123,7 +123,7 @@ NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds
 ### Cap log_message at 1000 lines  
 **Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)     
 **Type of update**: Bug Fix   
-**Release Version/Date**:  CMAQv6.0   
+**Release Version**:  CMAQv6.0   
 
 **Description**:   
 When excessively long character strings are sent to log_message, it has the potential to reach an infinite loop. This update establishes a cap on the log_message at 1000 lines.
@@ -153,7 +153,7 @@ The update removes a CCTM compile error from the desid_module.F file when the bu
 ### Simplify RETRIEVE_OCEAN_DATA
 **Chris Nolte**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**:  Simplify code  
-**Release Version/Date**: CMAQv6.0  
+**Release Version**: CMAQv6.0  
 
 **Description**:   
 Simplified the logic in CCTM/src/cio/centralized_io_module.F for subroutine retrieve_ocean_data.
@@ -171,7 +171,7 @@ No impact on model results.
 ### GNU build flag update to enable compilation with GNU versions 10+
 [Fahim Sidi](mailto:sidi.fahim@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix    
-**Release Version/Date**:  CMAQv5.5     
+**Release Version**:  CMAQv5.5     
 
 **Description**:  Starting GNU version 10+, GNU no longer allows rank mismatches between the callee and the calling function. The exact verbiage from the GNU change logs:"Mismatches between actual and dummy argument lists in a single file are now rejected with an error. Use the new option -fallow-argument-mismatch to turn these errors into warnings; this option is implied with -std=legacy. -Wargument-mismatch has been removed.” (https://gcc.gnu.org/gcc-10/changes.html)
 
@@ -210,7 +210,7 @@ These updates improve consistency among diagnostic output files and improve read
 ## Add precision to timing metrics in logfiles 
 **Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Improvement (Minor log formatting change)     
-**Release Version/Date**: CMAQv5.5      
+**Release Version**: CMAQv5.5      
 
 **Description**:   
 This PR adds three decimal places of precision to the process-level timing metrics in the ascii logfile.

@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ====================== JPROCv5.5 Build Script ===================== 
+# ====================== JPROCv6.X Build Script ===================== 
 # Usage: bldit_jproc.csh >&! bldit.jproc.log                              
 # Requirements: I/O API & netCDF libraries; a Fortran compiler
 #
@@ -35,7 +35,7 @@
  set Mechs   = $CMAQ_REPO/CCTM/src/MECHS      #> location of the chemistry mechanism include files
 
 #> Working directory and application IDs
- set VSRN = v55                       #> model configuration ID
+ set VSRN = v6                       #> model configuration ID
  setenv Vrsn ${VSRN}
 
 #> Controls for managing the source code compilation

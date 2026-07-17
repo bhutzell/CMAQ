@@ -33,10 +33,10 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v6a1              #> Code Version
+ set VRSN      = v6                #> Code Version
  set PROC      = mpi               #> serial or mpi
- setenv MECH     cracmm2      #> Mechanism ID
-# set EMIS      = 2016fh            #> Emission Inventory Details
+ setenv MECH     cracmm2           #> Mechanism ID
+# set EMIS      = 2016fh           #> Emission Inventory Details
  set APPL      = 2019_12US1        #> Application Name (e.g. Gridname)
 
 #> Define RUNID as any combination of parameters above or others. By default,

@@ -41,7 +41,7 @@ echo 'Start Model Run At ' `date`
 setenv CTM_DIAG_LVL 0 
 
 #> Set General Parameters and Labels for Configuring the Simulation
-set VRSN        = v6a1               #> Code Version
+set VRSN        = v6                 #> Code Version
 set PROC        = mpi                #> serial or mpi
 setenv MECH       cracmm3            #> Mechanism ID
 set APPL        = Bench_2018_12NE3   #> Application Name (e.g. Domain)

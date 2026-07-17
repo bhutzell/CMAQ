@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-# ===================== CALC_TMETRIC_v5.5.X Run Script =============
+# ===================== CALC_TMETRIC_v6.X Run Script =============
 # Usage: run_calc_tmetric.csh >&! calc_tmetric.log &
 #
 # To report problems or request help with this script/program:
@@ -20,7 +20,7 @@
  source ./config_cmaq.csh
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v55               #> Code Version
+ set VRSN      = v6                #> Code Version
  set PROC      = mpi               #> serial or mpi
  set MECH      = cb6r5_ae7_aq      #> Mechanism ID
  set APPL      = Bench_2016_12SE1        #> Application Name (e.g. Gridname)

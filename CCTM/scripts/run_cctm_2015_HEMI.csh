@@ -33,7 +33,7 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v6a1               #> Code Version
+ set VRSN      = v6                #> Code Version
  set PROC      = mpi               #> serial or mpi
  setenv MECH     cb6r5m_ae7_aq     #> Mechanism ID
  set APPL      = 2015_HEMI         #> Application Name (e.g. Gridname)

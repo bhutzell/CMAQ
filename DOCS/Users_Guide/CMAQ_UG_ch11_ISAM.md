@@ -257,7 +257,7 @@ Tonnesen, G.S. & Dennis, R.L. (2000b). Analysis of radical propagation efficienc
 <!-- BEGIN COMMENT -->
 
 [<< Previous Chapter](CMAQ_UG_ch10_HDDM-3D.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch12_sulfur_tracking.md)<br>
-CMAQv5.5 User's Guide <br>
+CMAQv6.0 User's Guide <br>
 
 <!-- END COMMENT -->
 

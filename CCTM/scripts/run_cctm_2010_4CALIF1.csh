@@ -33,7 +33,7 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters and Labels for Configuring the Simulation
- set VRSN      = v6a1             #> Code Version
+ set VRSN      = v6                 #> Code Version
  set PROC      = mpi                #> serial or mpi
  setenv MECH     saprc07tic_ae7i_aq #> Mechanism ID
  set EMIS      = 2011eh_saprc_10g   #> Emission Inventory Details

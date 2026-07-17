@@ -72,7 +72,7 @@ Kang, D., H. K. Heath, R. C. Gilliam, T. L. Spero, and J. E. Pleim (2022), Light
 <!-- BEGIN COMMENT -->
 
 [<< Previous Appendix](CMAQ_UG_appendixD_parallel_implementation.md) - [Home](../README.md) - [Next Appendix >>](CMAQ_UG_appendixF_elmo_output.md) <br>
-CMAQv5.5 User's Guide<br>
+CMAQv6.0 User's Guide<br>
 
 <!-- END COMMENT -->
 

@@ -1,7 +1,8 @@
 ## CMAQ ELMO Tutorial ##
 ### Adding Keywords and Derived Variables ###
 Purpose: This tutorial will step you through the processes of adding ELMO Keywords to the CMAQ Control Namelist and 
-adding new derived variables to the ELMO source code.  
+adding new derived variables to the ELMO source code.
+An ELMO Keyword defines a group of variables which can then be used to prescribe the variables to be written to an ELMO output file.  
 
 ------------
 
@@ -15,7 +16,7 @@ Go to the CMAQ Control Namelist ([CMAQ_Control.nml][link_cmaq_ctrl]) under the s
 &ELMO_INIT
   N_Files = 2               
   N_Max_Output_Variables = 400
-  N_Keywords = 74                    ! change from 73 to 74
+  N_Keywords = 82                    ! change from 81 to 82
   N_Max_Keyword_Variables = 150
 /
 ```
@@ -38,7 +39,7 @@ Example:
  !----- DEFINE ELMO KEYWORDS FOR USE IN FILE_VARS -----!
  !-----------------------------------------------------!
 
-  Keywd_name(74) = 'NEW_KEYWORD'
+  Keywd_name(82) = 'NEW_KEYWORD'
 ```
 
 
@@ -55,8 +56,8 @@ Example:
  !----- DEFINE ELMO KEYWORDS FOR USE IN FILE_VARS -----!
  !-----------------------------------------------------!
 
-  Keywd_name(74) = 'NEW_KEYWORD'
-  Keywd(74,:) = 'SO2','ASO4','PMF_SO4','PMC_SO4','TA','RH'
+  Keywd_name(82) = 'NEW_KEYWORD'
+  Keywd(82,:) = 'SO2','ASO4','PMF_SO4','PMC_SO4','TA','RH'
 ```
 
 
@@ -91,7 +92,7 @@ Or you may create a new output file and use the keyword there.
 &ELMO_INIT
   N_Files = 3                        ! change from 2 to 3 output files
   N_Max_Output_Variables = 400
-  N_Keywords = 74                    
+  N_Keywords = 82                    
   N_Max_Keyword_Variables = 150
 /
 

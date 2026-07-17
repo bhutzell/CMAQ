@@ -1,7 +1,7 @@
 #!/bin/csh -f
 
 # ===================== CCTMv6.X Run Script ========================= 
-# Usage: run.cctm >&! cctm_2022_12US1_CRACMM2.log &                                
+# Usage: run.cctm >&! cctm_2023_12US4_CRACMM.log &                                
 #
 # To report problems or request help with this script/program:     
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -74,7 +74,7 @@ echo 'Start Model Run At ' `date`
  #setenv MECH     cracmm3haps       #> Mechanism ID
 
  # Select ONE version; this affects some default settings below
- #set VRSN      = v6a1          #> Code Version
+ #set VRSN      = v6            #> Code Version
  set VRSN      = v55           #> Code Version
                                                       
 #> Define RUNID as any combination of parameters above or others. By default,
@@ -84,7 +84,7 @@ echo 'Start Model Run At ' `date`
 
 #> Set the build directory (this is where the CMAQ executable
 #> is located by default).
- if( $VRSN == v6a1 ) set BLD = ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
+ if( $VRSN == v6 )  set BLD = ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
  if( $VRSN == v55 ) set BLD = ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_${MECH}_stage
  set EXEC      = CCTM_${VRSN}.exe  
 
@@ -189,12 +189,12 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
 
-if( $VRSN == v6a1 ) setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
-if( $VRSN == v55 )  setenv CTM_WB_DUST N         #> WBD not recommened for use in v55
+if( $VRSN == v6 )  setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
+if( $VRSN == v55 ) setenv CTM_WB_DUST N         #> WBD not recommened for use in v55
 
 setenv CTM_BROWN_VEG N       #> when using CTM_WB_DUST, use non-photosynthetic (brown) vegetation input files to limit dust emissions [ default: N ] (new in v6)
 
-if( $VRSN == v6a1 ) then
+if( $VRSN == v6 ) then
   setenv CTM_LNO_ONLINE Y    #> v6 turn on lightning NOx emissions [ default: N ]
                              #> alternatively LNOx emissions can also be read in as external emissions inputs,
                              #> in this case, please setenv this variable to N to avoid double counting
@@ -384,7 +384,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Ozone column data
   if( $VRSN == v55 )  set OMIfile   = OMI_1979_to_2019.dat               # CMAQv5.5 and prior
-  if( $VRSN == v6a1 ) set OMIfile   = omi_cmaq_2005through2024_27x27.dat # CMAQv6.0
+  if( $VRSN == v6 )   set OMIfile   = omi_cmaq_2005through2024_27x27.dat # CMAQv6.0
 
   # If using BROWN_VEG option, then set the path to the non-photosynthetic vegetation (npv) input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
@@ -436,7 +436,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   # Here, we set the Chem Control files (for v6.0). These will not be used in a v5.5-5.4 simulation.
   setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
   setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}_$APPL.nml
-  if( $VRSN == v6a1 ) echo CMAQ CH control file for v6.0 run is $CMAQ_CH_CTRL_NML
+  if( $VRSN == v6 ) echo CMAQ CH control file for v6.0 run is $CMAQ_CH_CTRL_NML
 
   #> The following namelist controls the mapping of meteorological land use types and the NH3 and Hg emission
   #> potentials
@@ -603,7 +603,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      setenv LTNGPARMS_FILE ${IN_LTpath}/LTNG_AllParms_${GRID_NAME}.nc #> lightning parameter file
   endif
 
-  #> Lightning NOx configuration v6a1
+  #> Lightning NOx configuration v6
   if ( $CTM_LNO_ONLINE == 'Y' ) then
   #> In-line lightning NOx options
      setenv USE_LTNG_DATA  Y        #> use hourly NLDN strike file [ default: Y ]

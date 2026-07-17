@@ -1,7 +1,7 @@
 #!/bin/csh -f
 
 # ===================== CCTMv6.X Run Script ========================= 
-# Usage: run.cctm >&! cctm_2022_12US1_CRACMM2.log &                                
+# Usage: run.cctm >&! cctm_2022_12US1_CRACMM.log &                                
 #
 # To report problems or request help with this script/program:     
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -33,7 +33,7 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v6a1           #> Code Version
+ set VRSN      = v6            #> Code Version
  set PROC      = mpi           #> serial or mpi
  setenv MECH     cracmm3       #> Mechanism ID
  set APPL      = 2022r1_12US1  #> Application Name (e.g. Gridname)

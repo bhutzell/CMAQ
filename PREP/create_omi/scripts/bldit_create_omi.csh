@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-# ================== CREATE_OMIv5.5.X Build Script ================== #
+# ================== CREATE_OMIv6.X Build Script ================== #
 # Usage: bldit_create_omi.csh >&! bldit_create_omi.log                #
 # Requirements: I/O API & netCDF libraries; a Fortran compiler        #
 #                                                                     #
@@ -51,7 +51,7 @@
 #===============================================================================
 
 #> User choices: working directory and application ID
- set VRSN     = v55                    #> version
+ set VRSN     = v6                     #> version
  set EXEC     = create_omi_${VRSN}.exe #> executable name for this application
  set CFG      = create_omi.cfg         #> bldmake configuration file name
 
