@@ -9,15 +9,15 @@
 
 ## 5.1 Introduction
 
-During this chapter the user will learn about how to obtain the CMAQ source codes and how to set-up their CMAQ environment to complete a CMAQ simulation. It should be noted that before you can configure your CMAQ Environment, consult the chapter "Preparing to run" to see you have the minimum requirement of hardware and software on your system.
+In this chapter the user will learn about how to obtain the CMAQ source code and how to set-up their CMAQ environment to complete a simulation. System software and hardware requirements are listed in the "preparing to run" chapter.
 
 ## 5.2 Getting the CMAQ Source Code
 
-CMAQ source code can be installed either using git or from tarballs downloaded from the git repository hosted by GitHub. Both options are described here.
+CMAQ source code can be installed either using git or from .zip files downloaded from the git repository hosted by GitHub. Both options are described here.
 
 ### 5.2.1 Git Installation
 
-In the directory where you would like to install CMAQ, issue the following command to clone the official EPA GitHub repository for CMAQv5.5:
+In the directory where you would like to install CMAQ, issue the following command to clone the official EPA GitHub repository for the latest version of CMAQ:
 
 `git clone -b main https://github.com/USEPA/CMAQ CMAQ_REPO`
 
@@ -54,7 +54,7 @@ CMAQ-main/PYTOOLS
 CMAQ-main/DOCS
 ```
 
-The Git and Zip file installation options will produce slightly different subdirectories on your Linux system. The base installation directory using the git clone command will be `CMAQ_REPO`; the directory from the Zip file will be `CMAQ-main`. The subsequent instructions in this guide will be based on the git clone installation. For Zip file installations, replace `CMAQ_REPO` with `CMAQ-main` in the instructions that follow. The differences in the directory names highlights the difference in functionality between the two options. Cloning the repository gives the user access to the full repository and its history, while downloading the Zip file will only give access to version 5.4.
+The Git and Zip file installation options will produce slightly different subdirectories on your Linux system. The base installation directory using the git clone command will be `CMAQ_REPO`; the directory from the Zip file will be `CMAQ-main`. The subsequent instructions in this guide will be based on the git clone installation. For Zip file installations, replace `CMAQ_REPO` with `CMAQ-main` in the instructions that follow. The differences in the directory names highlights the difference in functionality between the two options. Cloning the repository gives the user access to the full repository and its history, while downloading the Zip file will only give access to the most recent CMAQ version.
 
 ## 5.3 The CMAQ Repository Structure
 
@@ -66,24 +66,24 @@ After downloading the source codes the user is encouraged to look through the re
 
 **Figure 5‑1. CMAQ repository structure**
 
-In this image it can be seen that there are six main sub folders within the CMAQ repository. The first folder, CCTM, houses all the source codes (i.e. Fortran/C programs) and scripts that drive the CMAQ Chemistry Transport Model (CCTM). 
+There are six main sub folders within the CMAQ repository. The first folder, CCTM, houses all source code (i.e. Fortran/C programs) and scripts that drive the CMAQ Chemistry Transport Model (CCTM). 
 
-The second folder, DOCS, contains the CMAQ User's Guide and a Developers Guide for a general description of CMAQ's open-source collaboration workflow and step-by-step instructions for how to make code contributions through GitHub.
+The second folder, DOCS, contains the CMAQ User's Guide and a Developers Guide, which contains a general description of CMAQ's open-source collaboration workflow and step-by-step instructions for how to make code contributions through GitHub.
 
-The third folder in the repository is the POST folder which contains several very useful tools for post-processing of the input/output data files. Each tool within the folder comes wth the source code, scripts and a README used to run the tool. A technical description of the tools within this folder can be found in [Chapter 8](CMAQ_UG_ch08_analysis_tools.md).
+The third folder in the repository is the POST folder which contains several very useful tools for post-processing of the input/output data files. Each tool within the folder comes with the source code, scripts and a README used to run the tool. A technical description of the tools within this folder can be found in [Chapter 8](CMAQ_UG_ch08_analysis_tools.md).
 
 The fourth folder in the repository is the PREP folder which contains several pre-processing programs that can be run before the CCTM to prepare meteorology, initial conditions and boundary conditions inputs. Similar to the POST tools, documentation on compiling and running the programs is provided within each subfolder under PREP.
 
 The fifth folder in the repository is the PYTOOLS folder. This folder holds python tools relating to OCEAN file augmentation and tools relating to PREP and POST processing of inputs for CMAQ. Similar to the PREP and POST tools, documentation on how to run these tools is provided within each subfolder under PYTOOLS.
 
-The last folder within the repository is the UTIL folder which contains useful utilities relating to the CMAQ program suite. An example is the bldmake utility which is used to compile the source code into executables when you use any of the build scripts in the CMAQ repository. Also included in this repository is a top-level README file with an overview of the contents of the release and two additional C-Shell scripts, `bldit_project.csh` and `config_cmaq.csh`.  `bldit_project.csh` allows the user to extract the build and run scripts and compile the model outside of the repository, while `config_cmaq.csh` helps enforce consistent environment setting for the CMAQ project. Both these scripts will be discussed in the following sections.
+The last folder within the repository is the UTIL folder which contains utilities relating to the CMAQ program suite. An example is the bldmake utility which is used to compile the source code into executables when you use any of the build scripts in the CMAQ repository. Also included in this repository is a top-level README file with an overview of the contents of the release and two additional C-Shell scripts, `bldit_project.csh` and `config_cmaq.csh`.  `bldit_project.csh` allows the user to extract the build and run scripts and compile the model outside of the repository, while `config_cmaq.csh` helps enforce consistent environment setting for the CMAQ project. Both these scripts will be discussed in the following sections.
 
 ## 5.4 Building CMAQ Outside of the Repository in a User-Specified Directory
 
 When cloning the repository or unpacking the tar file of the CMAQ distribution, the top-level directory is recognized by the default build and run scripts as `CMAQ_HOME` (formerly M3HOME prior to CMAQv5.2). This directory is an arbitrary base location of the CMAQ installation on your Linux system for a specific application. If the user will build and run CMAQ within the repository folder structure, then `CMAQ_HOME` does not need to be set explicitly in the `bldit_project.csh` script. If, on the other hand, the user wishes to extract the build and run scripts and compile the model outside of the repository, then `CMAQ_HOME` will need to be specified in `bldit_project.csh`. Executing `bldit_project.csh` will automatically perform this extraction and create a CMAQ folder structure under the location now specified by `CMAQ_HOME`. To perform this operation, modify the variable `CMAQ_HOME` in the `bldit_project.csh ` script to identify the folder that you would like to install the CMAQ package under. For example:
 
 ```
-set CMAQ_HOME = /home/username/CMAQ_v5.5
+set CMAQ_HOME = /home/username/CMAQ
 ```
 
 Now execute the script:
@@ -118,9 +118,9 @@ Sourcing the `config_cmaq.csh` script only needs to be invoked during a new inst
 
 ## 5.6 Compiling CMAQ Chemistry-Transport Model (CCTM)
 
-After all required CMAQ inputs are generated using the preprocessors mentioned above the user is now ready to compile CCTM. CMAQ’s current coding structure is based on a modular design principle that seperates CCTM’s main driver, science modules, data estimation modules, and control/utility subroutines. Also distinguished from each other are the science models (including submodels for meteorology, emissions, chemistry-transport modeling) and the analysis and visualization subsystems.
+After all required CMAQ inputs are generated using the preprocessors mentioned above the user is now ready to compile CCTM. CMAQ’s current coding structure is based on a modular design principle that separates CCTM’s main driver, science modules, data estimation modules, and control/utility subroutines. Also distinguished from each other are the science models (including submodels for meteorology, emissions, chemistry-transport modeling) and the analysis and visualization subsystems.
 
-In CCTM, the process modules that affect the pollutant concentration fields are classified as listed below. Each bullet contains a description of the process followed by module name in parentheses. These modules are discussed further in [Chapter 6](CMAQ_UG_ch06_model_configuration_options.md).
+In CCTM, the process modules that affect the pollutant concentration fields are classified as listed below. Each bullet contains a description of the process followed by the pertinent module name in parentheses. These modules are described in further detail in [Chapter 6](CMAQ_UG_ch06_model_configuration_options.md).
 
 
 Science Modules:
@@ -136,7 +136,7 @@ Science Modules:
 -  Aerosol dynamics and size distributions (aero)
 -  Potential vorticity scaling for stratosphere/troposphere exchange (pv_o3)
 
-The user has the ability to configure the model in a multitude of ways by selecting from different options for each scientific process. Model configuration is split into build time options and run time options. To modify any science options during build time, edit the `bldit_cctm.csh` script. The `bldit_cctm.csh` script also contains other information, such as the option to run in single or multiprocessor mode as well as debug mode. It should be noted default build time options are alrady set within the `bldit_cctm.csh`. To modify any run time options, such as turning on in-line biogenic emission calculation or using in-line windblown dust emission, edit the run script, `run_cctm.csh`, and set the corresponding environment variable. To read more about build and run time configurations for specific scientific processes, see the next chapter [(Chapter 6)](CMAQ_UG_ch06_model_configuration_options.md). To see a complete list configuration options reference [Appendix A](Appendix/CMAQ_UG_appendixA_model_options.md).  
+The user has the ability to configure the model by selecting from different options for each scientific process. Model configuration is split into build time options and run time options. To modify any science options during build time, edit the `bldit_cctm.csh` script. The `bldit_cctm.csh` script also contains other information, such as the option to run in single or multiprocessor mode as well as debug mode. It should be noted default build time options are already set within the `bldit_cctm.csh`. To modify any run time options, such as turning on in-line biogenic emission calculation or using in-line windblown dust emission, edit the run script, `run_cctm.csh`, and set the corresponding environment variable. To read more about build and run time configurations for specific scientific processes, see the next chapter [(Chapter 6)](CMAQ_UG_ch06_model_configuration_options.md). To see a complete list configuration options reference [Appendix A](Appendix/CMAQ_UG_appendixA_model_options.md).  
 
 Once the `bldit_cctm.csh` script is configured to the user's preference, the user is ready to run the script to build the CCTM executable. To do this run the following commands:
 
@@ -148,7 +148,7 @@ source bldit_cctm.csh [compiler] [version] |& tee build_cctm.log
 The bldit script invokes the CMAQ utility program [bldmake][link_5_bldmake], which extracts source code from your CMAQ GIT repository, constructs a Makefile based on your selected options, and compiles the executable automatically.  Following normal termination of the script with the default configuration, the user will notice a BLD directory created. This is the location of the CCTM executable along with the relevant source codes and the Makefile needed to build the model. In this directory a few useful commands can be used to update the executable if any changes are made to the Fortran source codes via the MakeFile. For example, if the user wants to recompile the source codes in debug mode _instead_ of re-running the `bldit_cctm.csh` script the user can use the following commands:
 
 ```
-cd BLD_CCTM_v54_[compiler][version]
+cd BLD_CCTM_v6_[compiler][version]
 make clean
 make DEBUG=TRUE
 ```
@@ -156,7 +156,7 @@ make DEBUG=TRUE
 In another example, if the user has made any changes to the source codes in the BLD directory and wanted to update the CCTM executable to reflect these changes the user can use the following commands:
 
 ```
-cd BLD_CCTM_v54_[compiler][version]
+cd BLD_CCTM_v6_[compiler][version]
 make
 ```
 
@@ -176,7 +176,7 @@ run_cctm.csh |& tee run_cctm.log
 
 The CCTM simulation will write two types of logfile, a main logfile (e.g. run_cctm.log) and processor-specific logfiles that have the name convention:  
 ```
-CTM_LOG_[ProcessorID].v54_[compiler]_[data_name]/_[RUNDATE].log
+CTM_LOG_[ProcessorID].v6_[compiler]_[data_name]_[RUNDATE]
 ```
 
 The main logfile contains extensive metadata and useful information about the details of your simulation. The following examples describe some of this information:  
@@ -189,9 +189,9 @@ Working Directory is ...
 Build Directory is ...
 Output Directory is ...
 Log Directory is ...
-Executable Name is CCTM_v54.exe
+Executable Name is CCTM_v6.exe
 
----CMAQ EXECUTION ID: CMAQ_CCTMv54_sha=[git-SHA]_[userID]_YYYYMMDD_hhmmss_nanosecs ---
+---CMAQ EXECUTION ID: CMAQ_CCTMv6_sha=[git-SHA]_[userID]_YYYYMMDD_hhmmss_nanosecs ---
 
 Set up input and output files for Day YYYY-MM-DD.
 
@@ -438,7 +438,7 @@ The processor-specific logfiles provide detailed information on the operation of
 Note: The log file for each processor is also moved from the $CMAQ_HOME/CCTM/scripts directory to the data output directory:
 
 ```
-$CMAQ_DATA/output_CCTM_v54_[compiler]/[data_name]
+$CMAQ_DATA/output_CCTM_v6_[compiler]/[data_name]
 ```
 
 ### 5.7.2 CCTM Output files
@@ -446,10 +446,10 @@ $CMAQ_DATA/output_CCTM_v54_[compiler]/[data_name]
 The output results will have been placed in the directory:
 
 ```
-$CMAQ_DATA/output_CCTM_v54_[compiler]_[data_name]
+$CMAQ_DATA/output_CCTM_v6_[compiler]_[data_name]
 ```
 
-and can include the following netCDF-type files: ACONC, AELMO, B3GTS_S, CGRID, CONC, DEPV, DRYDEP, DUSTEMIS, LTNGDIAG1, LTNGDIAG2, MEDIA_CONC, ELMO, RJ_1, RJ_2, RJ_3, SOILOUT, SSEMIS, VDIFF, VSED, WETDEP1, WETDEP2 and VEXT_1. The in-depth description about each of these files is described in [Chapter 7](CMAQ_UG_ch07_model_outputs.md).
+In-depth descriptions of output files are provided in [Chapter 7](CMAQ_UG_ch07_model_outputs.md).
 
 
 ### 5.7.3 Common errors causing the CCTM simulation to crash
@@ -468,7 +468,7 @@ See the [CMAQ Installation and Benchmarking Tutorial](Tutorials/CMAQ_UG_tutorial
 <!-- BEGIN COMMENT -->
 
 [<< Previous Chapter](CMAQ_UG_ch04_model_inputs.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch06_model_configuration_options.md)<br>
-CMAQv5.5 User's Guide <br>
+CMAQv6.0 User's Guide <br>
 
 <!-- END COMMENT -->
 

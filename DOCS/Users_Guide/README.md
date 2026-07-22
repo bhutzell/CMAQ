@@ -71,6 +71,6 @@ END_OF_COMMENT
 
 ***
 
-CMAQv5.5 User's Guide <br>
+CMAQv6.0 User's Guide <br>
 
 

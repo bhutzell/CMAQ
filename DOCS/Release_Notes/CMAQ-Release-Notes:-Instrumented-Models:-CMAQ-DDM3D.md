@@ -1,9 +1,24 @@
 # Decoupled Direct Method in Three Dimensions (CMAQ-DDM-3D)
 
+### DDM-3D Convective Clouds
+[Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Science Update   
+**Release Version**: CMAQv6.0   
+  
+**Description**:
+The procedures for calculating convective cloud mixing for ddm-3d fields have been addressed and reconfigured to limit the previously encountered instabilities in the sensitivity calculations. These changes should make model results more robust for a wider range of applications.
+
+**Significance and Impact**:  
+Base model results will not change. The fix will help prevent some of the unstable results in the sensitivity fields.
+
+|Merge Commit | Internal record|  
+|:------:|:-------:|
+|[Merge for PR#1419](https://github.com/USEPA/CMAQ/commit/ba3f0824d528c8e50b08f3d1a309413e64b0b612) | [PR#1419](https://github.com/USEPA/CMAQ_Dev/pull/1419)  |
+
 ### DDM-3D Sensitivity Fix Related to Heterogeneous Reactions
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Bug fix    
-**Release Version/Date**: CMAQv6.0   
+**Release Version**: CMAQv6.0   
   
 **Description**:    
 This update addresses a reported issue with DDM-3D sensitivity fields becoming unstable (increasing to unreasonable numbers) with the addition of aerosol nitrate photolysis as a heterogeneous reaction in the cracmm mechanism. After the investigation, it was found that all heterogeneous reactions produce erroneous results in the sensitivity fields due to inconsistent unit conversion. The most recently added heterogeneous reaction manifested the issue most dramatically by going unstable.
@@ -13,14 +28,14 @@ Base model results will not changes. The fix will help prevent some of the unsta
 
 |Merge Commit | Internal record|  
 |:------:|:-------:|
-|[Merge for PR#1312](https://github.com/USEPA/CMAQ/commit/d21ad770f33b87eba55df5fe84c2e5924f40965a)) | [PR#1312](https://github.com/USEPA/CMAQ_Dev/pull/1312)  |
+|[Merge for PR#1312](https://github.com/USEPA/CMAQ/commit/d21ad770f33b87eba55df5fe84c2e5924f40965a) | [PR#1312](https://github.com/USEPA/CMAQ_Dev/pull/1312)  |
 
 
 
 ### DDM-3D control file character limit increase
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Functionality expansion    
-**Release Version/Date**: CMAQv6.0   
+**Release Version**: CMAQv6.0   
   
 **Description**:    
 As applications of DDM-3D become more complex in scope, users have come up against the hard-coded limit of how long the SPECIES, EMIS streams, and REGIONS specification strings can be in the DDM-3D control file.  This update increases the size to 1024 characters.  
@@ -34,7 +49,7 @@ As applications of DDM-3D become more complex in scope, users have come up again
 ### CMAQ-HDDM-3D Second Order Sensitivity Fix  
 [Sergey L. Napelenok](mailto:contact.email@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
-**Release Version/Date**: CMAQv5.5   
+**Release Version**: CMAQv5.5   
 
 **Description**:   
 A bug made its way into the chemistry routines that calculated 2nd order sensitivities (HDDM-3D) resulting in erroneous output for these parameters. Additionally, there are some runtime errors in the log files associated with writing out deposition sensitivity output. Finally, dry deposition sensitivities were not written out correctly.  
@@ -50,7 +65,7 @@ Second order sensitivities will now provide correct output and the log files wil
 ### CMAQ-DDM-3D potential vorticity sensitivity  
 [Sergey L. Napelenok](mailto:contact.email@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update  
-**Release Version/Date**: CMAQv5.5  
+**Release Version**: CMAQv5.5  
 **Description**: It is possible to compute sensitivity to ozone incursions at the top of the simulated volume if the base model is compiled with potential vorticity module enabled. For CMAQ-DDM-3D, the sensitivity is to the total domain-wide incursion.   
 **Significance and Impact**: The sensitivity parameter is defined in the control file as follows:
 
@@ -67,7 +82,7 @@ Second order sensitivities will now provide correct output and the log files wil
 ### CMAQ-DDM-3D Version 5.4
 [Sergey L. Napelenok](mailto:contact.email@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update  
-**Release Version/Date**: CMAQv5.4  
+**Release Version**: CMAQv5.4  
 **Description**:  CMAQ-DDM-3D has been fully integrated into the base model. There is no longer a separate repository, and the sensitivity calculations are accessed through compiler flags set in the build script and by completing the appropriate sections of the run script. These options are demonstrated in the sample scripts provided with the release of the base model.
 
 Additionally, some code structure changes were made to the DDM-3D mainly in the gas phase chemistry routines.  Of note is the ability of the model to now calculate gas phase Jacobians inline making the code more flexible to accept new chemical mechanisms as well as changes to existing ones. 
@@ -88,7 +103,7 @@ Additionally, some code structure changes were made to the DDM-3D mainly in the 
 ### Speed up DDM3 solution of Gas Chemistry Sensitivities
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science/Numerical Update  
-**Release Version/Date**:  CMAQ version 5.4
+**Release Version**:  CMAQ version 5.4
 
 **Description**: In DDM3D's method for solving sensitivities from gas chemistry, code changes shortened CMAQ_DDM3D runtimes by 15% to 35% dependent on the chemical mechanism used. The changes also implemented DDM3D's approach for gas chemistry in the Rosenbrock and SMVGear solvers so CMAQ_DDM3D can use any of the available gas chemistry solvers. The option better supports using CMAQ_DDM3D built with the cb6r5m_ae7_aq mechanism because the Rosenbrock solver is recommended for the cb6r5m_ae7_aq mechanism.
 

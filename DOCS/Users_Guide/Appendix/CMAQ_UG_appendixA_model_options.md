@@ -746,6 +746,6 @@ Options for use with MEGAN:
 <!-- BEGIN COMMENT -->
 
 [<< Tables and Figures](../CMAQ_UG_tables_figures.md) - [Home](../README.md) - [Next Appendix >>](CMAQ_UG_appendixB_emissions_control.md)<br>
-CMAQv5.5 User's Guide <br>
+CMAQv6.0 User's Guide <br>
 
  <!-- END COMMENT -->
