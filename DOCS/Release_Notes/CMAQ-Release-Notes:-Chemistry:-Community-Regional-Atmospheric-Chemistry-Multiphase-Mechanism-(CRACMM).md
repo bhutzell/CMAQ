@@ -148,6 +148,21 @@ Chlorine chemistry increases nitryl chloride (ClNO2) in winter which subsequentl
 |:------:|:-------:|
 |[Merge for PR#1252](https://github.com/USEPA/CMAQ/commit/686bde3e7b2a335d8769b8ff14368d068ba95583) | [PR#1252](https://github.com/USEPA/CMAQ_Dev/pull/1252)  |
 
+### Add aerosol organic nitrates to NOy definition for CRACMM
+ [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Post-processing  
+**Release Version/Date**: CMAQv6.0  
+
+**Description**:  
+CRACMM species ATRPN and AHONIT which represent monoterpene-derived aerosol organic nitrates were previously not included when calculating NOy. These species have now been added to the calculation of NOy for all CRACMM-based mechanisms. This change affects how NOy is defined in the species definition files which are used to post-process CMAQ CONC or ACONC output files to create aggregate quantities from CMAQ model species.  
+
+**Significance and Impact**:  
+The addition of aerosol organic nitrate species to NOy has a small effect on the value of NOy that is calculated. For an annual 2022 CONUS modeling scenario, the largest increase in seasonal average NOy for any grid cell was less than 1 percent. The largest increase for any daily average NOy concentration was about 2.5 percent. This is not expected to result in significant changes in NOy performance compared to NOy measurements.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+| tbd | [PR#1446](https://github.com/USEPA/CMAQ_Dev/pull/1446)  |
+
 ### Correct the molecular weight of HCL for CRACMM
 [Havala Pye](mailto:pye.havala@epa.gov),  U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
