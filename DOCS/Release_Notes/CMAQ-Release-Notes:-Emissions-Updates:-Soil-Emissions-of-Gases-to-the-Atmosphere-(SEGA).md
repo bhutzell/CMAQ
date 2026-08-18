@@ -4,7 +4,7 @@
 
 **Jesse Bash**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)    
 **Type of update**: Science Update  
-**Release Version/Date**: CMAQv6.0  
+**Release Version**: CMAQv6.0  
 **Description**:  
 
 The Soil Emissions of Gases to the Atmosphere (SEGA) module for CMAQ estimates soil NO and HONO emissions generally following that of the BDSNP ([Hudman et al. 2012](https://doi.org/10.5194/acp-12-7779-2012)) parameterization.  This is a simple soil NO and HONO research option and includes a revised temperature function similar to [Wang et al., 2021](https://doi.org/10.1088/1748-9326/ac16a3) for both regional and hemispheric CMAQ simulations. Detailed soil emission factors - using USDA Crop Data Layers - are being developed and supported. Emission factors are based on the mean reported values in [Steinkamp and Lawrence 2011](https://doi.org/10.5194/acp-11-6063-2011) with updates to biocrust NO and HONO emissions following [Weber et al. 2015](http://www.pnas.org/cgi/doi/10.1073/pnas.1515818112). Agricultural cropping system soil NO was adjusted to a global total of 2.8 Tg with total global soil NO emissions of 9.5 Tg, matching the observationally constrained estimates of [Weng et al. 2020](https://doi.org/10.6084/m9.figshare.12205379).  Soil moisture functions for soil NO and HONO follow [Rasool et al., 2019](https://doi.org/10.5194/gmd-12-849-2019). STAGE land use aggregated data is needed to calculate in-line emission factors when an input emission factor file is not available.        
@@ -80,7 +80,7 @@ Figure 13, Climate region Kelly plot of max 8-hour ozone at AQS sites for 2018 1
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1332](https://github.com/USEPA/CMAQ_Dev/commit/f5192cffca116ad6144d01216cf5fd128cef2132) | [PR#1332](https://github.com/USEPA/CMAQ_Dev/pull/1332) | 
-|[Merge for PR#1379](https://github.com/USEPA/CMAQ_Dev/commit/ab3f9bce2f7850f4ffea887a08272106bc6e7b42) | [PR#1379](https://github.com/USEPA/CMAQ_Dev/pull/1379) | 
-|[Merge for PR#1386](https://github.com/USEPA/CMAQ_Dev/commit/d00b77ea602d4957120a13d2d96b1bd5771f0341) | [PR#1386](https://github.com/USEPA/CMAQ_Dev/pull/1386) |
-|[Merge for PR#1394](https://github.com/USEPA/CMAQ_Dev/commit/de4621bcb5eb67e5da1e3fa614d498fe9525247b) | [PR#1394](https://github.com/USEPA/CMAQ_Dev/pull/1394) |
+|[Merge for PR#1332](https://github.com/USEPA/CMAQ/commit/f5192cffca116ad6144d01216cf5fd128cef2132) | [PR#1332](https://github.com/USEPA/CMAQ_Dev/pull/1332) | 
+|[Merge for PR#1379](https://github.com/USEPA/CMAQ/commit/ab3f9bce2f7850f4ffea887a08272106bc6e7b42) | [PR#1379](https://github.com/USEPA/CMAQ_Dev/pull/1379) | 
+|[Merge for PR#1386](https://github.com/USEPA/CMAQ/commit/d00b77ea602d4957120a13d2d96b1bd5771f0341) | [PR#1386](https://github.com/USEPA/CMAQ_Dev/pull/1386) |
+|[Merge for PR#1394](https://github.com/USEPA/CMAQ/commit/de4621bcb5eb67e5da1e3fa614d498fe9525247b) | [PR#1394](https://github.com/USEPA/CMAQ_Dev/pull/1394) |

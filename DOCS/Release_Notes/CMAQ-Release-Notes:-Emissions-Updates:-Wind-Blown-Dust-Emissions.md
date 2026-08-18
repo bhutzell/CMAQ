@@ -1,8 +1,8 @@
 # Wind Blown Dust Emissions
 ### Brown vegetation added to Windblown Dust Module
-[Jeff Willison](mailto:willison.jeff@epa.gov), U.S. Environmental Protection Agency     
-**Type of update**: Science Update 
-**Release Version/Date**:  CMAQv6.0
+[Jeff Willison](mailto:willison.jeff@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Science Update       
+**Release Version**:  CMAQv6.0
 
 **Description**:   
 Brown (or non-photosynthetically active) vegetation, like photosynthetically active vegetation, creates a sheltering effect that reduces windblown dust emissions. In this update, the vegetation fraction, the vegetation height, and the vegetation roughness are updated using the MODIS spectral mixture analysis (SMA) following the method described by [Huang and Foroutan](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2021JD035243) (2022, HF22).
@@ -18,7 +18,7 @@ The addition of NPV to the windblown dust model significantly reduces dust emiss
 ### Correction for NLCD40 Land Use Mapping in Windblown Dust Module
 [Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Bug Fix    
-**Release Version/Date**:  CMAQv6.0 (first released with [5.5.0.1](https://github.com/USEPA/CMAQ/releases/tag/CMAQv5.5.01_19Mar2025))  
+**Release Version**:  CMAQv6.0 (first released with [5.5.0.1](https://github.com/USEPA/CMAQ/releases/tag/CMAQv5.5.01_19Mar2025))  
 
 **Description**:   
 Resolves excessive inline windblown dust (WBD) emissions when using WRF simulations with NLCD40 land use (LU). The excessive emissions were caused by mapping two NLCD40 categories (“shrub/scrub” and “dwarf scrub” to the wrong internal BELD3 LU class (“barren or sparsely vegetated” instead of “shrubland”) that is being used in the WBD module.
@@ -34,7 +34,7 @@ Without this fix, users enabling the inline WBD module and using WRF simulations
 ### Updates to Windblown Dust Emissions 
 [Jeff Willison](mailto:willison.jeffrey@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update and Bug Fix  
-**Release Version/Date**: CMAQv5.4  
+**Release Version**: CMAQv5.4  
 **Description**: 
 Several updates have been made to the windblown dust routine for CMAQ 5.4. The module has been updated to include additional PX soil texture information from WRF when available. The fugitive dust subroutines tfabove.F and tfbelow.F have been removed, since these were not originally intended to be used with windblown dust sources. 
 

@@ -9,7 +9,7 @@
 
 ## 3.1 Introduction
 
-In this chapter the user will learn basic hardware and software requirements to run CMAQ. In addition, if the user does not have the required software, this chapter provides links to download the required software. 
+In this chapter, the user will learn basic hardware and software requirements to run CMAQ. In addition, if the user does not have the required software, this chapter provides links to download the required software. 
 
 ## 3.2 Hardware Requirements
 
@@ -21,7 +21,7 @@ The suggested hardware requirements for running the CMAQ Northeast Benchmark cas
 
 However, to use CMAQ in a production environment where multiple iterations of the model will be executed for different spatial domains and/or emissions control strategies, either a cluster of multiprocessor PCs on a high-end network or an expandable rack-mounted Linux server is recommended.
 
-For example, the CMAQ team at the EPA uses a Dell cluster. The cluster consists 128 nodes and each node contain two Intel Xeon E5-2697A v4 16-core processors (with a total of 4096 processors), 256 GB memory (8 GB/core), EDR InfiniBand interconnect and runs on Red Hat Enterprise Linux 8 operating system.
+For example, the CMAQ team at the EPA uses a Dell cluster with 128 server nodes. Each node has multiple multicore processors (e.g., 2 16-core CPU), 8 GB of memory per core, connected to networked disks by EDR InfiniBand interconnect, and running on Red Hat Enterprise Linux 8 operating system.
 
 Table 3-1 provides a general snapshot of three different CMAQ setups for a day of simulation conducted at the EPA. The output only included: the concentration file (CONC), the average concentration file (ACONC), 3-D average concentration file (CGRID), hourly dry deposition file (DRYDEP), and wet deposition from the clouds file (WETDEP1). The run time and domain size are dictated by the system hardware. Furthermore, the run time may vary due to compiler choice and system load.
 
@@ -47,8 +47,8 @@ To build the CMAQ program suite, users must install these libraries in the order
 
 |**Software**|**Versions**|
 |:--------------:|:----:|
-| Intel Compiler | 18.0, 21.4  | 
-| GNU Compiler | 6.1.0, 9.1, 12.2 | 
+| Intel Compiler | 21.4, 23.2  | 
+| GNU Compiler | 9.1, 12.2 | 
 | PGI Compiler | 17.4, 21.9, 22.11 |
 
 **NOTE: The CMAQ team recommends using a single compiler suite when building these libraries. Mixing compiler suites when building these libraries can cause unexpected behavior (e.g., mixing intel 18.0 to build netCDF C libraries and gcc 6.1.0 to build netCDF fortran libraries may lead to compile time errors).** 
@@ -57,7 +57,7 @@ To build the CMAQ program suite, users must install these libraries in the order
 
 CMAQ is primarily a MPI based programming system that runs on parallel programming platforms. Many programs within the CMAQ system require a flavor of MPI installed on your machine. CMAQ has been tested with the [OpenMPI](https://www.open-mpi.org), [MPICH](https://www.mpich.org/downloads), [MVAPICH2](http://mvapich.cse.ohio-state.edu), and the [Intel MPI](https://software.intel.com/en-us/intel-mpi-library) libraries. The choice of MPI library may affect model run time. For example, if you have the Intel compiler suite available on your system, you may want to choose Intel MPI or if your system is using InfiniBand (IB) interconnects, choose MVAPICH2 which is tailored for IB.
 
-Users can download the MPI library source code from one of these sites and follow provided procedures for proper installation. **Versions Tested: IntelMPI 2017.0, 21.4 | MPICH 3.3.1 | MVAPICH2 2.3.1 | OpenMPI 2.1.0, 4.1.4**
+Users can download the MPI library source code from one of these sites and follow provided procedures for proper installation. **Versions Tested: IntelMPI 21.4, 23.2 | MPICH 3.3.1 | MVAPICH2 2.3.1 | OpenMPI 2.1.0, 4.1.4**
 
 ### 3.3.2 netCDF library
 
@@ -159,6 +159,6 @@ Wong, D. C., Yang, C. E., Fu, J. S., Wong, K., and Gao, Y., “An approach to en
 <!-- BEGIN COMMENT -->
 
  [<< Previous Chapter](CMAQ_UG_ch02_program_structure.md)- [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch04_model_inputs.md)<br>
-CMAQv5.5 User's Guide <br>
+CMAQv6.0 User's Guide <br>
 
 <!-- END COMMENT -->

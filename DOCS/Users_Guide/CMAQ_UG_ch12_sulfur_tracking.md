@@ -7,10 +7,7 @@
 
 # 12. Sulfur Tracking Method
 ## 12.1 Introduction
-Starting with CMAQv5.3, a runtime diagnostic model option that provides detailed information on the modeled sulfur budget. This option, referred to as the "Sulfur Tracking Method (STM)", tracks sulfate production from gas- and aqueous-phase chemical reactions, as well as contributions from emissions and initial and boundary conditions. Each tracked species is treated as other modeled species, undergoing transport (advection, diffusion, cloud-mixing) and removal by deposition (both wet and dry).  Several notable features in the CMAQv5.3 release of STM include:
-
-- The STM is now a runtime option enabled by an environment variable.
-- Additional species (Table 12-2) are included to track the loss of inorganic sulfate to organosulfate for chemical mechanisms that include this loss pathway.
+Starting with CMAQv5.3, the Sulfur Tracking Method (STM) has been available as a runtime diagnostic model option that provides detailed information on the modeled sulfur budget. This option tracks sulfate production from heterogeneous, gas-phase, and aqueous-phase chemical reactions, loss of inorganic sulfate to organosulfates, as well as contributions from emissions and initial and boundary conditions. Each tracked species is treated as other modeled species, undergoing transport (advection, diffusion, cloud-mixing) and removal by deposition (both wet and dry).  
 
 ## 12.2 Usage
 
@@ -18,7 +15,7 @@ To activate the STM option, edit the CCTM runscript and set the following enviro
 
 - setenv STM_SO4TRACK Y
 
-The STM option does not require any additional input files, and uses the initial conditions, boundary conditions, and emissions files available for with the standard, non-instrumented CCTM.
+The STM option does not require any additional input files, and uses the initial conditions, boundary conditions, and emissions files available for the standard, non-instrumented CCTM.
 
 Next, run the CMAQ CTM following the instructions described in Chapter 5, section 5.7.
 
@@ -39,6 +36,7 @@ Note that several of the standard CMAQ output files (ACONC, CONC, CGRID, DDEP, a
 |AE           |ASO4AQFEMNJ | 96.0 |ASO4J produced by aqueous-phase oxygen catalyzed by Fe<sup>3+</sup> and Mn<sup>2+</sup> oxidation reaction: O<sub>2</sub> + S(IV) -> S(VI) |
 |AE           |ASO4AQMHPJ  | 96.0 |ASO4J produced by aqueous-phase methyl hydrogen peroxide oxidation reaction:  MHP + S(IV) -> S(VI) |
 |AE           |ASO4AQPAAJ  | 96.0 |ASO4J produced by aqueous-phase peroxyacetic acid oxidation reaction:  PAA + S(IV) -> S(VI) |
+|AE           |ASO4HETJ  | 96.0 |ASO4J produced by reactions in aerosol water |
 |AE           |ASO4GASJ    | 96.0 |ASO4J condensation following gas-phase reaction:  OH + SO<sub>2</sub> -> SULF + HO<sub>2</sub> |
 |AE           |ASO4EMISJ   | 96.0 |ASO4J from source emissions |
 |AE           |ASO4ICBCJ   | 96.0 |ASO4J from boundary and initial conditions |
@@ -52,7 +50,7 @@ Note that several of the standard CMAQ output files (ACONC, CONC, CGRID, DDEP, a
 
 <a id=Table12-2></a>
 
-**Table 12-2.  Additional Tracking Species Representing Loss of Inorganic Sulfate to Organosulfate (only included if using SAPRC07TIC_AE7I, CB6R3_AE7, CB6R5_AE7,CB6R5M_AE7, CRACMM1 or CRACMM1AMORE based mechanisms)**
+**Table 12-2.  Additional Tracking Species Representing Loss of Inorganic Sulfate to Organosulfate**
 
 |Species Group|Species Name| MW   | Description |
 |:------------|:-----------|:-----|:------------|
@@ -62,17 +60,18 @@ Note that several of the standard CMAQ output files (ACONC, CONC, CGRID, DDEP, a
 |AE           |OSO4AQFEMNJ | 96.0 |Loss of ASO4AQFEMNJ to organosulfate |
 |AE           |OSO4AQMHPJ  | 96.0 |Loss of ASO4AQMHPJ to organosulfate |
 |AE           |OSO4AQPAAJ  | 96.0 |Loss of ASO4AQPAAJ to organosulfate |
+|AE           |OSO4HETJ    | 96.0 |Loss of ASO4HETJ to organosulfate |
 |AE           |OSO4GASJ    | 96.0 |Loss of ASO4GASJ to organosulfate |
 |AE           |OSO4EMISJ   | 96.0 |Loss of ASO4EMISJ to organosulfate |
 |AE           |OSO4ICBCJ   | 96.0 |Loss of ASO4ICBCJ to organosulfate |
 
 **Contact**
 
- [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. EPA
+ [Kathleen M. Fahey](mailto:fahey.kathleen@epa.gov), U.S. EPA
  
 <!-- BEGIN COMMENT -->
 
 [<< Previous Chapter](CMAQ_UG_ch11_ISAM.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch13_WRF-CMAQ.md) <br>
-CMAQv5.5 User's Guide <br>
+CMAQv6.0 User's Guide <br>
 
 <!-- END COMMENT -->

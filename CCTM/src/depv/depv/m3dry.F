@@ -430,7 +430,7 @@ C-------------------------------------------------------------------------------
          rh_grnd  = 100.0 * q2p0cr / MET_DATA%QSS_GRND( c,r )
          rh_grnd  = MIN( 100.0, rh_grnd )
 
-         IF ( ( NINT(GRID_DATA%LWMASK( c,r )) .NE. 0 ) .AND. ( vegcr .GT. 0.0 ) ) THEN  ! land
+         IF ( NINT(GRID_DATA%LWMASK( c,r )) .NE. 0 ) THEN  ! land
 
             IF ( .NOT. WR_AVAIL ) THEN  ! approx canopy wetness - dew from Wesely
 
@@ -786,7 +786,7 @@ C--------------------------------------------------------------------------
 
                chg  = cgridl1( n_HG,c,r )
 
-               IF ( NINT( GRID_DATA%LWMASK( c,r ) ) .EQ. 0  .AND. ( vegcr .EQ. 0.0 )) THEN ! water
+               IF ( NINT( GRID_DATA%LWMASK( c,r ) ) .EQ. 0 ) THEN  ! water
 
                   depvel_gas( n_Hg,c,r ) = 1.0 / ( rsurf + rac )
                   vdhg = depvel_gas( n_Hg,c,r )
@@ -815,7 +815,7 @@ C************* Call the Hg air surface exchange subroutine *********************
 
          END DO ddloop  ! (l = 1, n_spc_m3dry)
 
-         IF ( HGBIDI .AND. NINT( GRID_DATA%LWMASK( c,r ) ) .EQ. 0 .AND. ( vegcr .EQ. 0.0 )) THEN ! water
+         IF ( HGBIDI .AND. NINT( GRID_DATA%LWMASK( c,r ) ) .EQ. 0 ) THEN  ! water
 
             chgIIgas = cgridl1( n_HGII,c,r )
             vdhgII   = depvel_gas( n_HGII,c,r )

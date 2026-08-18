@@ -225,6 +225,7 @@
          IF ( LTNGON_DATA ) THEN
              XMSG = 'Using hourly LTNG data'
              CALL M3MSG2( XMSG )
+! default, use lightning strikes such as NLDN, WWLLNs
              IF (LNO_OPTION == 1) THEN
                IF (LT_VARS == 1) THEN
                    WsflIdx = 1
@@ -236,14 +237,16 @@
                       CALL M3EXIT( 'Online Lightning NO', 1, 1, XMSG, XSTAT1 )
                    ENDIF
                ENDIF
-             ELSE IF (LNO_OPTION == 2) THEN
+! use GLM flashes
+             ELSE IF (LNO_OPTION == 99) THEN
                   GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
                   IF ( GflIdx .EQ. 0 ) THEN
                       XMSG = "The variable name GLMfl doesn't
      &                             exist in the input lightning data" 
                       CALL M3EXIT( 'Online Lightning NO', 1, 1, XMSG, XSTAT1 )
                   ENDIF
-             ELSE IF (LNO_OPTION == 3) THEN
+! use GLM Energy
+             ELSE IF (LNO_OPTION == 98) THEN
                   GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
                   GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
                   IF ( (GflIdx .EQ. 0) .or. (GegIdx .EQ. 0)) THEN
@@ -257,7 +260,10 @@
                   ELSE
                      BetaF2E = 0
                   ENDIF
-             ELSE IF (LNO_OPTION >= 4) THEN
+! LNO_OPTION  2: LNO using maximum of GLMeng and WLNseng with daily Beta/sGama values
+!                  and ICCG adjustment (setting the upper bound)
+! LNO_OPTION 97: LNO using maximum of GLMeng and WLNeng with daily Beta/Gama values
+             ELSE IF (LNO_OPTION == 2 .OR. LNO_OPTION == 97 ) THEN
                   GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
                   GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
                   WflIdx = INDEX1("WLNfl", LT_VARS, LT_NAME)
@@ -325,7 +331,7 @@
                   ENDIF 
 
              ELSE
-                 XMSG = 'LNO_OPTION must be in the range from 1 to 5'
+                 XMSG = 'LNO_OPTION expected to be in the range from 1 to 2'
                  CALL M3MSG2( XMSG )
              END IF
 
@@ -619,6 +625,7 @@
             DO ROW = 1, NROWS
                DO COL = 1, NCOLS
                   IF ( LTNGON_DATA .or. wrf_assim ) THEN 
+! default, use lightning strikes such as NLDN, WWLLNs
                     IF (LNO_OPTION == 1) THEN
                        COLUMN_LTNG_NO( COL,ROW ) =
      &                  ( LTNG_DATA( COL,ROW,WsflIdx )
@@ -626,33 +633,35 @@
      &                    * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
      &                    * ( MOLSNCG + MOLSNIC * ICCG( COL,ROW ) ) )
      &                    / 3600.0 ! get time units right: emissions are in the unit of moles/s
-                    ELSE IF (LNO_OPTION == 2) THEN
+! use GLM flashes
+                    ELSE IF (LNO_OPTION == 99) THEN
                        COLUMN_LTNG_NO( COL,ROW ) =
      &                  ( LTNG_DATA( COL,ROW,GflIdx )
      &                    * SQUAREKM     ! LTNG_DATA in km-2
      &                    * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
      &                    * ( MOLSNCG + MOLSNIC * ICCG( COL,ROW ) ) )
      &                    /3600.0 ! get time units right: emissions are in the unit of moles/s
-                    ELSE IF (LNO_OPTION == 3) THEN
+! use GLM Energy
+                    ELSE IF (LNO_OPTION == 98) THEN
                        COLUMN_LTNG_NO( COL,ROW ) =
      &                  ( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E)
      &                    / 3600.0 ! get time units right: emissions are in the unit of moles/s
 ! LNO using maximum of GLMeng and WLNeng with daily Beta/Gama values
-                    ELSE IF (LNO_OPTION == 4) THEN 
+                    ELSE IF (LNO_OPTION == 97) THEN 
                        COLUMN_LTNG_NO( COL,ROW ) =
      &                  max( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E,
      &                    LTNG_DATA( COL,ROW,WegIdx )*GamaF2E)   
      &                    / 3600.0 ! get time units right: emissions are in the unit of moles/s
 ! LNO using maximum of GLMeng and WLNseng with daily Beta/sGama values
 ! and ICCG adjustment (setting the upper bound)
-                    ELSE IF (LNO_OPTION == 5) THEN  !
+                    ELSE IF (LNO_OPTION == 2) THEN
                        COLUMN_LTNG_NO( COL,ROW ) =
      &                  max( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E,
      &                    LTNG_DATA( COL,ROW,WsegIdx )
      &                    * ( 1 + ICCG( COL,ROW ) )*sGamaF2E )
      &                    / 3600.0 ! get time units right: emissions are in the unit of moles/s
                     ELSE
-                      XMSG = 'LNO_OPTION is not correctly set; correct range is from 1 to 5'
+                      XMSG = 'LNO_OPTION is not correctly set; correct range is from 1 to 2'
                       CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
                     ENDIF
                   ELSE

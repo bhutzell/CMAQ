@@ -190,7 +190,9 @@
                                            !   EQB - Equilibrium Approach for all modes
                                            !   HYB - Equilibrium for Aitken and Accumulation modes, 
                                            !         and Dynamic for the coarse mode.
+                                           !   DYN and EQB options are experimental and not recommended
       INTEGER :: AERO_DYN_TSTEP = 90       ! Maximum sub-time-step for dynamic aerosol mass transfer
+                                           !   Changing AERO_DYN_TSTEP is an experimental option and not recommended
       LOGICAL :: BC_AERO_M2WET=.FALSE.     ! flag for specifying wet aerosol size parameters 
                                            !   for boundary conditions. FALSE = dry
       LOGICAL :: BC_AERO_M2USE=.TRUE.      ! flag for using the second moment from the input file
@@ -253,7 +255,8 @@
       LOGICAL :: LTNGON_DATA   = .FALSE. ! flag to use LTNG data directly 
       LOGICAL :: LTNGDIAG      = .FALSE. ! flag to turn on lightning NO diagnostics
       LOGICAL :: USE_SEGA_N    = .FALSE. ! flag to turn on SEGA biogenic soil NO and HONO emissions
-      LOGICAL :: USE_SEGA_N_EF = .FALSE. ! flag to use SEGA emission factor file
+      LOGICAL :: USE_SEGA_N_EF = .FALSE. ! flag to use BEIS emission factor file with SEGA
+                                         ! USE_SEGA_N_EF = .TRUE. is an experimental option and not recommended
       REAL    :: MOLSNCG       = 350.0   ! Lightning NO Production Rate
       REAL    :: MOLSNIC       = 350.0   ! Lightning NO Production Rate
       INTEGER :: LNO_OPTION    = 1       ! Lightning NO options, 1 is default
@@ -915,10 +918,12 @@
       ! Get Lightning NO Production Rate
       CALL GET_ENV ( MOLSNIC, 'MOLSNIC', 350.0, VARDEV )
 
-      ! Get Lightning NO Options: 1, 2, 3, 4
+      ! Get Lightning NO Options: 1 or 2 expected
+      !      97, 98, 99 available but may not be fully supported
       ! 1: default using ground-based lightning flash
-      ! 2: using GLM (satellite) flash, 3: using GLM energy
-      ! 4: using synergized GLM/WWLLN energy 
+      ! 2: using synergized GLM/WWLLN energy with ICCG adjustment (setting the upper bound)
+      ! 99: using GLM (satellite) flash, 98: using GLM energy
+      ! 97: using synergized GLM/WWLLN energy
       CALL GET_ENV ( LNO_OPTION, 'LNO_OPTION', 1, VARDEV )
  
       ! get number of different file groups (sectors)

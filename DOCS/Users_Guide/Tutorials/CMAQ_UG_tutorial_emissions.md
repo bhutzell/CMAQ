@@ -43,7 +43,7 @@ residential heating, etc.
 Emission streams can be zeroed using the options for individual streams in the CMAQ RunScript or creating rules in the Chemical Mapping Control Namelist.
 
 ##### a. Using Options in the CMAQ RunScript
-For gridded or inline emissions, reduce the value of N_EMIS_GR or N_EMIS_PT, respectively and adjust the values of the file paths and stream labels accordingly, if necessary.
+For gridded or inline point emissions, reduce the value of N_EMIS_GR or N_EMIS_PT, respectively and adjust the values of the file paths and stream labels accordingly, if necessary.
 
 Note that if you zero out the sea-spray or wind-blown dust emissions, you should also edit the emission control file by commenting out the coarse and fine species expected from those modules. Some of these species are used by both emission streams, so if you only want to zero out the sea-spray or dust stream but not the other stream, you will need to determine which species to comment out. Please check the AERO_DATA module for the list of species produced by each stream.  
 
@@ -63,7 +63,7 @@ setenv CTM_BIOGEMIS N
 ```
 To zero Lightning NO emissions,
 ```
-setenv CTM_LTNG_NO N
+setenv CTM_LNO_ONLINE N
 ```
 
 ##### b. Creating Rules in the Chemical Mapping Control Namelist (CMAQ_Chem_Control_${MECH}.nml)
@@ -73,7 +73,7 @@ All streams can be zeroed by creating a rule that refers to 'All' streams. For e
 !  Label      |               |Surrogate| Species      |Mode  |Factor|      |
 'EVERYWHERE' , 'All'          ,'All'    ,'All'         ,'All' ,0.    ,'UNIT','o',
 ```
-Here, the 'o' operator regers to *overwrite* and will instruct DESID to change existing instructions that emission variables and CMAQ-species to the new Scale Factor. Additionally, individual streams can be zeroed by creating rules that refer to specific streams.
+Here, the 'o' operator refers to *overwrite* and will instruct DESID to change existing instructions for emission variables and CMAQ-species to the new Scale Factor. Additionally, individual streams can be zeroed by creating rules that refer to specific streams.
 ```
 ! Region      | Stream Label  |Emission | CMAQ-        |Phase/|Scale |Basis |Op  
 !  Label      |               |Surrogate| Species      |Mode  |Factor|      |
@@ -154,7 +154,7 @@ If the following rule is already present on the default emission control namelis
 !  Label      |               |Surrogate| Species      |Mode  |Factor|      |
 'EVERYWHERE'  , 'All'         ,'TOL'    ,'TOL'         ,'GAS' ,1.0  ,'UNIT','a',
 ```
-The user wants to add or subtract toluene emissions based on the value of a different emission surrogate, CO for example, then this rule could be used:
+If the user wants to add or subtract toluene emissions based on the value of a different emission surrogate, CO for example, then this rule could be used:
 ```
 ! Region      | Stream Label  |Emission | CMAQ-        |Phase/|Scale |Basis |Op  
 !  Label      |               |Surrogate| Species      |Mode  |Factor|      |
@@ -244,7 +244,7 @@ Custom mask files may also be made using the [shp2cmaq](../../../PYTOOLS/shp2cma
 ### 12.  Define families of streams, regions, or chemical species
 Users can define any number of custom groups or "families" of emission streams, regions or chemical species to be used to streamline (i.e. enhance) prescribed emissions rules. For example, if a user would like to scale NOx by 50% from 4 different emission streams (e.g. PT_EGU, GRIDDED, MOBILE and PT_NONEGU) without using famlies, they would need 8 rules, one for NO and NO2 for each of 4 streams. However, by defining a family of 4 streams and another family of two chemical species (i.e. NOx), 1 rule can be used to achieve the same result.  
 
-Chemical families are defined by prescribing, via the [CMAQ Miscellaneous Control File](../../../CCTM/src/util/util/CMAQ_Control_Misc.nml), the total number of chemical families to be used, the name of each, the number of members of each family, and the name of each family member. For example,  
+Chemical families are defined by prescribing, via the mechanism-dependent Chemical Control file (e.g., CMAQ_Chem_Control_cb6r5_ae7_aq.nml), the total number of chemical families to be used, the name of each, the number of members of each family, and the name of each family member. For example,  
 ```
 &Chemical_FamVars
  N_Chem_Fams = 2
@@ -258,7 +258,7 @@ Chemical families are defined by prescribing, via the [CMAQ Miscellaneous Contro
  ChemFamilyMembers(2,:)= 'POC','PNCOM'  
 /
 ```  
-In this example, 2 chemical families, "NOX" and "POA", are defined with 2 members, "NO" and "NO2", and "POC" and "PNCOM". Note that CMAQv5.3 required the variable ChemFamilyNum to be specified and this value is internally calculated in CMAQv5.4. If the variable is provided, the model will crash. Also, it is required to ensure that no Chemical Family Name is identical to any emission species or CMAQ species. Currently, CMAQ will not detect a name conflict but results will be compromised. A future version of CMAQ will check for duplicative names, trigger an error, and stop the model.
+In this example, 2 chemical families, "NOX" and "POA", are defined with 2 members, "NO" and "NO2", and "POC" and "PNCOM". It is required to ensure that no Chemical Family Name is identical to any emission species or CMAQ species. Currently, CMAQ will not detect a name conflict but results will be compromised. 
 
 Stream families are defined analogously in the Control File (CMAQ_Control.nml):  
 ```

@@ -1,7 +1,7 @@
 #!/bin/csh -f
 
 # ===================== CCTMv6.X Run Script ========================= 
-# Usage: run.cctm >&! cctm_2022_12US1_CRACMM2.log &                                
+# Usage: run.cctm >&! cctm_2023_12US4_CRACMM.log &                                
 #
 # To report problems or request help with this script/program:     
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -74,7 +74,7 @@ echo 'Start Model Run At ' `date`
  #setenv MECH     cracmm3haps       #> Mechanism ID
 
  # Select ONE version; this affects some default settings below
- #set VRSN      = v6a1          #> Code Version
+ #set VRSN      = v6            #> Code Version
  set VRSN      = v55           #> Code Version
                                                       
 #> Define RUNID as any combination of parameters above or others. By default,
@@ -84,7 +84,7 @@ echo 'Start Model Run At ' `date`
 
 #> Set the build directory (this is where the CMAQ executable
 #> is located by default).
- if( $VRSN == v6a1 ) set BLD = ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
+ if( $VRSN == v6 )  set BLD = ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
  if( $VRSN == v55 ) set BLD = ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_${MECH}_stage
  set EXEC      = CCTM_${VRSN}.exe  
 
@@ -189,12 +189,12 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
 
-if( $VRSN == v6a1 ) setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
-if( $VRSN == v55 )  setenv CTM_WB_DUST N         #> WBD not recommened for use in v55
+if( $VRSN == v6 )  setenv CTM_WB_DUST Y         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
+if( $VRSN == v55 ) setenv CTM_WB_DUST N         #> WBD not recommened for use in v55
 
 setenv CTM_BROWN_VEG N       #> when using CTM_WB_DUST, use non-photosynthetic (brown) vegetation input files to limit dust emissions [ default: N ] (new in v6)
 
-if( $VRSN == v6a1 ) then
+if( $VRSN == v6 ) then
   setenv CTM_LNO_ONLINE Y    #> v6 turn on lightning NOx emissions [ default: N ]
                              #> alternatively LNOx emissions can also be read in as external emissions inputs,
                              #> in this case, please setenv this variable to N to avoid double counting
@@ -226,7 +226,6 @@ setenv CTM_BIOGEMIS_BE Y     #> calculate in-line biogenic emissions with BEIS [
 setenv CTM_BIOGEMIS_MG N     #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N         #> turns on BDSNP soil NO emissions [ default: N ]
 setenv USE_SEGA_N N          #> turns on EPA soil NO and HONO emissions [ default: N ] (new in v6)
-setenv USE_SEGA_N_EF N       #> Use BEIS input emission factor file for soil NO and HONO [ default: N ] (new in v6)
 
 setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affecting photolysis
                              #> frequencies ( 3 is the default value )
@@ -244,14 +243,6 @@ setenv CTM_STAGE_P22 N       #> Pleim et al. 2022 Aerosol deposition model [defa
 setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [default: Y; active only if CTM_USE_STAGE = Y]
 setenv CTM_STAGE_S22 N       #> Shu et al. 2022 (CMAQ v5.3) Aerosol deposition model [default: N]
 
-setenv AERO_MT "HYB"         #> Specify Inorganic Aerosol Mass Transfer Approach [default = HYB].
-                             #>    Set to EQB to assume equilibirum partitioning for all aerosol 
-                             #>    modes. Set to DYN to calculate dynamic fluxes with respect to 
-                             #>    a fixed sub-time-step. Set to HYB for coarse mode to use dynamic
-                             #>    mass transfer and fine modes to use equilibrium partitioning.
-                             #>    (new in v6)
-setenv AERO_DYN_TSTEP 90     #> Specify the fixed sub-time-step for dynamic partitioning of aerol 
-                             #>    modes. (new in v6)
 setenv BC_AERO_M2WET F       #> Specify whether or not boundary condition aerosol size distribution 
                              #>    is wet or dry [ default: F = dry ]. This option should be set
                              #>    to True if boundary condition size distirbution parameters are
@@ -393,7 +384,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Ozone column data
   if( $VRSN == v55 )  set OMIfile   = OMI_1979_to_2019.dat               # CMAQv5.5 and prior
-  if( $VRSN == v6a1 ) set OMIfile   = omi_cmaq_2005through2024_27x27.dat # CMAQv6.0
+  if( $VRSN == v6 )   set OMIfile   = omi_cmaq_2005through2024_27x27.dat # CMAQv6.0
 
   # If using BROWN_VEG option, then set the path to the non-photosynthetic vegetation (npv) input files
    if ( $CTM_BROWN_VEG == 'Y' ) then
@@ -445,7 +436,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   # Here, we set the Chem Control files (for v6.0). These will not be used in a v5.5-5.4 simulation.
   setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
   setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}_$APPL.nml
-  if( $VRSN == v6a1 ) echo CMAQ CH control file for v6.0 run is $CMAQ_CH_CTRL_NML
+  if( $VRSN == v6 ) echo CMAQ CH control file for v6.0 run is $CMAQ_CH_CTRL_NML
 
   #> The following namelist controls the mapping of meteorological land use types and the NH3 and Hg emission
   #> potentials
@@ -612,26 +603,21 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      setenv LTNGPARMS_FILE ${IN_LTpath}/LTNG_AllParms_${GRID_NAME}.nc #> lightning parameter file
   endif
 
-  #> Lightning NOx configuration v6a1
+  #> Lightning NOx configuration v6
   if ( $CTM_LNO_ONLINE == 'Y' ) then
   #> In-line lightning NOx options
      setenv USE_LTNG_DATA  Y        #> use hourly NLDN strike file [ default: Y ]
      if ( $USE_LTNG_DATA == Y ) then
         setenv LTNG_DATA ${IN_LTpath}/WWLLNs_${GRID_NAME}_60min_${YYYYMMDD}.ioapi
-         setenv LNO_OPTION 1 # default, use lightning strikes such as NLDN, WWLLNs
-        # LNO_OPTION 2:  use GLM flashes
-        # LNO_OPTION 3:  use GLM Energy
-        # LNO_OPTION 4:  use synergized GLM/WWLLN Energy
-        # LNO_OPTION 5:  use synergized GLM/WWLLNs Energy with ICCG adjustment to set upper bound
+        setenv LNO_OPTION 1
+             # LNO_OPTION 1: default, use lightning strikes such as NLDN, WWLLNs
+             # LNO_OPTION 2: use synergized GLM/WWLLNs Energy with ICCG adjustment to set upper bound
      endif
      setenv LTNGPARMS_FILE ${IN_LTpath}/LTNG_AllParms_${GRID_NAME}.nc #> lightning parameter file; ignore if LTNGPARAM = N
   endif
 
   if( $USE_SEGA_N == 'Y' ) then
      setenv SEGA_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
-     if( $USE_SEGA_N_EF == 'Y') then
-        setenv SEGA_EF ${INPDIR}/surface/BEIS4_SEGA_beld6_norm_emis_12US1.ncf
-     endif
   endif
 
   #> In-line biogenic emissions configuration
