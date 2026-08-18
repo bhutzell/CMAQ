@@ -41,6 +41,24 @@ C***********************************************************************
       REAL, ALLOCATABLE :: PRDRATE( : )
       REAL, ALLOCATABLE :: RKMID ( : )
 
+      Real, Allocatable, Save :: A( :, : )                 ! An upper triangular matrix and the
+                                              ! multipliers used to obtain it
+                                              ! (See s_lu.F)
+      Real, Allocatable, Save :: A1( :, : )
+      Real(8), Allocatable, Save :: Real8A( :, : )                 ! An upper triangular matrix and the
+                                              ! multipliers used to obtain it
+                                              ! (See s_lu.F)
+      Real(8), Allocatable, Save :: Real8A1( :, : )
+      
+      Real, Allocatable, Save    :: PDT( :, : )
+      Real, Allocatable, Save    :: PRD( : )
+      Real(8), Allocatable, Save :: Real8PRD( : )
+      Real, Allocatable, Save    :: PRD_RATE( : )             ! Contribution to PRD from rxn rate sens
+
+      Integer, Allocatable, Save :: IPVT ( : )             ! an integer vector of pivot indices.
+      Integer, Allocatable       :: SENS_INDEX( : )        ! CGRID_INDEX translated by JNEW2OLD
+      Integer, Allocatable       :: MECH_INDEX( : )        ! CGRID_INDEX translated by JNEW2OLD
+
 !20140307 Integrated Rates
 
 
@@ -140,6 +158,11 @@ C***********************************************************************
        REAL( 8 ), PARAMETER, PRIVATE :: ZERO   = 0.0D0
        REAL( 8 ), PARAMETER, PRIVATE :: CUTOFF = 1.0D-23
        REAL( 8 ), PARAMETER, PRIVATE :: BULK_CUTOFF = ZERO
+
+       INTERFACE FILTER_AND_RENORMAL
+          MODULE PROCEDURE DFILTER_AND_RENORMAL, ! double precision version
+     &                     SFILTER_AND_RENORMAL  ! single precision version
+       END INTERFACE
 
       CONTAINS
         SUBROUTINE SA_IRR_INIT
@@ -2101,4 +2124,530 @@ C..Local
       PH2O2_OVER_PHNO3 = PROD_H2O2 / MAX( 1.0D-30,PROD_HNO3 )
       
       END FUNCTION PH2O2_OVER_PHNO3
+C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      SUBROUTINE DFILTER_AND_RENORMAL( SIZE_XARRAY, XARRAY, FILTER, MAX_REMOVAL, SUCCESS )
+
+            IMPLICIT NONE
+
+! function set to zero values in a one dimensional array of real(8) variables, XARRAY,
+! that are less than a requested value, FILTER. Next, the XARRAY is normalized so its new
+! sum of values equals the original summation. However, the process is abandomed if sum of removed
+! values is greater than MAX_REMOVE percent.
+
+            INTEGER, INTENT( IN )    :: SIZE_XARRAY ! length of XARRAY
+            REAL(8), INTENT( INOUT ) :: XARRAY( : ) ! real array to be filter
+            REAL(8), INTENT( IN )    :: FILTER      ! test value for setting array values to zero
+            REAL(8), INTENT( IN )    :: MAX_REMOVAL ! limit on sum removed values. Process abandoned if exceeded.
+            LOGICAL, INTENT( INOUT ) :: SUCCESS     ! whether process is accomplished.
+
+! local:
+            REAL(8) :: SUM_INITIAL
+            REAL(8) :: SUM_FINAL
+            REAL(8) :: RENORMALIZE
+            INTEGER :: IX
+
+            SUCCESS = .TRUE.
+! Maximum removal is not zero
+            IF ( MAX_REMOVAL .LE. 1.0D-30 ) THEN
+              SUCCESS = .FALSE.
+              RETURN
+            END IF
+
+            SUM_INITIAL = SUM( XARRAY )
+            SUM_FINAL   = SUM( XARRAY, (XARRAY .GT. FILTER) )
+
+            RENORMALIZE = SUM_FINAL / MAX( SUM_INITIAL,1.0D-30 )
+! test limit is exceeded
+            IF ( RENORMALIZE .LT. MAX_REMOVAL ) THEN
+              SUCCESS = .FALSE.
+              RETURN
+            END IF
+! filter array
+            DO IX = 1,SIZE_XARRAY
+              IF ( XARRAY( IX ) .LE. FILTER ) XARRAY( IX ) = 0.0D0
+            END DO
+! renormalize array values
+            RENORMALIZE = 1.0D0 / RENORMALIZE
+            XARRAY = RENORMALIZE * XARRAY
+            SUCCESS = .TRUE.
+
+            RETURN
+       END SUBROUTINE DFILTER_AND_RENORMAL
+       SUBROUTINE SFILTER_AND_RENORMAL( SIZE_XARRAY, XARRAY, FILTER, MAX_REMOVAL, SUCCESS )
+
+            IMPLICIT NONE
+
+! function set to zero values in a one dimensional array of real(8) variables, XARRAY,
+! that are less than a requested value, FILTER. Next, the XARRAY is normalized so its new
+! sum of values equals the original summation. However, the process is abandomed if sum of removed
+! values is greater than MAX_REMOVE percent.
+
+            INTEGER, INTENT( IN )    :: SIZE_XARRAY ! length of XARRAY
+            REAL,    INTENT( INOUT ) :: XARRAY( : ) ! real array to be filter
+            REAL,    INTENT( IN )    :: FILTER      ! test value for setting array values to zero
+            REAL,    INTENT( IN )    :: MAX_REMOVAL ! limit on sum removed values. Process abandoned if exceeded.
+            LOGICAL, INTENT( INOUT ) :: SUCCESS     ! whether process is accomplished.
+
+! local:
+            REAL    :: SUM_INITIAL
+            REAL    :: SUM_FINAL
+            REAL    :: RENORMALIZE
+            INTEGER :: IX
+
+! Maximum removal is not zero
+            IF ( MAX_REMOVAL .LE. 1.0E-30 ) THEN
+              SUCCESS = .FALSE.
+              RETURN
+            END IF
+
+            SUM_INITIAL = SUM( XARRAY )
+            SUM_FINAL   = SUM( XARRAY, (XARRAY .GT. FILTER) )
+
+            RENORMALIZE = SUM_FINAL / MAX( SUM_INITIAL,1.0E-30 )
+! test limit is exceeded
+            IF ( RENORMALIZE .LT. MAX_REMOVAL ) THEN
+              SUCCESS = .FALSE.
+              RETURN
+            END IF
+! filter array
+            DO IX = 1,SIZE_XARRAY
+              IF ( XARRAY( IX ) .LE. FILTER ) XARRAY( IX ) = 0.0
+            END DO
+! renormalize array values
+            RENORMALIZE = 1.0 / RENORMALIZE
+            XARRAY = RENORMALIZE * XARRAY
+            SUCCESS = .TRUE.
+
+            RETURN
+       END SUBROUTINE SFILTER_AND_RENORMAL 
+       Subroutine SOLVE_ISAM_CHEM( REPLACE_SOLD, RKI, CBULK, DELT, OLD2NEW, NEW2OLD )
+
+          USE GRID_CONF             ! horizontal & vertical domain specifications
+          USE RXNS_DATA             ! chemical mechanism data
+          USE MECHANISM_FUNCTIONS
+          USE CGRID_SPCS            ! CGRID mechanism species
+          USE SA_DEFN
+          USE LU_DecompositionSolver
+          USE UTILIO_DEFN
+          
+          IMPLICIT NONE 
+                    
+          Character( 16 ), Save :: PNAME = 'SOLVE_ISAM_CHEM'
+          
+          LOGICAL,   Intent( In ) :: REPLACE_SOLD
+          Real( 8 ), Intent( In ) :: RKI( : )
+          Real( 8 ), Intent( In ) :: CBULK( : )
+          Real( 8 ), Intent( In ) :: DELT
+          Integer,   Optional, Intent( In ) :: OLD2NEW( :,: )
+          Integer,   Optional, Intent( In ) :: NEW2OLD( :,: )
+          
+          Integer I,J,S,N
+          Integer JROW, JCOL
+          Integer INFO                            ! see s_lu.F
+          
+          Real(8) SUMAT
+          Real(8) SUMSP
+          Real(8) TOTAL
+          Real(8) DIFF
+          Real(8) DIFFSP
+          
+          Real KSTEP                              ! Holds k times timestep(in min)
+          Real RXNMULT                            ! Holds product of concs of reactants
+          
+          Integer NRCT                            ! Counter over reactants
+          Integer NPROD                           ! Counter over products
+          Integer IREACT                          ! index for reaction reactant
+          Integer IPROD                           ! index for reaction produce
+
+C..Scratch Local Variables:
+          INTEGER ISP1, ISP2, ISP3  ! Species indices
+          INTEGER JSPC,  SPC        ! Species indices
+          INTEGER NCELL             ! Loop index for cells
+          INTEGER NOUT              ! IRR output index
+          INTEGER NC,NR,NRX         ! Loop index for reactions
+          INTEGER ASTAT             ! allocation status
+          INTEGER KTAG              ! Loop index/pointer for source
+          INTEGER RXN               ! Loop index/pointer for reaction
+                                                     
+C..Saved Local Variables:
+      Integer,   Allocatable       :: SENS_INDEX( : )  ! CGRID_INDEX translated by JNEW2OLD
+      Integer,   Allocatable       :: MECH_INDEX( : )  ! MECH_INDEX translated by JNEW2OLD
+
+      REAL                         :: CHEMSTEP               ! single precision conversion of DELT
+      REAL( 8 )                    :: RENORM_FACTOR          ! used to normal tag concentration wrt CBULK
+      REAL( 8 ), ALLOCATABLE, SAVE :: YNEW   ( : )           ! bulk concentrations from previous time step
+      REAL( 8 ), ALLOCATABLE, SAVE :: OUTSIDE( : )           ! species concentration outside isam tags
+      REAL( 8 ), ALLOCATABLE, SAVE :: YCMID  ( : )           ! bulk concentrations from previous time step
+      REAL( 8 ), ALLOCATABLE, SAVE :: YCRATES( : )           ! bulk concentration used to calculate reactionvrates 
+      REAL,      ALLOCATABLE, SAVE :: SNEW   ( :,: )         ! change in source tag species 
+      REAL,      ALLOCATABLE, SAVE :: IDENTITY_MATRIX( :,: ) ! change in source tag species 
+
+
+      Logical, Save :: FIRSTIME = .TRUE.
+      Logical, Save :: REORDER  = .TRUE. ! reorder CBULK
+      LOGICAL       :: SUCCESS  = .TRUE. ! flag call to FILTER_AND_RENORMAL worked      
+
+      Character( 96 ) :: XMSG = ' '
+
+      IF ( FIRSTIME ) THEN
+
+          FIRSTIME  = .FALSE.
+!          LOGDEV    = INIT3()
+         
+          CALL SET_MECHANISM( ) ! determine formulas for Mechanism Jacobain and Species Rate of Change
+  
+C Allocate arrays:
+          ALLOCATE( YNEW ( NUMB_MECH_SPC ), STAT = ASTAT )
+          IF ( ASTAT .NE. 0 ) THEN
+             XMSG = 'ERROR allocating YNEW variable'
+             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
+          END IF
+          
+          ALLOCATE( SNEW( NUMB_MECH_SPC,NTAG_SA ), STAT = ASTAT )
+          IF ( ASTAT .NE. 0 ) THEN
+             XMSG = 'ERROR allocating SNEW variable'
+             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
+          END IF
+          
+          ALLOCATE( IDENTITY_MATRIX( NUMB_MECH_SPC,NUMB_MECH_SPC ), STAT = ASTAT )
+          IF ( ASTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating IDENTITY_MATRIX'
+          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
+          END IF
+          
+          IDENTITY_MATRIX = 0.0
+          DO JSPC = 1,NUMB_MECH_SPC
+             IDENTITY_MATRIX( JSPC,JSPC ) = 1.0        
+          END DO
+          
+          ALLOCATE( A( NUMB_MECH_SPC, NUMB_MECH_SPC ),
+     &              A1( NUMB_MECH_SPC, NUMB_MECH_SPC ), STAT = ASTAT )
+          IF ( ASTAT .NE. 0 ) THEN
+             XMSG = 'Failure allocating A, A1'
+             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
+          END IF
+          
+          ALLOCATE( PDT( NUMB_MECH_SPC,NUMB_MECH_SPC ),
+     &              IPVT ( NUMB_MECH_SPC ),
+     &              PRD( NUMB_MECH_SPC ), STAT = ASTAT )
+          IF ( ASTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating PRD, IPVT, PRD_RATE'
+            CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
+          END IF
+          
+          ALLOCATE( Real8A( NUMB_MECH_SPC, NUMB_MECH_SPC ),
+     &              Real8A1( NUMB_MECH_SPC, NUMB_MECH_SPC ), STAT = ASTAT )
+          IF ( ASTAT .NE. 0 ) THEN
+             XMSG = 'Failure allocating Real8A, Real8A1'
+             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
+          END IF
+
+          ALLOCATE( Real8PRD( NUMB_MECH_SPC ), STAT = ASTAT )
+          IF ( ASTAT .NE. 0 ) THEN
+             XMSG = 'Failure allocating Real8PRD'
+             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
+          END IF
+
+          ALLOCATE( SENS_INDEX( NUMB_MECH_SPC ),
+     &              MECH_INDEX( NUMB_MECH_SPC ), STAT = ASTAT )
+          IF ( ASTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating SENS_INDEX or MECH_INDEX'
+          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
+          END IF
+          
+          DO JSPC = 1,NUMB_MECH_SPC
+             MECH_INDEX(JSPC) = CGRID_INDEX(JSPC)
+             SENS_INDEX(JSPC) = CGRID_INDEX(JSPC)
+          END DO
+
+         YNEW = 0.0D0
+         
+         IF( PRESENT( OLD2NEW ) .AND. PRESENT( OLD2NEW ) )THEN
+
+             REORDER = .FALSE. ! no reordering because YCDMM is already redeorderd by chemsolver
+             
+              PRINT*,"PRESENT( OLD2NEW ) .AND. PRESENT( OLD2NEW )"
+!              DO I = 1,NUMB_MECH_SPC
+!                 S  = NEW2OLD( I,1 )
+!                 YNEW( S ) = CBULK( I )
+!                 WRITE(LOGDEV,'(I4,A,A,ES16.4)')I,' ORIG: ' // CHEMISTRY_SPC(I),' = ',YNEW(S)
+!              END DO
+!              DO I = 1,NUMB_MECH_SPC
+!                 S  = NEW2OLD( I,1 )
+!                 WRITE(LOGDEV,'(I4,A,A,2(ES16.4,1X))')S,' SORT: ' // CHEMISTRY_SPC(S),' = ',CBULK( I ),YNEW(S)-CBULK( I )
+!              END DO
+!             CALL  EVALUATE_F_JAC_MECH( YNEW, SRK, PDT2 ) ! Evaluate Jacobian based on CBULK and SKR values
+
+! overwrite reordering using chemsolver conversing maps
+
+             JNEW2OLD(1:NUMB_MECH_SPC,1) = NEW2OLD(1:NUMB_MECH_SPC,1)
+             JOLD2NEW(1:NUMB_MECH_SPC,1) = OLD2NEW(1:NUMB_MECH_SPC,1)
+             RESET_JACOBIAN = .TRUE.
+             DO RXN = 1, NRXNS
+                DO NRCT = 1, NREACT( RXN )
+                   IREACT = ISPECIES_REACTION( NRCT,RXN )
+                   ISPECIES_REACTION( NRCT,RXN ) = OLD2NEW( IREACT,1 )
+                END DO
+
+                DO NPROD = 1, NPRDCT( RXN )
+                   IPROD = ISPECIES_REACTION( NPROD+3,RXN )
+                   ISPECIES_REACTION( NPROD+3,RXN ) = OLD2NEW( IPROD,1 )
+               END DO
+             END DO
+
+!             DO S = 1, NUMB_MECH_SPC
+!               MECH_INDEX(S) = CGRID_INDEX(JOLD2NEW(S,1))
+!               SENS_INDEX(S) = CGRID_INDEX(JNEW2OLD(S,1))
+!             END DO
+
+         ELSE
+!
+!            DO S = 1, NUMB_MECH_SPC
+!               MECH_INDEX(S) = CGRID_INDEX(JOLD2NEW(S,1))
+!               SENS_INDEX(S) = CGRID_INDEX(JNEW2OLD(S,1))
+!            END DO
+!            DO I = 1,NUMB_MECH_SPC
+!               S  = JOLD2NEW( I,1 )
+!               YNEW( S ) = CBULK( I )
+!               WRITE(LOGDEV,'(I4,1X,A,A,ES16.4)')I,' SORT: ' // CHEMISTRY_SPC(I),' = ',YNEW(S)
+!            END DO
+!            DO I = 1,NUMB_MECH_SPC
+!               S  = JNEW2OLD( I,1 )
+!               WRITE(LOGDEV,'(I4,1X,A,A,2(ES16.4,1X))')I,' ORIGINAL: ' // CHEMISTRY_SPC(S),' = ',CBULK( S ),YNEW(I)-CBULK( S )
+!            END DO
+!            CBULK = YNEW
+         
+         END IF
+ 
+!             DO RXN = 1, NRXNS
+
+!                WRITE(LOGDEV,'(A,1X,I4,1X,A)')'For reaction number and label,',RXN,
+!     &                                         TRIM(RXLABEL(RXN))
+!                WRITE(LOGDEV,*)'Reactants'
+!                WRITE(LOGDEV,'(10X,40(A,", "))')
+!     &         (CHEMISTRY_SPC(JNEW2OLD(ISPECIES_REACTION( NRCT,RXN ),1)),NRCT = 1, NREACT( RXN ))
+
+!                WRITE(LOGDEV,*)'Products'
+!                WRITE(LOGDEV,'(10X,40(A,", "))')
+!     &         (CHEMISTRY_SPC(JNEW2OLD(ISPECIES_REACTION( NPROD+3,RXN ),1)),NPROD = 1, NPRDCT( RXN ))
+
+!             END DO
+!             WRITE(LOGDEV,*)'Original order: chemistry species, cgrid index'
+!             DO S = 1, NUMB_MECH_SPC
+!                WRITE(LOGDEV,'(A16,1X,I4)')CHEMISTRY_SPC(S),CGRID_INDEX(S)
+!             END DO
+!             WRITE(LOGDEV,*)'Sort ordered: chemistry species, cgrid index'
+!             DO S = 1, NUMB_MECH_SPC
+!                WRITE(LOGDEV,'(A16,1X,I4)')CHEMISTRY_SPC(JOLD2NEW(S,1)),MECH_INDEX(S)
+!             END DO
+
+      END IF
+      
+      IF ( REORDER ) THEN  ! reorder to speed-up LU decomposition of Jacobian
+
+            DO I = 1,NUMB_MECH_SPC
+               S  = JOLD2NEW( I,1 )
+               YNEW( S ) = CBULK( I )
+               IF( YNEW( S ) .LE. 1.0D-25 )YNEW( S ) = 0.0D0 
+       !        WRITE(LOGDEV,'(I4,1X,A,A,2(ES16.4,1X))')I,
+     & !        ' YAVE and Difference with its sorted value: ' // CHEMISTRY_SPC(S),
+     & !        ' = ',CBULK( S ),YNEW(I)-CBULK( S )
+            END DO
+!            CBULK = YNEW
+         
+      ELSE
+             DO I = 1,NUMB_MECH_SPC
+               YNEW( I ) = CBULK( I )
+       !       IF( YNEW( I ) .LE. 1.0D-25 )YNEW( I ) = 0.0D0 
+       !       WRITE(LOGDEV,'(I4,1X,A,A,2(ES16.4,1X))')I,
+     & !       ' YAVE for ' // CHEMISTRY_SPC(I),
+     & !       ' = ',YNEW( I )
+            END DO
+      END IF
+      
+!     DO I = 1,NRXNS
+!        write(6,'(I4,1X,"reaction:",A16," = ",ES12.4)')I,RXLABEL(I),RKI(I)
+!     END DO
+
+      CALL  EVALUATE_F_JAC_MECH( YNEW, RKI, PDT ) ! Evaluate Jacobian based on CBULK and SKR values
+
+      CHEMSTEP = REAL( DELT,4 )
+      DO 433 J = 1, NUMB_MECH_SPC
+         DO 434 I = 1, NUMB_MECH_SPC
+
+         ISP1 = JNEW2OLD( J,1 )
+         ISP2 = JNEW2OLD( I,1 )
+
+            A( I, J )  = 0.0
+            A1( I, J ) = 0.0
+            A( I, J )  = -0.5 * CHEMSTEP * PDT( I,J )
+            A1( I, J ) =  0.5 * CHEMSTEP * PDT( I,J )
+            IF ( I .EQ. J ) THEN
+               A( I, J )  = 1.0 + A( I, J )
+               A1( I, J ) = 1.0 + A1( I, J )
+!          IF( I .GT. 1 .AND. I .LT. 4 )THEN      
+!           write(6,'(A16," STEP: (1-dt/2*Jacobian)(",I4,",",I4,"),Jacobian(",I4,",",I4,") = ",2(ES18.6,A2))')
+!     &     CHEMISTRY_SPC(ISP1),J,J,J,J,A(J,J),", ",-0.5 * CHEMSTEP * PDT(J,J)
+!          END IF       
+            END IF
+            
+!            Real8A1( I,J ) = Real( A1( I,J ),8 )
+            Real8A( I,J )  = Real( A( I,J ),8 )
+!           IF( TRIM( ADJUSTL(CHEMISTRY_SPC(ISP2)) ) .EQ. "O3" .AND. Real8A1( I,J ) .GT. 0.0D0 )THEN
+!              write(6,'("1st:",I4,1X,A16," STEP: (1+dt/2*Jacobian)(",I4,",",I4,"),Jacobian(",I4,",",I4,") = ",2(ES18.6,A2))')
+!    &         ISP1,CHEMISTRY_SPC(ISP2),I,J,I,J,A1(I,J),", ",PDT(I,J)                           
+!           END IF
+            
+434      CONTINUE
+433   CONTINUE
+
+      !print*,"CHEMSTEP = ",CHEMSTEP
+      !DO J = 1, NUMB_MECH_SPC
+      !   S = JNEW2OLD( J,1 )
+      !   write(6,'(A,":(1-dt/2*Jacobian)(",I4,",",I4,"),Jacobian(",I4,",",I4,") = ",2(ES18.6,A2))')
+     & !   CHEMISTRY_SPC(S),J,J,J,J,A(J,J),", ",-0.5 * CHEMSTEP * PDT(J,J)
+      !END DO
+
+
+C Factor matrix A by Gaussian elimination
+      INFO = 0
+!      CALL SGEFA( A, NUMB_MECH_SPC, NUMB_MECH_SPC, IPVT, INFO )
+!      print*,"SGEFA: INFO = ",INFO
+       CALL  ludcmp_f90(Real8A,IPVT,INFO)
+       INFO = 0
+       A = REAL( Real8A,4 )
+      
+       !DO J = 1, NUMB_MECH_SPC
+       !  S = JNEW2OLD( J,1 )
+       !  write(6,'(A,":Inverse(1-dt/2*Jacobian)(",I4,",",I4,") = ",2(ES18.6,1X))')
+     & !   CHEMISTRY_SPC(S),J,J,A(J,J),Real8A(J,J)
+       !END DO
+
+!     DO J = 1, NUMB_MECH_SPC
+!        S = JNEW2OLD( J,1 )
+!        write(6,'(A,":Inverse(1-dt/2*Jacobian)(",I4,",",I4,") = ",(ES18.6,A2))')
+!    &   CHEMISTRY_SPC(S),J,J,A(J,J)
+!     END DO
+
+      IF ( INFO .NE. 0 ) THEN
+        XMSG = "Error Inverse of (Identity Matrix - 0.5*TimeStep*Jacobain has below zero(s) on diagonal. "
+        WRITE(LOGDEV,'(A)')Trim(XMSG)
+        DO J = 1, NUMB_MECH_SPC
+          IF( A(J,J) .EQ. 0.0 .OR. Real8A(J,J) .LE. 0.0D0 )THEN
+            S = JNEW2OLD( J,1 )
+            write(6,'(A,":Inverse(1-dt/2*Jacobian)(",I4,",",I4,") = ",2(ES18.6,1X))')
+     &      CHEMISTRY_SPC(S),J,J,A(J,J),Real8A(J,J)
+          END IF
+        END DO       
+        XMSG = "Check Jacobian Matrix for bad values, especially the diagonal."
+        WRITE(LOGDEV,'(A)')Trim(XMSG)
+        XMSG = "Above Fatal Error in LU Decomposition occurred."
+        CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
+      END IF  
+
+!      IF ( .NOT. REPLACE_SOLD ) THEN
+      ! load SNEW for efficient computation using SOLD  
+         DO JSPC = 1,NUMB_MECH_SPC
+            J = JOLD2NEW( JSPC,1 )
+            DO KTAG = 1, NTAG_SA
+               SNEW( J,KTAG ) = REAL( SOLD( KTAG,JSPC ),4 )
+!               IF( SOLD( KTAG,JSPC ) .GT. 1.0D-36 )THEN
+!              IF( KTAG .EQ. 3 )THEN
+!                 write(6,'(2(I4,1X),A,2(ES12.4,1X))')KTAG,JSPC,
+!    &            "Initial Condition:"
+!    &            // CHEMISTRY_SPC(JOLD2NEW(JSPC,1))
+!    &            // ":SNEW( J,KTAG ),SOLD( KTAG,JSPC ) = ",
+!    &            SNEW( J,KTAG ),SOLD( KTAG,JSPC )             
+!              END IF
+!               IF ( SNEW( J,KTAG ) .LT. 1.e-25 ) SNEW( J,KTAG ) = 0.0
+            END DO
+         END DO
+!      ELSE
+!         print*,".NOT. REPLACE_SOLD = FALSE"   
+!      END IF
+!      STOP
+
+!      DO J = 1, NUMB_MECH_SPC
+!        DO I = 1, NUMB_MECH_SPC
+!            ISP2 = JNEW2OLD( I,1 )
+!            IF( TRIM( ADJUSTL(CHEMISTRY_SPC(ISP2)) ) .EQ. "O3" .AND. Real8A1( J,I) .GT. 0.0D0 )THEN
+!               write(6,'("2nd:",I4,1X,A16," STEP: (1+dt/2*Jacobian)(",I4,",",I4,"),Jacobian(",I4,",",I4,") = ",2(ES18.6,A2))')
+!    &          ISP1,CHEMISTRY_SPC(ISP2),I,J,J,I,A1(I,J),", ",PDT(I,J)                           
+!            END IF
+!        END DO
+!      END DO   
+
+      ! Time Integration for SNEW at t+dt
+      DO KTAG = 1,NTAG_SA
+         ! Evaluate tag concentration vector times (Id+dt/2*Jac) matrix
+         DO I = 1,NUMB_MECH_SPC
+         ! Evaluate prd: prd = (Id+dt/2*Jac)*sold
+            PRD( I ) = 0.0
+!           Real8PRD( I ) = 0.0D0
+            DO J = 1,NUMB_MECH_SPC
+               PRD( I ) = PRD( I ) + A1( I, J ) * SNEW( J,KTAG )
+
+               
+!           ISP1 = JNEW2OLD( I,1 )
+!           IF( TRIM( ADJUSTL(CHEMISTRY_SPC(ISP1)) ) .EQ. "O3" .AND. Real8A1( I,J ) .GT. 0.0D0 )THEN
+!              write(6,'("2nd:",I4,1X,A16," STEP: (1+dt/2*Jacobian)(",I4,",",I4,"),Jacobian(",I4,",",I4,") = ",2(ES18.6,A2))')
+!    &         ISP1,CHEMISTRY_SPC(ISP1),I,J,I,J,A1(I,J),", ",PDT(I,J)                           
+!           END IF
+            
+            
+!              IF( I .EQ. 1 .AND. A1( I, J ) .GT. 0.0 )THEN
+!                 write(6,"(2(I4,1X),A,4(es12.4,1X))")I,J,
+!    &            TRIM( CHEMISTRY_SPC(JOLD2NEW(I,1)) ) 
+!    &            // ":PRD( I ),A1( I, J ),SNEW( I,KTAG ) = ", 
+!    &            PRD( I ),A1( I,J ),SNEW( I,KTAG )              
+!              END IF
+            END DO
+            Real8PRD( I ) =  REAL( PRD( I ),8 )
+!           IF( SNEW( I,KTAG ) .GT. 1.0E-30 )THEN
+!               write(6,"(2(I4,1X),A,4(es12.4,1X))")KTAG,I,
+!    &         TRIM( CHEMISTRY_SPC(JOLD2NEW(I,1)) ) 
+!    &         // ":PRD( I ),SNEW( I,KTAG ) = ", 
+!    &            REAL8PRD( I ),SNEW( I,KTAG )
+!           END IF
+         END DO
+!        STOP
+         
+         ! Solve tag concentrations at t+dt:Inverse(Id-dt/2*Jac) * prd
+!         CALL SGESL( A, NUMB_MECH_SPC, NUMB_MECH_SPC, IPVT, PRD, 0 )
+         CALL lubksb_f90(Real8A,IPVT,Real8PRD)
+         DO I = 1,NUMB_MECH_SPC
+!            SNEW( I,KTAG ) = MAX( PRD( I ),0.0 )
+           SNEW( I,KTAG ) = MAX( REAL( Real8PRD( I ),4 ),0.0 )
+         END DO 
+      END DO  ! tag loop
+
+      CALL FILTER_AND_RENORMAL( NTAG_SA, SNEW(1:NTAG_SA,J), 1.0E-25, 0.98, SUCCESS )
+      ! Load Solution into SOLD using SNEW
+      IF ( REPLACE_SOLD ) THEN
+         DO JSPC = 1,NUMB_MECH_SPC
+            J = JNEW2OLD( JSPC,1 )
+            DO KTAG = 1, NTAG_SA
+               SOLD( KTAG,J ) = REAL( SNEW( JSPC,KTAG ),8 )
+               IF( SOLD( KTAG,JSPC ) .GT. 1.0D3 )THEN
+                 write(6,"('Warning High Prediction:Tag Number,Species Number = ',2(I4,1X),A,ES12.4)")
+     &           KTAG,J,CHEMISTRY_SPC(J) // "SOLD = ",SOLD( KTAG,J )
+               END IF
+        !       IF( KTAG .EQ. 3 )THEN
+        !         write(6,"('Prediction:Tag Number,Species Number = ',2(I4,1X),A,2(ES12.4,1X))")
+     &  !         KTAG,J,CHEMISTRY_SPC(J) // "SOLD = ",SOLD( KTAG,J ),YNEW(JSPC)
+        !       END IF
+            END DO           
+            RENORM_FACTOR = CBULK(J)/MAX( SUM( SOLD( :,J ) ),1.0D-25 )
+!            print*," RENORM_FACTOR for ",CHEMISTRY_SPC(J)," = ",RENORM_FACTOR
+            SOLD( :,J ) = RENORM_FACTOR * SOLD( :,J )
+!            DO KTAG = 1, NTAG_SA
+!               SOLD( KTAG,J ) = RENORM_FACTOR * SOLD( KTAG,J )
+!            END DO            
+         END DO
+      END IF
+!     STOP
+
+      Return
+
+      End Subroutine SOLVE_ISAM_CHEM
       END MODULE SA_IRR_DEFN

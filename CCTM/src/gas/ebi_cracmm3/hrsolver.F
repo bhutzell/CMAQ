@@ -127,6 +127,9 @@ C..SCRATCH LOCAL VARIABLES:
       LOGICAL, SAVE  :: LOPEN = .FALSE.
 #endif
 
+#ifdef isam
+      LOGICAL        :: LOAD_SOLD = .FALSE. 
+#endif
 
 C**********************************************************************
 
@@ -217,9 +220,13 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
       NEBI        = 1
       LEBI_CONV   = .TRUE.
 #ifdef isam
+      YAVE        = 0.0D0
+      SA_TEMP     = TA( C,R,L )
+      SA_DENSITY  = DENS( C,R,L )
+      LOAD_SOLD   = .TRUE.
       UPDATE_SOLD = .FALSE.
       UPDATE_PROBABILITIES = .TRUE.
-      CALL SA_IRR_UNBLOCKED ( .TRUE., RKI, YC, DTC )
+!      CALL SA_IRR_UNBLOCKED ( .TRUE., RKI, YC, DTC )
 #endif
 
 
@@ -355,9 +362,27 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 
                  IF( CALL_IRR ) CALL PA_IRR ( .FALSE., RKI, YC, DTC )
 #ifdef isam
-                 IF( NEBI .EQ. N_EBI_STEPS )UPDATE_SOLD = .TRUE.
-                 CALL SA_IRR_UNBLOCKED ( .FALSE., RKI, YC, DTC )
-                 UPDATE_PROBABILITIES = .FALSE.
+!                 CALL SA_IRR_UNBLOCKED ( .FALSE., RKI, YC, DTC )
+C  Compute final sum update and the average
+                  YAVE = YAVE
+     &                 + ( ( 0.5D0 * DTC ) * ( YC + YC0 )  )
+                 IF( NEBI .EQ. N_EBI_STEPS )THEN
+                    UPDATE_SOLD = .TRUE.
+C  Compute average
+!                    YAVE = YAVE
+!     &                   + ( ( 0.5D0 * DTC ) * ( YC + YC0 )  )
+                    YAVE = YAVE / CHEMSTEP                   
+!                    YAVE = YC
+!                     CALL SOLVE_ISAM_CHEM ( UPDATE_SOLD, RKI, YAVE, CHEMSTEP, IOLD2NEW, INEW2OLD )
+!                     CALL SOLVE_ISAM_CHEM ( UPDATE_SOLD, RKI, YAVE, CHEMSTEP )
+!                     CALL REAL4_ISAM_CHEM ( UPDATE_SOLD, RKI, YAVE, CHEMSTEP )
+                      CALL REAL8_ISAM_CHEM ( UPDATE_SOLD, RKI, YAVE, CHEMSTEP )
+                    UPDATE_PROBABILITIES = .FALSE.
+!                 ELSE
+!C Update the sum for the average over the chemistry integration
+!                    YAVE = YAVE
+!     &                   + ( ( 0.5D0 * DTC ) * ( YC + YC0 )  )
+                 END IF
 #endif
 
 #ifdef sens

@@ -1,4 +1,4 @@
-#ifdef sens
+#if defined(sens) || defined(isam)
 
       MODULE MECHANISM_FUNCTIONS
 
@@ -868,6 +868,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             
       IF( .NOT. CHECK_MECHANISM )RETURN
       
+      CHECK_MECHANISM = .FALSE.
       DO JROW = 1, NUMB_MECH_SPC
          JR1 = JROW ! JOLD2NEW( JROW,1 )
          DO JCOL = 1, NUMB_MECH_SPC
@@ -881,6 +882,142 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       RETURN 
       END SUBROUTINE EVALUATE_F_JAC_MECH
+      SUBROUTINE EVALUATE_F_DJAC_MECH( YIN, RKI, JAC )
+
+C***********************************************************************
+C
+C  Function: Compute the REAL8 Jacobian matrix, [J] ( Jij = d[dCi/dt]/dCj )
+C
+C  Preconditions: None
+C
+C  Key Subroutines/Functions Called: None
+C
+C***********************************************************************
+
+      USE RXNS_DATA
+
+      IMPLICIT NONE
+
+C..Includes:
+
+C..Arguments:
+      REAL( 8 ), INTENT( IN )   :: YIN( : )    ! species concs, ppm
+      REAL( 8 ), INTENT( IN )   :: RKI(  : )   ! Rate constants so reaction rates are ppm//min
+      REAL( 8 ), INTENT( INOUT) :: JAC( :,:)   ! jacobian values 
+
+C..Parameters: None
+
+C..External Functions: None
+
+C..Local Variables:
+      INTEGER JR1, JR2, JR3  ! Pointer to reactant species conc.
+      INTEGER JROW           ! Jacobian Row
+      INTEGER JCOL           ! Jacobian Column
+      INTEGER NP             ! Loop index over partial derivation terms
+      INTEGER IPART          ! index for partial derivation of reaction
+      INTEGER NRK            ! Reaction number
+      INTEGER IOS
+      
+      REAL( 8 ) :: CR2           ! Temporary product for 3 reactant reaction
+      REAL( 8 ) :: FRACN         ! Stoichiometric coefficient
+      REAL( 8 ) :: EXPLIC( 3 )   ! Reaction partial derivatives
+      
+      LOGICAL, SAVE :: INITIALIZE = .TRUE.
+
+      INTEGER, ALLOCATABLE       :: JACOBIAN_COL( : )
+      INTEGER, ALLOCATABLE       :: JACOBIAN_ROW( : )
+      CHARACTER(16), ALLOCATABLE :: JACOBIAN_COL_SPECIES( : )
+      CHARACTER(16), ALLOCATABLE :: JACOBIAN_ROW_SPECIES( : )
+      
+C***********************************************************************
+
+      IF( RESET_JACOBIAN )THEN ! reroder row and columns of Jacobian
+                               ! using sorted species maps
+      
+          DO NRK = 1, NRXNS
+             DO NP = 1, REACTION_CHART( NRK )%JACOB_OCCURANCES             
+                JROW  = REACTION_CHART( NRK )%JACOB_PARTIAL_ROW( NP ) 
+                JCOL  = REACTION_CHART( NRK )%JACOB_PARTIAL_COL( NP ) 
+                JROW = JOLD2NEW( JROW,1 )
+                JCOL = JOLD2NEW( JCOL,1 )
+                REACTION_CHART( NRK )%JACOB_PARTIAL_ROW( NP ) = JROW
+                REACTION_CHART( NRK )%JACOB_PARTIAL_COL( NP ) = JCOL
+             END DO
+          END DO
+
+          DO NRK = 1, NRXNS
+             DO NP = 1,REACTION_CHART( NRK )%NREACTANTS
+                JR1 = JOLD2NEW( REACTION_CHART( NRK )%REACTANT( NP ),1 )
+                REACTION_CHART( NRK )%REACTANT( NP ) = JR1
+             END DO
+          END DO
+        
+          RESET_JACOBIAN = .FALSE.
+
+      END IF
+      IF( INITIALIZE )THEN
+          INITIALIZE = .FALSE.
+      END IF
+c...initialize Jacobian
+      JAC( :,: )  = 0.0D0
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  Loop over reaction rates adding partial derivatives; EXPLIC
+c  holds the values according to number of reactants
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      LOOP_REACTIONS: DO NRK = 1, NRXNS
+         IF( REACTION_CHART( NRK )%LIGHT_DEPENDENT .AND. .NOT. LSUNLIGHT )CYCLE    
+c...partial derivatives for reactions with 1 reactant
+         SELECT CASE ( REACTION_CHART( NRK )%NREACTANTS )
+            CASE( 1 ) 
+               EXPLIC( 1 ) = RKI( NRK ) 
+c...partial derivatives for reactions with 2 reactants
+            CASE( 2 ) 
+               JR1 = REACTION_CHART( NRK )%REACTANT( 1 )
+               JR2 = REACTION_CHART( NRK )%REACTANT( 2 )
+               EXPLIC( 1 )  = RKI( NRK )
+     &                      * YIN( JR2 )
+               EXPLIC( 2 )  = RKI( NRK )
+     &                      * YIN( JR1 ) 
+c.....partial derivatives for reactions with 3 reactants
+            CASE( 3 ) 
+               JR1 = REACTION_CHART( NRK )%REACTANT( 1 )
+               JR2 = REACTION_CHART( NRK )%REACTANT( 2 )
+               JR3 = REACTION_CHART( NRK )%REACTANT( 3 )
+               CR2 = RKI( NRK ) * YIN( JR2 )
+               EXPLIC( 1 ) = CR2 * YIN( JR3 )
+               EXPLIC( 2 ) = RKI( NRK )
+     &                     * YIN( JR1 )
+     &                     * YIN( JR3 ) 
+               EXPLIC( 3 ) = CR2 * YIN( JR1 )
+         END SELECT
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  Add Reaction's Partial Derivative to Jacobian 
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          DO NP = 1, REACTION_CHART( NRK )%JACOB_OCCURANCES          
+             JROW  = REACTION_CHART( NRK )%JACOB_PARTIAL_ROW( NP ) 
+             JCOL  = REACTION_CHART( NRK )%JACOB_PARTIAL_COL( NP ) 
+             FRACN = REACTION_CHART( NRK )%JACOB_PARTIAL_COEFF( NP )
+             IPART = REACTION_CHART( NRK )%JACOB_PARTIAL_INDEX( NP )
+             JAC( JROW, JCOL ) = JAC( JROW, JCOL ) + (FRACN * EXPLIC( IPART ))
+          END DO
+      END DO LOOP_REACTIONS
+            
+      IF( .NOT. CHECK_MECHANISM )RETURN
+      
+      CHECK_MECHANISM = .FALSE.
+      DO JROW = 1, NUMB_MECH_SPC
+         JR1 = JROW ! JOLD2NEW( JROW,1 )
+         DO JCOL = 1, NUMB_MECH_SPC
+              JR2 = JCOL ! JOLD2NEW( JCOL,1 )
+              WRITE(6,'(2(I4,1X),A32,ES16.6)')JR1,JR2,
+     &         'JACOBIAN( ' // TRIM( CHEMISTRY_SPC( JROW ) )
+     &        // ',' // TRIM( CHEMISTRY_SPC( JCOL ) ) // ' ) = ', JAC( JR1, JR2 )
+          END DO
+      END DO   
+      
+
+      RETURN 
+      END SUBROUTINE EVALUATE_F_DJAC_MECH
        SUBROUTINE EVALUATE_F_MECH( YIN, TAIR, DAIR, RKI, YDOT )
 
 C***********************************************************************
@@ -1198,6 +1335,6 @@ c..Add the number of species molecules produced in this reaction
 
         END SUBROUTINE WRITE_OUTPUT
       END MODULE 
-      
-    
-#endif    
+
+
+#endif

@@ -97,15 +97,18 @@ C***********************************************************************
                MSG = 'Error allocating SYC'
                CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
           END IF
-          ALLOCATE( IOLD2NEW( NUMB_MECH_SPC, 1 ), STAT = IOS )
-          IF ( IOS .NE. 0 ) THEN
-               MSG = 'Error allocating IOLD2NEW'
-               CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
-          END IF
-          DO N = 1, NUMB_MECH_SPC
-             IOLD2NEW( N, 1 ) = N
-          END DO
        END IF
+
+       ALLOCATE( IOLD2NEW( NUMB_MECH_SPC, 1 ),
+     &           INEW2OLD( NUMB_MECH_SPC, 1 ), STAT = IOS )
+       IF ( IOS .NE. 0 ) THEN
+            MSG = 'Error allocating IOLD2NEW and INEW2OLD'
+            CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
+       END IF
+       DO N = 1, NUMB_MECH_SPC
+          IOLD2NEW( N, 1 ) = N
+          INEW2OLD( N, 1 ) = N
+       END DO
 
        IF( .NOT. MAP_CHEMISTRY_SPECIES() )THEN
           MSG = 'Detected above error(s) when mapping Chemistry species from CGRID species'
@@ -135,7 +138,13 @@ C***********************************************************************
           CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
        END IF
 
-
+#ifdef isam
+      ALLOCATE( YAVE ( NUMB_MECH_SPC), STAT = IOS )
+      IF ( IOS .NE. 0 ) THEN
+         MSG = 'Failure allocating YAVE'
+         CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
+      END IF
+#endif      
 c..Allocate and define ebi species
 
       N_EBISP  = 200

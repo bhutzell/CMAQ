@@ -1,4 +1,4 @@
-       MODULE LU_DEcompositionSolver
+       MODULE LU_DEcompositionSolver_LINPACK
 C***********************************************************************
 C   Portions of Models-3/CMAQ software were developed or based on      *
 C   information from various groups: Federal Government employees,     *
@@ -18,6 +18,15 @@ C   permissions subject to the above restrictions.                     *
 C***********************************************************************
          Implicit None
 
+         INTERFACE lu_decompo
+          MODULE PROCEDURE DGEFA, ! double precision version
+     &                     SGEFA  ! single precision version
+         END INTERFACE
+         INTERFACE lu_solve
+          MODULE PROCEDURE DGESL, ! double precision version
+     &                     SGESL  ! single precision version
+         END INTERFACE
+ 
        CONTAINS
          subroutine sgeco(a,lda,n,ipvt,rcond,z)
          integer lda,n,ipvt(*)
@@ -214,7 +223,7 @@ c
          if (anorm .ne. 0.0e0) rcond = ynorm/anorm
          if (anorm .eq. 0.0e0) rcond = 0.0e0
          return
-         end
+         end subroutine sgeco
 
 C
 C
@@ -263,7 +272,7 @@ C
            SY(I + 3) = SY(I + 3) + SA*SX(I + 3)
    50    CONTINUE
          RETURN
-         END
+         END SUBROUTINE SAXPY
 C
 C
 C
@@ -370,7 +379,7 @@ C
          IPVT(N) = N
          IF (A(N,N) .EQ. 0.0E0) INFO = N
          RETURN
-         END
+         END SUBROUTINE SGEFA
 
 
 
@@ -414,7 +423,7 @@ C
            SX(I + 4) = SA*SX(I + 4)
    50    CONTINUE
          RETURN
-         END
+         END SUBROUTINE SSCAL
 
 
 
@@ -454,7 +463,7 @@ C
             SMAX = ABS(SX(I))
    30    CONTINUE
          RETURN
-         END
+         END FUNCTION 
 
          SUBROUTINE SGESL(A,LDA,N,IPVT,B,JOB)
          INTEGER LDA,N,IPVT(*),JOB
@@ -568,7 +577,7 @@ C
    90       CONTINUE
   100    CONTINUE
          RETURN
-         END
+         END SUBROUTINE SGESL
 C
 C
          REAL FUNCTION SDOT(N,SX,INCX,SY,INCY)
@@ -618,7 +627,7 @@ C
    50    CONTINUE
    60    SDOT = STEMP
          RETURN
-         END
+         END FUNCTION SDOT
 C
 C
          REAL FUNCTION SASUM(N,X,INCX)
@@ -661,7 +670,7 @@ C
    50    CONTINUE
    60    SASUM = TEMP
          RETURN
-         END
+         END FUNCTION SASUM
          subroutine dgefa(a,lda,n,ipvt,info)
 
          implicit none
@@ -769,7 +778,7 @@ c
          ipvt(n) = n
          if (a(n,n) .eq. 0.0d0) info = n
          return
-         end
+         end subroutine dgefa
 
 c ....   .............................................................
 
@@ -893,7 +902,7 @@ c
    90       continue
   100    continue
          return
-         end
+         end subroutine dgesl
 
 c ....   .............................................................
 
@@ -946,7 +955,7 @@ c
            dy(i + 3) = dy(i + 3) + da*dx(i + 3)
    50    continue
          return
-         end
+         end subroutine daxpy
 
 c ....   .............................................................
 
@@ -998,7 +1007,7 @@ c
    50    continue
    60    ddot = dtemp
          return
-         end
+         end function ddot
 
 c ....   .............................................................
 
@@ -1046,7 +1055,7 @@ c
            dx(i + 4) = da*dx(i + 4)
    50    continue
          return
-         end
+         end subroutine dscal
 
 c ....   .............................................................
 
@@ -1088,5 +1097,5 @@ c
             dmax = dabs(dx(i))
    30    continue
          return
-         end
-       END MODULE LU_DecompositionSolver
+         end function idamax
+       END MODULE LU_DecompositionSolver_LINPACK
