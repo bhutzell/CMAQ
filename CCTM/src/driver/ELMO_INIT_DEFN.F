@@ -1579,6 +1579,7 @@
       DO ISPEC = 1,NSPC_SA
         DO ITAG = 1,NTAG_SA
            N = N + 1
+        END DO
       END DO
 
 

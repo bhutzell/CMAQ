@@ -710,10 +710,12 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "Module ${ModPa};"                                           >> $Cfile
  echo                                                              >> $Cfile
 
+ if ( $?ISAM_CBOX ) then
  set text = "// compile for integrated source apportionment method"
  echo $text                                                        >> $Cfile
  echo "Module ${ModISAM};"                                         >> $Cfile
  echo                                                              >> $Cfile
+ endif
 
  if ( $?DDM3D_CBOX ) then
    set text = "// compile for decoupled direct method in 3d"
