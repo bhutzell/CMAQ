@@ -43,11 +43,11 @@ The ELMO_INIT namelist section prescribes how the ELMO output file parameters wi
 &ELMO_INIT
   N_Files = 2
   N_Max_Output_Variables = 400
-  N_Keywords = 71
+  N_Keywords = 81
   N_Max_Keywords_variables = 150
 /
 ```
-The variable N_Files must equal exactly the number of ELMO files you wish. N_Max_Output Variables provides a limit on the total number of variables on any one file. 
+The variable N_Files must equal exactly the number of ELMO files you wish. Setting N_Files equal to 0 instructs CMAQ not to activate ELMO. N_Max_Output Variables provides a limit on the total number of variables on any one file. 
 N_Keywords must match exactly the number of Keyword variables below. Finally, N_Max_Keywords_Variables should be greater than the largest number of components for any one keyword below.
 
 ```
@@ -87,7 +87,7 @@ will be output in ppm for gases and ug m-3 for aerosols. If DD_ is prepended, th
 
 Additionally, ELMOv2 allows several shortcut wildcards that will activate all CMAQ species so that Users do not have to list them all (Table F-1). 
 
-**Table F-1. Shortcut wildcard variables and their function
+**Table F-1. Shortcut wildcard variables and their function**
 
 |**Variable**         |**Function**|
 |---------------------|----------------------------------|
@@ -97,11 +97,9 @@ Additionally, ELMOv2 allows several shortcut wildcards that will activate all CM
 | **ALL_WDEP**        | Activate all CMAQ wet deposition fluxes |
 | **ALL_DDEP**        | Activate all CMAQ dry deposition fluxes |
 | **ALL_ISAM_CONC**   | Activate all ISAM source-oriented variables for CMAQ species concentrations |
-| **ALL_ISAM_DEP**    | Activate all ISAM source-oriented variables for CMAQ wet and dry deposition fluxes |
 | **ALL_ISAM_WDEP**   | Activate all ISAM source-oriented variables for CMAQ wet deposition fluxes |
 | **ALL_ISAM_DDEP**   | Activate all ISAM source-oriented variables for CMAQ dry deposition fluxes |
 | **ALL_DDM_CONC**    | Activate all DDM source-oriented variables for CMAQ species concentrations (gas, aerosol, and any tracers) |
-| **ALL_DDM_DEP**     | Activate all DDM source-oriented variables for CMAQ wet and dry deposition fluxes |
 | **ALL_DDM_WDEP**    | Activate all DDM source-oriented variables for CMAQ wet deposition fluxes |
 | **ALL_DDM_DDEP**    | Activate all DDM source-oriented variables for CMAQ dry deposition fluxes |
 | **ALL_AEROPROP**    | Activate all aerosol property variables |
@@ -144,12 +142,18 @@ internally to the sum of the Aitken and Accumulation modes. The name PMF_SO4 den
 | **PM25**       | particles with diameter less than 2.5 um |
 | **PM10**       | particles with diameter less than 10.0 um |
 | **PM25TO10**   | particles with diameter between 2.5 and 10.0 um |
-| **AMS**        | particles predicted to be detected by an aerosol mass spectrometer |
+| **PMAMS**      | particles predicted to be detected by an aerosol mass spectrometer |
 | **INUM10**     | particles with diameter greater than 10 nm |
 | **INUM20**     | particles with diameter greater than 20 nm | |
 | **INUM40**     | particles with diameter greater than 40 nm |
 | **INUM100**    | particles with diameter greater than 100 nm |
 | **GAS**        | No particle number, mass, or surface area concentrations used in COMPOSITE definition |
+| **FINE**       | particles in the Aitken and Accumulation modes (i.e., I and J modes) |
+| **COARSE**     | particles in the Coarse mode (i.e., K mode) |
+| **TSP**        | particles in all modes (I, J and K modes) |
+| **DEP_FINE**   | particles deposited in the Aitken and Accumulation modes (i.e., I and J modes) |
+| **DEP_COARSE** | particles deposited in the Coarse mode (i.e., K mode) |
+| **DEP**        | particles deposited in all modes (I, J and K modes) |
 
 Although these labels indicate mass or number (e.g. PM25 vs. INUM20), they merely define a size range and so could be used for number, mass, or surface area concentration species 
 interchangeably. Users may modify the size limits of these options or create new options by editing the 'ELMO_INLET' structure in [ELMO_DATA.F][link_elmo_data].
@@ -183,7 +187,7 @@ Total VOC is now defined in the Chemical Control Namelists provided with each ch
 ```
 'VOC'         , 'Volatile Organic Compound (VOC) Concentration',
                 'ppmC', 'GAS',
-                'PAR + 2.0*ETHA + 3.0*PRPA + MEOH + 2.0*ETH + 2.0*ETOH + 2.0*OLE + 3.0*ACET + 7.0*TOL + 8.0*XYLMN + 6.0*BENZENE + FORM + 3.0*GLY + 4.0*KET + 2.0*ETHY
+                'PAR + 2.0*ETHA + 3.0*PRPA + MEOH + 2.0*ETH + 2.0*ETOH + 2.0*OLE + 3.0*ACET + 7.0*TOL + 8.0*XYLMN + 6.0*BENZENE + FORM + 3.0*GLY + 4.0*KET + 2.0*ETHY + 2.0*ALD2 + 4.0*IOLE + 2.0*ALDX + 5.0*ISOP + 10.0*TERP + 10.0*NAPH + 10.0*APIN'
 ```
 The units specified are ppmC. CMAQ sums the species in ppm and coefficients are provided to convert from ppm to ppmC. Units of ppmV, ppbV, ug m-3, umol m-3, ng m-3, are supported. 
 If ppmC is desired, the user must provide the coefficients quantifying carbon number in the composite definition.   
@@ -330,7 +334,6 @@ on process anlysis (IRR) for comprehenisve diagnostics of the gas-phase chemical
 | **K_IEPOX**        |  IEPOX 1st order particle phase reaction rate const |
 | **GAMMA_IMAE**     |  IMAE+HMML heterogeneous uptake coefficient |
 | **VOC_NOX**        |  VOC-limiting (>0.35) or NOx-limiting (<0.35) O3 formation |
-| **DZ**             |  Height of each grid cell computed from top layer height |
 | **EF_HNO3**        |  Enhancement factor for HNO3 photolysis |
  
 #### F.2.7 Optical Variables
@@ -340,9 +343,6 @@ Variables that are useful for comparing to satelites or other remote sensing tec
 
 |**Optical Variable**  |**Meaning**  |
 |--------------------|----------------------|
-| **GAMMA_N2O5**     |  Fine Mode N2O5 Heterogeneous rxn probability |
-| **GAMMA_N2O5K**    |  Coarse Mode N2O5 Heterogeneous rxn probability |
-| **YIELD_CLNO2**    |  Fine Mode CLNO2 Heterogeneous reaction yield |
 | **AOD_550**        |  Aerosol Optical Depth at 550 nm -Angstrom interp |
 | **PM_EXT_550**     |  Aerosol Extinction at 550 nm -Angstrom interp |
 | **NO2_COLUMN**     |  NO2 column density |
@@ -356,18 +356,18 @@ for every user-defined source and requiring users to post-process them into aggr
 units, then the variable PM25_EGU can be added to File_Vars to request PM2.5 mass just for the EGU source.  
 
 If the subscripts _ISAM or _DDM are used after any CMAQ species or ELMO Composite, then the source-oriented variables corresponding to that variable are all added 
-to the output files. Additionally, a variable with the suffix _TAGS is added when running ISAM. This quantifies the sum of all tagged variables and may be compaerd 
+to the output files. Additionally, a variable with the suffix _TAGS is added when running ISAM. This quantifies the sum of all tagged variables and may be compared 
 to the bulk CMAQ output. For example, if a user is running ISAM with 3 user-defined sources: EGU, WLF (Wildland Fire), and AGR (Agriculture), and adds NOX_ISAM to
 File_Vars, then ELMO will add the following variables to the output file: NOX_EGU, NOX_WLF, NOX_AGR, NOX_ICO (initial conditions), 
 NOX_BCO (boundary conditions), NOX_OTH (other sources), and NOX_TAGS. Initial conditions, boundary conditions, and other are automatically 
-added for all ISAM and DDM simulations. The NOX_TAGS variable will equal the sum of all other NOX tagged variables. DDM simulations will 
+added for all ISAM simulations. The NOX_TAGS variable will equal the sum of all other NOX tagged variables. DDM simulations will 
 not include a _TAGS variable because DDM sensitivities do not add to a whole in the way tagged ISAM variables do. In this case, each 
 variable will equal the sum of NO and NO2, as defined by the NOX Composite in the Chemical Control Namelist.  
 
 The internal aerosol composites can be combined with source-oriented shortcuts to make sophisticated requests for variables to output files. Table F-8 lists 
 several possibilities for requesting particulate sulfate from the ISAM example in the preceding paragraph.  
 
-**Table F-8. Example variables related to source-oriented particulate sulfate
+**Table F-8. Example variables related to source-oriented particulate sulfate**
 
 |**Variable in File_Vars**  |**Variables added to Output File**  |
 |-------------------|----------------------|
@@ -375,21 +375,10 @@ several possibilities for requesting particulate sulfate from the ISAM example i
 | **ASO4_EGU**      |  ASO4I_EGU + ASO4J_EGU + ASO4K_EGU  |
 | ***ASO4_EGU**     |  ASO4I_EGU, ASO4J_EGU, ASO4K_EGU    |
 | **ASO4J_ISAM**    |  ASO4J_EGU, ASO4J_WLF, ASO4J_AGR, ASO4J_ICO, ASO4J_BCO, ASO4J_OTH, ASO4J_TAGS |
-| **ASO4_ISAM**     |  ASO4I_EGU + ASO4J_EGU + ASO4K_EGU, 
-                       ASO4I_WLF + ASO4J_WLF + ASO4K_WLF,
-                       ASO4I_AGR + ASO4J_AGR + ASO4K_AGR,
-                       ASO4I_ICO + ASO4J_ICO + ASO4K_ICO,
-                       ASO4I_BCO + ASO4J_BCO + ASO4K_BCO,
-                       ASO4I_OTH + ASO4J_OTH + ASO4K_OTH,
-                       ASO4I_TAGS + ASO4J_TAGS + ASO4K_TAGS |
-| ***ASO4_ISAM**    |  ASO4I_EGU, ASO4J_EGU, ASO4K_EGU, 
-                       ASO4I_WLF, ASO4J_WLF, ASO4K_WLF,
-                       ASO4I_AGR, ASO4J_AGR, ASO4K_AGR,
-                       ASO4I_ICO, ASO4J_ICO, ASO4K_ICO,
-                       ASO4I_BCO, ASO4J_BCO, ASO4K_BCO,
-                       ASO4I_OTH, ASO4J_OTH, ASO4K_OTH,
-                       ASO4I_TAGS, ASO4J_TAGS, ASO4K_TAGS |
+| **ASO4_ISAM**     |  ASO4I_EGU + ASO4J_EGU + ASO4K_EGU, <br> ASO4I_WLF + ASO4J_WLF + ASO4K_WLF, <br> ASO4I_AGR + ASO4J_AGR + ASO4K_AGR, <br> ASO4I_ICO + ASO4J_ICO + ASO4K_ICO, <br> ASO4I_BCO + ASO4J_BCO + ASO4K_BCO, <br> ASO4I_OTH + ASO4J_OTH + ASO4K_OTH, <br> ASO4I_TAGS + ASO4J_TAGS + ASO4K_TAGS |
+| ***ASO4_ISAM**    |  ASO4I_EGU, ASO4J_EGU, ASO4K_EGU, <br> ASO4I_WLF, ASO4J_WLF, ASO4K_WLF, <br> ASO4I_AGR, ASO4J_AGR, ASO4K_AGR, <br> ASO4I_ICO, ASO4J_ICO, ASO4K_ICO, <br> ASO4I_BCO, ASO4J_BCO, ASO4K_BCO, <br> ASO4I_OTH, ASO4J_OTH, ASO4K_OTH, <br> ASO4I_TAGS, ASO4J_TAGS, ASO4K_TAGS |  
 
+In addition to ISAM or DDM concentration variables, ELMOv2 can also output ISAM or DDM deposition variables, though with some limitations. To construct the output variable name for a source-resolved deposition species, ELMO prepends DD_ or WD_ to the species to indicate dry deposition or wet deposition then appends the tag or sensitivity name (e.g., _EGU). For example, the dry deposition of ozone associated with the EGU tag is DD_O3_EGU. CMAQ has a limit on the length of an output variable name of 16 characters which is inherited from the I/O API library. For species with longer names (e.g., HCHO_PRIMARY), the name for ISAM or DDM deposition species exceeds 16 characters (e.g., DD_HCHO_PRIMARY_EGU). CMAQ may crash due to duplicated variable names or may truncate the tag or sensitivity label, depending on the length of the species name. Thus, output of deposition species for ISAM and DDM using ELMO is only partially supported as of CMAQv6.0.  
 
 #### F.2.9 ELMO Keywords
 For convenience and mantainability, ELMO uses Keywords defined at run-time that expand to groups of variables (typically particularly meaningful or useful ones). 
@@ -537,7 +526,7 @@ Notice that the definition of PMF is complicated. These Composites are described
 <!-- BEGIN COMMENT -->
 
 [<< Previous Appendix](CMAQ_UG_appendixE_configuring_WRF.md) - [Home](../README.md) <br>
-CMAQv5.5 User's Guide<br>
+CMAQv6.0 User's Guide<br>
 
 <!-- END COMMENT -->
 

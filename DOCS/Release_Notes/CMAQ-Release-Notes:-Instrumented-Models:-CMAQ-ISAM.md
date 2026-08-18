@@ -1,9 +1,10 @@
 # Integrated Source Apportionment Method (ISAM)
 
-## Vapor Species for ISAM in CRACMM mechanisms]
-[Sergey L. Napelenok](mailto:Napelenok.Sergey@epa.gov), U.S. Environmental Protection Agency
-**Type of update**: Bug Fix
-**Release Version/Date**: CMAQv6.0
+
+## Vapor Species for ISAM in CRACMM mechanisms
+[Sergey L. Napelenok](mailto:Napelenok.Sergey@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Bug Fix      
+**Release Version**: CMAQv6.0  
 
 **Description**: The ISAM model was resulting in unreasonable behavior of the tagged species VELHOM and VHOM for some applications. When tracking, for example, contributions of EGU sources, these species returned unreasonably large values soon after the beginning of the simulation. It was determined that during the implementation of ISAM for the CRACMM family of mechanisms, vapor species were added to the tracked species lists without corresponding aerosol components including VELHOM and VHOM. For example, the list of tracked species for CRACMM3 includes:
 
@@ -28,13 +29,13 @@ This PR stabilizes ISAM outputs, but has no impact on concentrations.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1393](https://github.com/USEPA/CMAQ_Dev/commit/95db33911a8d7a41383b1c5050a2c77ba9b88537) | [PR#1390](https://github.com/USEPA/CMAQ_Dev/pull/1393)  |
+|[Merge for PR#1393](https://github.com/USEPA/CMAQ/commit/95db33911a8d7a41383b1c5050a2c77ba9b88537) | [PR#1393](https://github.com/USEPA/CMAQ_Dev/pull/1393)  |
 
 
 ## Correction to the STAGE implementation of ISAM
-[Sergey L. Napelenok](mailto:Napelenok.Sergey@epa.gov), U.S. Environmental Protection Agency
-**Type of update**: Bug Fix
-**Release Version/Date**: CMAQv6.0
+[Sergey L. Napelenok](mailto:Napelenok.Sergey@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Bug Fix      
+**Release Version**: CMAQv6.0  
 
 **Description**: Variable "SACONC" was used in a calculation before it was populated from the ISAM array at the top of the subroutine vdiffacmx. This caused errors as previously defined values for SACONC were used instead of correct current ones
 Significance and Impact: There is no impact on CMAQ base model output. There is some impact on ISAM apportionment results depending on user application.
@@ -62,7 +63,7 @@ Significance and Impact: There is no impact on CMAQ base model output. There is 
 ### Improve stability in ISAM apportionment output
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**:  Improve stability  
-**Release Version/Date**:  CMAQv6.0
+**Release Version**:  CMAQv6.0
 
 **Description**:   
 These changes address an issue in the aerosol/gas partitioning calculations for the ISAM model and expand on the previous changes outlined below. In some instances, mass was still erroneously allocated to the wrong tags. This was most obvious when a signal would occassionally show up far away from an isolated source. For example, below is a map of contribution of NO2 from a power plant in IL. Very early in the simulation, a substantial signature appears of the coast of CA.
@@ -71,24 +72,24 @@ These changes address an issue in the aerosol/gas partitioning calculations for 
 
 **Significance and Impact**:   
 
-The changes to the source apportionment routines in the aerosol and cloud module address the erroneous contribution issue for the scenarios identified by the users. No impact on base model concentration and deposition fields are expected and observed. The apportionment fields are more stable and show less erroneous attributions cropping up in the domain geographically distant from tracked sources.
+The changes to the source apportionment routines in the aerosol and cloud module address the erroneous contribution issue for the scenarios identified by the users. No impact on base model concentration nor deposition fields are expected nor observed. The apportionment fields are more stable and show less erroneous attributions cropping up in the domain geographically distant from tracked sources.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1305](https://github.com/USEPA/CMAQ/commit/32cd44f4046eb704504a012cdae32de04f04e1d8) | [PR#1305](https://github.com/USEPA/CMAQ_Dev/pull/1305)  |
 
 ### Erroneous mass attribution  
-[Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency 
-**Type of update**:  Bug Fix   
-**Release Version/Date**:  CMAQv6.0
+[Sergey L. Napelenok](mailto:Napelenok.Sergey@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Bug Fix      
+**Release Version**: CMAQv6.0  
 
 **Description**:   
-This bug fix resolves the erroneous growth of tagged mass far away from the location of emission sources. As pictured below, NO2 emitted from various states across the U.S. leads to NO2 from each source present in southern and central California. The reason for the error involves how tagged aerosol mass concentrations were floored in CMAQ v5.4. As implemented, the approach added artificial mass to condensing or evaporating species. This mass propagated through the system and led to enhancements in both particle- and gas-phase species.
+This bug fix resolves the erroneous growth of tagged mass far away from the location of emission sources. As pictured below, NO2 emitted from various states across the U.S. leads to NO2 from each source present in southern and central California. The reason for the error involves how tagged aerosol mass concentrations were floored in CMAQv5.4. As implemented, the approach added artificial mass to condensing or evaporating species. This mass propagated through the system and led to enhancements in both particle- and gas-phase species.
 
 ![combined_01052016](./images/instrumented-models/cmaqv6.0_isam_tagged_aerosol_mass_concentrations_bugfix.png)
 
 **Significance and Impact**:   
-Corrects erroneous mass attributed to sources geographically far away very soon after emissions that can not be explained by transport. This issues was brought to attention on the CMAS user forum. As depicted above, the concentration of these artificial enhancements can approach the true values of the tagged concentrations near and downwind real sources. It is difficult to completely know where these errors would have congregated in various domains, but they are likely more problematic in places with enhanced photoactivity, like SOUTHERN California.
+Corrects erroneous mass attributed to sources geographically far away very soon after emissions that can not be explained by transport. As depicted above, the concentration of these artificial enhancements can approach the true values of the tagged concentrations near and downwind to real sources. These errors are likely more problematic in places with enhanced photoactivity, like Southern California.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
@@ -96,24 +97,24 @@ Corrects erroneous mass attributed to sources geographically far away very soon 
 
 
 ### ISAM Control file
-[Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**:  Improve log file 
-**Release Version/Date**:  CMAQv6.0
+[Sergey L. Napelenok](mailto:Napelenok.Sergey@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Improve log file      
+**Release Version**: CMAQv6.0  
 
 **Description**:   
-Users were running into character limits for text parser of the isam control file. Additionally, issues with the isam control file are not clearly communicated by in the model log files.  To address this a simple ISAM tag summary is now written to the log files to provide additional clues if necessary.
+Users were running into character limits for the text parser of the ISAM control file. Additionally, issues with the ISAM control file are not clearly communicated in the model log files. An ISAM tag summary is now written to the log files to provide more information on how to debug.
 
 **Significance and Impact**:   
 No impact on any output files for both ISAM and the base model. Some minor changes to the log files.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1326](https://github.com/USEPA/CMAQ_Dev/commit/f735176e9a02a7dd82ca71031e76f74809ebaebc) | [PR#1326](https://github.com/USEPA/CMAQ_Dev/pull/1326)  |
+|[Merge for PR#1326](https://github.com/USEPA/CMAQ/commit/f735176e9a02a7dd82ca71031e76f74809ebaebc) | [PR#1326](https://github.com/USEPA/CMAQ_Dev/pull/1326)  |
 
 ## Avoid floating point exceptions in aerosol source apportionment algorithm
 **Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)       
 **Type of update**: Bug Fix  
-**Release Version/Date**:  CMAQv6.0 
+**Release Version**:  CMAQv6.0 
 
 **Description**:  
 ISAM encounters several floating-point exceptions when run in debug mode across all mechanisms. These are resolved by adding a minimum value to the denominator in each case.
@@ -129,7 +130,7 @@ This change will resolve unstable growth of small numerical noise in ISAM runs, 
 ## Adds pcVOC and NOy species to ISAM species lists
 **Ben Murphy**, U.S. Environmental Protection Agency (Please direct questions to [CMAQ_Team@epa.gov](mailto:CMAQ_Team@epa.gov).)  
 **Type of update**: Bug Fix  
-**Release Version/Date**:  CMAQv5.5+
+**Release Version**:  CMAQv5.5+
 
 **Description**:  
 The species pcVOC, CRON, and OPAN were missing from the VOC, NOY and NOY species lists in ISAM. This can cause discrepancies when propagating source apportionment through the VOC and NOY systems. For example, with pcVOC missing, an unexplainable magnitude of mass is reclassified into the 'OTHER' category. It is also impossible for ELMO to calculate ISAM_NOY from CB6 mechanisms because ELMO's definition of NOY (in the chemical control file) does not match the list of species available.

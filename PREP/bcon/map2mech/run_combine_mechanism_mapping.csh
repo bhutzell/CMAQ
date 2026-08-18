@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-# ====================== COMBINE_v5.4 Run Script ======================== 
+# ====================== COMBINE_v6.X Run Script ======================== 
 # Usage: run.combine.uncoupled.csh >&! combine_v53_uncoupled.log &                                
 #
 # To report problems or request help with this script/program:     
@@ -15,7 +15,7 @@ set compiler        = intel
 set compilerVrsn    = 18.0
 set compilerString  = ${compiler}${compilerVrsn}
 
-set VRSN            = v54
+set VRSN            = v6
 
 set BINDIR          = $CMAQ_HOME/POST/combine/scripts/BLD_combine_${VRSN}_${compilerString}
 

@@ -32,8 +32,8 @@ The CMAQ release includes several optional utilities for model developers. These
 
 <!-- BEGIN COMMENT -->
 
-[<< Previous Chapter](CMAQ_UG_ch01_overview.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch03_preparing_compute_environment.md)
-CMAQv5.5 User's Guide <br>
+[<< Previous Chapter](CMAQ_UG_ch01_overview.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch03_preparing_compute_environment.md)  
+CMAQv6.0 User's Guide <br>
 
 <!-- END COMMENT -->
 

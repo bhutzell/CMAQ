@@ -64,8 +64,6 @@ The following limited updates were made to **aqchem**:
 
 **Significance and Impact**:  These updates are needed to support transparency in model development and maintenance. Specifically, the streamlined mapping approach will support addition of aerosol modes and support of aerosol size section options in the future.
 
-**Internal PRs**: [PR#1130](https://github.com/USEPA/CMAQ_Dev/pull/1130)  
-
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1130](https://github.com/USEPA/CMAQ/commit/8d607848cdfe7b1f1b139dbb968145f092fb9714) | [PR#1130](https://github.com/USEPA/CMAQ_Dev/pull/1130)  |

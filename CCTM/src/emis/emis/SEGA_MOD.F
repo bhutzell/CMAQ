@@ -54,30 +54,29 @@ C    This module estimates soil NO and HONO emissions using a BDSNP type approac
      &              0.61 /                       ! HONO
       REAL :: EF_LU( 11 )                        ! NO Emission Factor gN/(km2 hr)
 ! Global geometric mean Steinkamp and Lawrence 2011 www.atmos-chem-phys.net/11/6063/2011/
-!      DATA EF_LU / 0.00,                         ! Water
-!     &             0.00,                         ! Ice
-!     &             0.43,                         ! Barren
-!     &             0.46,                         ! Urban
-!     &             1.23,                         ! Grassland
-!     &             1.23,                         ! Non-growing season ag
-!     &             1.07,                         ! Shrubland
-!     &             1.66,                         ! ENL
-!     &             0.44,                         ! EBL
-!     &             0.35,                         ! DNL
-!     &             0.08/                         ! DBL     
-! Global mean Steinkamp and Lawrence 2011 www.atmos-chem-phys.net/11/6063/2011/
       DATA EF_LU / 0.00,                         ! Water
      &             0.00,                         ! Ice
      &             0.43,                         ! Barren
      &             0.46,                         ! Urban
-     &             1.78,                         ! Grassland
-     &             3.13,                         ! Non-growing season ag
-     &             1.07,                         ! Shrubland
-     &             4.60,                         ! ENL
-     &             1.14,                         ! EBL
-     &             0.95,                         ! DNL
-     &             0.95/                         ! DBL     
-!      REAL            :: DX1, DX2                ! CX x1- and x2-cell widths    
+     &             0.42,                         ! Grassland
+     &             0.57,                         ! Non-growing season ag
+     &             0.09,                         ! Shrubland
+     &             1.66,                         ! ENL
+     &             0.44,                         ! EBL
+     &             0.35,                         ! DNL
+     &             0.08/                         ! DBL     
+! Global mean Steinkamp and Lawrence 2011 www.atmos-chem-phys.net/11/6063/2011/
+!      DATA EF_LU / 0.00,                         !! Water
+!     &             0.00,                         !! Ice
+!     &             0.43,                         !! Barren
+!     &             0.46,                         !! Urban
+!     &             1.78,                         !! Grassland
+!     &             3.13,                         !! Non-growing season ag
+!     &             0.21,                         ! Shrubland 
+!     &             4.60,                         ! ENL
+!     &             1.14,                         ! EBL
+!     &             0.95,                         ! DNL
+!     &             0.95/                         ! DBL     
       REAL, SAVE      :: GRID_AREA               ! horizontal area of cells, km**2   
       REAL, SAVE      :: UNIT_CON                ! converts from gN/(km2 hr) to mol/s   
      
@@ -543,29 +542,6 @@ C Local Variables
 
          END FUNCTION PULSING!_____
 
-         REAL FUNCTION DAY_LENGTH( DOY, LAT )
-C Computes the day length as a function of day of the year and lattitude
-
-         IMPLICIT NONE
-         
-C Function arguments:
-         REAL, INTENT( IN ) :: DOY
-         REAL, INTENT( IN ) :: LAT
-
-! Day length function
-         Real            :: hourang              ! noon hour solar angle
-         Real            :: delang               ! solar declanation angle
-         Real            :: daylen               ! day length (h)
-         Real, Parameter :: D_OFF  = 172.0       ! Summer Solstice in northern hemisphere
-         Real, Parameter :: ANGODY = 360.0/365.0 !* PIO180 
-
-C-----------------------------------------------------------------------
-         delang       = PI180 * min(max(23.45 * COS( ANGODY * PI180* ( DOY - D_OFF )),-89.0),89.0)
-         hourang      = min(max(-tan( delang ) * tan( PI180 * LAT ),-0.99),0.99)
-         DAY_LENGTH   = 2.0/15.0 * acos(hourang)/PI180
-         return
-
-         END FUNCTION DAY_LENGTH
 
          REAL FUNCTION FERT_ADJ( DATE, LAT, TS )
 
@@ -582,45 +558,38 @@ C Function arguments:
 
 C Local variables:
          Real     DOY       ! Day of the year (max 365)
-         Real     DOY_YEST  ! DOY for yesterday
 ! Day length function
-         Real            :: ddldt                ! d(day length)/dt (h/day)
-         Real            :: Fdl                  ! Day length function
+         Real            :: Fdmax = 166          ! Peak fertilizer date in northern hemisphere
+         Real            :: Fsig  = 90           ! Sigma for fertilizer function
+         Real            :: Dfd                  ! Delta from peak day
+         Real            :: Fdl                  ! Fertilizer day function
          Real            :: SDDL                 ! Day length Sandard Deviation (day)
 ! Temperature function
-         Real, Parameter :: Tmin  = 283.15 ! Soil Temerature of fertilzation peak
+         Real, Parameter :: Tmin  = 295    ! Soil temperature of fertilization peak
          Real, Parameter :: SDT   = 5.0    ! Temperature standard deviation K (change from 8 to 6 for sensitivity)
          Real, Parameter :: ExdDl = -4.0   ! Asymtotic exponent for day length difference function (day/h)
-         Real            :: FTs            ! Day length function
+         Real            :: FTs            ! Soil temperature function
          Real            :: FMIN           ! Minimum normalized soil nutrient status
 
 
 C-----------------------------------------------------------------------
 
          DOY      = FLOAT( MOD( DATE, 1000 ) )
-         if(DOY .eq. 1.0 ) Then
-            DOY_YEST = 365.0
-         else 
-            DOY_YEST = DOY - 1.0
-         end if
-         ! very near the equator the denominator for the calculation of ddldt
-         ! becomes zero, so avoid division by zero for that case
-         if( abs( DAY_LENGTH(81.0, LAT) - DAY_LENGTH(80.0, LAT) ) .lt. 1e-30 ) Then
-            ddldt = 0
-         else
-            ddldt    = ( DAY_LENGTH(DOY, LAT)  - DAY_LENGTH(DOY_YEST, LAT) ) /
-     &              abs( DAY_LENGTH(81.0, LAT) - DAY_LENGTH(80.0, LAT) )
-         endif
          SDDL     = min(0.9,(115-abs(LAT))/100)
-         Fdl      = exp(-(ddldt-1.0)**2/(2.0 * SDDL**2)) 
-         FTs      = exp(-0.5*((TS-TMin)/SDT)**2)
+         If( LAT > 0) Then
+            Dfd   = MOD((DOY - Fdmax) + (0.5 * 365), 365.) - (0.5 * 365)
+         Else
+            Dfd   = MOD((DOY - Fdmax + 365), 365.) - (0.5 * 365)
+         End If
+         Fdl      = exp(-1.2*(Dfd/(Fsig * SDDL))**2)
+         FTs      = exp(-1.2*((TS-TMin)/SDT)**2)
          FERT_ADJ = Fdl*FTs
          If( abs(LAT) > 23.4 ) Then
             FMIN  = 1.17/abs(LAT)
          Else 
             FMIN  = 0.05
          End If
-         if(Ts .Gt. 283.15) FERT_ADJ = max(FERT_ADJ, FMIN)
+         if(Ts .Gt. 295) FERT_ADJ = max(FERT_ADJ, FMIN)
 
          RETURN
          
@@ -649,8 +618,8 @@ C e.g. https://www.agry.purdue.edu/ext/corn/news/timeless/Emergence.html. Using 
          Else 
             CRF = 1.0
          End If
-         CRF = min(CRF, 0.4)
-
+         CRF = max(CRF, 0.4)
+         CRF = min(CRF, 1.0) 
          RETURN
       
          END FUNCTION CRF
@@ -700,8 +669,8 @@ C Function arguments:
          REAL,    INTENT( IN ) :: TS
 ! Fertilizer EF matched to the FERT_ADJ seasonality and global NO emission total of 9.5 Tg to match Weng et al. 2020
 ! based an annual 2018 MPAS simulation
-         REAL, PARAMETER       :: EF_FERT = 44.0  ! gN/(km2 hr) Mineral fertilzier
-         REAL, PARAMETER       :: EF_AGO  =  3.13 ! gN/(km2 hr) Global Ag mean from Steinkamp and Lawrence 2011 www.atmos-chem-phys.net/11/6063/2011/
+         REAL, PARAMETER       :: EF_FERT =  20.   ! gN/(km2 hr) Mineral fertilzier
+         REAL, PARAMETER       :: EF_AGO  =  0.57 ! gN/(km2 hr) Global Ag mean from Steinkamp and Lawrence 2011 www.atmos-chem-phys.net/11/6063/2011/
 
 C-----------------------------------------------------------------------
          EF_AG = frac_lu(i_ag) * ( EF_AGO + FERT_ADJ( DATE, LAT, TS )*EF_FERT )

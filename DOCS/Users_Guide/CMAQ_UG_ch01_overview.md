@@ -49,7 +49,7 @@ Designed under a community-modeling paradigm, CMAQ is distributed as open-source
 -   Designed for modularity, CMAQ uses standardized input/output (I/O) routines to facilitate extensibility.
 -   The diverse and continually growing community of CMAQ developers provides an excellent forum for discussing development-related topics of all kinds.
 
-The CMAQ modeling system is being developed and maintained under the leadership of the [EPA Office of Research and Development](https://www.epa.gov/aboutepa/about-office-research-and-development-ord) in Research Triangle Park, NC. CMAQ represents nearly three decades of research in atmospheric modeling and has been in active development since the early 1990s. The first public release of CMAQ was in 1998 to enable use by air quality scientists, policy makers, and stakeholder groups to address multiscale, multipollutant air quality concerns. Since then, through a series of phased development activities, new versions of the CMAQ modeling system are periodically released for use by the growing user community.
+The CMAQ modeling system is being developed and maintained under the leadership of the [EPA Office of Air and Radiation](https://www.epa.gov/aboutepa/about-office-air-and-radiation) in Research Triangle Park, NC. CMAQ represents nearly three decades of research in atmospheric modeling and has been in active development since the early 1990s. The first public release of CMAQ was in 1998 to enable use by air quality scientists, policy makers, and stakeholder groups to address multiscale, multipollutant air quality concerns. Since then, through a series of phased development activities, new versions of the CMAQ modeling system are periodically released for use by the growing user community.
 
 ## 1.3 Diagnostics, Tools, and Instrumented Models
 In addition to the air pollutant concentration and deposition fields output by CMAQ, the modeling system can also be instrumented to compute and output additional diagnostic information that can be used to probe the workings of the atmosphere as well as inform and guide policy inferences. These instrumented configurations include:
@@ -96,6 +96,6 @@ ___
 <!-- BEGIN COMMENT -->
 
 [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch02_program_structure.md)<br>
-CMAQv5.5 User's Guide <br>
+CMAQv6.0 User's Guide <br>
 
 <!-- END COMMENT -->

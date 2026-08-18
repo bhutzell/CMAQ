@@ -1,12 +1,12 @@
 #!/bin/csh -fx
 
-# ============ CSQY_TABLE_PROCESSOR_v5.5.x Build Script ================= #
-# Usage: bldrun_create_ebi.csh [compiler] >&! bldrun_create_ebi.log   #
-# Options for [compiler]: intel | gcc | pgi                           #
-#                                                                     #
-# To report problems or request help with this script/program:        #
-#             http://www.cmascenter.org                               #
-# =================================================================== #
+# ============ CSQY_TABLE_PROCESSOR_v6.X Build Script =============================== #
+# Usage: bldrun.inline_phot_preproc.csh [compiler] >&! bldrun.inline_phot_preproc.log #
+# Options for [compiler]: intel | gcc | pgi                                           #
+#                                                                                     #
+# To report problems or request help with this script/program:                        #
+#             http://www.cmascenter.org                                               #
+# =================================================================================== #
 
 # =======================================================================
 #> Preliminary error checking and environment configuration
@@ -78,7 +78,7 @@ unset echo
     setenv OUTDIR   ${WORKDIR}/output/${MECH}
  endif
 
- set VRSN =      v55                                 #> model version
+ set VRSN =      v6                                   #> model version
  setenv EXEC     CSQY_TABLE_PROCESSOR_${VRSN}.exe     #> executable name for this application
  setenv WORKREPO ${REPOROOT}
  setenv BLDIR    ${WORKDIR}/scripts/BLD_CSQY_TABLE_${VRSN}_${compilerString}
