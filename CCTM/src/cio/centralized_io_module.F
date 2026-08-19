@@ -908,7 +908,6 @@
           ELSE
              n_opened_file = n_opened_file + 1
              LUCRO_AVAIL = .TRUE.
-             print*,'LUCRO_AVAIL = ',LUCRO_AVAIL
              IF ( .NOT. DESC3( LUFRAC_CRO ) ) THEN
                 XMSG = 'Could not get ' // LUFRAC_CRO //' file description'
                 CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
@@ -926,9 +925,6 @@
              XMSG = 'Could not get ' // MET_CRO_2D //' file description'
              CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
           END IF
-          DO V = 1,NVARS3D
-             print*," METCRO2D var: ",TRIM(VNAME3D(V))," ",TRIM(UNITS3D(V))
-          END DO
 
           file_sdate(f_met) = sdate3d
           file_stime(f_met) = stime3d
@@ -1587,7 +1583,6 @@
           do v = 1, n_cio_grid_vars
 
 ! locate certain species
-             print*,v,cio_grid_var_name(v,1)," ",cio_grid_var_name(v,2)
              if (cio_grid_var_name(v,1) .eq. 'TEMPG') then
                 tempg_loc = v
              else if (cio_grid_var_name(v,1) .eq. 'TSEASFC') then
@@ -2004,7 +1999,6 @@
 #ifndef mpas
 ! assign TEMPG to TSEASFC when TSEASFC is not available in the input file
 #ifndef twoway
-             print*,"tempg_loc,tseasfc_loc = ",tempg_loc,tseasfc_loc
              if (.not. TSEASFC_AVAIL) then
                 begin = cio_grid_data_inx(1,buf_loc,tempg_loc)
                 end   = cio_grid_data_inx(2,buf_loc,tempg_loc)
