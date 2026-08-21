@@ -110,9 +110,6 @@ c...Allocatable arrays
       REAL( 8 ), ALLOCATABLE ::  RJIN    ( :, : )  ! J-values for a cell
       REAL( 8 ), ALLOCATABLE ::  SEAWATER ( : )    ! fractional area of OPEN+SURF for specific cell
 
-#ifdef isam
-      REAL( 8 ), ALLOCATABLE ::  YAVE ( : )        ! average over chemistry species over integration time
-#endif      
 c..Species indices
       INTEGER, PARAMETER :: O3               =    1
       INTEGER, PARAMETER :: O3P              =    2

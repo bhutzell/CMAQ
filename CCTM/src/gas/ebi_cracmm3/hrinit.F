@@ -138,6 +138,7 @@ C***********************************************************************
           CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
        END IF
 
+<<<<<<< Updated upstream
 #ifdef isam
       ALLOCATE( YAVE ( NUMB_MECH_SPC), STAT = IOS )
       IF ( IOS .NE. 0 ) THEN
@@ -145,6 +146,8 @@ C***********************************************************************
          CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
       END IF
 #endif      
+=======
+>>>>>>> Stashed changes
 c..Allocate and define ebi species
 
       N_EBISP  = 200

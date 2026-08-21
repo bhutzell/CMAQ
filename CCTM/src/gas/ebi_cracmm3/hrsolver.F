@@ -373,10 +373,17 @@ C  Compute average
 !     &                   + ( ( 0.5D0 * DTC ) * ( YC + YC0 )  )
                     YAVE = YAVE / CHEMSTEP                   
 !                    YAVE = YC
+<<<<<<< Updated upstream
 !                     CALL SOLVE_ISAM_CHEM ( UPDATE_SOLD, RKI, YAVE, CHEMSTEP, IOLD2NEW, INEW2OLD )
 !                     CALL SOLVE_ISAM_CHEM ( UPDATE_SOLD, RKI, YAVE, CHEMSTEP )
 !                     CALL REAL4_ISAM_CHEM ( UPDATE_SOLD, RKI, YAVE, CHEMSTEP )
                       CALL REAL8_ISAM_CHEM ( UPDATE_SOLD, RKI, YAVE, CHEMSTEP )
+=======
+!                     CALL SOLVE_ISAM_CHEM ( UPDATE_SOLD, RKI, YC, CHEMSTEP, IOLD2NEW, INEW2OLD )
+!                     CALL SOLVE_ISAM_CHEM ( UPDATE_SOLD, RKI, YC, CHEMSTEP )
+                      CALL REAL4_ISAM_CHEM ( UPDATE_SOLD, RKI, YC, CHEMSTEP )
+!                     CALL REAL8_ISAM_CHEM ( UPDATE_SOLD, RKI, YC, CHEMSTEP )
+>>>>>>> Stashed changes
                     UPDATE_PROBABILITIES = .FALSE.
 !                 ELSE
 !C Update the sum for the average over the chemistry integration
